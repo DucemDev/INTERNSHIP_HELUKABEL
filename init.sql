@@ -146,13 +146,13 @@ GO
 
 -- 3.2 INSERT USERS (ADMIN & SELLERS)
 INSERT INTO [user] (user_id, user_code, password, full_name, email, role_id, is_active) VALUES
-('46972d0d-5d96-4be8-be4a-bb0181243ba8', 'AD001', 'hashed_pass_123', N'Administrator', 'admin@helukabel.vn', 1, 1),
-('498e0fc7-6278-45fc-a374-1a81096727d2', 'NV001', 'hashed_pass_123', N'Vo Duc Thanh', 'thanh0@helukabel.vn', 2, 1),
-('f7809b53-55a5-43cc-b66b-73253bca0050', 'NV002', 'hashed_pass_123', N'Nguyen Thi Thu Huong', 'huong1@helukabel.vn', 2, 1),
-('62b15d9e-50fe-452f-a47a-3a1cd889e7bd', 'NV003', 'hashed_pass_123', N'Tran Quoc Minh', 'minh2@helukabel.vn', 2, 1),
-('742ce50d-08d4-4ed7-851b-946b5e990490', 'NV004', 'hashed_pass_123', N'Pham Thi Ngoc Lan', 'lan3@helukabel.vn', 2, 1),
-('1bc4b944-8597-4944-a590-ba9f66c6130d', 'NV005', 'hashed_pass_123', N'Le Van Hung', 'hung4@helukabel.vn', 2, 1),
-('f15e174c-73e5-4a14-9121-d2c62b89ad8b', 'NV006', 'hashed_pass_123', N'Hoang Minh Tuan', 'tuan5@helukabel.vn', 2, 1);
+('46972d0d-5d96-4be8-be4a-bb0181243ba8', 'AD001', '123', N'Administrator', 'admin@helukabel.vn', 1, 1),
+('498e0fc7-6278-45fc-a374-1a81096727d2', 'NV001', '123', N'Vo Duc Thanh', 'thanh0@helukabel.vn', 2, 1),
+('f7809b53-55a5-43cc-b66b-73253bca0050', 'NV002', '123', N'Nguyen Thi Thu Huong', 'huong1@helukabel.vn', 2, 1),
+('62b15d9e-50fe-452f-a47a-3a1cd889e7bd', 'NV003', '123', N'Tran Quoc Minh', 'minh2@helukabel.vn', 2, 1),
+('742ce50d-08d4-4ed7-851b-946b5e990490', 'NV004', '123', N'Pham Thi Ngoc Lan', 'lan3@helukabel.vn', 2, 1),
+('1bc4b944-8597-4944-a590-ba9f66c6130d', 'NV005', '123', N'Le Van Hung', 'hung4@helukabel.vn', 2, 1),
+('f15e174c-73e5-4a14-9121-d2c62b89ad8b', 'NV006', '123', N'Hoang Minh Tuan', 'tuan5@helukabel.vn', 2, 1);
 GO
 
 -- 3.3 INSERT LEAD SOURCES
