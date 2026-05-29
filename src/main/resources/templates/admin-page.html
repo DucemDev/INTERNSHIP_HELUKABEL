@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard - INTERNSHIP 2026</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav>
+        <div class="logo">HELUKABEL | ADMIN</div>
+        <div>
+            <a href="/admin">Dashboard</a>
+            <a href="/api/users" target="_blank">Quản lý Users</a>
+            <a href="/api/leads" target="_blank">Hệ thống Leads</a>
+            <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 1.5rem;">
+                <button type="submit" class="btn btn-black" style="padding: 0.4rem 0.8rem;">Đăng xuất</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container" style="border-top: 5px solid var(--primary-red);">
+        <h1>Hệ Thống Quản Trị (Admin)</h1>
+        <p style="color: #666; margin-bottom: 2.5rem;">Chào mừng Quản trị viên. Bạn có toàn quyền truy cập hệ thống.</p>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Tổng số Leads</h3>
+                <div class="value">150</div>
+                <p>Toàn hệ thống</p>
+            </div>
+            <div class="card">
+                <h3>Tổng số Nhân viên</h3>
+                <div class="value">6</div>
+                <p>Đang hoạt động</p>
+            </div>
+            <div class="card">
+                <h3>Yêu cầu phê duyệt</h3>
+                <div class="value">0</div>
+                <p>Không có yêu cầu mới</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 3rem;">
+            <h2>Công cụ quản trị</h2>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <a href="/api/users" class="btn btn-primary">Thêm tài khoản mới</a>
+                <a href="/api/leads" class="btn btn-black">Xuất báo cáo Leads</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
