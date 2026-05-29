@@ -1,14 +1,17 @@
-#
-#spring.application.name=INTERNSHIP
-server:
-  port: 8080
-
 spring:
   application:
     name: INTERNSHIP
+
   datasource:
-    url:
-    username:
-    password:
+    url: jdbc:sqlserver://localhost:1433;databaseName=INTERNSHIP_2026;encrypt=true;trustServerCertificate=true
+    username: sa
+    password: 123456789
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
-
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
