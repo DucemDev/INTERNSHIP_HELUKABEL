@@ -39,6 +39,13 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    public UserResponse getUserByCode(String userCode) {
+        UserEntity user = userRepo.findByUserCode(userCode)
+                .orElseThrow(() -> new RuntimeException("User not found with code: " + userCode));
+        return mapToResponse(user);
+    }
+
+    @Override
     @Transactional
     public UserResponse createUser(UserRequest request) {
         RoleEntity role = roleRepo.findById(request.getRoleId())

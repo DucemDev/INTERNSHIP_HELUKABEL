@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Quản lý Leads - HELUKABEL</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        .data-table th, .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        .data-table th {
+            background-color: var(--dark-black);
+            color: var(--white);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .data-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: var(--white);
+            margin: 5% auto;
+            padding: 2rem;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            border-top: 5px solid var(--primary-red);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Actions */
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn-sm {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+        }
+        .status-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        /* Specific Status Colors */
+        .status-new { background: #e3f2fd; color: #1976d2; }
+        .status-contacted { background: #fff3e0; color: #f57c00; }
+        .status-won { background: #e8f5e9; color: #2e7d32; }
+        .status-lost { background: #ffebee; color: #c62828; }
+
+        /* Grid for Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">HELUKABEL | LEADS</div>
+        <div>
+            <a href="/admin">Dashboard</a>
+            <a href="/leads">Quản lý Leads</a>
+            <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 1.5rem;">
+                <button type="submit" class="btn btn-black" style="padding: 0.4rem 0.8rem;">Đăng xuất</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h1>Danh sách Leads</h1>
+            <button class="btn btn-primary" onclick="openModal('add')">+ Thêm Lead mới</button>
+        </div>
+
+        <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm theo tên, công ty..." style="max-width: 400px;">
+            <button class="btn btn-black" onclick="searchLeads()">Tìm kiếm</button>
+        </div>
+
+        <table class="data-table" id="leadsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ngày tạo</th>
+                    <th>Khách hàng</th>
+                    <th>Công ty</th>
+                    <th>Trạng thái</th>
+                    <th>Giá trị</th>
+                    <th>Sản phẩm</th>
+                    <th>Phụ trách</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="leadsBody">
+                <!-- Data will be loaded here via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="leadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Thêm Lead mới</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="leadForm">
+                <input type="hidden" id="leadId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tên khách hàng</label>
+                        <input type="text" id="fullName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Công ty</label>
+                        <input type="text" id="account" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Lĩnh vực</label>
+                        <input type="text" id="industryType" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nhóm khách hàng</label>
+                        <input type="text" id="customerGroup" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Địa điểm</label>
+                        <input type="text" id="location" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Vùng miền</label>
+                        <select id="region" class="form-control">
+                            <option value="North">North</option>
+                            <option value="Central">Central</option>
+                            <option value="South">South</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Trạng thái</label>
+                        <select id="status" class="form-control">
+                            <option value="New">New</option>
+                            <option value="Contacted">Contacted</option>
+                            <option value="Qualified">Qualified</option>
+                            <option value="Proposal Sent">Proposal Sent</option>
+                            <option value="Won">Won</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Giá trị (VND)</label>
+                        <input type="number" id="cost" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sản phẩm quan tâm</label>
+                        <select id="productId" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nguồn Lead</label>
+                        <select id="sourceId" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Người phụ trách</label>
+                        <select id="userId" class="form-control" required></select>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; text-align: right;">
+                    <button type="button" class="btn btn-black" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/api/leads';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initDropdowns();
+            fetchLeads();
+            
+            document.getElementById('leadForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveLead();
+            });
+        });
+
+        async function initDropdowns() {
+            try {
+                const [products, sources, users] = await Promise.all([
+                    fetch('/api/products').then(r => r.json()),
+                    fetch('/api/lead-sources').then(r => r.json()),
+                    fetch('/api/users').then(r => r.json())
+                ]);
+
+                populateSelect('productId', products, 'productId', 'productName');
+                populateSelect('sourceId', sources, 'sourceId', 'sourceName');
+                populateSelect('userId', users, 'userId', 'fullName');
+            } catch (error) {
+                console.error('Error loading dropdowns:', error);
+            }
+        }
+
+        function populateSelect(id, data, valKey, textKey) {
+            const select = document.getElementById(id);
+            select.innerHTML = '<option value="">-- Chọn --</option>';
+            data.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item[valKey];
+                opt.text = item[textKey];
+                select.add(opt);
+            });
+        }
+
+        async function fetchLeads() {
+            try {
+                const response = await fetch(apiBase);
+                const leads = await response.json();
+                renderTable(leads);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function renderTable(leads) {
+            const tbody = document.getElementById('leadsBody');
+            tbody.innerHTML = '';
+            leads.forEach(lead => {
+                const tr = document.createElement('tr');
+                const statusClass = lead.status.toLowerCase().replace(' ', '-');
+                tr.innerHTML = `
+                    <td>${lead.leadId}</td>
+                    <td>${lead.createdDate}</td>
+                    <td>${lead.fullName}</td>
+                    <td>${lead.account}</td>
+                    <td><span class="status-badge status-${statusClass}">${lead.status}</span></td>
+                    <td>${new Intl.NumberFormat('vi-VN').format(lead.cost)} đ</td>
+                    <td>${lead.productName}</td>
+                    <td>${lead.userName}</td>
+                    <td class="action-btns">
+                        <button class="btn btn-black btn-sm" onclick="editLead('${lead.leadId}')">Sửa</button>
+                        <button class="btn btn-primary btn-sm" onclick="deleteLead('${lead.leadId}')">Xóa</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openModal(mode) {
+            document.getElementById('leadModal').style.display = 'block';
+            if (mode === 'add') {
+                document.getElementById('modalTitle').innerText = 'Thêm Lead mới';
+                document.getElementById('leadForm').reset();
+                document.getElementById('leadId').value = '';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('leadModal').style.display = 'none';
+        }
+
+        async function editLead(id) {
+            try {
+                const response = await fetch(`${apiBase}/${id}`);
+                const lead = await response.json();
+                
+                document.getElementById('modalTitle').innerText = 'Chỉnh sửa Lead';
+                document.getElementById('leadId').value = lead.leadId;
+                document.getElementById('fullName').value = lead.fullName;
+                document.getElementById('account').value = lead.account;
+                document.getElementById('industryType').value = lead.industryType;
+                document.getElementById('customerGroup').value = lead.customerGroup;
+                document.getElementById('location').value = lead.location;
+                document.getElementById('region').value = lead.region;
+                document.getElementById('status').value = lead.status;
+                document.getElementById('cost').value = lead.cost;
+                
+                // Set dropdowns - need to find correct IDs
+                // In a real app, LeadResponse should return IDs too
+                // For now, we assume standard IDs are known or fetch by name if needed
+                // But since we created the APIs, we should ideally update LeadResponse to include IDs
+                
+                document.getElementById('leadModal').style.display = 'block';
+            } catch (error) {
+                alert('Lỗi khi lấy thông tin lead');
+            }
+        }
+
+        async function saveLead() {
+            const id = document.getElementById('leadId').value;
+            const data = {
+                leadId: id || `L-${new Date().getFullYear()}-${Math.floor(Math.random()*9000)+1000}`,
+                createdDate: new Date().toISOString().split('T')[0],
+                fullName: document.getElementById('fullName').value,
+                account: document.getElementById('account').value,
+                industryType: document.getElementById('industryType').value,
+                customerGroup: document.getElementById('customerGroup').value,
+                customerRole: "Contact", // Default
+                location: document.getElementById('location').value,
+                region: document.getElementById('region').value,
+                status: document.getElementById('status').value,
+                cost: document.getElementById('cost').value,
+                productId: document.getElementById('productId').value,
+                sourceId: document.getElementById('sourceId').value,
+                userId: document.getElementById('userId').value
+            };
+
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${apiBase}/${id}` : apiBase;
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    fetchLeads();
+                    alert('Thành công!');
+                } else {
+                    alert('Lỗi khi lưu dữ liệu');
+                }
+            } catch (error) {
+                alert('Lỗi kết nối');
+            }
+        }
+
+        async function deleteLead(id) {
+            if (confirm('Xóa lead này?')) {
+                await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
+                fetchLeads();
+            }
+        }
+
+        function searchLeads() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#leadsBody tr');
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(input) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

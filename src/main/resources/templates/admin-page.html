@@ -10,8 +10,8 @@
         <div class="logo">HELUKABEL | ADMIN</div>
         <div>
             <a href="/admin">Dashboard</a>
-            <a href="/api/users" target="_blank">Quản lý Users</a>
-            <a href="/api/leads" target="_blank">Hệ thống Leads</a>
+            <a href="/users">Quản lý Nhân sự</a>
+            <a href="/leads">Hệ thống Leads</a>
             <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 1.5rem;">
                 <button type="submit" class="btn btn-black" style="padding: 0.4rem 0.8rem;">Đăng xuất</button>
             </form>
@@ -43,8 +43,8 @@
         <div style="margin-top: 3rem;">
             <h2>Công cụ quản trị</h2>
             <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <a href="/api/users" class="btn btn-primary">Thêm tài khoản mới</a>
-                <a href="/api/leads" class="btn btn-black">Xuất báo cáo Leads</a>
+                <a href="/users" class="btn btn-primary">Quản lý Nhân sự</a>
+                <a href="/leads" class="btn btn-black">Quản lý Leads</a>
             </div>
         </div>
     </div>
