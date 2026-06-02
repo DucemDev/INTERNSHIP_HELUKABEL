@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class LeadViewController {
 
     @GetMapping("/leads")
-    public String leadManagementPage() {
+    public String leadManagementPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "leads");
         return "lead/lead-management";
     }
 }

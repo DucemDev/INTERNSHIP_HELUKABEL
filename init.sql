@@ -60,6 +60,8 @@ CREATE TABLE lead (
                       lead_id VARCHAR(50) NOT NULL,
                       created_date DATE NOT NULL,
                       full_name NVARCHAR(100) NOT NULL,
+                      phone_number VARCHAR(20) NULL,
+                      email VARCHAR(100) NULL,
                       account NVARCHAR(150) NOT NULL,
                       industry_type NVARCHAR(100) NOT NULL,
                       customer_group NVARCHAR(50) NOT NULL,

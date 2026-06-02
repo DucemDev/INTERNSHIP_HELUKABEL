@@ -1,52 +1,110 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Admin Dashboard - INTERNSHIP 2026</title>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
-    <nav>
-        <div class="logo">HELUKABEL | ADMIN</div>
+    <main class="space-y-8">
         <div>
-            <a href="/admin">Dashboard</a>
-            <a href="/users">Quản lý Nhân sự</a>
-            <a href="/leads">Hệ thống Leads</a>
-            <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 1.5rem;">
-                <button type="submit" class="btn btn-black" style="padding: 0.4rem 0.8rem;">Đăng xuất</button>
-            </form>
-        </div>
-    </nav>
-
-    <div class="container" style="border-top: 5px solid var(--primary-red);">
-        <h1>Hệ Thống Quản Trị (Admin)</h1>
-        <p style="color: #666; margin-bottom: 2.5rem;">Chào mừng Quản trị viên. Bạn có toàn quyền truy cập hệ thống.</p>
-
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3>Tổng số Leads</h3>
-                <div class="value">150</div>
-                <p>Toàn hệ thống</p>
-            </div>
-            <div class="card">
-                <h3>Tổng số Nhân viên</h3>
-                <div class="value">6</div>
-                <p>Đang hoạt động</p>
-            </div>
-            <div class="card">
-                <h3>Yêu cầu phê duyệt</h3>
-                <div class="value">0</div>
-                <p>Không có yêu cầu mới</p>
-            </div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Hệ Thống Quản Trị (Dashboard)</h1>
+            <p class="mt-1 text-sm font-medium text-gray-500">Chào mừng Quản trị viên. Theo dõi hiệu suất CRM HELUKABEL của bạn.</p>
         </div>
 
-        <div style="margin-top: 3rem;">
-            <h2>Công cụ quản trị</h2>
-            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <a href="/users" class="btn btn-primary">Quản lý Nhân sự</a>
-                <a href="/leads" class="btn btn-black">Quản lý Leads</a>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Total Leads -->
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tổng số Leads</h3>
+                        <div class="mt-2 text-4xl font-extrabold text-helu-red tracking-tight">1,284</div>
+                    </div>
+                    <div class="rounded-2xl bg-red-50 p-3 text-helu-red shadow-sm">
+                        <i data-lucide="users" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="mt-6 flex items-center gap-2 text-xs font-bold text-emerald-600 bg-emerald-50 w-fit px-3 py-1.5 rounded-full">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    <span>+12% so với tháng trước</span>
+                </div>
+            </div>
+
+            <!-- Win Rate -->
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tỷ lệ thắng</h3>
+                        <div class="mt-2 text-4xl font-extrabold text-gray-900 tracking-tight">28.4%</div>
+                    </div>
+                    <div class="rounded-2xl bg-emerald-50 p-3 text-emerald-600 shadow-sm">
+                        <i data-lucide="target" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="mt-6 flex items-center gap-2 text-xs font-bold text-emerald-600 bg-emerald-50 w-fit px-3 py-1.5 rounded-full">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    <span>+5% so với tháng trước</span>
+                </div>
+            </div>
+
+            <!-- Expected Revenue -->
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Doanh thu dự kiến</h3>
+                        <div class="mt-2 text-4xl font-extrabold text-gray-900 tracking-tight">4.2 tỷ <span class="text-xl">đ</span></div>
+                    </div>
+                    <div class="rounded-2xl bg-amber-50 p-3 text-amber-600 shadow-sm">
+                        <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <p class="mt-6 text-xs font-medium text-gray-500 italic">Dựa trên 45 deals đang báo giá</p>
             </div>
         </div>
-    </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Recent Activities -->
+            <div class="lg:col-span-2 rounded-3xl border border-helu-border bg-white p-8 shadow-sm">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-xl font-extrabold text-gray-900 tracking-tight">Hoạt động gần đây</h2>
+                    <a href="#" class="text-sm font-bold text-helu-red hover:text-red-700 transition-colors">Xem tất cả</a>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex gap-4 group cursor-default">
+                        <div class="mt-1 flex h-2 w-2 rounded-full bg-helu-red ring-4 ring-red-50"></div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-700 leading-relaxed"><strong class="text-gray-900">Nguyễn Văn B</strong> đã thêm lead mới: <span class="font-bold text-helu-red">Công ty Cáp điện A</span></p>
+                            <span class="text-xs font-medium text-gray-400 mt-1 block">10 phút trước</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 group cursor-default">
+                        <div class="mt-1 flex h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-50"></div>
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-700 leading-relaxed"><strong class="text-gray-900">Trần Thị C</strong> đã chốt deal: <span class="font-bold text-emerald-600">Dự án Nhà máy Helu B</span></p>
+                            <span class="text-xs font-medium text-gray-400 mt-1 block">1 giờ trước</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Sellers -->
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm">
+                <h2 class="text-xl font-extrabold text-gray-900 tracking-tight mb-8">Top Sellers</h2>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4 group hover:bg-gray-50 p-2 rounded-2xl transition-all">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-helu-red font-bold text-white shadow-sm shadow-red-100">B</div>
+                        <div class="flex-1">
+                            <div class="text-sm font-bold text-gray-800">Nguyễn Văn B</div>
+                            <div class="text-xs font-bold text-gray-400">1.2 tỷ đ</div>
+                        </div>
+                        <div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+                    </div>
+                    <div class="flex items-center gap-4 group hover:bg-gray-50 p-2 rounded-2xl transition-all">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 font-bold text-gray-500 shadow-sm">D</div>
+                        <div class="flex-1">
+                            <div class="text-sm font-bold text-gray-800">Lê Văn D</div>
+                            <div class="text-xs font-bold text-gray-400">850 triệu đ</div>
+                        </div>
+                        <div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 </body>
 </html>

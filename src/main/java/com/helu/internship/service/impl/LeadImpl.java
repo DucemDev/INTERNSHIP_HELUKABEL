@@ -49,6 +49,8 @@ public class LeadImpl implements LeadService {
                 .leadId(request.getLeadId())
                 .createdDate(request.getCreatedDate())
                 .fullName(request.getFullName())
+                .phoneNumber(request.getPhoneNumber())
+                .email(request.getEmail())
                 .account(request.getAccount())
                 .industryType(request.getIndustryType())
                 .customerGroup(request.getCustomerGroup())
@@ -90,6 +92,8 @@ public class LeadImpl implements LeadService {
         }
 
         lead.setFullName(request.getFullName());
+        lead.setPhoneNumber(request.getPhoneNumber());
+        lead.setEmail(request.getEmail());
         lead.setAccount(request.getAccount());
         lead.setIndustryType(request.getIndustryType());
         lead.setCustomerGroup(request.getCustomerGroup());
@@ -115,6 +119,8 @@ public class LeadImpl implements LeadService {
                 .leadId(lead.getLeadId())
                 .createdDate(lead.getCreatedDate())
                 .fullName(lead.getFullName())
+                .phoneNumber(lead.getPhoneNumber())
+                .email(lead.getEmail())
                 .account(lead.getAccount())
                 .industryType(lead.getIndustryType())
                 .customerGroup(lead.getCustomerGroup())

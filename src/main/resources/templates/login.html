@@ -1,40 +1,123 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login - INTERNSHIP 2026</title>
+    <title>Đăng nhập - HELUKABEL CRM</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        helu: {
+                            red: '#f6171b',
+                            dark: '#1a1a1a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body style="background-color: #1a1a1a;">
-    <div class="login-box">
-        <div style="text-align: center; margin-bottom: 1.5rem;">
-            <span class="logo">HELUKABEL</span>
-        </div>
-        <h2>ĐĂNG NHẬP</h2>
-        
-        <div th:if="${param.error}" class="alert alert-danger">
-            Email hoặc mật khẩu không chính xác.
-        </div>
-        <div th:if="${param.logout}" class="alert alert-info">
-            Bạn đã đăng xuất thành công.
-        </div>
-        
-        <form th:action="@{/login}" method="post">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="text" name="username" class="form-control" placeholder="admin@helukabel.vn" required autofocus/>
-            </div>
-            <div class="form-group">
-                <label>Mật khẩu</label>
-                <input type="password" name="password" class="form-control" placeholder="******" required/>
-            </div>
-            <div style="margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary" style="width: 100%;">VÀO HỆ THỐNG</button>
-            </div>
-        </form>
-
-        <span>admin@helukabel.vn | password: 123</span>
-        <span>thanh0@helukabel.vn | password: 123</span>
+<body class="bg-gray-50 font-['Inter'] antialiased flex items-center justify-center min-h-screen p-6">
+    <!-- Background Decor -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-helu-red/5 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-gray-200/50 rounded-full blur-3xl"></div>
     </div>
+
+    <div class="relative w-full max-w-md">
+        <div class="bg-white rounded-[2.5rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
+            <!-- Branding -->
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-50 rounded-[2rem] mb-6 shadow-inner">
+                    <img th:src="@{/images/logo.png}" alt="HELUKABEL" class="h-8 w-auto object-contain">
+                </div>
+                <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight uppercase">Hệ Thống Quản Trị</h2>
+                <p class="text-sm font-medium text-gray-400 mt-2">Vui lòng đăng nhập để tiếp tục</p>
+            </div>
+
+            <!-- Alerts -->
+            <div th:if="${param.error}" class="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 flex items-center gap-3 text-red-600 animate-in fade-in zoom-in duration-300">
+                <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                <span class="text-sm font-bold">Sai email hoặc mật khẩu</span>
+            </div>
+            
+            <div th:if="${param.logout}" class="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 text-emerald-600 animate-in fade-in zoom-in duration-300">
+                <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                <span class="text-sm font-bold">Đăng xuất thành công</span>
+            </div>
+
+            <form th:action="@{/login}" method="post" class="space-y-6">
+                <div class="space-y-2">
+                    <label class="text-[11px] font-bold uppercase tracking-widest text-gray-400 ml-1">Tài khoản Email</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-helu-red transition-colors">
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                        </div>
+                        <input type="email" name="username" class="h-14 w-full rounded-2xl border border-gray-100 bg-gray-50 pl-14 pr-5 text-sm font-semibold outline-none focus:border-helu-red/50 focus:bg-white focus:ring-4 focus:ring-helu-red/5 transition-all shadow-sm shadow-inner" placeholder="admin@helukabel.vn" required autofocus/>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center ml-1">
+                        <label class="text-[11px] font-bold uppercase tracking-widest text-gray-400">Mật khẩu</label>
+                        <a href="#" class="text-[10px] font-bold text-helu-red hover:text-red-700 transition-colors uppercase tracking-tight">Quên mật khẩu?</a>
+                    </div>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-helu-red transition-colors">
+                            <i data-lucide="lock" class="w-5 h-5"></i>
+                        </div>
+                        <input type="password" name="password" class="h-14 w-full rounded-2xl border border-gray-100 bg-gray-50 pl-14 pr-5 text-sm font-semibold outline-none focus:border-helu-red/50 focus:bg-white focus:ring-4 focus:ring-helu-red/5 transition-all shadow-sm shadow-inner" placeholder="••••••••" required/>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="group relative h-14 w-full overflow-hidden rounded-2xl bg-helu-red text-sm font-bold text-white shadow-xl shadow-red-100 transition-all hover:scale-[1.01] hover:shadow-red-200 active:scale-[0.99] uppercase tracking-widest">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            Đăng Nhập Hệ Thống
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </span>
+                        <div class="absolute inset-0 z-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-500 -translate-x-full group-hover:translate-x-full"></div>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Test Accounts -->
+            <div class="mt-10 pt-8 border-t border-gray-50">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="h-px flex-1 bg-gray-100"></div>
+                    <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Tài khoản thử nghiệm</span>
+                    <div class="h-px flex-1 bg-gray-100"></div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100/50">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase">Quản trị</span>
+                        <span class="text-[11px] font-semibold text-gray-600">admin@helukabel.vn | 123</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100/50">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase">Nhân viên</span>
+                        <span class="text-[11px] font-semibold text-gray-600">thanh0@helukabel.vn | 123</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <p class="text-[11px] text-gray-400 font-medium tracking-tight">
+                &copy; 2026 HELUKABEL VIETNAM. CRM Version 2.0
+            </p>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>

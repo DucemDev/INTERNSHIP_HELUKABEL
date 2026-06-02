@@ -1,286 +1,300 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Quản lý Nhân sự - HELUKABEL</title>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <style>
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1.5rem;
-        }
-        .data-table th, .data-table td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--medium-gray);
-        }
-        .data-table th {
-            background-color: var(--dark-black);
-            color: var(--white);
-        }
-        .data-table tr:hover { background-color: #f9f9f9; }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: var(--white);
-            margin: 10% auto;
-            padding: 2rem;
-            width: 500px;
-            border-radius: 8px;
-            border-top: 5px solid var(--primary-red);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .status-active { color: #2e7d32; font-weight: bold; }
-        .status-inactive { color: #c62828; font-weight: bold; }
-        .action-btns { display: flex; gap: 0.5rem; }
-    </style>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
-    <nav>
-        <div class="logo">HELUKABEL | USERS</div>
-        <div>
-            <a href="/admin">Dashboard</a>
-            <a href="/users">Nhân sự</a>
-            <a href="/leads">Leads</a>
-            <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 1.5rem;">
-                <button type="submit" class="btn btn-black" style="padding: 0.4rem 0.8rem;">Đăng xuất</button>
-            </form>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h1>Quản lý Nhân sự (Sellers/Staff)</h1>
-            <button class="btn btn-primary" onclick="openModal('add')">+ Thêm tài khoản mới</button>
-        </div>
-
-        <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
-            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo Mã nhân viên (user_code) hoặc Tên..." style="max-width: 400px;">
-            <button class="btn btn-black" onclick="searchUsers()">Tìm kiếm</button>
-        </div>
-
-        <table class="data-table" id="userTable">
-            <thead>
-                <tr>
-                    <th>Mã nhân viên</th>
-                    <th>Họ và Tên</th>
-                    <th>Email</th>
-                    <th>Vai trò</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày tạo</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody id="userBody">
-                <!-- Data loaded via JS -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Modal -->
-    <div id="userModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Thêm người dùng</h2>
-                <span style="cursor:pointer; font-size:1.5rem;" onclick="closeModal()">&times;</span>
+    <main class="space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Quản lý Nhân sự</h1>
+                <p class="mt-1 text-sm font-medium text-gray-500">Quản lý danh sách nhân viên và phân quyền truy cập hệ thống.</p>
             </div>
-            <form id="userForm">
-                <input type="hidden" id="userId">
-                <div class="form-group">
-                    <label>Mã nhân viên (user_code)</label>
-                    <input type="text" id="userCode" class="form-control" required placeholder="Ví dụ: EMP0001">
-                </div>
-                <div class="form-group">
-                    <label>Họ và Tên</label>
-                    <input type="text" id="fullName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="email" class="form-control" required>
-                </div>
-                <div class="form-group" id="passwordGroup">
-                    <label>Mật khẩu</label>
-                    <input type="password" id="password" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label>Vai trò</label>
-                    <select id="roleId" class="form-control" required></select>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="isActive" checked> Đang hoạt động
-                    </label>
-                </div>
-                <div style="text-align: right; margin-top: 1rem;">
-                    <button type="button" class="btn btn-black" onclick="closeModal()">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu</button>
-                </div>
-            </form>
+            <div class="flex items-center gap-3">
+                <button class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all">
+                    <i data-lucide="download" class="w-4 h-4"></i> Xuất danh sách
+                </button>
+                <button class="inline-flex items-center gap-2 rounded-xl bg-helu-red px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all" onclick="openModal('add')">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Thêm nhân viên
+                </button>
+            </div>
         </div>
-    </div>
 
-    <script>
-        const apiBase = '/api/users';
-        let currentRoles = [];
+        <!-- Filter Bar -->
+        <div class="rounded-2xl border border-helu-border bg-white p-6 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Tìm kiếm nhân viên</label>
+                    <div class="relative group">
+                        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-helu-red transition-colors"></i>
+                        <input type="text" id="searchInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="Mã NV, Tên, Email..." onkeyup="filterUsers()">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Vai trò</label>
+                    <select id="roleFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterUsers()">
+                        <option value="">Tất cả vai trò</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Seller">Seller</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</label>
+                    <select id="statusFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterUsers()">
+                        <option value="">Tất cả</option>
+                        <option value="true">Đang hoạt động</option>
+                        <option value="false">Đã khóa</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Sắp xếp</label>
+                    <select id="sortFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterUsers()">
+                        <option value="name">Tên (A-Z)</option>
+                        <option value="code">Mã NV</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchRoles();
-            fetchUsers();
+        <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left" id="userTable">
+                    <thead>
+                        <tr class="border-b border-gray-100 bg-gray-50/50">
+                            <th class="w-16 py-4 px-6 text-center text-xs font-bold uppercase tracking-wider text-gray-400">STT</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Mã NV</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Họ và Tên</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Email</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Vai trò</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</th>
+                            <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userBody" class="divide-y divide-gray-50">
+                        <!-- Data loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
             
-            document.getElementById('userForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                saveUser();
-            });
+            <!-- Pagination Mockup -->
+            <div class="flex items-center justify-between border-t border-gray-100 bg-white px-6 py-4">
+                <div class="text-sm font-medium text-gray-500" id="recordCount">
+                    Hiển thị 0/0 bản ghi
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition-all">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                    <button class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-helu-red text-sm font-bold text-white shadow-md shadow-red-100">1</button>
+                    <button class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition-all">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-            // Gắn sự kiện enter cho ô tìm kiếm
-            document.getElementById('searchInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') searchUsers();
-            });
-        });
+        <!-- User Modal -->
+        <div id="userModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+            <div class="w-full max-w-xl rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="modalTitle">Thêm nhân sự mới</h2>
+                    <button onclick="closeModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <form id="userForm" class="space-y-6">
+                    <input type="hidden" id="userId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Mã nhân viên <span class="text-helu-red">*</span></label>
+                            <input type="text" id="userCode" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="VD: NV001">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Vai trò <span class="text-helu-red">*</span></label>
+                            <select id="roleId" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required></select>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700">Họ và Tên <span class="text-helu-red">*</span></label>
+                        <input type="text" id="fullName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Nhập đầy đủ họ tên">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700">Email <span class="text-helu-red">*</span></label>
+                        <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="username@helukabel.vn">
+                    </div>
+                    <div id="passwordField" class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700">Mật khẩu <span class="text-helu-red">*</span></label>
+                        <input type="password" id="password" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="Để trống nếu không muốn thay đổi">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="isActive" checked class="h-5 w-5 rounded-md border-gray-200 text-helu-red focus:ring-helu-red cursor-pointer">
+                        <label for="isActive" class="text-sm font-bold text-gray-700 cursor-pointer">Kích hoạt tài khoản</label>
+                    </div>
+                    <div class="flex items-center justify-end gap-3 pt-4">
+                        <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeModal()">Hủy bỏ</button>
+                        <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">Lưu thông tin</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-        async function fetchRoles() {
-            const res = await fetch('/api/roles');
-            currentRoles = await res.json();
-            const select = document.getElementById('roleId');
-            select.innerHTML = '<option value="">-- Chọn vai trò --</option>';
-            currentRoles.forEach(role => {
-                const opt = document.createElement('option');
-                opt.value = role.roleId;
-                opt.text = role.roleName;
-                select.add(opt);
-            });
-        }
+        <script>
+            const apiBase = '/api/users';
+            let allUsers = [];
 
-        async function fetchUsers() {
-            try {
-                const res = await fetch(apiBase);
-                const users = await res.json();
-                renderUsers(users);
-            } catch (error) {
-                console.error('Lỗi tải danh sách người dùng:', error);
+            async function fetchUsers() {
+                try {
+                    const res = await fetch(apiBase);
+                    allUsers = await res.json();
+                    renderUsers(allUsers);
+                } catch (error) { console.error(error); }
             }
-        }
 
-        function renderUsers(users) {
-            const tbody = document.getElementById('userBody');
-            tbody.innerHTML = '';
-            users.forEach(user => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${user.userCode}</strong></td>
-                    <td>${user.fullName}</td>
-                    <td>${user.email}</td>
-                    <td>${user.roleName}</td>
-                    <td><span class="${user.isActive ? 'status-active' : 'status-inactive'}">${user.isActive ? 'Active' : 'Locked'}</span></td>
-                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-                    <td class="action-btns">
-                        <button class="btn btn-black btn-sm" onclick="editUser('${user.userId}')">Sửa</button>
-                        <button class="btn btn-primary btn-sm" onclick="deleteUser('${user.userId}')">Xóa</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+            function renderUsers(users) {
+                const tbody = document.getElementById('userBody');
+                tbody.innerHTML = '';
+                users.forEach((user, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50/50 transition-colors";
+                    
+                    const roleBadgeClass = user.roleName === 'Admin' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600';
+                    const statusBadgeClass = user.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
 
-        function openModal(mode) {
-            document.getElementById('userModal').style.display = 'block';
-            document.getElementById('userForm').reset();
-            document.getElementById('userId').value = '';
-            document.getElementById('userCode').readOnly = false;
-            document.getElementById('passwordGroup').style.display = 'block';
-            document.getElementById('modalTitle').innerText = 'Thêm nhân sự mới';
-        }
+                    tr.innerHTML = `
+                        <td class="py-4 px-6 text-center text-sm font-medium text-gray-400">${index + 1}</td>
+                        <td class="py-4 px-6 text-sm font-extrabold text-gray-900">${user.userCode}</td>
+                        <td class="py-4 px-6">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-helu-red font-bold text-white text-xs shadow-sm">${user.fullName ? user.fullName.charAt(0) : '?'}</div>
+                                <span class="text-sm font-bold text-gray-800">${user.fullName}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6 text-sm font-medium text-gray-500">${user.email}</td>
+                        <td class="py-4 px-6">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider ${roleBadgeClass}">
+                                ${user.roleName}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider ${statusBadgeClass}">
+                                ${user.isActive ? 'Đang hoạt động' : 'Đã khóa'}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 text-right pr-10">
+                            <div class="flex items-center justify-end gap-2">
+                                <button class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" onclick="editUser('${user.userId}')">
+                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                </button>
+                                <button class="rounded-lg p-2 text-gray-400 hover:bg-rose-50 hover:text-rose-600 transition-all" onclick="deleteUser('${user.userId}')">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                document.getElementById('recordCount').innerText = `Hiển thị ${users.length}/${allUsers.length} bản ghi`;
+                lucide.createIcons();
+            }
 
-        function closeModal() {
-            document.getElementById('userModal').style.display = 'none';
-        }
+            function filterUsers() {
+                const search = document.getElementById('searchInput').value.toLowerCase();
+                const role = document.getElementById('roleFilter').value;
+                const status = document.getElementById('statusFilter').value;
+                const sort = document.getElementById('sortFilter').value;
 
-        async function editUser(id) {
-            const res = await fetch(`${apiBase}/${id}`);
-            const user = await res.json();
-            
-            document.getElementById('userId').value = user.userId;
-            document.getElementById('userCode').value = user.userCode;
-            document.getElementById('userCode').readOnly = true; // Thường mã NV không đổi khi sửa
-            document.getElementById('fullName').value = user.fullName;
-            document.getElementById('email').value = user.email;
-            document.getElementById('isActive').checked = user.isActive;
-            
-            const role = currentRoles.find(r => r.roleName === user.roleName);
-            if (role) document.getElementById('roleId').value = role.roleId;
+                let filtered = allUsers.filter(u => {
+                    const matchesSearch = u.fullName.toLowerCase().includes(search) || 
+                                          u.userCode.toLowerCase().includes(search) ||
+                                          u.email.toLowerCase().includes(search);
+                    const matchesRole = !role || u.roleName === role;
+                    const matchesStatus = status === "" || String(u.isActive) === status;
+                    return matchesSearch && matchesRole && matchesStatus;
+                });
 
-            document.getElementById('passwordGroup').style.display = 'none';
-            document.getElementById('modalTitle').innerText = 'Chỉnh sửa nhân sự';
-            document.getElementById('userModal').style.display = 'block';
-        }
+                if (sort === 'name') filtered.sort((a, b) => a.fullName.localeCompare(b.fullName));
+                else filtered.sort((a, b) => a.userCode.localeCompare(b.userCode));
 
-        async function saveUser() {
-            const id = document.getElementById('userId').value;
-            const data = {
-                userCode: document.getElementById('userCode').value,
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                roleId: document.getElementById('roleId').value,
-                isActive: document.getElementById('isActive').checked
+                renderUsers(filtered);
+            }
+
+            async function openModal(mode, id = null) {
+                const modal = document.getElementById('userModal');
+                const form = document.getElementById('userForm');
+                const title = document.getElementById('modalTitle');
+                form.reset();
+                document.getElementById('userId').value = '';
+                
+                await loadRoles();
+
+                if (mode === 'edit' && id) {
+                    title.innerText = 'Cập nhật nhân sự';
+                    const user = allUsers.find(u => u.userId === id);
+                    if (user) {
+                        document.getElementById('userId').value = user.userId;
+                        document.getElementById('userCode').value = user.userCode;
+                        document.getElementById('fullName').value = user.fullName;
+                        document.getElementById('email').value = user.email;
+                        document.getElementById('roleId').value = user.roleId;
+                        document.getElementById('isActive').checked = user.isActive;
+                    }
+                } else {
+                    title.innerText = 'Thêm nhân sự mới';
+                }
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            async function loadRoles() {
+                try {
+                    const res = await fetch('/api/roles');
+                    const roles = await res.json();
+                    const select = document.getElementById('roleId');
+                    select.innerHTML = roles.map(r => `<option value="${r.roleId}">${r.roleName}</option>`).join('');
+                } catch (e) { console.error(e); }
+            }
+
+            function closeModal() { 
+                const modal = document.getElementById('userModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            document.getElementById('userForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('userId').value;
+                const method = id ? 'PUT' : 'POST';
+                const url = id ? `${apiBase}/${id}` : apiBase;
+
+                const data = {
+                    userCode: document.getElementById('userCode').value,
+                    fullName: document.getElementById('fullName').value,
+                    email: document.getElementById('email').value,
+                    roleId: document.getElementById('roleId').value,
+                    isActive: document.getElementById('isActive').checked
+                };
+                
+                const pwd = document.getElementById('password').value;
+                if (pwd) data.password = pwd;
+
+                try {
+                    const res = await fetch(url, {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if (res.ok) { closeModal(); fetchUsers(); }
+                } catch (err) { console.error(err); }
             };
 
-            if (!id) {
-                data.password = document.getElementById('password').value || '123';
-            }
-
-            const method = id ? 'PUT' : 'POST';
-            const url = id ? `${apiBase}/${id}` : apiBase;
-
-            const res = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            if (res.ok) {
-                closeModal();
-                fetchUsers();
-                alert('Thành công!');
-            } else {
-                alert('Có lỗi xảy ra khi lưu!');
-            }
-        }
-
-        async function deleteUser(id) {
-            if (confirm('Xóa nhân viên này?')) {
-                await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
-                fetchUsers();
-            }
-        }
-
-        function searchUsers() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('#userBody tr');
-            rows.forEach(row => {
-                const userCode = row.cells[0].innerText.toLowerCase();
-                const fullName = row.cells[1].innerText.toLowerCase();
-                if (userCode.includes(keyword) || fullName.includes(keyword)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
+            async function deleteUser(id) {
+                if (confirm('Bạn có chắc muốn xóa nhân viên này?')) {
+                    try {
+                        const res = await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
+                        if (res.ok) fetchUsers();
+                    } catch (err) { console.error(err); }
                 }
-            });
-        }
-    </script>
+            }
+
+            document.addEventListener('DOMContentLoaded', fetchUsers);
+        </script>
+    </main>
 </body>
 </html>

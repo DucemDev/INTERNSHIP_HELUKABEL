@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class UserViewController {
 
     @GetMapping("/users")
-    public String userManagementPage() {
+    public String userManagementPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "users");
         return "user/user-management";
     }
 }
