@@ -1,17 +1,90 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Welcome - INTERNSHIP 2026</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELUKABEL CRM - Hệ Thống Quản Trị</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        helu: {
+                            red: '#f6171b',
+                            dark: '#1a1a1a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body style="background-color: var(--dark-black); color: var(--white); display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
-    <div style="text-align: center;">
-        <h1 style="font-size: 3rem; color: var(--primary-red);">HELUKABEL</h1>
-        <p style="font-size: 1.2rem; margin-bottom: 2rem;">HỆ THỐNG QUẢN TRỊ NỘI BỘ 2026</p>
-        <div>
-            <a href="/login" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;">BẮT ĐẦU NGAY</a>
+<body class="font-['Inter'] antialiased">
+    <div class="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-helu-red via-red-700 to-black overflow-hidden px-6 py-20">
+        <!-- Abstract Background Shapes -->
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-red-500/20 rounded-full blur-3xl"></div>
+
+        <div class="relative max-w-5xl w-full text-center">
+            <div class="inline-flex items-center justify-center p-4 bg-white/10 backdrop-blur-md rounded-3xl mb-12 shadow-2xl border border-white/20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <img th:src="@{/images/logo.png}" alt="Logo" class="h-16 w-auto brightness-0 invert">
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
+                HELUKABEL <span class="text-red-200">CRM</span>
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-red-50 mb-12 max-w-2xl mx-auto leading-relaxed opacity-90 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+                Giải pháp quản trị khách hàng và quy trình bán hàng thông minh dành riêng cho HELUKABEL Việt Nam.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
+                <a href="/login" class="inline-flex items-center justify-center px-10 py-5 bg-white text-helu-red text-lg font-extrabold rounded-full shadow-2xl shadow-black/20 hover:scale-105 transition-all active:scale-95">
+                    TRUY CẬP HỆ THỐNG
+                    <i data-lucide="arrow-right" class="ml-3 w-5 h-5"></i>
+                </a>
+                <a href="#" class="inline-flex items-center justify-center px-10 py-5 bg-transparent border-2 border-white/30 text-white text-lg font-bold rounded-full hover:bg-white/10 transition-all backdrop-blur-sm">
+                    TÌM HIỂU THÊM
+                </a>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
+                <div class="group p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl hover:bg-white/10 transition-all hover:-translate-y-2">
+                    <div class="inline-flex items-center justify-center w-14 h-14 bg-white/10 rounded-2xl mb-6 text-white group-hover:bg-helu-red transition-colors">
+                        <i data-lucide="users" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3 text-left">Quản lý Leads</h4>
+                    <p class="text-red-100/70 text-sm leading-relaxed text-left">Theo dõi 360 độ hành trình khách hàng từ lúc tiếp cận đến khi chốt đơn.</p>
+                </div>
+
+                <div class="group p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl hover:bg-white/10 transition-all hover:-translate-y-2">
+                    <div class="inline-flex items-center justify-center w-14 h-14 bg-white/10 rounded-2xl mb-6 text-white group-hover:bg-helu-red transition-colors">
+                        <i data-lucide="bot" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3 text-left">AI Chatbot</h4>
+                    <p class="text-red-100/70 text-sm leading-relaxed text-left">Tự động hóa hỗ trợ khách hàng và thu thập thông tin tiềm năng 24/7.</p>
+                </div>
+
+                <div class="group p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl hover:bg-white/10 transition-all hover:-translate-y-2">
+                    <div class="inline-flex items-center justify-center w-14 h-14 bg-white/10 rounded-2xl mb-6 text-white group-hover:bg-helu-red transition-colors">
+                        <i data-lucide="bar-chart-3" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3 text-left">Báo cáo Real-time</h4>
+                    <p class="text-red-100/70 text-sm leading-relaxed text-left">Hệ thống phân tích dữ liệu kinh doanh thông minh hỗ trợ ra quyết định.</p>
+                </div>
+            </div>
+            
+            <div class="mt-20 text-red-200/40 text-xs font-medium tracking-widest uppercase">
+                &copy; 2026 HELUKABEL VIETNAM. ALL RIGHTS RESERVED.
+            </div>
         </div>
     </div>
+    <script>lucide.createIcons();</script>
 </body>
 </html>

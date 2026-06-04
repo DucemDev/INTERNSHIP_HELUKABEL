@@ -1,51 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Staff Dashboard - INTERNSHIP 2026</title>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
-    <nav>
-        <div class="logo">HELUKABEL | STAFF</div>
+    <main class="space-y-8">
         <div>
-            <a href="/staff">Cá nhân</a>
-            <a href="/api/leads" target="_blank">Danh sách Leads</a>
-            <form th:action="@{/logout}" method="post" style="display: inline; margin-left: 1.5rem;">
-                <button type="submit" class="btn btn-black" style="padding: 0.4rem 0.8rem;">Đăng xuất</button>
-            </form>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Trang Nhân Viên (Staff)</h1>
+            <p class="mt-1 text-sm font-medium text-gray-500">Chào mừng bạn quay lại. Hãy cập nhật tiến độ công việc hôm nay.</p>
         </div>
-    </nav>
 
-    <div class="container" style="border-top: 5px solid var(--dark-black);">
-        <h1>Trang Nhân Viên (Staff)</h1>
-        <p style="color: #666; margin-bottom: 2.5rem;">Chào mừng bạn quay lại. Hãy cập nhật tiến độ công việc hôm nay.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- My Leads -->
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-gray-900">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Leads của tôi</h3>
+                <div class="mt-4 text-4xl font-extrabold text-gray-900 tracking-tight">25</div>
+                <p class="mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">Đang theo dõi</p>
+            </div>
 
-        <div class="dashboard-grid">
-            <div class="card" style="border-left-color: var(--dark-black);">
-                <h3>Leads của tôi</h3>
-                <div class="value">25</div>
-                <p>Đang theo dõi</p>
+            <!-- Won Target -->
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-helu-red">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Chỉ tiêu Won</h3>
+                <div class="mt-4 text-4xl font-extrabold text-helu-red tracking-tight">5/10</div>
+                <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Tháng này</p>
             </div>
-            <div class="card" style="border-left-color: var(--primary-red);">
-                <h3>Chỉ tiêu Won</h3>
-                <div class="value">5/10</div>
-                <p>Tháng này</p>
-            </div>
-            <div class="card" style="border-left-color: var(--medium-gray);">
-                <h3>Hoạt động gần đây</h3>
-                <div class="value">12</div>
-                <p>Tương tác trong ngày</p>
+
+            <!-- Recent Activity -->
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-gray-300">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Hoạt động gần đây</h3>
+                <div class="mt-4 text-4xl font-extrabold text-gray-900 tracking-tight">12</div>
+                <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Tương tác trong ngày</p>
             </div>
         </div>
 
-        <div style="margin-top: 3rem;">
-            <h2>Thao tác nhanh</h2>
-            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <a href="/api/leads" class="btn btn-primary">Thêm Lead mới</a>
-                <button class="btn btn-black">Gửi báo cáo ngày</button>
+        <div class="pt-8">
+            <h2 class="text-xl font-extrabold text-gray-900 tracking-tight mb-6">Thao tác nhanh</h2>
+            <div class="flex flex-wrap gap-4">
+                <a href="/leads" class="inline-flex items-center gap-2 rounded-2xl bg-helu-red px-8 py-4 text-sm font-extrabold text-white shadow-xl shadow-red-100 hover:bg-red-700 hover:-translate-y-1 transition-all active:scale-95">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    THÊM LEAD MỚI
+                </a>
+                <button class="inline-flex items-center gap-2 rounded-2xl bg-gray-900 px-8 py-4 text-sm font-extrabold text-white shadow-xl shadow-gray-200 hover:bg-black hover:-translate-y-1 transition-all active:scale-95">
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                    GỬI BÁO CÁO NGÀY
+                </button>
             </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

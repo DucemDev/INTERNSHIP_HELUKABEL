@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELUKABEL CRM</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main CSS -->
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        helu: {
+                            red: '#f6171b',
+                            dark: '#1a1a1a',
+                            light: '#f7f7f7',
+                            border: '#eeeeee'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 font-['Inter'] antialiased">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col lg:ml-64 transition-all duration-300">
+            <!-- Header -->
+            <div th:replace="~{fragments/header :: header}"></div>
+
+            <!-- Content Body -->
+            <div class="p-8 mt-20">
+                <div th:replace="${content}"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Lucide icons globally
+        lucide.createIcons();
+    </script>
+</body>
+</html>

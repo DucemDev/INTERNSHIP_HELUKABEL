@@ -25,6 +25,12 @@ public class LeadEntity {
     @Column(name = "full_name", length = 100, nullable = false)
     private String fullName;
 
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
+
+    @Column(name = "email", length = 100)
+    private String email;
+
     @Column(name = "account", length = 150, nullable = false)
     private String account;
 
