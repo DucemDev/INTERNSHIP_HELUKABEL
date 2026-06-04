@@ -73,19 +73,13 @@
                 </table>
             </div>
             
-            <!-- Pagination Mockup -->
+            <!-- Pagination -->
             <div class="flex items-center justify-between border-t border-gray-100 bg-white px-6 py-4">
                 <div class="text-sm font-medium text-gray-500" id="recordCount">
                     Hiển thị 0/0 bản ghi
                 </div>
-                <div class="flex items-center gap-2">
-                    <button class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition-all">
-                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                    </button>
-                    <button class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-helu-red text-sm font-bold text-white shadow-md shadow-red-100">1</button>
-                    <button class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition-all">
-                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                    </button>
+                <div class="flex items-center gap-2" id="paginationControls">
+                    <!-- Pagination buttons generated via JS -->
                 </div>
             </div>
         </div>
@@ -138,19 +132,28 @@
         <script>
             const apiBase = '/api/users';
             let allUsers = [];
+            let filteredUsers = [];
+            let currentPage = 1;
+            const pageSize = 10;
 
             async function fetchUsers() {
                 try {
                     const res = await fetch(apiBase);
                     allUsers = await res.json();
-                    renderUsers(allUsers);
+                    filteredUsers = [...allUsers];
+                    renderUsers();
                 } catch (error) { console.error(error); }
             }
 
-            function renderUsers(users) {
+            function renderUsers() {
                 const tbody = document.getElementById('userBody');
                 tbody.innerHTML = '';
-                users.forEach((user, index) => {
+                
+                const start = (currentPage - 1) * pageSize;
+                const end = start + pageSize;
+                const pagedUsers = filteredUsers.slice(start, end);
+
+                pagedUsers.forEach((user, index) => {
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-gray-50/50 transition-colors";
                     
@@ -158,7 +161,7 @@
                     const statusBadgeClass = user.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600';
 
                     tr.innerHTML = `
-                        <td class="py-4 px-6 text-center text-sm font-medium text-gray-400">${index + 1}</td>
+                        <td class="py-4 px-6 text-center text-sm font-medium text-gray-400">${start + index + 1}</td>
                         <td class="py-4 px-6 text-sm font-extrabold text-gray-900">${user.userCode}</td>
                         <td class="py-4 px-6">
                             <div class="flex items-center gap-3">
@@ -179,10 +182,10 @@
                         </td>
                         <td class="py-4 px-6 text-right pr-10">
                             <div class="flex items-center justify-end gap-2">
-                                <button class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" onclick="editUser('${user.userId}')">
-                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                <button class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" onclick="viewUserDetail('${user.userId}')" title="Xem chi tiết">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
                                 </button>
-                                <button class="rounded-lg p-2 text-gray-400 hover:bg-rose-50 hover:text-rose-600 transition-all" onclick="deleteUser('${user.userId}')">
+                                <button class="rounded-lg p-2 text-gray-400 hover:bg-rose-50 hover:text-rose-600 transition-all" onclick="deleteUser('${user.userId}')" title="Xóa">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
@@ -190,8 +193,47 @@
                     `;
                     tbody.appendChild(tr);
                 });
-                document.getElementById('recordCount').innerText = `Hiển thị ${users.length}/${allUsers.length} bản ghi`;
+                
+                document.getElementById('recordCount').innerText = `Hiển thị ${filteredUsers.length > 0 ? start + 1 : 0}-${Math.min(end, filteredUsers.length)}/${filteredUsers.length} bản ghi`;
+                renderPagination();
                 lucide.createIcons();
+            }
+
+            function renderPagination() {
+                const controls = document.getElementById('paginationControls');
+                controls.innerHTML = '';
+                const totalPages = Math.ceil(filteredUsers.length / pageSize);
+                
+                if (totalPages <= 1) return;
+
+                // Previous
+                const prevBtn = document.createElement('button');
+                prevBtn.className = `inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 transition-all ${currentPage === 1 ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:bg-gray-50'}`;
+                prevBtn.innerHTML = '<i data-lucide="chevron-left" class="w-4 h-4"></i>';
+                if (currentPage > 1) prevBtn.onclick = () => { currentPage--; renderUsers(); };
+                controls.appendChild(prevBtn);
+
+                // Page numbers
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageBtn = document.createElement('button');
+                    pageBtn.className = `inline-flex h-9 w-9 items-center justify-center rounded-lg text-sm font-bold transition-all ${currentPage === i ? 'bg-helu-red text-white shadow-md shadow-red-100' : 'border border-gray-200 text-gray-400 hover:bg-gray-50'}`;
+                    pageBtn.innerText = i;
+                    pageBtn.onclick = () => { currentPage = i; renderUsers(); };
+                    controls.appendChild(pageBtn);
+                }
+
+                // Next
+                const nextBtn = document.createElement('button');
+                nextBtn.className = `inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 transition-all ${currentPage === totalPages ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:bg-gray-50'}`;
+                nextBtn.innerHTML = '<i data-lucide="chevron-right" class="w-4 h-4"></i>';
+                if (currentPage < totalPages) nextBtn.onclick = () => { currentPage++; renderUsers(); };
+                controls.appendChild(nextBtn);
+                
+                lucide.createIcons();
+            }
+
+            function viewUserDetail(id) {
+                window.location.href = `/users/${id}`;
             }
 
             function filterUsers() {
@@ -200,7 +242,7 @@
                 const status = document.getElementById('statusFilter').value;
                 const sort = document.getElementById('sortFilter').value;
 
-                let filtered = allUsers.filter(u => {
+                filteredUsers = allUsers.filter(u => {
                     const matchesSearch = u.fullName.toLowerCase().includes(search) || 
                                           u.userCode.toLowerCase().includes(search) ||
                                           u.email.toLowerCase().includes(search);
@@ -209,10 +251,11 @@
                     return matchesSearch && matchesRole && matchesStatus;
                 });
 
-                if (sort === 'name') filtered.sort((a, b) => a.fullName.localeCompare(b.fullName));
-                else filtered.sort((a, b) => a.userCode.localeCompare(b.userCode));
+                if (sort === 'name') filteredUsers.sort((a, b) => a.fullName.localeCompare(b.fullName));
+                else filteredUsers.sort((a, b) => a.userCode.localeCompare(b.userCode));
 
-                renderUsers(filtered);
+                currentPage = 1;
+                renderUsers();
             }
 
             async function openModal(mode, id = null) {
@@ -285,7 +328,7 @@
             };
 
             async function deleteUser(id) {
-                if (confirm('Bạn có chắc muốn xóa nhân viên này?')) {
+                if (confirm('Bạn có muốn xóa nhân viên này?')) {
                     try {
                         const res = await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
                         if (res.ok) fetchUsers();

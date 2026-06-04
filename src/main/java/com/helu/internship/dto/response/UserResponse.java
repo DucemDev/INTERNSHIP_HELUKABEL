@@ -15,6 +15,7 @@ public class UserResponse {
     private String userCode;
     private String fullName;
     private String email;
+    private Integer roleId;
     private String roleName;
     private Boolean isActive;
     private LocalDateTime createdAt;

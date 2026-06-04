@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
+<body>
+    <main class="space-y-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="/users" class="group flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all">
+                    <i data-lucide="arrow-left" class="w-5 h-5 text-gray-400 group-hover:text-helu-red transition-colors"></i>
+                </a>
+                <div>
+                    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight" id="detailUserCode">Đang tải...</h1>
+                    <p class="text-sm font-medium text-gray-500">Chi tiết thông tin nhân sự</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="openModal('edit')" class="inline-flex items-center gap-2 rounded-xl bg-helu-red px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i> Chỉnh sửa nhân sự
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Info Card -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
+                    <div class="border-b border-gray-100 bg-gray-50/50 px-8 py-4">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Thông tin cá nhân</h3>
+                    </div>
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Họ và tên</label>
+                            <p class="text-base font-bold text-gray-900" id="detailFullName">-</p>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Mã nhân viên</label>
+                            <p class="text-base font-bold text-gray-900" id="detailUserCodeVal">-</p>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Email</label>
+                            <p class="text-base font-medium text-gray-600" id="detailEmail">-</p>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Ngày gia nhập</label>
+                            <p class="text-base font-medium text-gray-600" id="detailCreatedAt">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
+                    <div class="border-b border-gray-100 bg-gray-50/50 px-8 py-4">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Vai trò & Phân quyền</h3>
+                    </div>
+                    <div class="p-8">
+                        <div class="flex items-center gap-4">
+                            <div id="detailRoleBadge" class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wider">
+                                -
+                            </div>
+                            <p class="text-sm text-gray-500 font-medium" id="roleDescription">Phân quyền dựa trên vai trò hệ thống.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Info -->
+            <div class="space-y-8">
+                <div class="rounded-2xl border border-helu-border bg-white p-8 shadow-sm text-center">
+                    <div class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-helu-red font-bold text-white text-4xl shadow-lg shadow-red-100" id="userAvatar">?</div>
+                    <h3 class="text-xl font-extrabold text-gray-900 mb-1" id="sidebarFullName">-</h3>
+                    <p class="text-sm font-medium text-gray-500 mb-6" id="sidebarEmail">-</p>
+                    
+                    <div id="detailStatusBadge" class="w-full py-3 rounded-xl text-center text-xs font-bold uppercase tracking-widest">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Modal -->
+        <div id="userModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+            <div class="w-full max-w-xl rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="modalTitle">Cập nhật nhân sự</h2>
+                    <button onclick="closeModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <form id="userForm" class="space-y-6">
+                    <input type="hidden" id="userId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Mã nhân viên <span class="text-helu-red">*</span></label>
+                            <input type="text" id="userCode" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required readonly>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Vai trò <span class="text-helu-red">*</span></label>
+                            <select id="roleId" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required></select>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700">Họ và Tên <span class="text-helu-red">*</span></label>
+                        <input type="text" id="fullName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700">Email <span class="text-helu-red">*</span></label>
+                        <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required>
+                    </div>
+                    <div id="passwordField" class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700">Mật khẩu mới</label>
+                        <input type="password" id="password" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="Để trống nếu không muốn thay đổi">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="isActive" class="h-5 w-5 rounded-md border-gray-200 text-helu-red focus:ring-helu-red cursor-pointer">
+                        <label for="isActive" class="text-sm font-bold text-gray-700 cursor-pointer">Kích hoạt tài khoản</label>
+                    </div>
+                    <div class="flex items-center justify-end gap-3 pt-4">
+                        <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeModal()">Hủy bỏ</button>
+                        <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            const userId = [[${userId}]];
+            const apiBase = '/api/users';
+            let currentUser = null;
+
+            async function fetchUserDetail() {
+                try {
+                    const res = await fetch(`${apiBase}/${userId}`);
+                    currentUser = await res.json();
+                    renderUserDetail(currentUser);
+                } catch (error) { console.error(error); }
+            }
+
+            function renderUserDetail(user) {
+                document.getElementById('detailUserCode').innerText = user.userCode;
+                document.getElementById('detailUserCodeVal').innerText = user.userCode;
+                document.getElementById('detailFullName').innerText = user.fullName;
+                document.getElementById('sidebarFullName').innerText = user.fullName;
+                document.getElementById('detailEmail').innerText = user.email;
+                document.getElementById('sidebarEmail').innerText = user.email;
+                document.getElementById('detailCreatedAt').innerText = new Date(user.createdAt).toLocaleDateString('vi-VN');
+                document.getElementById('userAvatar').innerText = user.fullName ? user.fullName.charAt(0) : '?';
+
+                const roleBadge = document.getElementById('detailRoleBadge');
+                roleBadge.innerText = user.roleName;
+                roleBadge.className = 'inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wider ' + 
+                                    (user.roleName === 'Admin' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600');
+
+                const statusBadge = document.getElementById('detailStatusBadge');
+                statusBadge.innerText = user.isActive ? 'ĐANG HOẠT ĐỘNG' : 'ĐÃ KHÓA';
+                statusBadge.className = 'w-full py-3 rounded-xl text-center text-xs font-bold uppercase tracking-widest ' + 
+                                      (user.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600');
+
+                lucide.createIcons();
+            }
+
+            async function openModal(mode) {
+                const modal = document.getElementById('userModal');
+                await loadRoles();
+
+                if (currentUser) {
+                    document.getElementById('userId').value = currentUser.userId;
+                    document.getElementById('userCode').value = currentUser.userCode;
+                    document.getElementById('fullName').value = currentUser.fullName;
+                    document.getElementById('email').value = currentUser.email;
+                    document.getElementById('roleId').value = currentUser.roleId;
+                    document.getElementById('isActive').checked = currentUser.isActive;
+                }
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            async function loadRoles() {
+                try {
+                    const res = await fetch('/api/roles');
+                    const roles = await res.json();
+                    const select = document.getElementById('roleId');
+                    select.innerHTML = roles.map(r => `<option value="${r.roleId}">${r.roleName}</option>`).join('');
+                } catch (e) { console.error(e); }
+            }
+
+            function closeModal() { 
+                const modal = document.getElementById('userModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            document.getElementById('userForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const url = `${apiBase}/${userId}`;
+
+                const data = {
+                    userCode: document.getElementById('userCode').value,
+                    fullName: document.getElementById('fullName').value,
+                    email: document.getElementById('email').value,
+                    roleId: document.getElementById('roleId').value,
+                    isActive: document.getElementById('isActive').checked
+                };
+                
+                const pwd = document.getElementById('password').value;
+                if (pwd) data.password = pwd;
+
+                try {
+                    const res = await fetch(url, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if (res.ok) { 
+                        closeModal(); 
+                        fetchUserDetail(); 
+                    }
+                } catch (err) { console.error(err); }
+            };
+
+            document.addEventListener('DOMContentLoaded', fetchUserDetail);
+        </script>
+    </main>
+</body>
+</html>

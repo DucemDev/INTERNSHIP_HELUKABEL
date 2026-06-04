@@ -61,13 +61,11 @@ public class LeadEntity {
     @Column(name = "business_result")
     private BigDecimal businessResult;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private ProductEntity product;
+    @Column(name = "product_name", length = 100)
+    private String productName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_id", nullable = false)
-    private LeadSourceEntity source;
+    @Column(name = "source_name", length = 100)
+    private String sourceName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

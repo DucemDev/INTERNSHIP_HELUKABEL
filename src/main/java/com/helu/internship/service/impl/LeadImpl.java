@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 public class LeadImpl implements LeadService {
 
     private final LeadRepo leadRepo;
-    private final ProductRepo productRepo;
-    private final LeadSourceRepo leadSourceRepo;
     private final UserRepo userRepo;
 
     @Override
@@ -38,10 +36,6 @@ public class LeadImpl implements LeadService {
     @Override
     @Transactional
     public LeadResponse createLead(LeadRequest request) {
-        ProductEntity product = productRepo.findById(request.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        LeadSourceEntity source = leadSourceRepo.findById(request.getSourceId())
-                .orElseThrow(() -> new RuntimeException("Source not found"));
         UserEntity user = userRepo.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -61,8 +55,8 @@ public class LeadImpl implements LeadService {
                 .cost(request.getCost())
                 .lossReason(request.getLossReason())
                 .businessResult(request.getBusinessResult())
-                .product(product)
-                .source(source)
+                .productName(request.getProductName())
+                .sourceName(request.getSourceName())
                 .user(user)
                 .build();
 
@@ -75,16 +69,6 @@ public class LeadImpl implements LeadService {
         LeadEntity lead = leadRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Lead not found"));
 
-        if (request.getProductId() != null) {
-            ProductEntity product = productRepo.findById(request.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-            lead.setProduct(product);
-        }
-        if (request.getSourceId() != null) {
-            LeadSourceEntity source = leadSourceRepo.findById(request.getSourceId())
-                    .orElseThrow(() -> new RuntimeException("Source not found"));
-            lead.setSource(source);
-        }
         if (request.getUserId() != null) {
             UserEntity user = userRepo.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
@@ -104,6 +88,8 @@ public class LeadImpl implements LeadService {
         lead.setCost(request.getCost());
         lead.setLossReason(request.getLossReason());
         lead.setBusinessResult(request.getBusinessResult());
+        lead.setProductName(request.getProductName());
+        lead.setSourceName(request.getSourceName());
 
         return mapToResponse(leadRepo.save(lead));
     }
@@ -131,8 +117,8 @@ public class LeadImpl implements LeadService {
                 .cost(lead.getCost())
                 .lossReason(lead.getLossReason())
                 .businessResult(lead.getBusinessResult())
-                .productName(lead.getProduct().getProductName())
-                .sourceName(lead.getSource().getSourceName())
+                .productName(lead.getProductName())
+                .sourceName(lead.getSourceName())
                 .userName(lead.getUser().getFullName())
                 .build();
     }

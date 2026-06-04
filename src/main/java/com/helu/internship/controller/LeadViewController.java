@@ -12,4 +12,11 @@ public class LeadViewController {
         model.addAttribute("activeMenu", "leads");
         return "lead/lead-management";
     }
+
+    @GetMapping("/leads/{id}")
+    public String leadDetailPage(@org.springframework.web.bind.annotation.PathVariable String id, org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "leads");
+        model.addAttribute("leadId", id);
+        return "lead/lead-detail";
+    }
 }

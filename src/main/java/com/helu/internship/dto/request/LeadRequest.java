@@ -27,7 +27,7 @@ public class LeadRequest {
     private BigDecimal cost;
     private String lossReason;
     private BigDecimal businessResult;
-    private String productId;
-    private String sourceId;
+    private String productName;
+    private String sourceName;
     private UUID userId;
 }

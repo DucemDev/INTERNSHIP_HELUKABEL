@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
+<body>
+    <main class="space-y-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="/leads" class="group flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all">
+                    <i data-lucide="arrow-left" class="w-5 h-5 text-gray-400 group-hover:text-helu-red transition-colors"></i>
+                </a>
+                <div>
+                    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight" id="detailLeadId">Đang tải...</h1>
+                    <p class="text-sm font-medium text-gray-500">Chi tiết thông tin khách hàng tiềm năng</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="openModal('edit')" class="inline-flex items-center gap-2 rounded-xl bg-helu-red px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i> Chỉnh sửa thông tin
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Info Card -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
+                    <div class="border-b border-gray-100 bg-gray-50/50 px-8 py-4">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Thông tin khách hàng</h3>
+                    </div>
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Họ và tên</label>
+                            <p class="text-base font-bold text-gray-900" id="detailFullName">-</p>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Công ty / Tài khoản</label>
+                            <p class="text-base font-bold text-gray-900" id="detailAccount">-</p>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Số điện thoại</label>
+                            <p class="text-base font-medium text-gray-600" id="detailPhone">-</p>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Email</label>
+                            <p class="text-base font-medium text-gray-600" id="detailEmail">-</p>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Vai trò</label>
+                            <p class="text-base font-medium text-gray-600" id="detailRole">-</p>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Địa điểm</label>
+                            <p class="text-base font-medium text-gray-600" id="detailLocation">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
+                    <div class="border-b border-gray-100 bg-gray-50/50 px-8 py-4">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Phân loại & Thị trường</h3>
+                    </div>
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Nhóm khách hàng</label>
+                            <div class="mt-1">
+                                <span class="inline-flex items-center px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-bold" id="detailCustomerGroup">-</span>
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Ngành nghề</label>
+                            <div class="mt-1">
+                                <span class="inline-flex items-center px-3 py-1 rounded-lg bg-purple-50 text-purple-700 text-xs font-bold" id="detailIndustryType">-</span>
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold uppercase text-gray-400">Khu vực</label>
+                            <div class="mt-1">
+                                <span class="inline-flex items-center px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold" id="detailRegion">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
+                    <div class="border-b border-gray-100 bg-gray-50/50 px-8 py-4">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Sản phẩm & Kinh doanh</h3>
+                    </div>
+                    <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div class="space-y-6">
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-bold uppercase text-gray-400">Sản phẩm quan tâm</label>
+                                <p class="text-base font-bold text-gray-800" id="detailProduct">-</p>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-bold uppercase text-gray-400">Nguồn Lead</label>
+                                <p class="text-base font-medium text-gray-600" id="detailSource">-</p>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-bold uppercase text-gray-400">Chi phí dự kiến</label>
+                                <p class="text-xl font-extrabold text-helu-red" id="detailCost">0 VNĐ</p>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-bold uppercase text-gray-400">Kết quả kinh doanh</label>
+                                <p class="text-base font-bold text-gray-800" id="detailBusinessResult">0 VNĐ</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Info -->
+            <div class="space-y-8">
+                <div class="rounded-2xl border border-helu-border bg-white p-8 shadow-sm">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-6">Trạng thái hiện tại</h3>
+                    <div id="detailStatusBadge" class="w-full py-4 rounded-xl text-center text-sm font-bold uppercase tracking-widest mb-6">
+                        -
+                    </div>
+                    <div class="space-y-4 pt-6 border-t border-gray-100">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="font-medium text-gray-500">Ngày tạo:</span>
+                            <span class="font-bold text-gray-900" id="detailCreatedDate">-</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="font-medium text-gray-500">Người phụ trách:</span>
+                            <div class="flex items-center gap-2">
+                                <div id="detailUserAvatar" class="flex h-6 w-6 items-center justify-center rounded bg-helu-red font-bold text-white text-[10px]">?</div>
+                                <span class="font-bold text-gray-900" id="detailUserName">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl border border-helu-border bg-white p-8 shadow-sm" id="lossReasonSection" style="display: none;">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-rose-500 mb-4">Lý do thất bại</h3>
+                    <p class="text-sm font-medium text-gray-600 italic" id="detailLossReason">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reusing the Lead Modal from management page -->
+        <div id="leadModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+            <div class="w-full max-w-2xl rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200 overflow-y-auto max-h-[90vh]">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="modalTitle">Cập nhật thông tin Lead</h2>
+                    <button onclick="closeModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <form id="leadForm" class="space-y-6">
+                    <input type="hidden" id="leadId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Họ và tên <span class="text-helu-red">*</span></label>
+                            <input type="text" id="fullName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Nhập tên khách hàng">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Mã Lead <span class="text-helu-red">*</span></label>
+                            <input type="text" id="leadIdInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required readonly>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Số điện thoại</label>
+                            <input type="text" id="phoneNumber" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="0xxx.xxx.xxx">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Email</label>
+                            <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="customer@email.com">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Công ty / Tổ chức <span class="text-helu-red">*</span></label>
+                            <input type="text" id="account" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Tên doanh nghiệp">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Trạng thái <span class="text-helu-red">*</span></label>
+                            <select id="status" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                                <option value="New">Mới</option>
+                                <option value="In Progress">Đang chăm sóc</option>
+                                <option value="Won">Thành công</option>
+                                <option value="Lost">Thất bại</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Nhóm KH</label>
+                            <input type="text" id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Ngành</label>
+                            <input type="text" id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Khu vực</label>
+                            <input type="text" id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Nguồn khách hàng</label>
+                            <input type="text" id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700">Sản phẩm quan tâm</label>
+                            <input type="text" id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
+                        <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeModal()">Hủy bỏ</button>
+                        <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            const leadId = [[${leadId}]];
+            const apiBase = '/api/leads';
+            let currentLead = null;
+
+            async function fetchLeadDetail() {
+                try {
+                    const response = await fetch(`${apiBase}/${leadId}`);
+                    currentLead = await response.json();
+                    renderLeadDetail(currentLead);
+                } catch (error) { console.error('Error fetching lead detail:', error); }
+            }
+
+            function renderLeadDetail(lead) {
+                document.getElementById('detailLeadId').innerText = lead.leadId;
+                document.getElementById('detailFullName').innerText = lead.fullName;
+                document.getElementById('detailAccount').innerText = lead.account;
+                document.getElementById('detailPhone').innerText = lead.phoneNumber || '-';
+                document.getElementById('detailEmail').innerText = lead.email || '-';
+                document.getElementById('detailRole').innerText = lead.customerRole || '-';
+                document.getElementById('detailLocation').innerText = lead.location || '-';
+                document.getElementById('detailCustomerGroup').innerText = lead.customerGroup || '-';
+                document.getElementById('detailIndustryType').innerText = lead.industryType || '-';
+                document.getElementById('detailRegion').innerText = lead.region || '-';
+                document.getElementById('detailProduct').innerText = lead.productName || '-';
+                document.getElementById('detailSource').innerText = lead.sourceName || '-';
+                document.getElementById('detailCost').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(lead.cost || 0);
+                document.getElementById('detailBusinessResult').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(lead.businessResult || 0);
+                document.getElementById('detailCreatedDate').innerText = lead.createdDate;
+                document.getElementById('detailUserName').innerText = lead.userName || 'Chưa gán';
+                document.getElementById('detailUserAvatar').innerText = lead.userName ? lead.userName.charAt(0) : '?';
+
+                const statusBadge = document.getElementById('detailStatusBadge');
+                statusBadge.innerText = lead.status;
+                statusBadge.className = 'w-full py-4 rounded-xl text-center text-sm font-bold uppercase tracking-widest mb-6 ';
+                if (lead.status === 'Won') statusBadge.classList.add('bg-emerald-50', 'text-emerald-600');
+                else if (lead.status === 'Lost') statusBadge.classList.add('bg-rose-50', 'text-rose-600');
+                else if (lead.status === 'In Progress') statusBadge.classList.add('bg-amber-50', 'text-amber-600');
+                else statusBadge.classList.add('bg-blue-50', 'text-blue-600');
+
+                const lossSection = document.getElementById('lossReasonSection');
+                if (lead.status === 'Lost' && lead.lossReason) {
+                    lossSection.style.display = 'block';
+                    document.getElementById('detailLossReason').innerText = lead.lossReason;
+                } else {
+                    lossSection.style.display = 'none';
+                }
+                
+                lucide.createIcons();
+            }
+
+            async function openModal(mode) {
+                const modal = document.getElementById('leadModal');
+                const form = document.getElementById('leadForm');
+                
+                if (currentLead) {
+                    document.getElementById('leadId').value = currentLead.leadId;
+                    document.getElementById('leadIdInput').value = currentLead.leadId;
+                    document.getElementById('fullName').value = currentLead.fullName;
+                    document.getElementById('phoneNumber').value = currentLead.phoneNumber || '';
+                    document.getElementById('email').value = currentLead.email || '';
+                    document.getElementById('account').value = currentLead.account;
+                    document.getElementById('status').value = currentLead.status;
+                    document.getElementById('customerGroup').value = currentLead.customerGroup || '';
+                    document.getElementById('industryType').value = currentLead.industryType || '';
+                    document.getElementById('region').value = currentLead.region || '';
+                    document.getElementById('sourceName').value = currentLead.sourceName || '';
+                    document.getElementById('productName').value = currentLead.productName || '';
+                }
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function closeModal() { 
+                const modal = document.getElementById('leadModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            document.getElementById('leadForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const leadId = document.getElementById('leadId').value;
+                const url = `${apiBase}/${leadId}`;
+
+                const data = {
+                    leadId: document.getElementById('leadIdInput').value,
+                    fullName: document.getElementById('fullName').value,
+                    phoneNumber: document.getElementById('phoneNumber').value,
+                    email: document.getElementById('email').value,
+                    account: document.getElementById('account').value,
+                    status: document.getElementById('status').value,
+                    customerGroup: document.getElementById('customerGroup').value,
+                    industryType: document.getElementById('industryType').value,
+                    region: document.getElementById('region').value,
+                    productName: document.getElementById('productName').value,
+                    sourceName: document.getElementById('sourceName').value,
+                    // Keep original values for other fields
+                    createdDate: currentLead.createdDate,
+                    userId: '498e0fc7-6278-45fc-a374-1a81096727d2', // Mock
+                    customerRole: currentLead.customerRole,
+                    location: currentLead.location,
+                    cost: currentLead.cost,
+                    businessResult: currentLead.businessResult,
+                    lossReason: currentLead.lossReason
+                };
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if (response.ok) { 
+                        closeModal(); 
+                        fetchLeadDetail(); // Refresh data
+                    }
+                } catch (error) { console.error('Error updating lead:', error); }
+            };
+
+            document.addEventListener('DOMContentLoaded', fetchLeadDetail);
+        </script>
+    </main>
+</body>
+</html>
