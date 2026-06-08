@@ -7,6 +7,7 @@ spring:
 
   datasource:
     url: jdbc:sqlserver://localhost:1433;databaseName=INTERNSHIP_2026;encrypt=true;trustServerCertificate=true
+<<<<<<< HEAD
 
 
     username: sa3
@@ -15,6 +16,10 @@ spring:
 
 
 
+=======
+    username: sa2
+    password: Password.1
+>>>>>>> d717c73 (Add dashboard)
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   jpa:

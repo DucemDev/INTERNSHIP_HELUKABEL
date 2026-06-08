@@ -1,7 +1,10 @@
 package com.helu.internship.controller;
 
+import com.helu.internship.dto.response.ConversionRateResponse;
+import com.helu.internship.dto.response.CostPerWinBySourceResponse;
 import com.helu.internship.dto.response.LeadByStatusResponse;
 import com.helu.internship.dto.response.LeadStatusCountResponse;
+import com.helu.internship.dto.response.WinRateBySalesResponse;
 import com.helu.internship.service.DashboardService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +24,24 @@ public class DashboardController {
     public List<LeadStatusCountResponse> getLeadStatusCount() {
         return dashboardService.getLeadStatusCount();
     }
+
     @GetMapping("/leads-by-status")
     public List<LeadByStatusResponse> getLeadsByStatus(@RequestParam String status) {
         return dashboardService.getLeadsByStatus(status);
+    }
+
+    @GetMapping("/conversion-rate")
+    public ConversionRateResponse getConversionRate() {
+        return dashboardService.getConversionRate();
+    }
+
+    @GetMapping("/win-rate-by-saleowner")
+    public List<WinRateBySalesResponse> getWinRateBySalesOwner() {
+        return dashboardService.getWinRateBySalesOwner();
+    }
+
+    @GetMapping("/cost-per-win-source")
+    public List<CostPerWinBySourceResponse> getCostPerWinByLeadSource() {
+        return dashboardService.getCostPerWinByLeadSource();
     }
 }
