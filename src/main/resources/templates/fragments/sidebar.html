@@ -32,36 +32,6 @@
             </ul>
         </div>
 
-        <!-- Lead Source -->
-        <div class="space-y-1">
-            <button class="flex w-full items-center justify-between rounded-xl px-4 py-3 font-medium text-gray-500 transition-all duration-200 hover:bg-red-50 hover:text-helu-red" onclick="toggleSubmenu(this)">
-                <div class="flex items-center">
-                    <i data-lucide="database" class="mr-3 w-5 h-5"></i>
-                    <span>Lead Source</span>
-                </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-300 arrow-icon"></i>
-            </button>
-            <ul class="hidden pl-12 space-y-1 submenu">
-                <li><a href="#" class="block py-2 text-sm text-gray-500 hover:text-helu-red transition-colors">Danh sách nguồn</a></li>
-                <li><a href="#" class="block py-2 text-sm text-gray-500 hover:text-helu-red transition-colors">Thêm nguồn mới</a></li>
-            </ul>
-        </div>
-
-        <!-- Sản phẩm -->
-        <div class="space-y-1">
-            <button class="flex w-full items-center justify-between rounded-xl px-4 py-3 font-medium text-gray-500 transition-all duration-200 hover:bg-red-50 hover:text-helu-red" onclick="toggleSubmenu(this)">
-                <div class="flex items-center">
-                    <i data-lucide="package" class="mr-3 w-5 h-5"></i>
-                    <span>Sản phẩm</span>
-                </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-300 arrow-icon"></i>
-            </button>
-            <ul class="hidden pl-12 space-y-1 submenu">
-                <li><a href="#" class="block py-2 text-sm text-gray-500 hover:text-helu-red transition-colors">Danh sách sản phẩm</a></li>
-                <li><a href="#" class="block py-2 text-sm text-gray-500 hover:text-helu-red transition-colors">Thêm sản phẩm</a></li>
-            </ul>
-        </div>
-
         <!-- Nhân sự (Admin) -->
         <div class="space-y-1" th:classappend="${activeMenu == 'users' ? 'open' : ''}">
             <button class="flex w-full items-center justify-between rounded-xl px-4 py-3 font-medium text-gray-500 transition-all duration-200 hover:bg-red-50 hover:text-helu-red" onclick="toggleSubmenu(this)">

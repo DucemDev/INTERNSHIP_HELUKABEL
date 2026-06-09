@@ -1,6 +1,7 @@
 package com.helu.internship.service.impl;
 
 import com.helu.internship.dto.request.LeadRequest;
+import com.helu.internship.dto.response.LeadListProjection;
 import com.helu.internship.dto.response.LeadResponse;
 import com.helu.internship.entity.*;
 import com.helu.internship.repo.*;
@@ -17,20 +18,20 @@ import java.util.stream.Collectors;
 public class LeadImpl implements LeadService {
 
     private final LeadRepo leadRepo;
-    private final ProductRepo productRepo;
-    private final LeadSourceRepo leadSourceRepo;
     private final UserRepo userRepo;
 
     @Override
+    @Transactional(readOnly = true)
     public List<LeadResponse> getAllLeads() {
-        return leadRepo.findAll().stream()
+        return leadRepo.findLeadList().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public LeadResponse getLeadById(String id) {
-        LeadEntity lead = leadRepo.findById(id)
+        LeadListProjection lead = leadRepo.findLeadByIdForView(id)
                 .orElseThrow(() -> new RuntimeException("Lead not found"));
         return mapToResponse(lead);
     }
@@ -38,12 +39,12 @@ public class LeadImpl implements LeadService {
     @Override
     @Transactional
     public LeadResponse createLead(LeadRequest request) {
-        ProductEntity product = productRepo.findById(request.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        LeadSourceEntity source = leadSourceRepo.findById(request.getSourceId())
-                .orElseThrow(() -> new RuntimeException("Source not found"));
-        UserEntity user = userRepo.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        // Hỗ trợ trường hợp tạo Lead mà chưa gán user (userId truyền lên là null)
+        UserEntity user = null;
+        if (request.getUserId() != null) {
+            user = userRepo.findById(request.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+        }
 
         LeadEntity lead = LeadEntity.builder()
                 .leadId(request.getLeadId())
@@ -61,8 +62,8 @@ public class LeadImpl implements LeadService {
                 .cost(request.getCost())
                 .lossReason(request.getLossReason())
                 .businessResult(request.getBusinessResult())
-                .product(product)
-                .source(source)
+                .productName(request.getProductName())
+                .sourceName(request.getSourceName())
                 .user(user)
                 .build();
 
@@ -75,16 +76,6 @@ public class LeadImpl implements LeadService {
         LeadEntity lead = leadRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Lead not found"));
 
-        if (request.getProductId() != null) {
-            ProductEntity product = productRepo.findById(request.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-            lead.setProduct(product);
-        }
-        if (request.getSourceId() != null) {
-            LeadSourceEntity source = leadSourceRepo.findById(request.getSourceId())
-                    .orElseThrow(() -> new RuntimeException("Source not found"));
-            lead.setSource(source);
-        }
         if (request.getUserId() != null) {
             UserEntity user = userRepo.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
@@ -104,6 +95,8 @@ public class LeadImpl implements LeadService {
         lead.setCost(request.getCost());
         lead.setLossReason(request.getLossReason());
         lead.setBusinessResult(request.getBusinessResult());
+        lead.setProductName(request.getProductName());
+        lead.setSourceName(request.getSourceName());
 
         return mapToResponse(leadRepo.save(lead));
     }
@@ -114,7 +107,36 @@ public class LeadImpl implements LeadService {
         leadRepo.deleteById(id);
     }
 
+    // MAPPER AN TOÀN TUYỆT ĐỐI (Phòng thủ mọi NullPointerException)
+    private LeadResponse mapToResponse(LeadListProjection lead) {
+        return LeadResponse.builder()
+                .leadId(lead.getLeadId())
+                .createdDate(lead.getCreatedDate())
+                .fullName(lead.getFullName())
+                .phoneNumber(lead.getPhoneNumber())
+                .account(lead.getAccount())
+                .industryType(lead.getIndustryType())
+                .customerGroup(lead.getCustomerGroup())
+                .customerRole(lead.getCustomerRole())
+                .location(lead.getLocation())
+                .region(lead.getRegion())
+                .status(lead.getStatus())
+                .cost(lead.getCost())
+                .lossReason(lead.getLossReason())
+                .businessResult(lead.getBusinessResult())
+                .productName(lead.getProductName())
+                .sourceName(lead.getSourceName())
+                .userName(lead.getUserName())
+                .build();
+    }
     private LeadResponse mapToResponse(LeadEntity lead) {
+        String userName = null;
+
+        // Kiểm tra an toàn xem có user hay không
+        if (lead.getUser() != null) {
+            userName = lead.getUser().getFullName();
+        }
+
         return LeadResponse.builder()
                 .leadId(lead.getLeadId())
                 .createdDate(lead.getCreatedDate())
@@ -131,9 +153,9 @@ public class LeadImpl implements LeadService {
                 .cost(lead.getCost())
                 .lossReason(lead.getLossReason())
                 .businessResult(lead.getBusinessResult())
-                .productName(lead.getProduct().getProductName())
-                .sourceName(lead.getSource().getSourceName())
-                .userName(lead.getUser().getFullName())
+                .productName(lead.getProductName())
+                .sourceName(lead.getSourceName())
+                .userName(userName) // Đã được xử lý Null an toàn ở trên
                 .build();
     }
 }

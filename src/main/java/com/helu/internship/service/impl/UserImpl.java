@@ -99,6 +99,7 @@ public class UserImpl implements UserService {
                 .userCode(user.getUserCode())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
+                .roleId(user.getRole().getRoleId())
                 .roleName(user.getRole().getRoleName())
                 .isActive(user.getIsActive())
                 .createdAt(user.getCreatedAt())
