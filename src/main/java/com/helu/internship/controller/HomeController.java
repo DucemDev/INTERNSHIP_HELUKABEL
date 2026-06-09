@@ -17,7 +17,8 @@ public class HomeController {
     }
 
     @GetMapping("/admin")
-    public String adminPage() {
+    public String adminPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "dashboard");
         return "admin-page";
     }
 

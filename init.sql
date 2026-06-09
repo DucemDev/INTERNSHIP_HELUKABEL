@@ -1,17 +1,21 @@
 -- =================================================================================
 -- INTERNSHIP HELUKABEL 2026 - FINAL DATABASE SCRIPT & DATA MOCKUP (SQL SERVER 2022)
 -- =================================================================================
-USE master;
+USE
+master;
 GO
 
 IF DB_ID('Internship_2026') IS NOT NULL
 BEGIN
-    ALTER DATABASE [Internship_2026] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE [Internship_2026];
+    ALTER
+DATABASE [Internship_2026] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP
+DATABASE [Internship_2026];
 END
 GO
 
-CREATE DATABASE [Internship_2026];
+CREATE
+DATABASE [Internship_2026];
 GO
 
 USE [Internship_2026];
@@ -20,134 +24,213 @@ GO
 -- =================================================================================
 -- 1. CREATE TABLES
 -- =================================================================================
-CREATE TABLE role (
-                      role_id INT IDENTITY(1,1) NOT NULL,
-                      role_name NVARCHAR(50) NOT NULL,
-                      description NVARCHAR(255) NULL,
-                      CONSTRAINT PK_role PRIMARY KEY (role_id)
+CREATE TABLE role
+(
+    role_id     INT IDENTITY(1,1) NOT NULL,
+    role_name   NVARCHAR(50) NOT NULL,
+    description NVARCHAR(255) NULL,
+    CONSTRAINT PK_role PRIMARY KEY (role_id)
 );
 GO
 
-CREATE TABLE [user] (
-                        user_id UNIQUEIDENTIFIER DEFAULT NEWSEQUENTIALID() NOT NULL,
-    user_code VARCHAR(50) NOT NULL UNIQUE,
-    username VARCHAR(50) NOT NULL UNIQUE,  -- Phục hồi cột username vì bạn dùng mã này để login
-    password VARCHAR(255) NOT NULL,
-    full_name NVARCHAR(100) NOT NULL,
-    email VARCHAR(100) NULL,
+CREATE TABLE [user]
+(
+    user_id
+    UNIQUEIDENTIFIER
+    DEFAULT
+    NEWSEQUENTIALID
+(
+) NOT NULL,
+    user_code VARCHAR
+(
+    50
+) NOT NULL UNIQUE,
+    username VARCHAR
+(
+    50
+) NOT NULL UNIQUE, -- Phục hồi cột username vì bạn dùng mã này để login
+    password VARCHAR
+(
+    255
+) NOT NULL,
+    full_name NVARCHAR
+(
+    100
+) NOT NULL,
+    email VARCHAR
+(
+    100
+) NULL,
     role_id INT NOT NULL,
     is_active BIT DEFAULT 1 NOT NULL,
-    created_at DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
-    CONSTRAINT PK_user PRIMARY KEY (user_id),
-    CONSTRAINT FK_user_role FOREIGN KEY (role_id) REFERENCES role(role_id)
+    created_at DATETIME2 DEFAULT SYSDATETIME
+(
+) NOT NULL,
+    CONSTRAINT PK_user PRIMARY KEY
+(
+    user_id
+),
+    CONSTRAINT FK_user_role FOREIGN KEY
+(
+    role_id
+) REFERENCES role
+(
+    role_id
+)
     );
 GO
 
-CREATE TABLE lead_source (
-                             source_id VARCHAR(50) NOT NULL,
-                             source_name NVARCHAR(100) NOT NULL,
-                             CONSTRAINT PK_lead_source PRIMARY KEY (source_id)
+CREATE TABLE lead_source
+(
+    source_id   VARCHAR(50) NOT NULL,
+    source_name NVARCHAR(100) NOT NULL,
+    CONSTRAINT PK_lead_source PRIMARY KEY (source_id)
 );
 GO
 
-CREATE TABLE product (
-                         product_id VARCHAR(50) NOT NULL,
-                         product_name NVARCHAR(100) NOT NULL,
-                         CONSTRAINT PK_product PRIMARY KEY (product_id)
+CREATE TABLE product
+(
+    product_id   VARCHAR(50) NOT NULL,
+    product_name NVARCHAR(100) NOT NULL,
+    CONSTRAINT PK_product PRIMARY KEY (product_id)
 );
 GO
 
-CREATE TABLE lead (
-                      lead_id VARCHAR(50) NOT NULL,
-                      created_date DATE NOT NULL,
-                      full_name NVARCHAR(100) NOT NULL,
-                      account NVARCHAR(150) NOT NULL,
-                      industry_type NVARCHAR(100) NOT NULL,
-                      customer_group NVARCHAR(50) NOT NULL,
-                      customer_role NVARCHAR(50) NOT NULL,
-                      location NVARCHAR(100) NOT NULL,
-                      region NVARCHAR(50) NOT NULL,
-                      status NVARCHAR(50) NOT NULL,
-                      cost DECIMAL(18,2) NOT NULL,
-                      loss_reason NVARCHAR(100) NULL,
-                      business_result DECIMAL(18,2) NULL,
+CREATE TABLE lead
+(
+    lead_id         VARCHAR(50)      NOT NULL,
+    created_date    DATE             NOT NULL,
+    full_name       NVARCHAR(100) NOT NULL,
+    account         NVARCHAR(150) NOT NULL,
+    industry_type   NVARCHAR(100) NOT NULL,
+    customer_group  NVARCHAR(50) NOT NULL,
+    customer_role   NVARCHAR(50) NOT NULL,
+    location        NVARCHAR(100) NOT NULL,
+    region          NVARCHAR(50) NOT NULL,
+    status          NVARCHAR(50) NOT NULL,
+    cost            DECIMAL(18, 2)   NOT NULL,
+    loss_reason     NVARCHAR(100) NULL,
+    business_result DECIMAL(18, 2) NULL,
     -- product_id đã bị xóa theo Hướng 2
-                      source_id VARCHAR(50) NOT NULL,
-                      user_id UNIQUEIDENTIFIER NOT NULL,
-                      CONSTRAINT PK_lead PRIMARY KEY (lead_id),
-                      CONSTRAINT FK_lead_source FOREIGN KEY (source_id) REFERENCES lead_source(source_id),
-                      CONSTRAINT FK_lead_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
+    source_id       VARCHAR(50)      NOT NULL,
+    user_id         UNIQUEIDENTIFIER NOT NULL,
+    CONSTRAINT PK_lead PRIMARY KEY (lead_id),
+    CONSTRAINT FK_lead_source FOREIGN KEY (source_id) REFERENCES lead_source (source_id),
+    CONSTRAINT FK_lead_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
 );
 GO
 
-CREATE TABLE lead_item (
-                           item_id BIGINT IDENTITY(1,1) NOT NULL,
-                           lead_id VARCHAR(50) NOT NULL,
-                           product_id VARCHAR(50) NOT NULL,
-                           quantity INT NOT NULL DEFAULT 1,
-                           expected_revenue DECIMAL(18,2) NOT NULL,
-                           CONSTRAINT PK_lead_item PRIMARY KEY (item_id),
-                           CONSTRAINT FK_lead_item_lead FOREIGN KEY (lead_id) REFERENCES lead(lead_id) ON DELETE CASCADE,
-                           CONSTRAINT FK_lead_item_product FOREIGN KEY (product_id) REFERENCES product(product_id)
+CREATE TABLE lead_item
+(
+    item_id          BIGINT IDENTITY(1,1) NOT NULL,
+    lead_id          VARCHAR(50)    NOT NULL,
+    product_id       VARCHAR(50)    NOT NULL,
+    quantity         INT            NOT NULL DEFAULT 1,
+    expected_revenue DECIMAL(18, 2) NOT NULL,
+    CONSTRAINT PK_lead_item PRIMARY KEY (item_id),
+    CONSTRAINT FK_lead_item_lead FOREIGN KEY (lead_id) REFERENCES lead (lead_id) ON DELETE CASCADE,
+    CONSTRAINT FK_lead_item_product FOREIGN KEY (product_id) REFERENCES product (product_id)
 );
 GO
 
-CREATE TABLE lead_status_history (
-                                     history_id BIGINT IDENTITY(1,1) NOT NULL,
-                                     lead_id VARCHAR(50) NOT NULL,
-                                     old_status NVARCHAR(50) NULL,
-                                     new_status NVARCHAR(50) NOT NULL,
-                                     changed_at DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
-                                     changed_by_user_id UNIQUEIDENTIFIER NULL,
-                                     note NVARCHAR(255) NULL,
-                                     CONSTRAINT PK_lead_status_history PRIMARY KEY (history_id),
-                                     CONSTRAINT FK_history_lead FOREIGN KEY (lead_id) REFERENCES lead(lead_id),
-                                     CONSTRAINT FK_history_user FOREIGN KEY (changed_by_user_id) REFERENCES [user](user_id)
+CREATE TABLE lead_status_history
+(
+    history_id         BIGINT IDENTITY(1,1) NOT NULL,
+    lead_id            VARCHAR(50)                     NOT NULL,
+    old_status         NVARCHAR(50) NULL,
+    new_status         NVARCHAR(50) NOT NULL,
+    changed_at         DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+    changed_by_user_id UNIQUEIDENTIFIER NULL,
+    note               NVARCHAR(255) NULL,
+    CONSTRAINT PK_lead_status_history PRIMARY KEY (history_id),
+    CONSTRAINT FK_history_lead FOREIGN KEY (lead_id) REFERENCES lead (lead_id),
+    CONSTRAINT FK_history_user FOREIGN KEY (changed_by_user_id) REFERENCES [user](user_id)
 );
 GO
 
-CREATE TABLE activity_log (
-                              log_id BIGINT IDENTITY(1,1) NOT NULL,
-                              user_id UNIQUEIDENTIFIER NULL,
-                              action_type VARCHAR(50) NOT NULL,
-                              entity_type VARCHAR(50) NOT NULL,
-                              entity_id VARCHAR(50) NULL,
-                              description NVARCHAR(MAX) NULL,
-                              created_at DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
-                              CONSTRAINT PK_activity_log PRIMARY KEY (log_id),
-                              CONSTRAINT FK_activity_log_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
+CREATE TABLE activity_log
+(
+    log_id      BIGINT IDENTITY(1,1) NOT NULL,
+    user_id     UNIQUEIDENTIFIER NULL,
+    action_type VARCHAR(50)                     NOT NULL,
+    entity_type VARCHAR(50)                     NOT NULL,
+    entity_id   VARCHAR(50) NULL,
+    description NVARCHAR(MAX) NULL,
+    created_at  DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+    CONSTRAINT PK_activity_log PRIMARY KEY (log_id),
+    CONSTRAINT FK_activity_log_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
 );
 GO
 
-CREATE TABLE notification (
-                              notification_id BIGINT IDENTITY(1,1) NOT NULL,
-                              user_id UNIQUEIDENTIFIER NOT NULL,
-                              title NVARCHAR(150) NOT NULL,
-                              message NVARCHAR(MAX) NOT NULL,
-                              is_read BIT DEFAULT 0 NOT NULL,
-                              related_link VARCHAR(255) NULL,
-                              created_at DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
-                              CONSTRAINT PK_notification PRIMARY KEY (notification_id),
-                              CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
+CREATE TABLE notification
+(
+    notification_id BIGINT IDENTITY(1,1) NOT NULL,
+    user_id         UNIQUEIDENTIFIER                NOT NULL,
+    title           NVARCHAR(150) NOT NULL,
+    message         NVARCHAR(MAX) NOT NULL,
+    is_read         BIT       DEFAULT 0             NOT NULL,
+    related_link    VARCHAR(255) NULL,
+    created_at      DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+    CONSTRAINT PK_notification PRIMARY KEY (notification_id),
+    CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
 );
 GO
+
+CREATE TABLE sales_target
+(
+    target_id      BIGINT IDENTITY(1,1) NOT NULL,
+    user_id        UNIQUEIDENTIFIER                NOT NULL, -- Seller được giao chỉ tiêu
+    period_month   INT                             NOT NULL, -- Tháng (1-12)
+    period_year    INT                             NOT NULL, -- Năm (VD: 2026)
+    revenue_target DECIMAL(18, 2)                  NOT NULL, -- Chỉ tiêu doanh thu (VD: 5,000,000,000)
+    created_by     UNIQUEIDENTIFIER                NOT NULL, -- Admin giao chỉ tiêu
+    created_at     DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+
+    CONSTRAINT PK_sales_target PRIMARY KEY (target_id),
+    CONSTRAINT FK_target_user FOREIGN KEY (user_id) REFERENCES [user](user_id),
+    CONSTRAINT FK_target_creator FOREIGN KEY (created_by) REFERENCES [user](user_id),
+    -- Đảm bảo 1 nhân viên chỉ có 1 target trong 1 tháng của 1 năm
+    CONSTRAINT UQ_sales_target_period UNIQUE (user_id, period_month, period_year),
+    -- Đảm bảo dữ liệu tháng hợp lệ
+    CONSTRAINT CHK_target_month CHECK (period_month >= 1 AND period_month <= 12)
+);
+GO
+
+-- Thêm Index để Power BI dễ dàng truy vấn theo tháng/năm
+CREATE
+NONCLUSTERED INDEX IX_sales_target_period ON sales_target (period_year, period_month);
+GO
+
+-- 2. Chèn dữ liệu mẫu (Mock Data)
+-- Tran Quoc Minh
 
 -- =================================================================================
 -- 2. CREATE INDEXES
 -- =================================================================================
-CREATE NONCLUSTERED INDEX IX_lead_source_id ON lead (source_id);
-CREATE NONCLUSTERED INDEX IX_lead_user_id ON lead (user_id);
-CREATE NONCLUSTERED INDEX IX_lead_created_date ON lead (created_date);
-CREATE NONCLUSTERED INDEX IX_lead_status ON lead (status);
-CREATE NONCLUSTERED INDEX IX_lead_analytics_covering ON lead (source_id, region, status) INCLUDE (cost, business_result);
+CREATE
+NONCLUSTERED INDEX IX_lead_source_id ON lead (source_id);
+CREATE
+NONCLUSTERED INDEX IX_lead_user_id ON lead (user_id);
+CREATE
+NONCLUSTERED INDEX IX_lead_created_date ON lead (created_date);
+CREATE
+NONCLUSTERED INDEX IX_lead_status ON lead (status);
+CREATE
+NONCLUSTERED INDEX IX_lead_analytics_covering ON lead (source_id, region, status) INCLUDE (cost, business_result);
 
-CREATE NONCLUSTERED INDEX IX_lead_item_lead_id ON lead_item (lead_id);
-CREATE NONCLUSTERED INDEX IX_lead_item_product_id ON lead_item (product_id);
+CREATE
+NONCLUSTERED INDEX IX_lead_item_lead_id ON lead_item (lead_id);
+CREATE
+NONCLUSTERED INDEX IX_lead_item_product_id ON lead_item (product_id);
 
-CREATE NONCLUSTERED INDEX IX_status_history_lead_id ON lead_status_history (lead_id);
-CREATE NONCLUSTERED INDEX IX_status_history_changed_at ON lead_status_history (changed_at);
-CREATE NONCLUSTERED INDEX IX_notification_unread ON notification (user_id, is_read);
-CREATE NONCLUSTERED INDEX IX_activity_log_user_date ON activity_log (user_id, created_at);
+CREATE
+NONCLUSTERED INDEX IX_status_history_lead_id ON lead_status_history (lead_id);
+CREATE
+NONCLUSTERED INDEX IX_status_history_changed_at ON lead_status_history (changed_at);
+CREATE
+NONCLUSTERED INDEX IX_notification_unread ON notification (user_id, is_read);
+CREATE
+NONCLUSTERED INDEX IX_activity_log_user_date ON activity_log (user_id, created_at);
 GO
 
 -- =================================================================================
@@ -170,6 +253,21 @@ INSERT INTO [user] (user_id, user_code, username, password, full_name, email, ro
 ('f1460724-4d7f-4796-bca7-50bf1ab09811', 'NV005', 'seller_hung', 'hashed_pass_123', N'Le Van Hung', 'seller_hung@helukabel.vn', 2, 1),
 ('aa512e88-565a-44bb-84f6-612ecc49e949', 'NV006', 'seller_tuan', 'hashed_pass_123', N'Hoang Minh Tuan', 'seller_tuan@helukabel.vn', 2, 1);
 GO
+
+
+-- INSERT sales_target moved after users to satisfy FK
+INSERT INTO sales_target (user_id, period_month, period_year, revenue_target, created_by) VALUES
+-- Target Tháng 5/2026
+('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 5, 2026, 2000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 5 Tỷ
+('f3f1ab23-29da-4ea3-8377-befc37b314f1', 5, 2026, 1500000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 4.5 Tỷ
+('45f0d7fa-7580-4d9e-98e2-495aa86f75c9', 5, 2026, 2000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 6 Tỷ
+
+-- Target Tháng 6/2026
+('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 6, 2026, 1500000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 5.5 Tỷ
+('f3f1ab23-29da-4ea3-8377-befc37b314f1', 6, 2026, 2000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 5 Tỷ
+('45f0d7fa-7580-4d9e-98e2-495aa86f75c9', 6, 2026, 1500000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'); -- 6.5 Tỷ
+GO
+
 
 -- 3.3 INSERT LEAD SOURCES
 INSERT INTO lead_source (source_id, source_name) VALUES

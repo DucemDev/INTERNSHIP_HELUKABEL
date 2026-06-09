@@ -27,6 +27,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
+    @GetMapping("/code/{userCode}")
+    public ResponseEntity<UserResponse> getUserByCode(@PathVariable String userCode) {
+        return ResponseEntity.ok(userService.getUserByCode(userCode));
+    }
+
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
         return ResponseEntity.ok(userService.createUser(request));

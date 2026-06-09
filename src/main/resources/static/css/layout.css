@@ -1,0 +1,10 @@
+/* Layout styles migrated to Tailwind CSS utility classes */
+/* This file is now primarily for global transitions or non-Tailwind layout tweaks */
+
+.sidebar-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-content-transition {
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
