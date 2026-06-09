@@ -10,6 +10,7 @@ import java.util.List;
 
 @Repository
 public interface LeadRepo extends JpaRepository<LeadEntity, String> {
+
     @Query("SELECT l.status, COUNT(l) FROM LeadEntity l GROUP BY l.status")
     List<Object[]> countLeadByStatus();
     @Query("""
@@ -26,5 +27,6 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         WHERE l.status = :status
         """)
     List<LeadByStatusResponse> findLeadsByStatus(String status);
+
 
 }
