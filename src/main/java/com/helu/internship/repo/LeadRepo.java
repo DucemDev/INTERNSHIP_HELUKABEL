@@ -99,3 +99,5 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     """, nativeQuery = true)
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
 }
+
+

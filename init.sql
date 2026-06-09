@@ -33,7 +33,6 @@ CREATE TABLE role
 );
 GO
 
-<<<<<<< HEAD
 CREATE TABLE [user]
 (
     user_id
@@ -62,15 +61,6 @@ CREATE TABLE [user]
 (
     100
 ) NULL,
-=======
-CREATE TABLE [user] (
-                        user_id UNIQUEIDENTIFIER DEFAULT NEWSEQUENTIALID() NOT NULL,
-    user_code VARCHAR(50) NOT NULL UNIQUE,
-    username VARCHAR(50) NOT NULL UNIQUE,  -- Phục hồi cột username vì bạn dùng mã này để login
-    password VARCHAR(255) NOT NULL,
-    full_name NVARCHAR(100) NOT NULL,
-    email VARCHAR(100) NULL,
->>>>>>> cd3962f (VanHa dashboard)
     role_id INT NOT NULL,
     is_active BIT DEFAULT 1 NOT NULL,
     created_at DATETIME2 DEFAULT SYSDATETIME
@@ -106,7 +96,6 @@ CREATE TABLE product
 );
 GO
 
-<<<<<<< HEAD
 CREATE TABLE lead
 (
     lead_id         VARCHAR(50)      NOT NULL,
@@ -141,54 +130,6 @@ CREATE TABLE lead_item
     CONSTRAINT PK_lead_item PRIMARY KEY (item_id),
     CONSTRAINT FK_lead_item_lead FOREIGN KEY (lead_id) REFERENCES lead (lead_id) ON DELETE CASCADE,
     CONSTRAINT FK_lead_item_product FOREIGN KEY (product_id) REFERENCES product (product_id)
-=======
-CREATE TABLE lead (
-                      lead_id VARCHAR(50) NOT NULL,
-                      created_date DATE NOT NULL,
-                      full_name NVARCHAR(100) NOT NULL,
-                      account NVARCHAR(150) NOT NULL,
-                      industry_type NVARCHAR(100) NOT NULL,
-                      customer_group NVARCHAR(50) NOT NULL,
-                      customer_role NVARCHAR(50) NOT NULL,
-                      location NVARCHAR(100) NOT NULL,
-                      region NVARCHAR(50) NOT NULL,
-                      status NVARCHAR(50) NOT NULL,
-                      cost DECIMAL(18,2) NOT NULL,
-                      loss_reason NVARCHAR(100) NULL,
-                      business_result DECIMAL(18,2) NULL,
-    -- product_id đã bị xóa theo Hướng 2
-                      source_id VARCHAR(50) NOT NULL,
-                      user_id UNIQUEIDENTIFIER NOT NULL,
-                      CONSTRAINT PK_lead PRIMARY KEY (lead_id),
-                      CONSTRAINT FK_lead_source FOREIGN KEY (source_id) REFERENCES lead_source(source_id),
-                      CONSTRAINT FK_lead_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
-);
-GO
-
-CREATE TABLE lead_item (
-                           item_id BIGINT IDENTITY(1,1) NOT NULL,
-                           lead_id VARCHAR(50) NOT NULL,
-                           product_id VARCHAR(50) NOT NULL,
-                           quantity INT NOT NULL DEFAULT 1,
-                           expected_revenue DECIMAL(18,2) NOT NULL,
-                           CONSTRAINT PK_lead_item PRIMARY KEY (item_id),
-                           CONSTRAINT FK_lead_item_lead FOREIGN KEY (lead_id) REFERENCES lead(lead_id) ON DELETE CASCADE,
-                           CONSTRAINT FK_lead_item_product FOREIGN KEY (product_id) REFERENCES product(product_id)
-);
-GO
-
-CREATE TABLE lead_status_history (
-                                     history_id BIGINT IDENTITY(1,1) NOT NULL,
-                                     lead_id VARCHAR(50) NOT NULL,
-                                     old_status NVARCHAR(50) NULL,
-                                     new_status NVARCHAR(50) NOT NULL,
-                                     changed_at DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
-                                     changed_by_user_id UNIQUEIDENTIFIER NULL,
-                                     note NVARCHAR(255) NULL,
-                                     CONSTRAINT PK_lead_status_history PRIMARY KEY (history_id),
-                                     CONSTRAINT FK_history_lead FOREIGN KEY (lead_id) REFERENCES lead(lead_id),
-                                     CONSTRAINT FK_history_user FOREIGN KEY (changed_by_user_id) REFERENCES [user](user_id)
->>>>>>> cd3962f (VanHa dashboard)
 );
 GO
 
@@ -266,7 +207,6 @@ GO
 -- =================================================================================
 -- 2. CREATE INDEXES
 -- =================================================================================
-<<<<<<< HEAD
 CREATE
 NONCLUSTERED INDEX IX_lead_source_id ON lead (source_id);
 CREATE
@@ -291,21 +231,6 @@ CREATE
 NONCLUSTERED INDEX IX_notification_unread ON notification (user_id, is_read);
 CREATE
 NONCLUSTERED INDEX IX_activity_log_user_date ON activity_log (user_id, created_at);
-=======
-CREATE NONCLUSTERED INDEX IX_lead_source_id ON lead (source_id);
-CREATE NONCLUSTERED INDEX IX_lead_user_id ON lead (user_id);
-CREATE NONCLUSTERED INDEX IX_lead_created_date ON lead (created_date);
-CREATE NONCLUSTERED INDEX IX_lead_status ON lead (status);
-CREATE NONCLUSTERED INDEX IX_lead_analytics_covering ON lead (source_id, region, status) INCLUDE (cost, business_result);
-
-CREATE NONCLUSTERED INDEX IX_lead_item_lead_id ON lead_item (lead_id);
-CREATE NONCLUSTERED INDEX IX_lead_item_product_id ON lead_item (product_id);
-
-CREATE NONCLUSTERED INDEX IX_status_history_lead_id ON lead_status_history (lead_id);
-CREATE NONCLUSTERED INDEX IX_status_history_changed_at ON lead_status_history (changed_at);
-CREATE NONCLUSTERED INDEX IX_notification_unread ON notification (user_id, is_read);
-CREATE NONCLUSTERED INDEX IX_activity_log_user_date ON activity_log (user_id, created_at);
->>>>>>> cd3962f (VanHa dashboard)
 GO
 
 -- =================================================================================
@@ -320,7 +245,6 @@ GO
 
 -- 3.2 INSERT USERS (ADMIN & SELLERS)
 INSERT INTO [user] (user_id, user_code, username, password, full_name, email, role_id, is_active) VALUES
-<<<<<<< HEAD
 ('21cf3ed1-c2eb-410c-8098-bf3020e06991', 'AD001', 'admin', '123', N'Administrator', 'admin@helukabel.vn', 1, 1),
 ('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 'NV001', 'seller_thanh', '123', N'Vo Duc Thanh', 'seller_thanh@helukabel.vn', 2, 1),
 ('f3f1ab23-29da-4ea3-8377-befc37b314f1', 'NV002', 'seller_huong', '123', N'Nguyen Thi Thu Huong', 'seller_huong@helukabel.vn', 2, 1),
@@ -328,15 +252,6 @@ INSERT INTO [user] (user_id, user_code, username, password, full_name, email, ro
 ('655612cb-fc04-4fa8-a2de-87a6a55d30c7', 'NV004', 'seller_lan', '123', N'Pham Thi Ngoc Lan', 'seller_lan@helukabel.vn', 2, 1),
 ('f1460724-4d7f-4796-bca7-50bf1ab09811', 'NV005', 'seller_hung', '123', N'Le Van Hung', 'seller_hung@helukabel.vn', 2, 1),
 ('aa512e88-565a-44bb-84f6-612ecc49e949', 'NV006', 'seller_tuan', '123', N'Hoang Minh Tuan', 'seller_tuan@helukabel.vn', 2, 1);
-=======
-('21cf3ed1-c2eb-410c-8098-bf3020e06991', 'AD001', 'admin', 'hashed_pass_123', N'Administrator', 'admin@helukabel.vn', 1, 1),
-('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 'NV001', 'seller_thanh', 'hashed_pass_123', N'Vo Duc Thanh', 'seller_thanh@helukabel.vn', 2, 1),
-('f3f1ab23-29da-4ea3-8377-befc37b314f1', 'NV002', 'seller_huong', 'hashed_pass_123', N'Nguyen Thi Thu Huong', 'seller_huong@helukabel.vn', 2, 1),
-('45f0d7fa-7580-4d9e-98e2-495aa86f75c9', 'NV003', 'seller_minh', 'hashed_pass_123', N'Tran Quoc Minh', 'seller_minh@helukabel.vn', 2, 1),
-('655612cb-fc04-4fa8-a2de-87a6a55d30c7', 'NV004', 'seller_lan', 'hashed_pass_123', N'Pham Thi Ngoc Lan', 'seller_lan@helukabel.vn', 2, 1),
-('f1460724-4d7f-4796-bca7-50bf1ab09811', 'NV005', 'seller_hung', 'hashed_pass_123', N'Le Van Hung', 'seller_hung@helukabel.vn', 2, 1),
-('aa512e88-565a-44bb-84f6-612ecc49e949', 'NV006', 'seller_tuan', 'hashed_pass_123', N'Hoang Minh Tuan', 'seller_tuan@helukabel.vn', 2, 1);
->>>>>>> cd3962f (VanHa dashboard)
 GO
 
 
