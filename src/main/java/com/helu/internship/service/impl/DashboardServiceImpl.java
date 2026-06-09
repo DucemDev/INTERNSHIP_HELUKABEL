@@ -1,6 +1,8 @@
 package com.helu.internship.service.impl;
 
+import com.helu.internship.dto.response.LeadByStatusResponse;
 import com.helu.internship.dto.response.LeadSourceCostProjection;
+import com.helu.internship.dto.response.LeadStatusCountResponse;
 import com.helu.internship.dto.response.PipelineCoverageProjection;
 import com.helu.internship.repo.CostPerLeadRepo;
 import com.helu.internship.repo.LeadStatusHistoryRepo;
@@ -39,4 +41,13 @@ public  class DashboardServiceImpl implements DashboardService {
         return pipelineCoverageRepo.getPipelineCoverage();
     }
 
+    @Override
+    public List<LeadStatusCountResponse> getLeadStatusCount() {
+        return null;
+    }
+
+    @Override
+    public List<LeadByStatusResponse> getLeadsByStatus(String status) {
+        return null;
+    }
 }

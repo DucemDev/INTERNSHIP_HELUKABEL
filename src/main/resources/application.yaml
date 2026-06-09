@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:sqlserver://localhost:1433;databaseName=INTERNSHIP_2026;encrypt=true;trustServerCertificate=true
     username: sa
-    password: sa12345
+    password: 123456789
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   jpa:
