@@ -89,17 +89,18 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
     @Query(value = """
     SELECT
-        user_id AS userId,
+        l.user_id AS userId,
+        u.full_name AS userName,
         SUM(
             CASE
-                WHEN status IN ('Qualified','Won')
+                WHEN l.status IN ('Qualified','Won')
                 THEN 1
                 ELSE 0
             END
         ) AS qualifiedLead,
         SUM(
             CASE
-                WHEN status = 'Won'
+                WHEN l.status = 'Won'
                 THEN 1
                 ELSE 0
             END
@@ -107,7 +108,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         (
             SUM(
                 CASE
-                    WHEN status = 'Won'
+                    WHEN l.status = 'Won'
                     THEN 1
                     ELSE 0
                 END
@@ -116,7 +117,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             NULLIF(
                 SUM(
                     CASE
-                        WHEN status IN ('Qualified','Won')
+                        WHEN l.status IN ('Qualified','Won')
                         THEN 1
                         ELSE 0
                     END
@@ -124,8 +125,9 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 0
             )
         ) AS winRate
-    FROM lead
-    GROUP BY user_id
+    FROM lead l
+    LEFT JOIN [user] u ON l.user_id = u.user_id
+    GROUP BY l.user_id, u.full_name
     """, nativeQuery = true)
     List<WinRateBySalesResponse> getWinRateBySalesOwner();
 
