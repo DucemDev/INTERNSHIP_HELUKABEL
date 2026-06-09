@@ -1,31 +1,35 @@
 package com.helu.internship.service.impl;
 
-import com.helu.internship.dto.response.ConversionRateResponse;
-import com.helu.internship.dto.response.CostPerWinBySourceResponse;
-import com.helu.internship.dto.response.WinRateBySalesResponse;
+import com.helu.internship.dto.response.LeadByStatusResponse;
+import com.helu.internship.dto.response.LeadStatusCountResponse;
 import com.helu.internship.repo.LeadRepo;
 import com.helu.internship.service.DashboardService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-
 public class DashboardServiceImpl implements DashboardService {
+
     private final LeadRepo leadRepo;
-    @Override
-    public ConversionRateResponse getConversionRate() {
-        return leadRepo.getConversionRate();
+
+    public DashboardServiceImpl(LeadRepo leadRepo) {
+        this.leadRepo = leadRepo;
     }
 
     @Override
-    public List<WinRateBySalesResponse> getWinRateBySalesOwner() {
-        return leadRepo.getWinRateBySalesOwner();
+    public List<LeadStatusCountResponse> getLeadStatusCount() {
+        return leadRepo.countLeadByStatus()
+                .stream()
+                .map(row -> new LeadStatusCountResponse(
+                        String.valueOf(row[0]),
+                        (Long) row[1]
+                ))
+                .toList();
     }
+
     @Override
-    public List<CostPerWinBySourceResponse> getCostPerWinByLeadSource() {
-        return leadRepo.getCostPerWinByLeadSource();
+    public List<LeadByStatusResponse> getLeadsByStatus(String status) {
+        return leadRepo.findLeadsByStatus(status);
     }
 }
