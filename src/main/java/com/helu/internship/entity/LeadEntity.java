@@ -52,13 +52,13 @@ public class LeadEntity {
     @Column(name = "status", length = 50, nullable = false)
     private String status;
 
-    @Column(name = "cost", nullable = false)
+    @Column(name = "cost", nullable = false, precision = 18, scale = 2)
     private BigDecimal cost;
 
     @Column(name = "loss_reason", length = 100)
     private String lossReason;
 
-    @Column(name = "business_result")
+    @Column(name = "business_result", precision = 18, scale = 2)
     private BigDecimal businessResult;
 
     @ManyToOne(fetch = FetchType.LAZY)
