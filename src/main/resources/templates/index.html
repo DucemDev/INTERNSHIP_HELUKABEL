@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HELUKABEL CRM - Hệ Thống Quản Trị</title>
+    <title>HELUKABEL CRM</title>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -24,67 +24,107 @@
     </script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="font-['Inter'] antialiased">
-    <div class="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-helu-red via-red-700 to-black overflow-hidden px-6 py-20">
-        <!-- Abstract Background Shapes -->
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/10 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-red-500/20 rounded-full blur-3xl"></div>
+<body class="font-['Inter'] antialiased bg-white text-slate-600 selection:bg-red-50 selection:text-helu-red">
 
-        <div class="relative max-w-5xl w-full text-center">
-            <div class="inline-flex items-center justify-center p-4 bg-white/10 backdrop-blur-md rounded-3xl mb-12 shadow-2xl border border-white/20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <img th:src="@{/images/logo.png}" alt="Logo" class="h-16 w-auto brightness-0 invert">
-            </div>
+    <!-- [1] NAVIGATION -->
+    <nav class="fixed top-0 w-full z-50 bg-white/40 backdrop-blur-xl">
+        <div class="max-w-6xl mx-auto px-8 h-20 flex items-center justify-between">
+            <!-- Simple Logo - No Borders -->
+            <img th:src="@{/images/logo.png}" alt="Logo" class="h-6 w-auto">
             
-            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
-                HELUKABEL <span class="text-red-200">CRM</span>
-            </h1>
-            
-            <p class="text-xl md:text-2xl text-red-50 mb-12 max-w-2xl mx-auto leading-relaxed opacity-90 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-                Giải pháp quản trị khách hàng và quy trình bán hàng thông minh dành riêng cho HELUKABEL Việt Nam.
-            </p>
-            
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
-                <a href="/login" class="inline-flex items-center justify-center px-10 py-5 bg-white text-helu-red text-lg font-extrabold rounded-full shadow-2xl shadow-black/20 hover:scale-105 transition-all active:scale-95">
-                    TRUY CẬP HỆ THỐNG
-                    <i data-lucide="arrow-right" class="ml-3 w-5 h-5"></i>
+            <div class="hidden md:flex items-center gap-10 text-[13px] font-semibold tracking-wide text-slate-500">
+                <a href="#features" class="hover:text-helu-red transition-all">Tính năng</a>
+                <a href="#preview" class="hover:text-helu-red transition-all">Giao diện</a>
+                <a th:href="@{/login}" class="px-5 py-2 bg-slate-900 text-white rounded-full hover:bg-helu-red transition-all active:scale-95 shadow-sm">
+                    Đăng nhập
                 </a>
-                <a href="#" class="inline-flex items-center justify-center px-10 py-5 bg-transparent border-2 border-white/30 text-white text-lg font-bold rounded-full hover:bg-white/10 transition-all backdrop-blur-sm">
-                    TÌM HIỂU THÊM
-                </a>
-            </div>
-
-            <!-- Features Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
-                <div class="group p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl hover:bg-white/10 transition-all hover:-translate-y-2">
-                    <div class="inline-flex items-center justify-center w-14 h-14 bg-white/10 rounded-2xl mb-6 text-white group-hover:bg-helu-red transition-colors">
-                        <i data-lucide="users" class="w-7 h-7"></i>
-                    </div>
-                    <h4 class="text-xl font-bold text-white mb-3 text-left">Quản lý Leads</h4>
-                    <p class="text-red-100/70 text-sm leading-relaxed text-left">Theo dõi 360 độ hành trình khách hàng từ lúc tiếp cận đến khi chốt đơn.</p>
-                </div>
-
-                <div class="group p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl hover:bg-white/10 transition-all hover:-translate-y-2">
-                    <div class="inline-flex items-center justify-center w-14 h-14 bg-white/10 rounded-2xl mb-6 text-white group-hover:bg-helu-red transition-colors">
-                        <i data-lucide="bot" class="w-7 h-7"></i>
-                    </div>
-                    <h4 class="text-xl font-bold text-white mb-3 text-left">AI Chatbot</h4>
-                    <p class="text-red-100/70 text-sm leading-relaxed text-left">Tự động hóa hỗ trợ khách hàng và thu thập thông tin tiềm năng 24/7.</p>
-                </div>
-
-                <div class="group p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl hover:bg-white/10 transition-all hover:-translate-y-2">
-                    <div class="inline-flex items-center justify-center w-14 h-14 bg-white/10 rounded-2xl mb-6 text-white group-hover:bg-helu-red transition-colors">
-                        <i data-lucide="bar-chart-3" class="w-7 h-7"></i>
-                    </div>
-                    <h4 class="text-xl font-bold text-white mb-3 text-left">Báo cáo Real-time</h4>
-                    <p class="text-red-100/70 text-sm leading-relaxed text-left">Hệ thống phân tích dữ liệu kinh doanh thông minh hỗ trợ ra quyết định.</p>
-                </div>
-            </div>
-            
-            <div class="mt-20 text-red-200/40 text-xs font-medium tracking-widest uppercase">
-                &copy; 2026 HELUKABEL VIETNAM. ALL RIGHTS RESERVED.
             </div>
         </div>
-    </div>
-    <script>lucide.createIcons();</script>
+    </nav>
+
+    <!-- [2] HERO SECTION -->
+    <section class="relative pt-48 pb-24 overflow-hidden">
+        <div class="max-w-4xl mx-auto px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight leading-[1.2]">
+                Quản trị khách hàng <br class="hidden md:block"> 
+<!--                <span class="text-slate-400 font-medium"></span>-->
+            </h1>
+            
+            <p class="text-base md:text-lg text-slate-500 mb-10 max-w-xl mx-auto leading-relaxed">
+                Giải pháp CRM nội bộ giúp tối ưu hóa quy trình làm việc, <br class="hidden md:block">
+                mang lại cái nhìn toàn diện về hoạt động kinh doanh.
+            </p>
+            
+            <div class="flex items-center justify-center gap-6">
+                <a th:href="@{/login}" class="text-[14px] font-bold text-helu-red hover:underline flex items-center gap-2 group">
+                    Bắt đầu làm việc
+                    <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- [3] PRODUCT PREVIEW - Smaller & More Natural -->
+    <section id="preview" class="pb-32 px-8">
+        <div class="max-w-5xl mx-auto">
+            <div class="relative bg-white rounded-3xl p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-slate-100">
+                <div class="overflow-hidden rounded-2xl">
+                    <img th:src="@{/images/index1.jpg}" alt="Dashboard Preview" class="w-full h-auto opacity-95 hover:opacity-100 transition-opacity duration-500">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- [4] FEATURES - Minimalist -->
+    <section id="features" class="py-32 bg-slate-50/50 border-y border-slate-50">
+        <div class="max-w-6xl mx-auto px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+                <!-- Feature 1 -->
+                <div class="space-y-4">
+                    <div class="text-helu-red"><i data-lucide="layers" class="w-5 h-5"></i></div>
+                    <h4 class="text-sm font-bold text-slate-900 uppercase tracking-widest">Dữ liệu tập trung</h4>
+                    <p class="text-[14px] leading-relaxed text-slate-500">Mọi thông tin khách hàng được tổ chức khoa học, dễ dàng truy xuất và quản lý trong một nền tảng duy nhất.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="space-y-4">
+                    <div class="text-helu-red"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></div>
+                    <h4 class="text-sm font-bold text-slate-900 uppercase tracking-widest">Chỉ số trực quan</h4>
+                    <p class="text-[14px] leading-relaxed text-slate-500">Theo dõi tiến độ doanh thu và hiệu suất làm việc thông qua hệ thống biểu đồ thời gian thực tinh gọn.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="space-y-4">
+                    <div class="text-helu-red"><i data-lucide="shield" class="w-5 h-5"></i></div>
+                    <h4 class="text-sm font-bold text-slate-900 uppercase tracking-widest">Bảo mật & Phân quyền</h4>
+                    <p class="text-[14px] leading-relaxed text-slate-500">Đảm bảo an toàn dữ liệu với cơ chế phân quyền chi tiết cho từng vai trò trong hệ thống kinh doanh.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- [5] SUBTLE CTA -->
+    <section class="py-40 text-center px-8">
+        <h2 class="text-2xl font-semibold text-slate-900 mb-8">Nâng cao hiệu suất ngay hôm nay.</h2>
+        <a th:href="@{/login}" class="inline-flex items-center justify-center px-8 py-3 bg-helu-red text-white text-[13px] font-bold rounded-full shadow-lg shadow-red-100 hover:scale-105 transition-all">
+            Truy cập CRM
+        </a>
+    </section>
+
+    <!-- [6] FOOTER - Ultra Minimal -->
+    <footer class="py-12 border-t border-slate-100">
+        <div class="max-w-6xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <img th:src="@{/images/logo.png}" alt="Logo" class="h-4 w-auto grayscale opacity-50">
+            <div class="flex gap-8 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                <span>&copy; 2026 HELUKABEL VIETNAM</span>
+                <a href="#" class="hover:text-helu-red transition-colors">Bảo mật</a>
+                <a href="#" class="hover:text-helu-red transition-colors">Hỗ trợ</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
