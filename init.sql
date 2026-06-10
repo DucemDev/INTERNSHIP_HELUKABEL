@@ -84,7 +84,11 @@ CREATE TABLE lead_source
 (
     source_id   VARCHAR(50) NOT NULL,
     source_name NVARCHAR(100) NOT NULL,
-    CONSTRAINT PK_lead_source PRIMARY KEY (source_id)
+    source_type VARCHAR(20) NOT NULL, -- Thuộc tính mới thêm vào
+
+    CONSTRAINT PK_lead_source PRIMARY KEY (source_id),
+    -- Ràng buộc CHECK để đảm bảo dữ liệu luôn chuẩn hóa, chỉ nhận 1 trong 2 giá trị này
+    CONSTRAINT CHK_source_type CHECK (source_type IN ('IN BOUND', 'OUT BOUND'))
 );
 GO
 
@@ -270,17 +274,17 @@ GO
 
 
 -- 3.3 INSERT LEAD SOURCES
-INSERT INTO lead_source (source_id, source_name) VALUES
-('SRC01', N'Industry Publication'),
-('SRC02', N'Cold Call'),
-('SRC03', N'Exhibition'),
-('SRC04', N'Referral'),
-('SRC05', N'Partner Introduction'),
-('SRC06', N'LinkedIn'),
-('SRC07', N'Website Inquiry'),
-('SRC08', N'Trade Show'),
-('SRC09', N'Email Campaign'),
-('SRC10', N'Webinar');
+INSERT INTO lead_source (source_id, source_name, source_type) VALUES
+('SRC01', N'Industry Publication', 'OUT BOUND'), -- Quảng cáo báo chí ngành
+('SRC02', N'Cold Call',            'OUT BOUND'), -- Gọi điện tiếp cận trực tiếp
+('SRC03', N'Exhibition',           'OUT BOUND'), -- Gian hàng triển lãm
+('SRC04', N'Referral',             'IN BOUND'),  -- Khách hàng tự giới thiệu
+('SRC05', N'Partner Introduction', 'IN BOUND'),  -- Đối tác giới thiệu sang
+('SRC06', N'LinkedIn',             'OUT BOUND'), -- Sales tự đi săn trên mạng xã hội
+('SRC07', N'Website Inquiry',      'IN BOUND'),  -- Khách tự để lại thông tin trên web
+('SRC08', N'Trade Show',           'OUT BOUND'), -- Hội chợ thương mại
+('SRC09', N'Email Campaign',       'OUT BOUND'), -- Gửi mail hàng loạt tiếp cận
+('SRC10', N'Webinar',              'IN BOUND');  -- Khách đăng ký xem thảo luận trực tuyến
 GO
 
 -- 3.4 INSERT PRODUCTS
