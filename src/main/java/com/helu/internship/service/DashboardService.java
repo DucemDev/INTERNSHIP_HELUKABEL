@@ -3,6 +3,7 @@ package com.helu.internship.service;
 
 import com.helu.internship.dto.response.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface DashboardService {
@@ -27,6 +28,22 @@ public interface DashboardService {
 
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
 
-    List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
+
+    List<LostReasonSummaryProjection> getLostReasonSummary();
+    List<RevenueIndustryResponse> getRevenueByIndustry();
+    List<RoiLeadSourceResponse> getROIByLeadSource();
+    List<ConversionRateResponse> getConversionRateFilter(
+            String sourceId,
+            String sourceType,
+            String region,
+            String industry,
+            String salesOwnerId,
+            String customerGroup,
+            LocalDate timeFrom,
+            LocalDate timeTo
+    );
+
+  List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
+
 }
 

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -292,7 +293,97 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     GROUP BY l.loss_reason
     ORDER BY totalLost DESC
     """, nativeQuery = true)
-    List<LostReasonSummaryProjection> getLostReasonSummary(
-            @Param("productId") String productId
+
+    List<LostReasonSummaryProjection> getLostReasonSummary();
+
+    @Query(value = """
+                SELECT
+                    ls.source_name AS label,
+                    l.region AS region,
+                    COUNT(*) AS totalLead,
+                    SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
+                    SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS conversionRate
+                FROM lead l
+                JOIN lead_source ls
+                    ON l.source_id = ls.source_id
+                WHERE (:sourceId IS NULL OR l.source_id = :sourceId)
+                  AND (:sourceType IS NULL OR ls.source_type = :sourceType)
+                  AND (:region IS NULL OR l.region = :region)
+                  AND (:industry IS NULL OR l.industry_type = :industry)
+                  AND (:salesOwnerId IS NULL OR CAST(l.user_id AS VARCHAR(36)) = :salesOwnerId)
+                  AND (:customerGroup IS NULL OR l.customer_group = :customerGroup)
+                  AND (:timeFrom IS NULL OR l.created_date >= :timeFrom)
+                  AND (:timeTo IS NULL OR l.created_date <= :timeTo)
+                GROUP BY ls.source_name, l.region
+                ORDER BY conversionRate DESC
+            """, nativeQuery = true)
+    List<ConversionRateResponse> getConversionRateFilter(
+            @Param("sourceId") String sourceId,
+            @Param("sourceType") String sourceType,
+            @Param("region") String region,
+            @Param("industry") String industry,
+            @Param("salesOwnerId") String salesOwnerId,
+            @Param("customerGroup") String customerGroup,
+            @Param("timeFrom") LocalDate timeFrom,
+            @Param("timeTo") LocalDate timeTo
     );
+
+    @Query(value = """
+                SELECT
+                    ls.source_name AS label,
+            
+                    CAST(
+                        SUM(
+                            CASE
+                                WHEN l.status = 'Won'
+                                THEN 1
+                                ELSE 0
+                            END
+                        ) AS BIGINT
+                    ) AS wonLead,
+            
+                    SUM(l.cost) AS totalCost,
+            
+                    (
+                        SUM(
+                            CASE
+                                WHEN l.status = 'Won'
+                                THEN 1
+                                ELSE 0
+                            END
+                        ) * 1.0
+                        /
+                        NULLIF(SUM(l.cost), 0)
+                    ) AS roi
+            
+                FROM lead l
+            
+                JOIN lead_source ls
+                    ON l.source_id = ls.source_id
+            
+                GROUP BY ls.source_name
+            
+                ORDER BY roi DESC
+            """, nativeQuery = true)
+    List<RoiLeadSourceResponse> getROIByLeadSource();
+    @Query(value = """
+    SELECT
+        l.industry_type AS industry,
+
+        SUM(l.business_result) AS revenue
+        FROM lead l
+        
+            GROUP BY l.industry_type
+        
+            ORDER BY revenue DESC
+        """, nativeQuery = true)
+            List<RevenueIndustryResponse> getRevenueByIndustry();
+        
+
+
+   List<LostReasonSummaryProjection> getLostReasonSummary(
+            @Param("productId") String productId
+   );
 }
+
+
