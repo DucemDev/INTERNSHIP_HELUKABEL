@@ -163,6 +163,75 @@
         </div>
 
         <!-- ========================================== -->
+        <!-- MODAL: DANH SÁCH LEADS THEO TRẠNG THÁI -->
+        <!-- ========================================== -->
+        <div id="leadStatusModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" onclick="closeLeadModal()"></div>
+                
+                <!-- Trick to center modal -->
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                
+                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full border border-slate-200">
+                    <!-- Header -->
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                            <span id="modalStatusTitle" class="text-blue-600">Status</span>
+                            <span class="text-slate-400 font-medium text-lg">| Danh sách Leads</span>
+                        </h3>
+                        <button onclick="closeLeadModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
+                            <i data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Body -->
+                    <div class="p-6">
+                        <div id="modalTableContainer" class="overflow-hidden rounded-xl border border-slate-100 shadow-sm">
+                            <div class="overflow-x-auto max-h-[60vh]">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="sticky top-0 z-10">
+                                        <tr class="bg-slate-50 border-b border-slate-100">
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap">Lead ID</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap">Tài khoản/Công ty</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap">Người liên hệ</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap">Email</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap">Số điện thoại</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap">Trạng thái</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap">Người phụ trách</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap">Ngày tạo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modalTableBody" class="divide-y divide-slate-50 bg-white">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Loading State -->
+                        <div id="modalLoading" class="hidden py-12 text-center">
+                            <i data-lucide="loader-2" class="w-10 h-10 animate-spin text-blue-500 mx-auto mb-4"></i>
+                            <p class="text-slate-500 font-medium">Đang truy xuất dữ liệu từ hệ thống...</p>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div id="modalEmpty" class="hidden py-12 text-center">
+                            <div class="bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="folder-open" class="w-8 h-8 text-slate-300"></i>
+                            </div>
+                            <p class="text-slate-500 font-bold">Không tìm thấy Lead nào cho trạng thái này.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                        <button onclick="closeLeadModal()" class="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm">Đóng cửa sổ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
         <!-- THƯ VIỆN JAVASCRIPT BÊN NGOÀI -->
         <!-- ========================================== -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -257,7 +326,23 @@
                         plugins: {
                             legend: {
                                 position: 'right',
-                                labels: { usePointStyle: true, padding: 20, font: { size: 13, weight: '600' } }
+                                labels: { 
+                                    usePointStyle: true, 
+                                    padding: 20, 
+                                    font: { size: 13, weight: '600' },
+                                    cursor: 'pointer'
+                                },
+                                // XỬ LÝ CLICK VÀO LEGEND ĐỂ MỞ MODAL
+                                onClick: (e, legendItem, legend) => {
+                                    // 1. Lấy tên status gốc (bỏ phần % trong ngoặc)
+                                    const statusName = labels[legendItem.index];
+                                    
+                                    // 2. Gọi hàm mở modal
+                                    openLeadStatusModal(statusName);
+                                    
+                                    // 3. Giữ hành vi mặc định (ẩn/hiện dataset)
+                                    Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
+                                }
                             }
                         }
                     });
@@ -522,6 +607,98 @@
                 }
             }
 
+            // ==========================================
+            // LOGIC XỬ LÝ MODAL CHI TIẾT LEADS THEO STATUS
+            // ==========================================
+
+            /**
+             * Mở modal và tải danh sách Lead theo Status
+             */
+            async function openLeadStatusModal(status) {
+                const modal = document.getElementById('leadStatusModal');
+                const title = document.getElementById('modalStatusTitle');
+                const tbody = document.getElementById('modalTableBody');
+                const loading = document.getElementById('modalLoading');
+                const empty = document.getElementById('modalEmpty');
+                const container = document.getElementById('modalTableContainer');
+
+                // Setup giao diện ban đầu
+                title.innerText = status;
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Khóa cuộn trang chính
+
+                tbody.innerHTML = '';
+                loading.classList.remove('hidden');
+                empty.classList.add('hidden');
+                container.classList.add('hidden');
+                
+                lucide.createIcons();
+
+                try {
+                    // Gọi API lấy dữ liệu
+                    const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    
+                    const data = await res.json();
+                    loading.classList.add('hidden');
+
+                    if (!data || !Array.isArray(data) || data.length === 0) {
+                        empty.classList.remove('hidden');
+                        return;
+                    }
+
+                    // Render dữ liệu vào bảng
+                    container.classList.remove('hidden');
+                    data.forEach(lead => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50 transition-colors group';
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 text-[11px] font-bold text-slate-400">#${lead.leadId || '-'}</td>
+                            <td class="px-4 py-3 text-sm font-bold text-slate-800">${lead.account || '-'}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600">${lead.fullName || '-'}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500">${lead.email || '-'}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500">${lead.phoneNumber || '-'}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-1 rounded-lg text-[10px] font-black uppercase ${getStatusBadgeClass(lead.status)}">
+                                    ${lead.status || '-'}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm font-medium text-slate-700">${lead.userName || 'Chưa gán'}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500">${lead.createdDate || '-'}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    lucide.createIcons();
+                } catch (error) {
+                    console.error('Error fetching leads for modal:', error);
+                    loading.classList.add('hidden');
+                    tbody.innerHTML = `<tr><td colspan="8" class="py-12 text-center text-red-500 font-bold">Không thể tải dữ liệu. Vui lòng thử lại sau.</td></tr>`;
+                    container.classList.remove('hidden');
+                }
+            }
+
+            /**
+             * Đóng modal
+             */
+            function closeLeadModal() {
+                document.getElementById('leadStatusModal').classList.add('hidden');
+                document.body.style.overflow = ''; // Mở lại cuộn trang chính
+            }
+
+            /**
+             * Helper: Trả về class màu sắc cho badge trạng thái
+             */
+            function getStatusBadgeClass(status) {
+                switch(status?.toLowerCase()) {
+                    case 'won': return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+                    case 'lost': return 'bg-red-100 text-red-700 border border-red-200';
+                    case 'new': return 'bg-blue-100 text-blue-700 border border-blue-200';
+                    case 'contacted': return 'bg-amber-100 text-amber-700 border border-amber-200';
+                    case 'qualified': return 'bg-purple-100 text-purple-700 border border-purple-200';
+                    default: return 'bg-slate-100 text-slate-600 border border-slate-200';
+                }
+            }
+
             // HÀM 7: Bảng dữ liệu Leads lọc theo Status
             async function loadLeadsByStatus(status) {
                 try {
@@ -529,7 +706,7 @@
                     tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto"></i></td></tr>`;
                     lucide.createIcons();
 
-                    const res = await fetch(`${API_BASE}/leads-by-status?status=${status}`);
+                    const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
                     const data = await res.json();
                     
                     tbody.innerHTML = '';

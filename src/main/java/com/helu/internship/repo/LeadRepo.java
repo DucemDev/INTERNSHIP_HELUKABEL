@@ -71,7 +71,11 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             l.status,
             l.region,
             l.industryType,
-            l.customerGroup
+            l.customerGroup,
+            CAST(NULL AS string),
+            CAST(NULL AS string),
+            l.user.fullName,
+            l.createdDate
         )
         FROM LeadEntity l
         WHERE l.status = :status
