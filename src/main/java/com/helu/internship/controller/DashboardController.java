@@ -36,12 +36,24 @@ public class DashboardController {
         return dashboardService.getWinRateBySalesOwner();
     }
 
+    @GetMapping("/win-rate-by-industry")
+    public List<WinRateByIndustryProjection> getWinRateByIndustry() {
+        return dashboardService.getWinRateByIndustry();
+    }
+
+    @GetMapping("/win-rate-by-region")
+    public List<WinRateByRegionProjection> getWinRateByRegion() {
+        return dashboardService.getWinRateByRegion();
+    }
+
     @GetMapping("/cost-per-win-source")
     public List<CostPerWinBySourceResponse> getCostPerWinByLeadSource() {
         return dashboardService.getCostPerWinByLeadSource();
     }
     @GetMapping("/lost-reasons")
-    public List<LostReasonSummaryProjection> getLostReasonSummary() {
-        return dashboardService.getLostReasonSummary();
+    public List<LostReasonSummaryProjection> getLostReasonSummary(
+            @RequestParam(required = false) String productId
+    ) {
+        return dashboardService.getLostReasonSummary(productId);
     }
 }

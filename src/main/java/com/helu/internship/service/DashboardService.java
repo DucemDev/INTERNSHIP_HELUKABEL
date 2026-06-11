@@ -21,8 +21,12 @@ public interface DashboardService {
 
     List<WinRateBySalesResponse> getWinRateBySalesOwner();
 
+    List<WinRateByIndustryProjection> getWinRateByIndustry();
+
+    List<WinRateByRegionProjection> getWinRateByRegion();
+
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
 
-    List<LostReasonSummaryProjection> getLostReasonSummary();
+    List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
 }
 

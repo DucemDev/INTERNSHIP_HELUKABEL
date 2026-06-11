@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class DashboardServiceImpl implements DashboardService {
+public
+class DashboardServiceImpl implements DashboardService {
 
     private final LeadRepo leadRepo;
     private final LeadStatusHistoryRepo leadStatusHistoryRepo;
@@ -32,6 +33,15 @@ public class DashboardServiceImpl implements DashboardService {
         this.pipelineCoverageRepo = pipelineCoverageRepo;
     }
 
+    @Override
+    public List<WinRateByIndustryProjection> getWinRateByIndustry() {
+        return leadRepo.getWinRateByIndustry();
+    }
+    @Override
+    public List<WinRateByRegionProjection> getWinRateByRegion() {
+        return leadRepo.getWinRateByRegion();
+    }
+    
     @Override
     public List<LeadStatusCountResponse> getLeadStatusCount() {
         return leadRepo.countLeadByStatus()
@@ -79,8 +89,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<LostReasonSummaryProjection> getLostReasonSummary() {
-        return leadRepo.getLostReasonSummary();
+    public List<LostReasonSummaryProjection> getLostReasonSummary(String productId) {
+        return leadRepo.getLostReasonSummary(productId);
     }
 }
 

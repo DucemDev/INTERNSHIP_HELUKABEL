@@ -127,6 +127,99 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
     @Query(value = """
     SELECT
+        industry_type AS industryType,
+
+        CAST(SUM(
+            CASE
+                WHEN status IN ('Qualified','Won')
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS qualifiedLead,
+
+        CAST(SUM(
+            CASE
+                WHEN status = 'Won'
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS wonLead,
+
+        CAST((
+            SUM(
+                CASE
+                    WHEN status = 'Won'
+                    THEN 1
+                    ELSE 0
+                END
+            ) * 100.0
+            /
+            NULLIF(
+                SUM(
+                    CASE
+                        WHEN status IN ('Qualified','Won')
+                        THEN 1
+                        ELSE 0
+                    END
+                ),
+                0
+            )
+        ) AS DECIMAL(18,2)) AS winRate
+
+    FROM lead
+    GROUP BY industry_type
+    ORDER BY winRate DESC
+    """, nativeQuery = true)
+    List<WinRateByIndustryProjection> getWinRateByIndustry();
+
+    @Query(value = """
+    SELECT
+        region AS region,
+
+        CAST(SUM(
+            CASE
+                WHEN status IN ('Qualified','Won')
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS qualifiedLead,
+
+        CAST(SUM(
+            CASE
+                WHEN status = 'Won'
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS wonLead,
+
+        CAST((
+            SUM(
+                CASE
+                    WHEN status = 'Won'
+                    THEN 1
+                    ELSE 0
+                END
+            ) * 100.0
+            /
+            NULLIF(
+                SUM(
+                    CASE
+                        WHEN status IN ('Qualified','Won')
+                        THEN 1
+                        ELSE 0
+                    END
+                ),
+                0
+            )
+        ) AS DECIMAL(18,2)) AS winRate
+
+    FROM lead
+    GROUP BY region
+    ORDER BY winRate DESC
+    """, nativeQuery = true)
+    List<WinRateByRegionProjection> getWinRateByRegion();
+    @Query(value = """
+    SELECT
         ls.source_id AS sourceId,
         ls.source_name AS sourceName,
         SUM(l.cost) AS totalCost,
@@ -186,13 +279,20 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     Optional<LeadListProjection> findLeadByIdForView(@Param("id") String id);
     @Query(value = """
     SELECT
-        loss_reason AS lossReason,
-        COUNT(*) AS totalLost
-    FROM lead
-    WHERE status = 'Lost'
-        AND loss_reason IS NOT NULL
-    GROUP BY loss_reason
+        l.loss_reason AS lossReason,
+        COUNT(DISTINCT l.lead_id) AS totalLost
+    FROM lead l
+    INNER JOIN lead_item li
+        ON l.lead_id = li.lead_id
+    INNER JOIN product p
+        ON li.product_id = p.product_id
+    WHERE l.status = 'Lost'
+        AND l.loss_reason IS NOT NULL
+        AND (:productId IS NULL OR p.product_id = :productId)
+    GROUP BY l.loss_reason
     ORDER BY totalLost DESC
     """, nativeQuery = true)
-    List<LostReasonSummaryProjection> getLostReasonSummary();
+    List<LostReasonSummaryProjection> getLostReasonSummary(
+            @Param("productId") String productId
+    );
 }
