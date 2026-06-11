@@ -1,10 +1,6 @@
 package com.helu.internship.controller;
 
-import com.helu.internship.dto.response.ConversionRateResponse;
-import com.helu.internship.dto.response.CostPerWinBySourceResponse;
-import com.helu.internship.dto.response.LeadByStatusResponse;
-import com.helu.internship.dto.response.LeadStatusCountResponse;
-import com.helu.internship.dto.response.WinRateBySalesResponse;
+import com.helu.internship.dto.response.*;
 import com.helu.internship.service.DashboardService;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,8 +36,24 @@ public class DashboardController {
         return dashboardService.getWinRateBySalesOwner();
     }
 
+    @GetMapping("/win-rate-by-industry")
+    public List<WinRateByIndustryProjection> getWinRateByIndustry() {
+        return dashboardService.getWinRateByIndustry();
+    }
+
+    @GetMapping("/win-rate-by-region")
+    public List<WinRateByRegionProjection> getWinRateByRegion() {
+        return dashboardService.getWinRateByRegion();
+    }
+
     @GetMapping("/cost-per-win-source")
     public List<CostPerWinBySourceResponse> getCostPerWinByLeadSource() {
         return dashboardService.getCostPerWinByLeadSource();
+    }
+    @GetMapping("/lost-reasons")
+    public List<LostReasonSummaryProjection> getLostReasonSummary(
+            @RequestParam(required = false) String productId
+    ) {
+        return dashboardService.getLostReasonSummary(productId);
     }
 }

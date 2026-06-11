@@ -1,14 +1,8 @@
 package com.helu.internship.service.impl;
 
 
-import com.helu.internship.dto.response.ConversionRateResponse;
-import com.helu.internship.dto.response.CostPerWinBySourceResponse;
+import com.helu.internship.dto.response.*;
 
-import com.helu.internship.dto.response.LeadByStatusResponse;
-import com.helu.internship.dto.response.LeadSourceCostProjection;
-import com.helu.internship.dto.response.LeadStatusCountResponse;
-import com.helu.internship.dto.response.PipelineCoverageProjection;
-import com.helu.internship.dto.response.WinRateBySalesResponse;
 import com.helu.internship.repo.CostPerLeadRepo;
 import com.helu.internship.repo.LeadRepo;
 import com.helu.internship.repo.LeadStatusHistoryRepo;
@@ -19,7 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class DashboardServiceImpl implements DashboardService {
+public
+class DashboardServiceImpl implements DashboardService {
 
     private final LeadRepo leadRepo;
     private final LeadStatusHistoryRepo leadStatusHistoryRepo;
@@ -38,6 +33,15 @@ public class DashboardServiceImpl implements DashboardService {
         this.pipelineCoverageRepo = pipelineCoverageRepo;
     }
 
+    @Override
+    public List<WinRateByIndustryProjection> getWinRateByIndustry() {
+        return leadRepo.getWinRateByIndustry();
+    }
+    @Override
+    public List<WinRateByRegionProjection> getWinRateByRegion() {
+        return leadRepo.getWinRateByRegion();
+    }
+    
     @Override
     public List<LeadStatusCountResponse> getLeadStatusCount() {
         return leadRepo.countLeadByStatus()
@@ -65,9 +69,9 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<PipelineCoverageProjection> getPipelineCoverage() {
-        return pipelineCoverageRepo.getPipelineCoverage();
-    }
+    public List<PipelineCoverageProjection> getPipelineCoverage(
+            String sellerCode
+    ) {return pipelineCoverageRepo.getPipelineCoverage(sellerCode);}
 
     @Override
     public ConversionRateResponse getConversionRate() {
@@ -82,6 +86,11 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<CostPerWinBySourceResponse> getCostPerWinByLeadSource() {
         return leadRepo.getCostPerWinByLeadSource();
+    }
+
+    @Override
+    public List<LostReasonSummaryProjection> getLostReasonSummary(String productId) {
+        return leadRepo.getLostReasonSummary(productId);
     }
 }
 
