@@ -53,7 +53,18 @@ public class DashboardController {
     @GetMapping("/lost-reasons")
     public List<LostReasonSummaryProjection> getLostReasonSummary(
             @RequestParam(required = false) String productId
-    ) {
+    )
+    {
         return dashboardService.getLostReasonSummary(productId);
     }
+    @GetMapping("/revenue-industry")
+    public List<RevenueIndustryResponse> getRevenueByIndustry() {
+        return dashboardService.getRevenueByIndustry();
+    }
+    @GetMapping("/roi-lead-source")
+    public List<RoiLeadSourceResponse> getROIByLeadSource() {
+        return dashboardService.getROIByLeadSource();
+    }
+
+
 }

@@ -10,11 +10,11 @@ import com.helu.internship.repo.PipelineCoveragerRepo;
 import com.helu.internship.service.DashboardService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public
-class DashboardServiceImpl implements DashboardService {
+public class DashboardServiceImpl implements DashboardService {
 
     private final LeadRepo leadRepo;
     private final LeadStatusHistoryRepo leadStatusHistoryRepo;
@@ -89,8 +89,43 @@ class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<LostReasonSummaryProjection> getLostReasonSummary() {
+        return leadRepo.getLostReasonSummary(null);
+    }
+
+    @Override
     public List<LostReasonSummaryProjection> getLostReasonSummary(String productId) {
         return leadRepo.getLostReasonSummary(productId);
+    }
+    @Override
+    public List<RevenueIndustryResponse> getRevenueByIndustry() {
+        return leadRepo.getRevenueByIndustry();
+    }
+    @Override
+    public List<ConversionRateResponse> getConversionRateFilter(
+            String sourceId,
+            String sourceType,
+            String region,
+            String industry,
+            String salesOwnerId,
+            String  customerGroup,
+            LocalDate timeFrom,
+            LocalDate timeTo
+    ) {
+        return leadRepo.getConversionRateFilter(
+                sourceId,
+                sourceType,
+                region,
+                industry,
+                salesOwnerId,
+                customerGroup,
+                timeFrom,
+                timeTo
+        );
+    }
+    @Override
+    public List<RoiLeadSourceResponse> getROIByLeadSource() {
+        return leadRepo.getROIByLeadSource();
     }
 }
 
