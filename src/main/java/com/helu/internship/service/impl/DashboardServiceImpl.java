@@ -34,6 +34,15 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<WinRateByIndustryProjection> getWinRateByIndustry() {
+        return leadRepo.getWinRateByIndustry();
+    }
+    @Override
+    public List<WinRateByRegionProjection> getWinRateByRegion() {
+        return leadRepo.getWinRateByRegion();
+    }
+    
+    @Override
     public List<LeadStatusCountResponse> getLeadStatusCount() {
         return leadRepo.countLeadByStatus()
                 .stream()
@@ -80,8 +89,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<LostReasonSummaryProjection> getLostReasonSummary() {
-        return leadRepo.getLostReasonSummary();
+    public List<LostReasonSummaryProjection> getLostReasonSummary(String productId) {
+        return leadRepo.getLostReasonSummary(productId);
     }
     @Override
     public List<RevenueIndustryResponse> getRevenueByIndustry() {
