@@ -8,8 +8,13 @@ spring:
   datasource:
     url: jdbc:sqlserver://localhost:1433;databaseName=INTERNSHIP_2026;encrypt=true;trustServerCertificate=true
 
+<<<<<<< HEAD
     username: sa
     password: sa12345
+=======
+    username: sa3
+    password: 123456
+>>>>>>> f18d53d5646787d70da69c9257885a4685a3fb25
 
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 

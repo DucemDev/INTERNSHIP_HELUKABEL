@@ -11,7 +11,7 @@ public interface DashboardService {
 
     List<LeadSourceCostProjection> getLeadSourceCostDashboard();
 
-    List<PipelineCoverageProjection> getPipelineCoverage();
+    List<PipelineCoverageProjection> getPipelineCoverage(String sellerCode);
 
     List<LeadStatusCountResponse> getLeadStatusCount();
 
@@ -26,5 +26,7 @@ public interface DashboardService {
     List<WinRateByRegionProjection> getWinRateByRegion();
 
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
+
+    List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
 }
 

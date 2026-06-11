@@ -277,4 +277,22 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 u.full_name
             """, nativeQuery = true)
     Optional<LeadListProjection> findLeadByIdForView(@Param("id") String id);
+    @Query(value = """
+    SELECT
+        l.loss_reason AS lossReason,
+        COUNT(DISTINCT l.lead_id) AS totalLost
+    FROM lead l
+    INNER JOIN lead_item li
+        ON l.lead_id = li.lead_id
+    INNER JOIN product p
+        ON li.product_id = p.product_id
+    WHERE l.status = 'Lost'
+        AND l.loss_reason IS NOT NULL
+        AND (:productId IS NULL OR p.product_id = :productId)
+    GROUP BY l.loss_reason
+    ORDER BY totalLost DESC
+    """, nativeQuery = true)
+    List<LostReasonSummaryProjection> getLostReasonSummary(
+            @Param("productId") String productId
+    );
 }

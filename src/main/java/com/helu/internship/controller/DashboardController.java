@@ -50,4 +50,10 @@ public class DashboardController {
     public List<CostPerWinBySourceResponse> getCostPerWinByLeadSource() {
         return dashboardService.getCostPerWinByLeadSource();
     }
+    @GetMapping("/lost-reasons")
+    public List<LostReasonSummaryProjection> getLostReasonSummary(
+            @RequestParam(required = false) String productId
+    ) {
+        return dashboardService.getLostReasonSummary(productId);
+    }
 }

@@ -6,6 +6,7 @@ import com.helu.internship.dto.response.PipelineCoverageProjection;
 import com.helu.internship.service.DashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -29,7 +30,11 @@ import java.util.List;
         return dashboardService.getLeadSourceCostDashboard();
     }
     @GetMapping("/pipeline-coverage")
-    public List<PipelineCoverageProjection> getPipelineCoverage() {
-        return dashboardService.getPipelineCoverage();
+    public List<PipelineCoverageProjection> getPipelineCoverage(
+            @RequestParam(required = false) String sellerCode,
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year
+    ) {
+        return dashboardService.getPipelineCoverage(sellerCode);
     }
 }
