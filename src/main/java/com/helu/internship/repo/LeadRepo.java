@@ -293,8 +293,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     GROUP BY l.loss_reason
     ORDER BY totalLost DESC
     """, nativeQuery = true)
-
-    List<LostReasonSummaryProjection> getLostReasonSummary();
+    List<LostReasonSummaryProjection> getLostReasonSummary(@Param("productId") String productId);
 
     @Query(value = """
                 SELECT
@@ -378,12 +377,6 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             ORDER BY revenue DESC
         """, nativeQuery = true)
             List<RevenueIndustryResponse> getRevenueByIndustry();
-        
-
-
-   List<LostReasonSummaryProjection> getLostReasonSummary(
-            @Param("productId") String productId
-   );
 }
 
 
