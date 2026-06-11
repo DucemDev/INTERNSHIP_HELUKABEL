@@ -1,6 +1,6 @@
 <aside class="fixed left-0 top-0 z-[1001] flex h-screen w-64 flex-col border-r border-helu-border bg-white transition-all duration-300 sidebar" th:fragment="sidebar">
     <div class="flex h-20 items-center justify-between px-6 border-bottom border-helu-border">
-        <a href="/" class="flex items-center">
+        <a th:href="@{/dashboard}" class="flex items-center">
             <img th:src="@{/images/logo.png}" alt="HELUKABEL" class="h-9 w-auto object-contain">
         </a>
         <button class="p-2 text-gray-400 hover:text-helu-red lg:hidden" onclick="toggleSidebar()">
