@@ -1,10 +1,6 @@
 package com.helu.internship.repo;
 
-import com.helu.internship.dto.response.ConversionRateResponse;
-import com.helu.internship.dto.response.CostPerWinBySourceResponse;
-import com.helu.internship.dto.response.LeadByStatusResponse;
-import com.helu.internship.dto.response.LeadListProjection;
-import com.helu.internship.dto.response.WinRateBySalesResponse;
+import com.helu.internship.dto.response.*;
 import com.helu.internship.entity.LeadEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -188,4 +184,15 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 u.full_name
             """, nativeQuery = true)
     Optional<LeadListProjection> findLeadByIdForView(@Param("id") String id);
+    @Query(value = """
+    SELECT
+        loss_reason AS lossReason,
+        COUNT(*) AS totalLost
+    FROM lead
+    WHERE status = 'Lost'
+        AND loss_reason IS NOT NULL
+    GROUP BY loss_reason
+    ORDER BY totalLost DESC
+    """, nativeQuery = true)
+    List<LostReasonSummaryProjection> getLostReasonSummary();
 }

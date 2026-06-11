@@ -1,14 +1,7 @@
 package com.helu.internship.service;
 
 
-import com.helu.internship.dto.response.ConversionRateResponse;
-import com.helu.internship.dto.response.CostPerWinBySourceResponse;
-
-import com.helu.internship.dto.response.LeadByStatusResponse;
-import com.helu.internship.dto.response.LeadSourceCostProjection;
-import com.helu.internship.dto.response.LeadStatusCountResponse;
-import com.helu.internship.dto.response.PipelineCoverageProjection;
-import com.helu.internship.dto.response.WinRateBySalesResponse;
+import com.helu.internship.dto.response.*;
 
 import java.util.List;
 
@@ -29,5 +22,7 @@ public interface DashboardService {
     List<WinRateBySalesResponse> getWinRateBySalesOwner();
 
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
+
+    List<LostReasonSummaryProjection> getLostReasonSummary();
 }
 
