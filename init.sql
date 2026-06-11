@@ -25,179 +25,165 @@ GO
 -- 1. CREATE TABLES
 -- =================================================================================
 CREATE TABLE role
-(
-    role_id     INT IDENTITY(1,1) NOT NULL,
-    role_name   NVARCHAR(50) NOT NULL,
-    description NVARCHAR(255) NULL,
-    CONSTRAINT PK_role PRIMARY KEY (role_id)
-);
+(role_id     INT IDENTITY(1,1) NOT NULL,
+ role_name   NVARCHAR(50) NOT NULL,
+ description NVARCHAR(255) NULL,
+ CONSTRAINT PK_role PRIMARY KEY (role_id));
 GO
 
 CREATE TABLE [user]
-(
-    user_id
-    UNIQUEIDENTIFIER
-    DEFAULT
-    NEWSEQUENTIALID
-(
-) NOT NULL,
+(user_id
+ UNIQUEIDENTIFIER
+ DEFAULT
+ NEWSEQUENTIALID
+() NOT NULL,
     user_code VARCHAR
-(
-    50
-) NOT NULL UNIQUE,
+(50) NOT NULL UNIQUE,
     username VARCHAR
-(
-    50
-) NOT NULL UNIQUE, -- Phục hồi cột username vì bạn dùng mã này để login
+(50) NOT NULL UNIQUE, -- Phục hồi cột username vì bạn dùng mã này để login
     password VARCHAR
-(
-    255
-) NOT NULL,
+(255) NOT NULL,
     full_name NVARCHAR
-(
-    100
-) NOT NULL,
+(100) NOT NULL,
     email VARCHAR
-(
-    100
-) NULL,
+(100) NULL,
     role_id INT NOT NULL,
     is_active BIT DEFAULT 1 NOT NULL,
     created_at DATETIME2 DEFAULT SYSDATETIME
-(
-) NOT NULL,
+() NOT NULL,
     CONSTRAINT PK_user PRIMARY KEY
-(
-    user_id
-),
+(user_id),
     CONSTRAINT FK_user_role FOREIGN KEY
-(
-    role_id
-) REFERENCES role
-(
-    role_id
-)
-    );
+(role_id) REFERENCES role
+(role_id));
 GO
 
 CREATE TABLE lead_source
-(
-    source_id   VARCHAR(50) NOT NULL,
-    source_name NVARCHAR(100) NOT NULL,
-    source_type VARCHAR(20) NOT NULL, -- Thuộc tính mới thêm vào
+(source_id   VARCHAR(50) NOT NULL,
+ source_name NVARCHAR(100) NOT NULL,
+ source_type VARCHAR(20) NOT NULL, -- Thuộc tính mới thêm vào
 
-    CONSTRAINT PK_lead_source PRIMARY KEY (source_id),
+ CONSTRAINT PK_lead_source PRIMARY KEY (source_id),
     -- Ràng buộc CHECK để đảm bảo dữ liệu luôn chuẩn hóa, chỉ nhận 1 trong 2 giá trị này
-    CONSTRAINT CHK_source_type CHECK (source_type IN ('IN BOUND', 'OUT BOUND'))
-);
+ CONSTRAINT CHK_source_type CHECK (source_type IN ('IN BOUND', 'OUT BOUND')));
 GO
 
 CREATE TABLE product
-(
-    product_id   VARCHAR(50) NOT NULL,
-    product_name NVARCHAR(100) NOT NULL,
-    CONSTRAINT PK_product PRIMARY KEY (product_id)
-);
+(product_id   VARCHAR(50) NOT NULL,
+ product_name NVARCHAR(100) NOT NULL,
+ CONSTRAINT PK_product PRIMARY KEY (product_id));
 GO
 
 CREATE TABLE lead
-(
-    lead_id         VARCHAR(50)      NOT NULL,
-    created_date    DATE             NOT NULL,
-    full_name       NVARCHAR(100) NOT NULL,
-    account         NVARCHAR(150) NOT NULL,
-    industry_type   NVARCHAR(100) NOT NULL,
-    customer_group  NVARCHAR(50) NOT NULL,
-    customer_role   NVARCHAR(50) NOT NULL,
-    location        NVARCHAR(100) NOT NULL,
-    region          NVARCHAR(50) NOT NULL,
-    status          NVARCHAR(50) NOT NULL,
-    cost            DECIMAL(18, 2)   NOT NULL,
-    loss_reason     NVARCHAR(100) NULL,
-    business_result DECIMAL(18, 2) NULL,
+(lead_id         VARCHAR(50)      NOT NULL,
+ created_date    DATE             NOT NULL,
+ full_name       NVARCHAR(100) NOT NULL,
+ account         NVARCHAR(150) NOT NULL,
+ industry_type   NVARCHAR(100) NOT NULL,
+ customer_group  NVARCHAR(50) NOT NULL,
+ customer_role   NVARCHAR(50) NOT NULL,
+ location        NVARCHAR(100) NOT NULL,
+ region          NVARCHAR(50) NOT NULL,
+ status          NVARCHAR(50) NOT NULL,
+ cost            DECIMAL(18, 2)   NOT NULL,
+ loss_reason     NVARCHAR(100) NULL,
+ business_result DECIMAL(18, 2) NULL,
     -- product_id đã bị xóa theo Hướng 2
-    source_id       VARCHAR(50)      NOT NULL,
-    user_id         UNIQUEIDENTIFIER NOT NULL,
-    CONSTRAINT PK_lead PRIMARY KEY (lead_id),
-    CONSTRAINT FK_lead_source FOREIGN KEY (source_id) REFERENCES lead_source (source_id),
-    CONSTRAINT FK_lead_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
-);
+ source_id       VARCHAR(50)      NOT NULL,
+ user_id         UNIQUEIDENTIFIER NOT NULL,
+ CONSTRAINT PK_lead PRIMARY KEY (lead_id),
+ CONSTRAINT FK_lead_source FOREIGN KEY (source_id) REFERENCES lead_source (source_id),
+ CONSTRAINT FK_lead_user FOREIGN KEY (user_id) REFERENCES [user](user_id));
 GO
 
 CREATE TABLE lead_item
-(
-    item_id          BIGINT IDENTITY(1,1) NOT NULL,
-    lead_id          VARCHAR(50)    NOT NULL,
-    product_id       VARCHAR(50)    NOT NULL,
-    quantity         INT            NOT NULL DEFAULT 1,
-    expected_revenue DECIMAL(18, 2) NOT NULL,
-    CONSTRAINT PK_lead_item PRIMARY KEY (item_id),
-    CONSTRAINT FK_lead_item_lead FOREIGN KEY (lead_id) REFERENCES lead (lead_id) ON DELETE CASCADE,
-    CONSTRAINT FK_lead_item_product FOREIGN KEY (product_id) REFERENCES product (product_id)
-);
+(item_id          BIGINT IDENTITY(1,1) NOT NULL,
+ lead_id          VARCHAR(50)    NOT NULL,
+ product_id       VARCHAR(50)    NOT NULL,
+ quantity         INT            NOT NULL DEFAULT 1,
+ expected_revenue DECIMAL(18, 2) NOT NULL,
+ CONSTRAINT PK_lead_item PRIMARY KEY (item_id),
+ CONSTRAINT FK_lead_item_lead FOREIGN KEY (lead_id) REFERENCES lead (lead_id) ON DELETE CASCADE,
+ CONSTRAINT FK_lead_item_product FOREIGN KEY (product_id) REFERENCES product (product_id));
 GO
 
 CREATE TABLE lead_status_history
-(
-    history_id         BIGINT IDENTITY(1,1) NOT NULL,
-    lead_id            VARCHAR(50)                     NOT NULL,
-    old_status         NVARCHAR(50) NULL,
-    new_status         NVARCHAR(50) NOT NULL,
-    changed_at         DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
-    changed_by_user_id UNIQUEIDENTIFIER NULL,
-    note               NVARCHAR(255) NULL,
-    CONSTRAINT PK_lead_status_history PRIMARY KEY (history_id),
-    CONSTRAINT FK_history_lead FOREIGN KEY (lead_id) REFERENCES lead (lead_id),
-    CONSTRAINT FK_history_user FOREIGN KEY (changed_by_user_id) REFERENCES [user](user_id)
-);
+(history_id         BIGINT IDENTITY(1,1) NOT NULL,
+ lead_id            VARCHAR(50)                     NOT NULL,
+ old_status         NVARCHAR(50) NULL,
+ new_status         NVARCHAR(50) NOT NULL,
+ changed_at         DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+ changed_by_user_id UNIQUEIDENTIFIER NULL,
+ note               NVARCHAR(255) NULL,
+ CONSTRAINT PK_lead_status_history PRIMARY KEY (history_id),
+ CONSTRAINT FK_history_lead FOREIGN KEY (lead_id) REFERENCES lead (lead_id),
+ CONSTRAINT FK_history_user FOREIGN KEY (changed_by_user_id) REFERENCES [user](user_id));
 GO
 
 CREATE TABLE activity_log
-(
-    log_id      BIGINT IDENTITY(1,1) NOT NULL,
-    user_id     UNIQUEIDENTIFIER NULL,
-    action_type VARCHAR(50)                     NOT NULL,
-    entity_type VARCHAR(50)                     NOT NULL,
-    entity_id   VARCHAR(50) NULL,
-    description NVARCHAR(MAX) NULL,
-    created_at  DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
-    CONSTRAINT PK_activity_log PRIMARY KEY (log_id),
-    CONSTRAINT FK_activity_log_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
-);
+(log_id      BIGINT IDENTITY(1,1) NOT NULL,
+ user_id     UNIQUEIDENTIFIER NULL,
+ action_type VARCHAR(50)                     NOT NULL,
+ entity_type VARCHAR(50)                     NOT NULL,
+ entity_id   VARCHAR(50) NULL,
+ description NVARCHAR(MAX) NULL,
+ created_at  DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+ CONSTRAINT PK_activity_log PRIMARY KEY (log_id),
+ CONSTRAINT FK_activity_log_user FOREIGN KEY (user_id) REFERENCES [user](user_id));
 GO
 
 CREATE TABLE notification
-(
-    notification_id BIGINT IDENTITY(1,1) NOT NULL,
-    user_id         UNIQUEIDENTIFIER                NOT NULL,
-    title           NVARCHAR(150) NOT NULL,
-    message         NVARCHAR(MAX) NOT NULL,
-    is_read         BIT       DEFAULT 0             NOT NULL,
-    related_link    VARCHAR(255) NULL,
-    created_at      DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
-    CONSTRAINT PK_notification PRIMARY KEY (notification_id),
-    CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id)
-);
+(notification_id BIGINT IDENTITY(1,1) NOT NULL,
+ user_id         UNIQUEIDENTIFIER                NOT NULL,
+ title           NVARCHAR(150) NOT NULL,
+ message         NVARCHAR(MAX) NOT NULL,
+ is_read         BIT       DEFAULT 0             NOT NULL,
+ related_link    VARCHAR(255) NULL,
+ created_at      DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+ CONSTRAINT PK_notification PRIMARY KEY (notification_id),
+ CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id));
 GO
 
 CREATE TABLE sales_target
-(
-    target_id      BIGINT IDENTITY(1,1) NOT NULL,
-    user_id        UNIQUEIDENTIFIER                NOT NULL, -- Seller được giao chỉ tiêu
-    period_month   INT                             NOT NULL, -- Tháng (1-12)
-    period_year    INT                             NOT NULL, -- Năm (VD: 2026)
-    revenue_target DECIMAL(18, 2)                  NOT NULL, -- Chỉ tiêu doanh thu (VD: 5,000,000,000)
-    created_by     UNIQUEIDENTIFIER                NOT NULL, -- Admin giao chỉ tiêu
-    created_at     DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+(target_id      BIGINT IDENTITY(1,1) NOT NULL,
+ user_id        UNIQUEIDENTIFIER                NOT NULL, -- Seller được giao chỉ tiêu
+ period_month   INT                             NOT NULL, -- Tháng (1-12)
+ period_year    INT                             NOT NULL, -- Năm (VD: 2026)
+ revenue_target DECIMAL(18, 2)                  NOT NULL, -- Chỉ tiêu doanh thu (VD: 5,000,000,000)
+ created_by     UNIQUEIDENTIFIER                NOT NULL, -- Admin giao chỉ tiêu
+ created_at     DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
 
-    CONSTRAINT PK_sales_target PRIMARY KEY (target_id),
-    CONSTRAINT FK_target_user FOREIGN KEY (user_id) REFERENCES [user](user_id),
-    CONSTRAINT FK_target_creator FOREIGN KEY (created_by) REFERENCES [user](user_id),
+ CONSTRAINT PK_sales_target PRIMARY KEY (target_id),
+ CONSTRAINT FK_target_user FOREIGN KEY (user_id) REFERENCES [user](user_id),
+ CONSTRAINT FK_target_creator FOREIGN KEY (created_by) REFERENCES [user](user_id),
     -- Đảm bảo 1 nhân viên chỉ có 1 target trong 1 tháng của 1 năm
-    CONSTRAINT UQ_sales_target_period UNIQUE (user_id, period_month, period_year),
+ CONSTRAINT UQ_sales_target_period UNIQUE (user_id, period_month, period_year),
     -- Đảm bảo dữ liệu tháng hợp lệ
-    CONSTRAINT CHK_target_month CHECK (period_month >= 1 AND period_month <= 12)
-);
+ CONSTRAINT CHK_target_month CHECK (period_month >= 1 AND period_month <= 12));
+GO
+
+-- =================================================================================
+-- CREATE TABLE: lead_bant_point (Mô hình chấm điểm B-A-N-T)
+-- Thang điểm: 0 đến 100 cho mỗi tiêu chí (Tổng tối đa 400)
+-- =================================================================================
+CREATE TABLE lead_bant_point
+(lead_id     VARCHAR(50) NOT NULL,
+ budget      INT NOT NULL DEFAULT 0,
+ authority   INT NOT NULL DEFAULT 0,
+ need        INT NOT NULL DEFAULT 0,
+ timeline    INT NOT NULL DEFAULT 0,
+
+    -- Computed column: Tự động tính tổng điểm và lưu vật lý xuống đĩa (PERSISTED)
+ total_score AS (budget + authority + need + timeline) PERSISTED,
+
+ CONSTRAINT PK_lead_bant_point PRIMARY KEY (lead_id),
+ CONSTRAINT FK_bant_lead FOREIGN KEY (lead_id) REFERENCES lead (lead_id) ON DELETE CASCADE,
+
+    -- Ràng buộc dữ liệu: Đảm bảo điểm nhập vào nằm trong khoảng 0-100
+ CONSTRAINT CHK_bant_score CHECK (budget >= 0 AND budget <= 100 AND
+                                  authority >= 0 AND authority <= 100 AND
+                                  need >= 0 AND need <= 100 AND
+                                  timeline >= 0 AND timeline <= 100));
 GO
 
 -- Thêm Index để Power BI dễ dàng truy vấn theo tháng/năm
@@ -1329,4 +1315,162 @@ INSERT INTO lead_status_history (lead_id, old_status, new_status, changed_at, ch
 ('L-2026-0150', N'Qualified', N'Proposal Sent', '2025-10-28 17:00:00', 'aa512e88-565a-44bb-84f6-612ecc49e949', NULL),
 ('L-2026-0150', N'Proposal Sent', N'In Negotiation', '2025-11-21 22:00:00', 'aa512e88-565a-44bb-84f6-612ecc49e949', NULL),
 ('L-2026-0150', N'In Negotiation', N'Lost', '2025-12-01 02:00:00', 'aa512e88-565a-44bb-84f6-612ecc49e949', N'Lost-No Budget');
+GO
+
+
+
+-- =================================================================================
+-- INSERT MOCK DATA: lead_bant_point (150 Leads)
+-- =================================================================================
+INSERT INTO lead_bant_point (lead_id, budget, authority, need, timeline) VALUES
+('L-2026-0001', 85, 75, 90, 80),
+('L-2026-0002', 95, 80, 85, 90),
+('L-2026-0003', 75, 95, 70, 85),
+('L-2026-0004', 60, 75, 80, 65),
+('L-2026-0005', 80, 85, 95, 70),
+('L-2026-0006', 45, 50, 60, 40), -- Điểm thấp tương ứng Lead Lost
+('L-2026-0007', 70, 65, 80, 85),
+('L-2026-0008', 85, 90, 75, 80),
+('L-2026-0009', 75, 70, 85, 75),
+('L-2026-0010', 90, 95, 100, 85),
+('L-2026-0011', 85, 80, 75, 90),
+('L-2026-0012', 65, 75, 60, 70),
+('L-2026-0013', 80, 85, 80, 85),
+('L-2026-0014', 95, 70, 90, 80),
+('L-2026-0015', 55, 45, 50, 65),
+('L-2026-0016', 75, 80, 70, 75),
+('L-2026-0017', 50, 65, 45, 55),
+('L-2026-0018', 95, 100, 90, 95),
+('L-2026-0019', 40, 55, 50, 45),
+('L-2026-0020', 80, 90, 85, 80),
+('L-2026-0021', 55, 60, 55, 65),
+('L-2026-0022', 90, 85, 95, 80),
+('L-2026-0023', 75, 70, 85, 75),
+('L-2026-0024', 60, 55, 65, 50),
+('L-2026-0025', 85, 75, 80, 90),
+('L-2026-0026', 90, 95, 85, 80),
+('L-2026-0027', 70, 85, 95, 75),
+('L-2026-0028', 85, 70, 80, 85),
+('L-2026-0029', 100, 90, 95, 100),
+('L-2026-0030', 80, 85, 75, 80),
+('L-2026-0031', 95, 80, 85, 90),
+('L-2026-0032', 75, 95, 80, 75),
+('L-2026-0033', 85, 75, 90, 85),
+('L-2026-0034', 40, 35, 55, 45), -- No Budget
+('L-2026-0035', 90, 95, 85, 80),
+('L-2026-0036', 55, 60, 45, 55), -- Product Fit Issue
+('L-2026-0037', 50, 55, 65, 50),
+('L-2026-0038', 45, 65, 55, 40),
+('L-2026-0039', 65, 55, 50, 65),
+('L-2026-0040', 70, 85, 75, 70),
+('L-2026-0041', 55, 40, 65, 55),
+('L-2026-0042', 85, 70, 85, 80),
+('L-2026-0043', 95, 85, 90, 95),
+('L-2026-0044', 100, 95, 90, 85),
+('L-2026-0045', 60, 65, 55, 50),
+('L-2026-0046', 75, 80, 85, 70),
+('L-2026-0047', 85, 75, 70, 85),
+('L-2026-0048', 70, 95, 85, 75),
+('L-2026-0049', 80, 85, 90, 85),
+('L-2026-0050', 55, 50, 45, 60),
+('L-2026-0051', 85, 75, 80, 85),
+('L-2026-0052', 90, 95, 85, 90),
+('L-2026-0053', 75, 80, 75, 85),
+('L-2026-0054', 80, 85, 95, 90),
+('L-2026-0055', 70, 75, 85, 70),
+('L-2026-0056', 55, 65, 50, 45), -- Timing Issue
+('L-2026-0057', 45, 50, 65, 55),
+('L-2026-0058', 80, 85, 75, 80),
+('L-2026-0059', 75, 95, 85, 80),
+('L-2026-0060', 85, 75, 80, 70),
+('L-2026-0061', 80, 85, 85, 95),
+('L-2026-0062', 65, 55, 60, 65),
+('L-2026-0063', 50, 65, 55, 50),
+('L-2026-0064', 75, 80, 75, 85),
+('L-2026-0065', 65, 55, 65, 50),
+('L-2026-0066', 95, 80, 85, 90),
+('L-2026-0067', 40, 65, 55, 50),
+('L-2026-0068', 100, 95, 100, 90),
+('L-2026-0069', 55, 50, 65, 45),
+('L-2026-0070', 75, 85, 80, 75),
+('L-2026-0071', 60, 55, 50, 65),
+('L-2026-0072', 55, 45, 55, 50),
+('L-2026-0073', 90, 85, 95, 80),
+('L-2026-0074', 80, 75, 85, 85),
+('L-2026-0075', 55, 65, 50, 45),
+('L-2026-0076', 85, 95, 80, 75),
+('L-2026-0077', 75, 80, 75, 85),
+('L-2026-0078', 45, 55, 65, 50),
+('L-2026-0079', 95, 80, 85, 90),
+('L-2026-0080', 75, 70, 80, 75),
+('L-2026-0081', 55, 65, 55, 60),
+('L-2026-0082', 80, 95, 85, 80),
+('L-2026-0083', 75, 80, 70, 85),
+('L-2026-0084', 85, 75, 80, 95),
+('L-2026-0085', 65, 55, 65, 50),
+('L-2026-0086', 90, 85, 95, 80),
+('L-2026-0087', 55, 65, 50, 55),
+('L-2026-0088', 60, 55, 65, 60),
+('L-2026-0089', 75, 85, 70, 75),
+('L-2026-0090', 80, 75, 85, 80),
+('L-2026-0091', 95, 90, 100, 85),
+('L-2026-0092', 85, 80, 95, 90),
+('L-2026-0093', 90, 85, 90, 85),
+('L-2026-0094', 75, 80, 75, 85),
+('L-2026-0095', 80, 95, 85, 80),
+('L-2026-0096', 70, 75, 80, 75),
+('L-2026-0097', 85, 80, 75, 85),
+('L-2026-0098', 95, 85, 90, 95),
+('L-2026-0099', 80, 75, 85, 80),
+('L-2026-0100', 75, 85, 70, 75),
+('L-2026-0101', 90, 85, 95, 80),
+('L-2026-0102', 75, 70, 85, 80),
+('L-2026-0103', 55, 65, 50, 55),
+('L-2026-0104', 85, 75, 80, 85),
+('L-2026-0105', 65, 50, 65, 60),
+('L-2026-0106', 70, 85, 75, 80),
+('L-2026-0107', 95, 80, 85, 90),
+('L-2026-0108', 90, 95, 80, 85),
+('L-2026-0109', 85, 80, 75, 95),
+('L-2026-0110', 75, 85, 80, 70),
+('L-2026-0111', 80, 75, 70, 85),
+('L-2026-0112', 45, 50, 65, 55),
+('L-2026-0113', 90, 100, 95, 80),
+('L-2026-0114', 55, 60, 55, 45),
+('L-2026-0115', 50, 45, 65, 55),
+('L-2026-0116', 95, 85, 80, 90),
+('L-2026-0117', 75, 80, 75, 85),
+('L-2026-0118', 85, 90, 85, 80),
+('L-2026-0119', 90, 85, 95, 80),
+('L-2026-0120', 55, 65, 50, 55),
+('L-2026-0121', 80, 75, 85, 80),
+('L-2026-0122', 60, 55, 65, 60),
+('L-2026-0123', 45, 65, 50, 55),
+('L-2026-0124', 55, 50, 45, 65),
+('L-2026-0125', 75, 85, 70, 80),
+('L-2026-0126', 65, 55, 60, 50),
+('L-2026-0127', 80, 85, 75, 85),
+('L-2026-0128', 75, 70, 85, 80),
+('L-2026-0129', 85, 80, 75, 70),
+('L-2026-0130', 50, 65, 55, 50),
+('L-2026-0131', 80, 95, 85, 75),
+('L-2026-0132', 65, 55, 60, 65),
+('L-2026-0133', 90, 85, 80, 95),
+('L-2026-0134', 85, 75, 85, 80),
+('L-2026-0135', 95, 85, 90, 85),
+('L-2026-0136', 60, 55, 65, 50),
+('L-2026-0137', 55, 60, 50, 45),
+('L-2026-0138', 75, 85, 70, 80),
+('L-2026-0139', 85, 70, 80, 75),
+('L-2026-0140', 95, 80, 95, 85),
+('L-2026-0141', 70, 85, 75, 80),
+('L-2026-0142', 90, 85, 80, 95),
+('L-2026-0143', 95, 90, 85, 80),
+('L-2026-0144', 90, 85, 95, 90),
+('L-2026-0145', 55, 65, 50, 60),
+('L-2026-0146', 85, 70, 85, 80),
+('L-2026-0147', 95, 85, 80, 90),
+('L-2026-0148', 75, 80, 70, 85),
+('L-2026-0149', 50, 55, 45, 65),
+('L-2026-0150', 55, 40, 50, 55);
 GO
