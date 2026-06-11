@@ -18,7 +18,7 @@ public interface DashboardService {
 
     List<LeadSourceCostProjection> getLeadSourceCostDashboard();
 
-    List<PipelineCoverageProjection> getPipelineCoverage();
+    List<PipelineCoverageProjection> getPipelineCoverage(String sellerCode);
 
     List<LeadStatusCountResponse> getLeadStatusCount();
 
