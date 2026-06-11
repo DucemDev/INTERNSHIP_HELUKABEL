@@ -44,4 +44,14 @@ public class DashboardController {
     public List<LostReasonSummaryProjection> getLostReasonSummary() {
         return dashboardService.getLostReasonSummary();
     }
+    @GetMapping("/revenue-industry")
+    public List<RevenueIndustryResponse> getRevenueByIndustry() {
+        return dashboardService.getRevenueByIndustry();
+    }
+    @GetMapping("/roi-lead-source")
+    public List<RoiLeadSourceResponse> getROIByLeadSource() {
+        return dashboardService.getROIByLeadSource();
+    }
+
+
 }
