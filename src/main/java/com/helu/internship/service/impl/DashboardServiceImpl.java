@@ -79,8 +79,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<WinRateBySalesResponse> getWinRateBySalesOwner() {
-        return leadRepo.getWinRateBySalesOwner();
+    public List<WinRateBySalesResponse> getWinRateBySalesOwner(String region, String industry) {
+        return leadRepo.getWinRateBySalesOwner(region, industry);
     }
 
     @Override

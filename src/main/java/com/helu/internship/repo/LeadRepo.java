@@ -128,9 +128,14 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         ) AS winRate
     FROM lead l
     LEFT JOIN [user] u ON l.user_id = u.user_id
+    WHERE (:region IS NULL OR l.region = :region)
+      AND (:industry IS NULL OR l.industry_type = :industry)
     GROUP BY l.user_id, u.full_name
     """, nativeQuery = true)
-    List<WinRateBySalesResponse> getWinRateBySalesOwner();
+    List<WinRateBySalesResponse> getWinRateBySalesOwner(
+            @Param("region") String region,
+            @Param("industry") String industry
+    );
 
     @Query(value = """
     SELECT

@@ -20,7 +20,7 @@ public interface DashboardService {
 
     ConversionRateResponse getConversionRate();
 
-    List<WinRateBySalesResponse> getWinRateBySalesOwner();
+    List<WinRateBySalesResponse> getWinRateBySalesOwner(String region, String industry);
 
     List<WinRateByIndustryProjection> getWinRateByIndustry();
 

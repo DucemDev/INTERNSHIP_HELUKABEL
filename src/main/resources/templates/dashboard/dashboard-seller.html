@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
+<body>
+    <main class="space-y-8 p-4 md:p-8 bg-slate-50 min-h-screen">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Bảng điều khiển Nhân viên</h1>
+            <p class="mt-1 text-sm font-medium text-gray-500">Theo dõi hiệu suất cá nhân và so sánh với khu vực.</p>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-gray-900">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i data-lucide="users" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Leads của tôi</h3>
+                <div id="myTotalLeads" class="mt-4 text-4xl font-extrabold text-gray-900 tracking-tight">0</div>
+                <p class="mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">Đang theo dõi</p>
+            </div>
+
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-helu-red">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl"><i data-lucide="award" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Chỉ tiêu Won</h3>
+                <div id="myWonLeads" class="mt-4 text-4xl font-extrabold text-helu-red tracking-tight">0</div>
+                <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Tổng cộng</p>
+            </div>
+
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="bg-purple-100 text-purple-600 p-3 rounded-xl"><i data-lucide="pie-chart" class="w-6 h-6"></i></div>
+                </div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tỷ lệ chuyển đổi</h3>
+                <div id="myConversionRate" class="mt-4 text-4xl font-extrabold text-blue-600 tracking-tight">0%</div>
+                <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Hiệu quả chốt đơn</p>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Pipeline Coverage Chart -->
+            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-red-600 rounded-full"></span> 
+                    Tiến độ Target
+                </h2>
+                <div class="relative h-[300px]">
+                    <canvas id="staffPipelineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Win Rate By Sales (Leaderboard) with Region Filter -->
+            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span> 
+                        Tỷ lệ thắng theo Nhân viên
+                    </h2>
+                    <!-- Region Filter -->
+                    <div class="relative w-full sm:w-auto">
+                        <select id="regionFilter" onchange="loadWinRateChart(this.value)" class="w-full appearance-none pl-4 pr-10 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer">
+                            <option value="">Tất cả khu vực</option>
+                            <!-- Options populated by JS -->
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+                <div class="relative flex-1 min-h-[300px]">
+                    <canvas id="winRateChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            let winRateChart = null;
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                loadStats();
+                loadPipelineChart();
+                loadRegions();
+                loadWinRateChart('');
+            });
+
+            async function loadStats() {
+                try {
+                    const response = await fetch('/api/dashboard/staff/stats');
+                    if (response.ok) {
+                        const data = await response.json();
+                        document.getElementById('myTotalLeads').innerText = (data.totalLead || 0).toLocaleString();
+                        document.getElementById('myWonLeads').innerText = (data.wonLead || 0).toLocaleString();
+                        document.getElementById('myConversionRate').innerText = (data.conversionRate || 0).toFixed(1) + '%';
+                    }
+                } catch (error) {
+                    console.error('Error loading staff stats:', error);
+                }
+            }
+
+            async function loadPipelineChart() {
+                try {
+                    const response = await fetch('/api/dashboard/staff/pipeline-coverage');
+                    if (!response.ok) return;
+                    const data = await response.json();
+                    if (data.length === 0) return;
+                    const item = data[0];
+                    const ctx = document.getElementById('staffPipelineChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Tiến độ doanh số'],
+                            datasets: [
+                                { label: 'Open Pipeline', data: [item.openPipeline || 0], backgroundColor: 'rgba(59, 130, 246, 0.8)', borderRadius: 8 },
+                                { label: 'Target', data: [item.target || 0], backgroundColor: 'rgba(239, 68, 68, 0.8)', borderRadius: 8 }
+                            ]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom' } },
+                            scales: { x: { beginAtZero: true, ticks: { callback: (v) => v.toLocaleString() } } }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading pipeline chart:', error);
+                }
+            }
+
+            async function loadRegions() {
+                try {
+                    const res = await fetch('/api/dashboard/win-rate-by-region');
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    const filter = document.getElementById('regionFilter');
+                    data.forEach(item => {
+                        if (item.region) {
+                            const opt = document.createElement('option');
+                            opt.value = item.region;
+                            opt.textContent = item.region;
+                            filter.appendChild(opt);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading regions:', error);
+                }
+            }
+
+            async function loadWinRateChart(region) {
+                try {
+                    // Mặc dù Backend chưa hỗ trợ filter, chúng ta vẫn truyền param theo yêu cầu Front-end
+                    const url = region ? `/api/dashboard/win-rate-by-saleowner?region=${encodeURIComponent(region)}` : '/api/dashboard/win-rate-by-saleowner';
+                    const res = await fetch(url);
+                    if (!res.ok) return;
+                    const data = await res.json();
+
+                    const labels = data.map(item => item.userName || 'N/A');
+                    const values = data.map(item => item.winRate || 0);
+
+                    if (winRateChart) winRateChart.destroy();
+
+                    const ctx = document.getElementById('winRateChart').getContext('2d');
+                    winRateChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Tỷ lệ thắng (%)',
+                                data: values,
+                                backgroundColor: '#10b981',
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: { beginAtZero: true, max: 100 }
+                            },
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading win rate chart:', error);
+                }
+            }
+        </script>
+    </main>
+</body>
+</html>

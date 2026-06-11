@@ -32,8 +32,11 @@ public class DashboardController {
     }
 
     @GetMapping("/win-rate-by-saleowner")
-    public List<WinRateBySalesResponse> getWinRateBySalesOwner() {
-        return dashboardService.getWinRateBySalesOwner();
+    public List<WinRateBySalesResponse> getWinRateBySalesOwner(
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String industry
+    ) {
+        return dashboardService.getWinRateBySalesOwner(region, industry);
     }
 
     @GetMapping("/win-rate-by-industry")

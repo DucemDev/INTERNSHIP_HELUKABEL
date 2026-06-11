@@ -1,682 +1,787 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
-    <main class="p-4 md:p-8 space-y-8 bg-slate-50 min-h-screen">
-        
+<main class="p-4 md:p-8 space-y-8 bg-slate-50 min-h-screen">
 
 
-        <!-- ========================================== -->
-        <!-- [KHỐI 2] 4 THẺ SỐ LIỆU TỔNG QUAN (KPI CARDS) -->
-        <!-- ========================================== -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Thẻ 1: Tổng Leads -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i data-lucide="users" class="w-6 h-6"></i></div>
-                </div>
-                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.total_leads}">Tổng Leads thu về</h3>
-                <div id="totalLeads" class="mt-1 text-3xl font-black text-slate-800">0</div>
+
+    <!-- ========================================== -->
+    <!-- [KHỐI 2] 4 THẺ SỐ LIỆU TỔNG QUAN (KPI CARDS) -->
+    <!-- ========================================== -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Thẻ 1: Tổng Leads -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
+            <div class="flex justify-between items-start mb-4">
+                <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i data-lucide="users" class="w-6 h-6"></i></div>
             </div>
-
-            <!-- Thẻ 2: Leads Thắng -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl"><i data-lucide="award" class="w-6 h-6"></i></div>
-                </div>
-                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.won_leads}">Leads Thắng (Won)</h3>
-                <div id="wonLeads" class="mt-1 text-3xl font-black text-slate-800">0</div>
-            </div>
-
-            <!-- Thẻ 3: Tỷ lệ chuyển đổi -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="bg-purple-100 text-purple-600 p-3 rounded-xl"><i data-lucide="pie-chart" class="w-6 h-6"></i></div>
-                </div>
-                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.conversion_rate}">Tỷ lệ chuyển đổi</h3>
-                <div id="conversionRate" class="mt-1 text-3xl font-black text-slate-800">0%</div>
-            </div>
-
-            <!-- Thẻ 4: Thời gian chốt TB -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="bg-amber-100 text-amber-600 p-3 rounded-xl"><i data-lucide="clock" class="w-6 h-6"></i></div>
-                </div>
-                <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.avg_days}">Thời gian chốt TB</h3>
-                <div class="mt-1 flex items-baseline gap-1.5">
-                    <div id="avgDaysToWon" class="text-3xl font-black text-slate-800">0</div>
-                    <span class="text-sm font-bold text-slate-400" th:text="#{dashboard.days}">ngày</span>
-                </div>
-            </div>
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.total_leads}">Tổng Leads thu về</h3>
+            <div id="totalLeads" class="mt-1 text-3xl font-black text-slate-800">0</div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- [KHỐI 3] BIỂU ĐỒ DÒNG 1 (Trạng thái Leads & Tỷ lệ thắng) -->
-        <!-- ========================================== -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Biểu đồ: Trạng thái Leads (Doughnut) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[350px]">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
-                    <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
-                </h2>
-                <div class="relative w-full flex-1 min-h-[300px]">
-                    <canvas id="leadStatusChart"></canvas>
-                </div>
+        <!-- Thẻ 2: Leads Thắng -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
+            <div class="flex justify-between items-start mb-4">
+                <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl"><i data-lucide="award" class="w-6 h-6"></i></div>
             </div>
-
-            <!-- Biểu đồ: Tỷ lệ thắng theo Sales (Bar) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[350px]">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span> 
-                    <span th:text="#{dashboard.win_rate_by_sales}">Tỷ lệ thắng (Win Rate) theo Nhân viên</span>
-                </h2>
-                <div class="relative w-full flex-1 min-h-[300px]">
-                    <canvas id="winRateChart"></canvas>
-                </div>
-            </div>
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.won_leads}">Leads Thắng (Won)</h3>
+            <div id="wonLeads" class="mt-1 text-3xl font-black text-slate-800">0</div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- [KHỐI 4] BIỂU ĐỒ DÒNG 2 (Phân tích chi phí & Nguồn) -->
-        <!-- ========================================== -->
-        <div class="grid grid-cols-1 gap-6">
-            <!-- Biểu đồ: Chi phí trên mỗi khách Won (Bar) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[350px]">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span> 
-                    <span th:text="#{dashboard.cost_per_win}">Chi phí cho mỗi Deal Thắng (Theo Nguồn)</span>
-                </h2>
-                <div class="relative w-full flex-1 min-h-[300px]">
-                    <canvas id="costPerWinChart"></canvas>
-                </div>
+        <!-- Thẻ 3: Tỷ lệ chuyển đổi -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
+            <div class="flex justify-between items-start mb-4">
+                <div class="bg-purple-100 text-purple-600 p-3 rounded-xl"><i data-lucide="pie-chart" class="w-6 h-6"></i></div>
             </div>
-
-            <!-- Biểu đồ: Phân tích Chi phí & Số lượng Lead (Mixed Line + Bar) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[350px]">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-purple-500 rounded-full"></span> 
-                    <span th:text="#{dashboard.source_analysis}">Phân tích số lượng Lead & Tổng chi phí</span>
-                </h2>
-                <div class="relative w-full flex-1 min-h-[300px]">
-                    <canvas id="leadSourceCostChart"></canvas>
-                </div>
-            </div>
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.conversion_rate}">Tỷ lệ chuyển đổi</h3>
+            <div id="conversionRate" class="mt-1 text-3xl font-black text-slate-800">0%</div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- [KHỐI 5] BIỂU ĐỒ FULL CHIỀU RỘNG (Pipeline Coverage) -->
-        <!-- ========================================== -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 min-h-[450px] flex flex-col">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <!-- Thẻ 4: Thời gian chốt TB -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
+            <div class="flex justify-between items-start mb-4">
+                <div class="bg-amber-100 text-amber-600 p-3 rounded-xl"><i data-lucide="clock" class="w-6 h-6"></i></div>
+            </div>
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.avg_days}">Thời gian chốt TB</h3>
+            <div class="mt-1 flex items-baseline gap-1.5">
+                <div id="avgDaysToWon" class="text-3xl font-black text-slate-800">0</div>
+                <span class="text-sm font-bold text-slate-400" th:text="#{dashboard.days}">ngày</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- [KHỐI 3] BIỂU ĐỒ DÒNG 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Biểu đồ: Trạng thái Leads -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[500px]">
+            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
+            </h2>
+            <div class="relative w-full flex-1 min-h-[300px]"><canvas id="leadStatusChart"></canvas></div>
+        </div>
+
+        <!-- BIỂU ĐỒ: TỶ LỆ THẮNG (SMART MULTI-FILTER) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[500px]">
+            <!-- Header: Tiêu đề -->
+            <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-red-600 rounded-full"></span> 
-                    <span th:text="#{dashboard.pipeline_safety}">Độ an toàn Target (Pipeline Coverage)</span>
+                    <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
+                    <span th:text="#{dashboard.win_rate_effectiveness}">Hiệu quả Win Rate</span>
                 </h2>
-                <!-- Chú thích màu sắc (Legend) -->
-                <div class="flex flex-wrap items-center gap-3 text-xs font-semibold bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
-                    <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-emerald-500"></div><span class="text-slate-600" th:text="#{dashboard.safety_very_safe}">Rất an toàn (> 3,0 Lần)</span></div>
-                    <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-emerald-300"></div><span class="text-slate-600" th:text="#{dashboard.safety_safe}">An toàn (2,0 - 3,0 Lần)</span></div>
-                    <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-amber-400"></div><span class="text-slate-600" th:text="#{dashboard.safety_warning}">Cảnh báo (1,0 - 2,0 Lần)</span></div>
-                    <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-red-500"></div><span class="text-slate-600" th:text="#{dashboard.safety_danger}">Nguy hiểm (< 1,0 Lần)</span></div>
-                </div>
+                <button onclick="clearWinRateFilters()" class="text-xs font-bold text-emerald-600 hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 border border-emerald-100">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    <span th:text="#{dashboard.reset_filter}">Làm mới lọc</span>
+                </button>
             </div>
-            <div class="relative w-full flex-1 min-h-[400px]">
-                <canvas id="pipelineCoverageChart"></canvas>
-            </div>
-        </div>
 
-        <!-- ========================================== -->
-        <!-- [KHỐI 6] BẢNG DỮ LIỆU CHI TIẾT LEADS -->
-        <!-- ========================================== -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-slate-800 rounded-full"></span> 
-                    <span th:text="#{dashboard.lead_list_title}">Danh sách Leads chi tiết</span>
-                </h2>
-                <!-- Nút Filter Trạng thái -->
-                <div class="relative">
-                    <i data-lucide="filter" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                    <select id="statusFilter" onchange="loadLeadsByStatus(this.value)" class="appearance-none pl-9 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all cursor-pointer">
-                        <option value="New">New</option>
-                        <option value="Contacted">Contacted</option>
-                        <option value="Qualified">Qualified</option>
-                        <option value="Lost">Lost</option>
-                        <option value="Won">Won</option>
+            <!-- Filter Bar: Xuống dòng nhưng cùng 1 hàng -->
+            <div class="grid grid-cols-2 gap-4 mb-10">
+                <div class="relative group">
+                    <i data-lucide="map-pin" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors"></i>
+                    <select id="winRateRegionFilter" onchange="updateWinRateDashboard()" class="w-full appearance-none pl-10 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all cursor-pointer">
+                        <option value="" th:text="#{dashboard.all_regions}">Tất cả khu vực</option>
                     </select>
-                    <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                    <i data-lucide="chevron-down" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                </div>
+                <div class="relative group">
+                    <i data-lucide="briefcase" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-emerald-500 transition-colors"></i>
+                    <select id="winRateIndustryFilter" onchange="updateWinRateDashboard()" class="w-full appearance-none pl-10 pr-10 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-bold text-slate-700 outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all cursor-pointer">
+                        <option value="" th:text="#{dashboard.all_industries}">Tất cả ngành nghề</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
                 </div>
             </div>
-            
-            <div class="overflow-hidden rounded-xl border border-slate-100">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-100">
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.name}">Họ tên KH</th>
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.account}">Tài khoản/Công ty</th>
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.region}">Khu vực</th>
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.industry}">Ngành nghề</th>
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap text-right" th:text="#{dashboard.col.group}">Nhóm KH</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leadsTableBody" class="divide-y divide-slate-50 bg-white">
-                            <!-- Dữ liệu JS sẽ được render vào đây -->
-                        </tbody>
-                    </table>
-                </div>
+
+            <div class="relative w-full flex-1 min-h-[300px]"><canvas id="winRateChart"></canvas></div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- [KHỐI 4] BIỂU ĐỒ DÒNG 2 (Phân tích chi phí & Nguồn) -->
+    <!-- ========================================== -->
+    <div class="grid grid-cols-1 gap-6">
+        <!-- Biểu đồ: Chi phí trên mỗi khách Won (Bar) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[350px]">
+            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
+                <span th:text="#{dashboard.cost_per_win}">Chi phí cho mỗi Deal Thắng (Theo Nguồn)</span>
+            </h2>
+            <div class="relative w-full flex-1 min-h-[300px]">
+                <canvas id="costPerWinChart"></canvas>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- MODAL: DANH SÁCH LEADS THEO TRẠNG THÁI -->
-        <!-- ========================================== -->
-        <div id="leadStatusModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" onclick="closeLeadModal()"></div>
-                
-                <!-- Trick to center modal -->
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-                
-                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full border border-slate-200">
-                    <!-- Header -->
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
-                            <span id="modalStatusTitle" class="text-blue-600">Status</span>
-                            <span class="text-slate-400 font-medium text-lg">| <span th:text="#{modal.lead_list}">Danh sách Leads</span></span>
-                        </h3>
-                        <button onclick="closeLeadModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
-                            <i data-lucide="x" class="w-6 h-6"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- Body -->
-                    <div class="p-6">
-                        <div id="modalTableContainer" class="overflow-hidden rounded-xl border border-slate-100 shadow-sm">
-                            <div class="overflow-x-auto max-h-[60vh]">
-                                <table class="w-full text-left border-collapse">
-                                    <thead class="sticky top-0 z-10">
-                                        <tr class="bg-slate-50 border-b border-slate-100">
-                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.lead_id}">Lead ID</th>
-                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.account}">Tài khoản/Công ty</th>
-                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.contact}">Người liên hệ</th>
-                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.email}">Email</th>
-                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.phone}">Số điện thoại</th>
-                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.status}">Trạng thái</th>
-                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.assigned}">Người phụ trách</th>
-                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.created}">Ngày tạo</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="modalTableBody" class="divide-y divide-slate-50 bg-white">
-                                        <!-- Rendered by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Loading State -->
-                        <div id="modalLoading" class="hidden py-12 text-center">
-                            <i data-lucide="loader-2" class="w-10 h-10 animate-spin text-blue-500 mx-auto mb-4"></i>
-                            <p class="text-slate-500 font-medium" th:text="#{modal.loading}">Đang truy xuất dữ liệu từ hệ thống...</p>
-                        </div>
+        <!-- Biểu đồ: Phân tích Chi phí & Số lượng Lead (Mixed Line + Bar) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[350px]">
+            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-purple-500 rounded-full"></span>
+                <span th:text="#{dashboard.source_analysis}">Phân tích số lượng Lead & Tổng chi phí</span>
+            </h2>
+            <div class="relative w-full flex-1 min-h-[300px]">
+                <canvas id="leadSourceCostChart"></canvas>
+            </div>
+        </div>
+    </div>
 
-                        <!-- Empty State -->
-                        <div id="modalEmpty" class="hidden py-12 text-center">
-                            <div class="bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <i data-lucide="folder-open" class="w-8 h-8 text-slate-300"></i>
-                            </div>
-                            <p class="text-slate-500 font-bold" th:text="#{modal.empty}">Không tìm thấy Lead nào cho trạng thái này.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Footer -->
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-                        <button onclick="closeLeadModal()" class="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm" th:text="#{modal.close}">Đóng cửa sổ</button>
-                    </div>
-                </div>
+    <!-- ========================================== -->
+    <!-- [KHỐI 5] BIỂU ĐỒ FULL CHIỀU RỘNG (Pipeline Coverage) -->
+    <!-- ========================================== -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 min-h-[450px] flex flex-col">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-red-600 rounded-full"></span>
+                <span th:text="#{dashboard.pipeline_safety}">Độ an toàn Target (Pipeline Coverage)</span>
+            </h2>
+            <!-- Chú thích màu sắc (Legend) -->
+            <div class="flex flex-wrap items-center gap-3 text-xs font-semibold bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-emerald-500"></div><span class="text-slate-600" th:text="#{dashboard.safety_very_safe}">Rất an toàn (> 3,0 Lần)</span></div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-emerald-300"></div><span class="text-slate-600" th:text="#{dashboard.safety_safe}">An toàn (2,0 - 3,0 Lần)</span></div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-amber-400"></div><span class="text-slate-600" th:text="#{dashboard.safety_warning}">Cảnh báo (1,0 - 2,0 Lần)</span></div>
+                <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-red-500"></div><span class="text-slate-600" th:text="#{dashboard.safety_danger}">Nguy hiểm (< 1,0 Lần)</span></div>
+            </div>
+        </div>
+        <div class="relative w-full flex-1 min-h-[400px]">
+            <canvas id="pipelineCoverageChart"></canvas>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- [KHỐI 6] BẢNG DỮ LIỆU CHI TIẾT LEADS -->
+    <!-- ========================================== -->
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-slate-800 rounded-full"></span>
+                <span th:text="#{dashboard.lead_list_title}">Danh sách Leads chi tiết</span>
+            </h2>
+            <!-- Nút Filter Trạng thái -->
+            <div class="relative">
+                <i data-lucide="filter" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                <select id="statusFilter" onchange="loadLeadsByStatus(this.value)" class="appearance-none pl-9 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-all cursor-pointer">
+                    <option value="New">New</option>
+                    <option value="Contacted">Contacted</option>
+                    <option value="Qualified">Qualified</option>
+                    <option value="Lost">Lost</option>
+                    <option value="Won">Won</option>
+                </select>
+                <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- THƯ VIỆN JAVASCRIPT BÊN NGOÀI -->
-        <!-- ========================================== -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+        <div class="overflow-hidden rounded-xl border border-slate-100">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100">
+                        <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.name}">Họ tên KH</th>
+                        <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.account}">Tài khoản/Công ty</th>
+                        <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.region}">Khu vực</th>
+                        <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.industry}">Ngành nghề</th>
+                        <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap text-right" th:text="#{dashboard.col.group}">Nhóm KH</th>
+                    </tr>
+                    </thead>
+                    <tbody id="leadsTableBody" class="divide-y divide-slate-50 bg-white">
+                    <!-- Dữ liệu JS sẽ được render vào đây -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-        <!-- ========================================== -->
-        <!-- [KHỐI 7] LOGIC JAVASCRIPT XỬ LÝ BIỂU ĐỒ & API -->
-        <!-- ========================================== -->
-        <script th:inline="javascript">
-            // Đăng ký Plugin Datalabels và Cấu hình font chữ chung
-            Chart.register(ChartDataLabels);
-            Chart.defaults.font.family = "'Inter', 'Segoe UI', Roboto, sans-serif";
-            Chart.defaults.color = '#64748b'; // Màu text chung
-            Chart.defaults.plugins.datalabels.display = false; // Tắt datalabels ở tất cả biểu đồ (sẽ bật riêng cho cái nào cần)
-            
-            // Đường dẫn gốc API (Không thay đổi)
-            const API_BASE = '/api/dashboard';
-            
-            // Bộ lưu trữ các instance của biểu đồ để xóa trước khi vẽ lại
-            let charts = {};
+    <!-- ========================================== -->
+    <!-- MODAL: DANH SÁCH LEADS THEO TRẠNG THÁI -->
+    <!-- ========================================== -->
+    <div id="leadStatusModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" onclick="closeLeadModal()"></div>
 
-            // Chạy ngay khi tải trang
-            document.addEventListener('DOMContentLoaded', () => {
-                refreshDashboard();
-                loadLeadsByStatus('New');
-            });
+            <!-- Trick to center modal -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
 
-            // GỌI TẤT CẢ API CÙNG LÚC
-            async function refreshDashboard() {
-                const btnIcon = document.querySelector('button[onclick="refreshDashboard()"] i');
-                if (btnIcon) btnIcon.classList.add('animate-spin');
-                
-                await Promise.all([
-                    loadKPIs(),
-                    loadLeadStatusChart(),
-                    loadWinRateChart(),
-                    loadCostPerWinChart(),
-                    loadLeadSourceCostChart(),
-                    loadPipelineCoverageChart()
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full border border-slate-200">
+                <!-- Header -->
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                        <span id="modalStatusTitle" class="text-blue-600">Status</span>
+                        <span class="text-slate-400 font-medium text-lg">| <span th:text="#{modal.lead_list}">Danh sách Leads</span></span>
+                    </h3>
+                    <button onclick="closeLeadModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="p-6">
+                    <div id="modalTableContainer" class="overflow-hidden rounded-xl border border-slate-100 shadow-sm">
+                        <div class="overflow-x-auto max-h-[60vh]">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="sticky top-0 z-10">
+                                <tr class="bg-slate-50 border-b border-slate-100">
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.lead_id}">Lead ID</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.account}">Tài khoản/Công ty</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.contact}">Người liên hệ</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.email}">Email</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.phone}">Số điện thoại</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.status}">Trạng thái</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.assigned}">Người phụ trách</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.created}">Ngày tạo</th>
+                                </tr>
+                                </thead>
+                                <tbody id="modalTableBody" class="divide-y divide-slate-50 bg-white">
+                                <!-- Rendered by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="modalLoading" class="hidden py-12 text-center">
+                        <i data-lucide="loader-2" class="w-10 h-10 animate-spin text-blue-500 mx-auto mb-4"></i>
+                        <p class="text-slate-500 font-medium" th:text="#{modal.loading}">Đang truy xuất dữ liệu từ hệ thống...</p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="modalEmpty" class="hidden py-12 text-center">
+                        <div class="bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="folder-open" class="w-8 h-8 text-slate-300"></i>
+                        </div>
+                        <p class="text-slate-500 font-bold" th:text="#{modal.empty}">Không tìm thấy Lead nào cho trạng thái này.</p>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                    <button onclick="closeLeadModal()" class="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm" th:text="#{modal.close}">Đóng cửa sổ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- THƯ VIỆN JAVASCRIPT BÊN NGOÀI -->
+    <!-- ========================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <!-- ========================================== -->
+    <!-- [KHỐI 7] LOGIC JAVASCRIPT XỬ LÝ BIỂU ĐỒ & API -->
+    <!-- ========================================== -->
+    <script th:inline="javascript">
+        // Đăng ký Plugin Datalabels và Cấu hình font chữ chung
+        Chart.register(ChartDataLabels);
+        Chart.defaults.font.family = "'Inter', 'Segoe UI', Roboto, sans-serif";
+        Chart.defaults.color = '#64748b'; // Màu text chung
+        Chart.defaults.plugins.datalabels.display = false; // Tắt datalabels ở tất cả biểu đồ (sẽ bật riêng cho cái nào cần)
+
+        // Đường dẫn gốc API (Không thay đổi)
+        const API_BASE = '/api/dashboard';
+
+        // Bộ lưu trữ các instance của biểu đồ để xóa trước khi vẽ lại
+        let charts = {};
+
+        // Chạy ngay khi tải trang
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshDashboard();
+            loadLeadsByStatus('New');
+        });
+
+        // GỌI TẤT CẢ API CÙNG LÚC
+        async function refreshDashboard() {
+            const btnIcon = document.querySelector('button[onclick="refreshDashboard()"] i');
+            if (btnIcon) btnIcon.classList.add('animate-spin');
+
+            await Promise.all([
+                loadKPIs(),
+                loadLeadStatusChart(),
+                loadWinRateChart(),
+                loadWinRateFilters(),
+                loadCostPerWinChart(),
+                loadLeadSourceCostChart(),
+                loadPipelineCoverageChart()
+            ]);
+
+            if (btnIcon) setTimeout(() => btnIcon.classList.remove('animate-spin'), 500);
+        }
+
+        // HÀM 1: Tải số liệu thẻ KPI
+        async function loadKPIs() {
+            try {
+                const convRes = await fetch(`${API_BASE}/conversion-rate`);
+                const convData = await convRes.json();
+                document.getElementById('totalLeads').innerText = (convData.totalLead || 0).toLocaleString('vi-VN');
+                document.getElementById('wonLeads').innerText = (convData.wonLead || 0).toLocaleString('vi-VN');
+                document.getElementById('conversionRate').innerText = `${(convData.conversionRate || 0).toFixed(1)}%`;
+
+                const avgRes = await fetch(`${API_BASE}/average-days-to-won`);
+                const avgData = await avgRes.json();
+                document.getElementById('avgDaysToWon').innerText = (avgData || 0).toFixed(1);
+            } catch (error) {
+                console.error('Error loading KPIs:', error);
+            }
+        }
+
+        // HÀM 2: Biểu đồ Cơ cấu Trạng thái
+        async function loadLeadStatusChart() {
+            try {
+                const res = await fetch(`${API_BASE}/lead-status`);
+                const data = await res.json();
+
+                const labels = data.map(item => item.status);
+                const values = data.map(item => item.total);
+                const total = values.reduce((a, b) => a + b, 0);
+
+                // Màu sắc hiện đại, không trùng lặp
+                const bgColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
+
+                // Tính % dán thẳng vào Legend
+                const labelsWithPercent = labels.map((label, i) => {
+                    const pct = total === 0 ? 0 : ((values[i] / total) * 100).toFixed(1);
+                    return `${label} (${pct}%)`;
+                });
+
+                renderChart('leadStatusChart', 'doughnut', {
+                    labels: labelsWithPercent,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: bgColors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 6
+                    }]
+                }, {
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: { size: 13, weight: '600' },
+                                cursor: 'pointer'
+                            },
+                            // XỬ LÝ CLICK VÀO LEGEND ĐỂ MỞ MODAL
+                            onClick: (e, legendItem, legend) => {
+                                // 1. Lấy tên status gốc (bỏ phần % trong ngoặc)
+                                const statusName = labels[legendItem.index];
+
+                                // 2. Gọi hàm mở modal
+                                openLeadStatusModal(statusName);
+
+                                // 3. Giữ hành vi mặc định (ẩn/hiện dataset)
+                                Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#fff',
+                            font: { weight: 'bold', size: 12 },
+                            formatter: (value, ctx) => {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total === 0 ? 0 : ((value / total) * 100).toFixed(1);
+                                return percentage > 5 ? `${percentage}%` : ''; // Chỉ hiện nếu > 5% để tránh đè nhau
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading Lead Status chart:', error);
+            }
+        }
+
+        // HÀM 3: Biểu đồ Win Rate
+        async function loadWinRateChart(region = '', industry = '') {
+            try {
+                let url = `${API_BASE}/win-rate-by-saleowner`;
+                const params = new URLSearchParams();
+                if (region) params.append('region', region);
+                if (industry) params.append('industry', industry);
+                if (params.toString()) url += `?${params.toString()}`;
+
+                const res = await fetch(url);
+                const data = await res.json();
+
+                const labels = data.map(item => item.userName || `Owner ${item.userId?.substring(0,6)}`);
+                const values = data.map(item => item.winRate || 0);
+
+                const winRateLabel = /*[[#{dashboard.win_rate_label}]]*/ 'Tỷ lệ thắng (%)';
+
+                renderChart('winRateChart', 'bar', {
+                    labels: labels,
+                    datasets: [{
+                        label: winRateLabel,
+                        data: values,
+                        backgroundColor: '#10b981', // Màu Emerald an toàn
+                        borderRadius: 6,
+                        barThickness: 32
+                    }]
+                }, {
+                    layout: { padding: { top: 30 } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { 
+                            beginAtZero: true, 
+                            suggestedMax: 115, 
+                            border: { display: false },
+                            ticks: {
+                                callback: (v) => v <= 100 ? v + '%' : ''
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            display: true,
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#10b981',
+                            font: { weight: 'bold' },
+                            formatter: v => (v || 0).toFixed(1) + '%'
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading Win Rate chart:', error);
+            }
+        }
+
+        // HÀM 3.1: Tải dữ liệu cho các Filter của Win Rate
+        async function loadWinRateFilters() {
+            try {
+                const [regRes, indRes] = await Promise.all([
+                    fetch(`${API_BASE}/win-rate-by-region`),
+                    fetch(`${API_BASE}/win-rate-by-industry`)
                 ]);
 
-                if (btnIcon) setTimeout(() => btnIcon.classList.remove('animate-spin'), 500);
-            }
-
-            // HÀM 1: Tải số liệu thẻ KPI
-            async function loadKPIs() {
-                try {
-                    const convRes = await fetch(`${API_BASE}/conversion-rate`);
-                    const convData = await convRes.json();
-                    document.getElementById('totalLeads').innerText = (convData.totalLead || 0).toLocaleString('vi-VN');
-                    document.getElementById('wonLeads').innerText = (convData.wonLead || 0).toLocaleString('vi-VN');
-                    document.getElementById('conversionRate').innerText = `${(convData.conversionRate || 0).toFixed(1)}%`;
-
-                    const avgRes = await fetch(`${API_BASE}/average-days-to-won`);
-                    const avgData = await avgRes.json();
-                    document.getElementById('avgDaysToWon').innerText = (avgData || 0).toFixed(1);
-                } catch (error) {
-                    console.error('Error loading KPIs:', error);
-                }
-            }
-
-            // HÀM 2: Biểu đồ Cơ cấu Trạng thái
-            async function loadLeadStatusChart() {
-                try {
-                    const res = await fetch(`${API_BASE}/lead-status`);
-                    const data = await res.json();
-
-                    const labels = data.map(item => item.status);
-                    const values = data.map(item => item.total);
-                    const total = values.reduce((a, b) => a + b, 0);
-
-                    // Màu sắc hiện đại, không trùng lặp
-                    const bgColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
-
-                    // Tính % dán thẳng vào Legend
-                    const labelsWithPercent = labels.map((label, i) => {
-                        const pct = total === 0 ? 0 : ((values[i] / total) * 100).toFixed(1);
-                        return `${label} (${pct}%)`;
+                if (regRes.ok) {
+                    const regions = await regRes.json();
+                    const regFilter = document.getElementById('winRateRegionFilter');
+                    const currentVal = regFilter.value;
+                    const allRegionsText = /*[[#{dashboard.all_regions}]]*/ 'Tất cả khu vực';
+                    regFilter.innerHTML = `<option value="">${allRegionsText}</option>`;
+                    regions.forEach(r => {
+                        if (r.region) {
+                            const opt = document.createElement('option');
+                            opt.value = r.region;
+                            opt.textContent = r.region;
+                            regFilter.appendChild(opt);
+                        }
                     });
+                    regFilter.value = currentVal;
+                }
 
-                    renderChart('leadStatusChart', 'doughnut', {
-                        labels: labelsWithPercent,
-                        datasets: [{
-                            data: values,
-                            backgroundColor: bgColors,
-                            borderWidth: 2,
-                            borderColor: '#ffffff',
-                            hoverOffset: 6
-                        }]
-                    }, {
-                        cutout: '65%',
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: { 
-                                    usePointStyle: true, 
-                                    padding: 20, 
-                                    font: { size: 13, weight: '600' },
-                                    cursor: 'pointer'
-                                },
-                                // XỬ LÝ CLICK VÀO LEGEND ĐỂ MỞ MODAL
-                                onClick: (e, legendItem, legend) => {
-                                    // 1. Lấy tên status gốc (bỏ phần % trong ngoặc)
-                                    const statusName = labels[legendItem.index];
-                                    
-                                    // 2. Gọi hàm mở modal
-                                    openLeadStatusModal(statusName);
-                                    
-                                    // 3. Giữ hành vi mặc định (ẩn/hiện dataset)
-                                    Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
+                if (indRes.ok) {
+                    const industries = await indRes.json();
+                    const indFilter = document.getElementById('winRateIndustryFilter');
+                    const currentVal = indFilter.value;
+                    const allIndustriesText = /*[[#{dashboard.all_industries}]]*/ 'Tất cả ngành nghề';
+                    indFilter.innerHTML = `<option value="">${allIndustriesText}</option>`;
+                    industries.forEach(i => {
+                        if (i.industryType) {
+                            const opt = document.createElement('option');
+                            opt.value = i.industryType;
+                            opt.textContent = i.industryType;
+                            indFilter.appendChild(opt);
+                        }
+                    });
+                    indFilter.value = currentVal;
+                }
+            } catch (error) {
+                console.error('Error loading Win Rate filters:', error);
+            }
+        }
+
+        // HÀM 3.2: Xử lý khi thay đổi filter
+        function updateWinRateDashboard() {
+            const region = document.getElementById('winRateRegionFilter').value;
+            const industry = document.getElementById('winRateIndustryFilter').value;
+            loadWinRateChart(region, industry);
+        }
+
+        // HÀM 3.3: Làm mới filter
+        function clearWinRateFilters() {
+            document.getElementById('winRateRegionFilter').value = '';
+            document.getElementById('winRateIndustryFilter').value = '';
+            loadWinRateChart();
+        }
+
+        // HÀM 4: Biểu đồ Chi phí trên khách Won
+        async function loadCostPerWinChart() {
+            try {
+                const res = await fetch(`${API_BASE}/cost-per-win-source`);
+                const data = await res.json();
+
+                const labels = data.map(item => item.sourceName);
+                const values = data.map(item => item.costPerWin || 0);
+
+                const locale = /*[[${#locale.language}]]*/ 'vi';
+                const currency = locale === 'vi' ? ' VNĐ' : ' VND';
+                const chartLabel = /*[[#{dashboard.cost_per_win}]]*/ 'Chi phí/Won Lead (VNĐ)';
+
+                renderChart('costPerWinChart', 'bar', {
+                    labels: labels,
+                    datasets: [{
+                        label: chartLabel,
+                        data: values,
+                        backgroundColor: '#f59e0b', // Màu Amber
+                        borderRadius: 6,
+                        barThickness: 32
+                    }]
+                }, {
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            beginAtZero: true,
+                            border: { display: false },
+                            ticks: {
+                                callback: (val) => val.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US') + currency
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.parsed.y.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}${currency}`;
                                 }
                             }
                         }
-                    });
-                } catch (error) {
-                    console.error('Error loading Lead Status chart:', error);
-                }
-            }
-
-            // HÀM 3: Biểu đồ Win Rate
-            async function loadWinRateChart() {
-                try {
-                    const res = await fetch(`${API_BASE}/win-rate-by-saleowner`);
-                    const data = await res.json();
-
-                    const labels = data.map(item => item.userName || `Owner ${item.userId?.substring(0,6)}`);
-                    const values = data.map(item => item.winRate || 0);
-                    
-                    const winRateLabel = /*[[#{dashboard.win_rate_label}]]*/ 'Tỷ lệ thắng (%)';
-
-                    renderChart('winRateChart', 'bar', {
-                        labels: labels,
-                        datasets: [{
-                            label: winRateLabel,
-                            data: values,
-                            backgroundColor: '#10b981', // Màu Emerald an toàn
-                            borderRadius: 6,
-                            barThickness: 32
-                        }]
-                    }, {
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: { beginAtZero: true, max: 100, border: { display: false } }
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            datalabels: {
-                                display: true,
-                                anchor: 'end',
-                                align: 'top',
-                                color: '#10b981',
-                                font: { weight: 'bold' },
-                                formatter: v => v.toFixed(1) + '%'
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading Win Rate chart:', error);
-                }
-            }
-
-            // HÀM 4: Biểu đồ Chi phí trên khách Won
-            async function loadCostPerWinChart() {
-                try {
-                    const res = await fetch(`${API_BASE}/cost-per-win-source`);
-                    const data = await res.json();
-
-                    const labels = data.map(item => item.sourceName);
-                    const values = data.map(item => item.costPerWin || 0);
-                    
-                    const locale = /*[[${#locale.language}]]*/ 'vi';
-                    const currency = locale === 'vi' ? ' VNĐ' : ' VND';
-                    const chartLabel = /*[[#{dashboard.cost_per_win}]]*/ 'Chi phí/Won Lead (VNĐ)';
-
-                    renderChart('costPerWinChart', 'bar', {
-                        labels: labels,
-                        datasets: [{
-                            label: chartLabel,
-                            data: values,
-                            backgroundColor: '#f59e0b', // Màu Amber
-                            borderRadius: 6,
-                            barThickness: 32
-                        }]
-                    }, {
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: { 
-                                beginAtZero: true, 
-                                border: { display: false },
-                                ticks: {
-                                    callback: (val) => val.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US') + currency
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return ` ${context.dataset.label}: ${context.parsed.y.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')}${currency}`;
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading Cost per Win chart:', error);
-                }
-            }
-
-            // HÀM 5: Biểu đồ Mixed (Chi phí & Số lượng Lead)
-            async function loadLeadSourceCostChart() {
-                try {
-                    const res = await fetch(`${API_BASE}/lead-source-cost`);
-                    const data = await res.json();
-
-                    const labels = data.map(item => item.sourceName);
-                    const totalLeads = data.map(item => item.totalLead || 0);
-                    const totalCost = data.map(item => item.totalCost || 0); 
-                    
-                    const locale = /*[[${#locale.language}]]*/ 'vi';
-                    const currency = locale === 'vi' ? ' VNĐ' : ' VND';
-                    const leadLabel = /*[[#{dashboard.lead_count_label}]]*/ 'Tổng số Lead thu về';
-                    const costLabel = /*[[#{dashboard.total_cost_label}]]*/ 'Tổng chi phí (VNĐ)';
-
-                    renderChart('leadSourceCostChart', 'bar', {
-                        labels: labels,
-                        datasets: [
-                            {
-                                type: 'bar',
-                                label: leadLabel,
-                                data: totalLeads,
-                                backgroundColor: 'rgba(59, 130, 246, 0.8)', // Màu Blue
-                                borderRadius: 6,
-                                order: 2,
-                                yAxisID: 'y'
-                            },
-                            {
-                                type: 'line',
-                                label: costLabel,
-                                data: totalCost,
-                                borderColor: '#ef4444', // Màu Đỏ
-                                backgroundColor: '#ef4444',
-                                borderWidth: 3,
-                                pointBackgroundColor: '#fff',
-                                pointBorderWidth: 3,
-                                pointRadius: 5,
-                                tension: 0.3,
-                                order: 1,
-                                yAxisID: 'y1'
-                            }
-                        ]
-                    }, {
-                        interaction: { mode: 'index', intersect: false },
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: { 
-                                type: 'linear', position: 'left',
-                                title: { display: true, text: leadLabel, font: { weight: 'bold' } },
-                                border: { display: false }
-                            },
-                            y1: { 
-                                type: 'linear', position: 'right', 
-                                grid: { drawOnChartArea: false },
-                                title: { display: true, text: costLabel, font: { weight: 'bold' } },
-                                border: { display: false },
-                                ticks: {
-                                    callback: (val) => val.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US') + currency
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: { position: 'top', labels: { usePointStyle: true } },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed.y !== null) {
-                                            if (context.datasetIndex === 1) { // Cost dataset
-                                                label += context.parsed.y.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US') + currency;
-                                            } else {
-                                                label += context.parsed.y.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
-                                            }
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading Source Cost chart:', error);
-                }
-            }
-
-            // HÀM 6: Biểu đồ Pipeline Coverage (Chỉ dùng Hệ số Lần, bỏ %)
-            async function loadPipelineCoverageChart() {
-                try {
-                    const res = await fetch(`${API_BASE}/pipeline-coverage`);
-                    const data = await res.json();
-
-                    const labels = data.map(item => item.salesOwner || item.userCode || 'N/A');
-
-                    // Tính Hệ số Lần (Ratio)
-                    const ratios = data.map(item => {
-                        const pipeline = item.openPipeline || 0;
-                        const target = item.target || 1;
-                        return Number((pipeline / target).toFixed(2));
-                    });
-
-                    // Chia màu theo mức độ an toàn (Mốc 3.0, 2.0, 1.0)
-                    const colors = ratios.map(r => {
-                        if (r >= 3.0) return 'rgba(16, 185, 129, 0.9)'; // Rất an toàn (Emerald 500)
-                        if (r >= 2.0) return 'rgba(110, 231, 183, 0.9)'; // An toàn (Emerald 300)
-                        if (r >= 1.0) return 'rgba(251, 191, 36, 0.9)'; // Cảnh báo (Amber 400)
-                        return 'rgba(239, 68, 68, 0.9)'; // Nguy hiểm (Red 500)
-                    });
-
-                    const maxRatio = Math.max(...ratios, 3.0);
-                    
-                    const locale = /*[[${#locale.language}]]*/ 'vi';
-                    const currency = locale === 'vi' ? ' VNĐ' : ' VND';
-                    const safetyLabel = /*[[#{dashboard.safety_ratio_label}]]*/ 'Hệ số an toàn (Lần)';
-                    const timesUnit = /*[[#{dashboard.times}]]*/ 'lần';
-                    const pipelineLabel = /*[[#{dashboard.pipeline_label}]]*/ 'Pipeline';
-                    const targetLabel = /*[[#{dashboard.target_label}]]*/ 'Target';
-
-                    renderChart('pipelineCoverageChart', 'bar', {
-                        labels: labels,
-                        datasets: [{
-                            label: safetyLabel,
-                            data: ratios,
-                            backgroundColor: colors,
-                            borderRadius: 6,
-                            barThickness: 24
-                        }]
-                    }, {
-                        indexAxis: 'y', // Biểu đồ xoay ngang
-                        layout: { padding: { right: 120 } }, // Tăng khoảng trống bên phải lên 120 để không mất số
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                suggestedMax: maxRatio + 1.2, // Tăng buffer để đẩy thanh biểu đồ sang trái
-                                border: { display: false },
-                                grid: {
-                                    // Tô đậm đường kẻ dọc mốc 1, 2, 3
-                                    color: (ctx) => [1.0, 2.0, 3.0].includes(ctx.tick.value) ? '#e2e8f0' : '#f8fafc',
-                                    lineWidth: (ctx) => [1.0, 2.0, 3.0].includes(ctx.tick.value) ? 2 : 1,
-                                },
-                                ticks: {
-                                    callback: (val) => Number(val).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')
-                                }
-                            },
-                            y: { grid: { display: false }, border: { display: false } }
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            datalabels: {
-                                display: true,
-                                color: '#4b5563',
-                                anchor: 'end',
-                                align: 'right',
-                                offset: 8,
-                                font: { weight: 'bold', size: 11 },
-                                formatter: (val) => Number(val).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + timesUnit
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return ` ${safetyLabel}: ${Number(context.parsed.x).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${timesUnit}`;
-                                    },
-                                    afterLabel: function(ctx) {
-                                        const d = data[ctx.dataIndex];
-                                        const pipeline = Number(d.openPipeline || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
-                                        const target = Number(d.target || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
-                                        return [
-                                            '', 
-                                            `💰 ${pipelineLabel}: ${pipeline}${currency}`,
-                                            `🎯 ${targetLabel}: ${target}${currency}`
-                                        ];
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading Pipeline Coverage chart:', error);
-                }
-            }
-
-            // ==========================================
-            // LOGIC XỬ LÝ MODAL CHI TIẾT LEADS THEO STATUS
-            // ==========================================
-
-            /**
-             * Mở modal và tải danh sách Lead theo Status
-             */
-            async function openLeadStatusModal(status) {
-                const modal = document.getElementById('leadStatusModal');
-                const title = document.getElementById('modalStatusTitle');
-                const tbody = document.getElementById('modalTableBody');
-                const loading = document.getElementById('modalLoading');
-                const empty = document.getElementById('modalEmpty');
-                const container = document.getElementById('modalTableContainer');
-
-                // Setup giao diện ban đầu
-                title.innerText = status;
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; // Khóa cuộn trang chính
-
-                tbody.innerHTML = '';
-                loading.classList.remove('hidden');
-                empty.classList.add('hidden');
-                container.classList.add('hidden');
-                
-                lucide.createIcons();
-
-                try {
-                    // Gọi API lấy dữ liệu
-                    const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
-                    if (!res.ok) throw new Error('Network response was not ok');
-                    
-                    const data = await res.json();
-                    loading.classList.add('hidden');
-
-                    if (!data || !Array.isArray(data) || data.length === 0) {
-                        empty.classList.remove('hidden');
-                        return;
                     }
+                });
+            } catch (error) {
+                console.error('Error loading Cost per Win chart:', error);
+            }
+        }
 
-                    // Render dữ liệu vào bảng
-                    container.classList.remove('hidden');
-                    data.forEach(lead => {
-                        const tr = document.createElement('tr');
-                        tr.className = 'hover:bg-slate-50 transition-colors group';
-                        tr.innerHTML = `
+        // HÀM 5: Biểu đồ Mixed (Chi phí & Số lượng Lead)
+        async function loadLeadSourceCostChart() {
+            try {
+                const res = await fetch(`${API_BASE}/lead-source-cost`);
+                const data = await res.json();
+
+                const labels = data.map(item => item.sourceName);
+                const totalLeads = data.map(item => item.totalLead || 0);
+                const totalCost = data.map(item => item.totalCost || 0);
+
+                const locale = /*[[${#locale.language}]]*/ 'vi';
+                const currency = locale === 'vi' ? ' VNĐ' : ' VND';
+                const leadLabel = /*[[#{dashboard.lead_count_label}]]*/ 'Tổng số Lead thu về';
+                const costLabel = /*[[#{dashboard.total_cost_label}]]*/ 'Tổng chi phí (VNĐ)';
+
+                renderChart('leadSourceCostChart', 'bar', {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: leadLabel,
+                            data: totalLeads,
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)', // Màu Blue
+                            borderRadius: 6,
+                            order: 2,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'line',
+                            label: costLabel,
+                            data: totalCost,
+                            borderColor: '#ef4444', // Màu Đỏ
+                            backgroundColor: '#ef4444',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#fff',
+                            pointBorderWidth: 3,
+                            pointRadius: 5,
+                            tension: 0.3,
+                            order: 1,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                }, {
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            type: 'linear', position: 'left',
+                            title: { display: true, text: leadLabel, font: { weight: 'bold' } },
+                            border: { display: false }
+                        },
+                        y1: {
+                            type: 'linear', position: 'right',
+                            grid: { drawOnChartArea: false },
+                            title: { display: true, text: costLabel, font: { weight: 'bold' } },
+                            border: { display: false },
+                            ticks: {
+                                callback: (val) => val.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US') + currency
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        if (context.datasetIndex === 1) { // Cost dataset
+                                            label += context.parsed.y.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US') + currency;
+                                        } else {
+                                            label += context.parsed.y.toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading Source Cost chart:', error);
+            }
+        }
+
+        // HÀM 6: Biểu đồ Pipeline Coverage (Chỉ dùng Hệ số Lần, bỏ %)
+        async function loadPipelineCoverageChart() {
+            try {
+                const res = await fetch(`${API_BASE}/pipeline-coverage`);
+                const data = await res.json();
+
+                const labels = data.map(item => item.salesOwner || item.userCode || 'N/A');
+
+                // Tính Hệ số Lần (Ratio)
+                const ratios = data.map(item => {
+                    const pipeline = item.openPipeline || 0;
+                    const target = item.target || 1;
+                    return Number((pipeline / target).toFixed(2));
+                });
+
+                // Chia màu theo mức độ an toàn (Mốc 3.0, 2.0, 1.0)
+                const colors = ratios.map(r => {
+                    if (r >= 3.0) return 'rgba(16, 185, 129, 0.9)'; // Rất an toàn (Emerald 500)
+                    if (r >= 2.0) return 'rgba(110, 231, 183, 0.9)'; // An toàn (Emerald 300)
+                    if (r >= 1.0) return 'rgba(251, 191, 36, 0.9)'; // Cảnh báo (Amber 400)
+                    return 'rgba(239, 68, 68, 0.9)'; // Nguy hiểm (Red 500)
+                });
+
+                const maxRatio = Math.max(...ratios, 3.0);
+
+                const locale = /*[[${#locale.language}]]*/ 'vi';
+                const currency = locale === 'vi' ? ' VNĐ' : ' VND';
+                const safetyLabel = /*[[#{dashboard.safety_ratio_label}]]*/ 'Hệ số an toàn (Lần)';
+                const timesUnit = /*[[#{dashboard.times}]]*/ 'lần';
+                const pipelineLabel = /*[[#{dashboard.pipeline_label}]]*/ 'Pipeline';
+                const targetLabel = /*[[#{dashboard.target_label}]]*/ 'Target';
+
+                renderChart('pipelineCoverageChart', 'bar', {
+                    labels: labels,
+                    datasets: [{
+                        label: safetyLabel,
+                        data: ratios,
+                        backgroundColor: colors,
+                        borderRadius: 6,
+                        barThickness: 24
+                    }]
+                }, {
+                    indexAxis: 'y', // Biểu đồ xoay ngang
+                    layout: { padding: { right: 120 } }, // Tăng khoảng trống bên phải lên 120 để không mất số
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            suggestedMax: maxRatio + 1.2, // Tăng buffer để đẩy thanh biểu đồ sang trái
+                            border: { display: false },
+                            grid: {
+                                // Tô đậm đường kẻ dọc mốc 1, 2, 3
+                                color: (ctx) => [1.0, 2.0, 3.0].includes(ctx.tick.value) ? '#e2e8f0' : '#f8fafc',
+                                lineWidth: (ctx) => [1.0, 2.0, 3.0].includes(ctx.tick.value) ? 2 : 1,
+                            },
+                            ticks: {
+                                callback: (val) => Number(val).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US')
+                            }
+                        },
+                        y: { grid: { display: false }, border: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            display: true,
+                            color: '#4b5563',
+                            anchor: 'end',
+                            align: 'right',
+                            offset: 8,
+                            font: { weight: 'bold', size: 11 },
+                            formatter: (val) => Number(val).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + timesUnit
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${safetyLabel}: ${Number(context.parsed.x).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${timesUnit}`;
+                                },
+                                afterLabel: function(ctx) {
+                                    const d = data[ctx.dataIndex];
+                                    const pipeline = Number(d.openPipeline || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
+                                    const target = Number(d.target || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
+                                    return [
+                                        '',
+                                        `💰 ${pipelineLabel}: ${pipeline}${currency}`,
+                                        `🎯 ${targetLabel}: ${target}${currency}`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading Pipeline Coverage chart:', error);
+            }
+        }
+
+        // ==========================================
+        // LOGIC XỬ LÝ MODAL CHI TIẾT LEADS THEO STATUS
+        // ==========================================
+
+        /**
+         * Mở modal và tải danh sách Lead theo Status
+         */
+        async function openLeadStatusModal(status) {
+            const modal = document.getElementById('leadStatusModal');
+            const title = document.getElementById('modalStatusTitle');
+            const tbody = document.getElementById('modalTableBody');
+            const loading = document.getElementById('modalLoading');
+            const empty = document.getElementById('modalEmpty');
+            const container = document.getElementById('modalTableContainer');
+
+            // Setup giao diện ban đầu
+            title.innerText = status;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Khóa cuộn trang chính
+
+            tbody.innerHTML = '';
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+            container.classList.add('hidden');
+
+            lucide.createIcons();
+
+            try {
+                // Gọi API lấy dữ liệu
+                const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
+                if (!res.ok) throw new Error('Network response was not ok');
+
+                const data = await res.json();
+                loading.classList.add('hidden');
+
+                if (!data || !Array.isArray(data) || data.length === 0) {
+                    empty.classList.remove('hidden');
+                    return;
+                }
+
+                // Render dữ liệu vào bảng
+                container.classList.remove('hidden');
+                data.forEach(lead => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition-colors group';
+                    tr.innerHTML = `
                             <td class="px-4 py-3 text-[11px] font-bold text-slate-400">#${lead.leadId || '-'}</td>
                             <td class="px-4 py-3 text-sm font-bold text-slate-800">${lead.account || '-'}</td>
                             <td class="px-4 py-3 text-sm text-slate-600">${lead.fullName || '-'}</td>
@@ -690,60 +795,62 @@
                             <td class="px-4 py-3 text-sm font-medium text-slate-700">${lead.userName || 'Chưa gán'}</td>
                             <td class="px-4 py-3 text-sm text-slate-500">${lead.createdDate || '-'}</td>
                         `;
-                        tbody.appendChild(tr);
-                    });
-                    lucide.createIcons();
-                } catch (error) {
-                    console.error('Error fetching leads for modal:', error);
-                    loading.classList.add('hidden');
-                    tbody.innerHTML = `<tr><td colspan="8" class="py-12 text-center text-red-500 font-bold">Không thể tải dữ liệu. Vui lòng thử lại sau.</td></tr>`;
-                    container.classList.remove('hidden');
+                    tbody.appendChild(tr);
+                });
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Error fetching leads for modal:', error);
+                loading.classList.add('hidden');
+                const errorText = /*[[#{dashboard.error_loading_data}]]*/ 'Không thể tải dữ liệu. Vui lòng thử lại sau.';
+                tbody.innerHTML = `<tr><td colspan="8" class="py-12 text-center text-red-500 font-bold">${errorText}</td></tr>`;
+                container.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Đóng modal
+         */
+        function closeLeadModal() {
+            document.getElementById('leadStatusModal').classList.add('hidden');
+            document.body.style.overflow = ''; // Mở lại cuộn trang chính
+        }
+
+        /**
+         * Helper: Trả về class màu sắc cho badge trạng thái
+         */
+        function getStatusBadgeClass(status) {
+            switch(status?.toLowerCase()) {
+                case 'won': return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+                case 'lost': return 'bg-red-100 text-red-700 border border-red-200';
+                case 'new': return 'bg-blue-100 text-blue-700 border border-blue-200';
+                case 'contacted': return 'bg-amber-100 text-amber-700 border border-amber-200';
+                case 'qualified': return 'bg-purple-100 text-purple-700 border border-purple-200';
+                default: return 'bg-slate-100 text-slate-600 border border-slate-200';
+            }
+        }
+
+        // HÀM 7: Bảng dữ liệu Leads lọc theo Status
+        async function loadLeadsByStatus(status) {
+            try {
+                const tbody = document.getElementById('leadsTableBody');
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto"></i></td></tr>`;
+                lucide.createIcons();
+
+                const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
+                const data = await res.json();
+
+                tbody.innerHTML = '';
+
+                if(data.length === 0) {
+                    const noLeadsText = /*[[#{dashboard.no_leads_for_status}]]*/ 'Không có khách hàng nào ở trạng thái này.';
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500 font-medium">${noLeadsText}</td></tr>`;
+                    return;
                 }
-            }
 
-            /**
-             * Đóng modal
-             */
-            function closeLeadModal() {
-                document.getElementById('leadStatusModal').classList.add('hidden');
-                document.body.style.overflow = ''; // Mở lại cuộn trang chính
-            }
-
-            /**
-             * Helper: Trả về class màu sắc cho badge trạng thái
-             */
-            function getStatusBadgeClass(status) {
-                switch(status?.toLowerCase()) {
-                    case 'won': return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
-                    case 'lost': return 'bg-red-100 text-red-700 border border-red-200';
-                    case 'new': return 'bg-blue-100 text-blue-700 border border-blue-200';
-                    case 'contacted': return 'bg-amber-100 text-amber-700 border border-amber-200';
-                    case 'qualified': return 'bg-purple-100 text-purple-700 border border-purple-200';
-                    default: return 'bg-slate-100 text-slate-600 border border-slate-200';
-                }
-            }
-
-            // HÀM 7: Bảng dữ liệu Leads lọc theo Status
-            async function loadLeadsByStatus(status) {
-                try {
-                    const tbody = document.getElementById('leadsTableBody');
-                    tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto"></i></td></tr>`;
-                    lucide.createIcons();
-
-                    const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
-                    const data = await res.json();
-                    
-                    tbody.innerHTML = '';
-
-                    if(data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500 font-medium">Không có khách hàng nào ở trạng thái này.</td></tr>`;
-                        return;
-                    }
-
-                    data.forEach(lead => {
-                        const tr = document.createElement('tr');
-                        tr.className = 'hover:bg-slate-50 transition-colors group';
-                        tr.innerHTML = `
+                data.forEach(lead => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition-colors group';
+                    tr.innerHTML = `
                             <td class="px-6 py-4">
                                 <div class="font-bold text-slate-800 group-hover:text-red-600 transition-colors">${lead.fullName || 'N/A'}</div>
                             </td>
@@ -756,48 +863,48 @@
                             </td>
                             <td class="px-6 py-4 text-sm font-bold text-slate-800 text-right">${lead.customerGroup || '-'}</td>
                         `;
-                        tbody.appendChild(tr);
-                    });
-                } catch (error) {
-                    console.error('Error loading leads by status:', error);
-                }
-            }
-
-            // HÀM 8: Helper vẽ và hủy Chart cũ (Tránh lỗi đè hình)
-            function renderChart(id, type, data, options = {}) {
-                if (charts[id]) charts[id].destroy(); // Rất quan trọng, tránh lỗi đè biểu đồ khi load lại
-
-                const ctx = document.getElementById(id).getContext('2d');
-                
-                // Cấu hình chung cho tooltip đẹp hơn
-                const defaultOptions = {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.9)', // Màu dark slate
-                            titleFont: { size: 13, family: "'Inter', sans-serif" },
-                            bodyFont: { size: 12, family: "'Inter', sans-serif" },
-                            padding: 12,
-                            cornerRadius: 8,
-                            boxPadding: 6
-                        }
-                    }
-                };
-
-                // Merge option của hàm gửi vào đè lên defaultOption
-                // (Mã merge sâu plugin config)
-                if(options.plugins) {
-                    options.plugins = { ...defaultOptions.plugins, ...options.plugins };
-                }
-
-                charts[id] = new Chart(ctx, {
-                    type: type,
-                    data: data,
-                    options: { ...defaultOptions, ...options }
+                    tbody.appendChild(tr);
                 });
+            } catch (error) {
+                console.error('Error loading leads by status:', error);
             }
-        </script>
-    </main>
+        }
+
+        // HÀM 8: Helper vẽ và hủy Chart cũ (Tránh lỗi đè hình)
+        function renderChart(id, type, data, options = {}) {
+            if (charts[id]) charts[id].destroy(); // Rất quan trọng, tránh lỗi đè biểu đồ khi load lại
+
+            const ctx = document.getElementById(id).getContext('2d');
+
+            // Cấu hình chung cho tooltip đẹp hơn
+            const defaultOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)', // Màu dark slate
+                        titleFont: { size: 13, family: "'Inter', sans-serif" },
+                        bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                        padding: 12,
+                        cornerRadius: 8,
+                        boxPadding: 6
+                    }
+                }
+            };
+
+            // Merge option của hàm gửi vào đè lên defaultOption
+            // (Mã merge sâu plugin config)
+            if(options.plugins) {
+                options.plugins = { ...defaultOptions.plugins, ...options.plugins };
+            }
+
+            charts[id] = new Chart(ctx, {
+                type: type,
+                data: data,
+                options: { ...defaultOptions, ...options }
+            });
+        }
+    </script>
+</main>
 </body>
 </html>
