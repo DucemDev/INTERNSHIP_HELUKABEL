@@ -4,12 +4,12 @@
 <main class="space-y-8">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Quản lý Lead</h1>
-            <p class="mt-1 text-sm font-medium text-gray-500">Theo dõi và quản lý hành trình khách hàng tiềm năng của HELUKABEL.</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight" th:text="#{manage.leads.title}">Quản lý Lead</h1>
+            <p class="mt-1 text-sm font-medium text-gray-500" th:text="#{manage.leads.desc}">Theo dõi và quản lý hành trình khách hàng tiềm năng của HELUKABEL.</p>
         </div>
         <div class="flex items-center gap-3">
             <button class="inline-flex items-center gap-2 rounded-xl bg-helu-red px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all" onclick="openModal('add')">
-                <i data-lucide="plus" class="w-4 h-4"></i> Thêm lead
+                <i data-lucide="plus" class="w-4 h-4"></i> <span th:text="#{manage.btn.add}">Thêm lead</span>
             </button>
         </div>
     </div>
@@ -18,31 +18,31 @@
     <div class="rounded-2xl border border-helu-border bg-white p-6 shadow-sm">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
             <div class="space-y-2">
-                <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Tìm kiếm khách hàng</label>
+                <label class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{manage.search.placeholder}">Tìm kiếm khách hàng</label>
                 <div class="relative group">
                     <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-helu-red transition-colors"></i>
-                    <input type="text" id="searchInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="Ten, SDT, Nguon..." onkeyup="filterLeads()">
+                    <input type="text" id="searchInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" th:placeholder="#{manage.search.placeholder}" onkeyup="filterLeads()">
                 </div>
             </div>
             <div class="space-y-2">
-                <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</label>
+                <label class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.status}">Trạng thái</label>
                 <select id="statusFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterLeads()">
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="New">Mới</option>
-                    <option value="In Progress">Đang chăm sóc</option>
-                    <option value="Won">Thành công</option>
-                    <option value="Lost">Thất bại</option>
+                    <option value="" th:text="#{manage.filter.all}">Tất cả trạng thái</option>
+                    <option value="New">New</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Won">Won</option>
+                    <option value="Lost">Lost</option>
                 </select>
             </div>
             <div class="space-y-2">
-                <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Sắp xếp</label>
+                <label class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{manage.sort.label}">Sắp xếp</label>
                 <select id="sortFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterLeads()">
-                    <option value="newest">Mới nhất</option>
-                    <option value="oldest">Cũ nhất</option>
+                    <option value="newest" th:text="#{manage.sort.newest}">Mới nhất</option>
+                    <option value="oldest" th:text="#{manage.sort.oldest}">Cũ nhất</option>
                 </select>
             </div>
             <div class="space-y-2">
-                <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Thời gian</label>
+                <label class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{manage.time.label}">Thời gian</label>
                 <input type="date" id="dateFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterLeads()">
             </div>
         </div>
@@ -53,19 +53,19 @@
             <table class="w-full text-left" id="leadsTable">
                 <thead>
                 <tr class="border-b border-gray-100 bg-gray-50/50">
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Mã Lead</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Khách hàng</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Nhóm KH</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Ngành</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Khu vực</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Phụ trách</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Nguồn / Sản phẩm</th>
-                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10">Thao tác</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.id}">Mã Lead</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{dashboard.col.name}">Khách hàng</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{dashboard.col.group}">Nhóm KH</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{dashboard.col.industry}">Ngành</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{dashboard.col.region}">Khu vực</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.status}">Trạng thái</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.assigned_to}">Phụ trách</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{manage.source_product}">Nguồn / Sản phẩm</th>
+                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10" th:text="#{manage.col.actions}">Thao tác</th>
                 </tr>
                 </thead>
-                <tbody id="leadsBody" class="divide-y divide-gray-50">
-                <!-- Data loaded via JS -->
+                <tbody class="divide-y divide-gray-50">
+                    <!-- Loaded via JS -->
                 </tbody>
             </table>
         </div>
@@ -85,7 +85,7 @@
     <div id="leadModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
         <div class="w-full max-w-2xl rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200 overflow-y-auto max-h-[90vh]">
             <div class="flex items-center justify-between mb-8">
-                <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="modalTitle">Thêm lead mới</h2>
+                <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="modalTitle" th:text="#{manage.btn.add}">Thêm lead mới</h2>
                 <button onclick="closeModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all">
                     <i data-lucide="x" class="w-6 h-6"></i>
                 </button>
@@ -94,288 +94,185 @@
                 <input type="hidden" id="leadId">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Họ và tên <span class="text-helu-red">*</span></label>
-                        <input type="text" id="fullName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Nhập tên khách hàng">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.fullname}">Họ và tên</span> <span class="text-helu-red">*</span></label>
+                        <input type="text" id="fullName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required th:placeholder="#{form.placeholder.name}">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Mã Lead <span class="text-helu-red">*</span></label>
-                        <input type="text" id="leadIdInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="VD: L00x">
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Số điện thoại</label>
-                        <input type="text" id="phoneNumber" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="0xxx.xxx.xxx">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.lead_id}">Mã Lead</span> <span class="text-helu-red">*</span></label>
+                        <input type="text" id="leadIdInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="L-2026-xxxx">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Công ty / Tổ chức <span class="text-helu-red">*</span></label>
-                        <input type="text" id="account" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Tên doanh nghiệp">
+                        <label class="text-sm font-bold text-gray-700" th:text="#{form.phone}">Số điện thoại</label>
+                        <input type="text" id="phoneNumber" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="0xxx.xxx.xxx">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Trạng thái <span class="text-helu-red">*</span></label>
+                        <label class="text-sm font-bold text-gray-700" th:text="#{form.email}">Email</label>
+                        <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" th:placeholder="#{form.placeholder.email}">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.company}">Công ty / Tổ chức</span> <span class="text-helu-red">*</span></label>
+                        <input type="text" id="account" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.status}">Trạng thái</span> <span class="text-helu-red">*</span></label>
                         <select id="status" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
-                            <option value="New">Mới</option>
-                            <option value="In Progress">Đang chăm sóc</option>
-                            <option value="Won">Thành công</option>
-                            <option value="Lost">Thất bại</option>
+                            <option value="New">New</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Won">Won</option>
+                            <option value="Lost">Lost</option>
                         </select>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Nhóm KH</label>
-                        <input type="text" id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="VD: FDI, Local...">
+                        <label class="text-sm font-bold text-gray-700" th:text="#{form.group}">Nhóm KH</label>
+                        <input type="text" id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Ngành</label>
-                        <input type="text" id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="VD: Solar, Wind...">
+                        <label class="text-sm font-bold text-gray-700" th:text="#{form.industry}">Ngành</label>
+                        <input type="text" id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Khu vực</label>
-                        <input type="text" id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="VD: North, South...">
+                        <label class="text-sm font-bold text-gray-700" th:text="#{form.region}">Khu vực</label>
+                        <input type="text" id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Nguồn khách hàng</label>
-                        <input type="text" id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="Nhập nguồn (VD: Website, Facebook...)">
+                        <label class="text-sm font-bold text-gray-700" th:text="#{form.source}">Nguồn khách hàng</label>
+                        <input type="text" id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Sản phẩm quan tâm</label>
-                        <input type="text" id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="Nhập tên sản phẩm">
+                        <label class="text-sm font-bold text-gray-700" th:text="#{form.product}">Sản phẩm quan tâm</label>
+                        <input type="text" id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
-                    <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeModal()">Hủy bỏ</button>
-                    <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">Lưu thông tin Lead</button>
+                    <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeModal()" th:text="#{form.btn.cancel}">Hủy bỏ</button>
+                    <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all" th:text="#{form.btn.save}">Lưu thông tin</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script>
+    <script th:inline="javascript">
         const apiBase = '/api/leads';
         let allLeads = [];
         let filteredLeads = [];
-        let currentPage = 1;
-        const pageSize = 10;
-
-        // KIỂM TRA THAM SỐ TÌM KIẾM TỪ URL (TỪ DASHBOARD CHUYỂN SANG)
-        function checkUrlParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const searchParam = urlParams.get('search');
-            if (searchParam) {
-                document.getElementById('searchInput').value = searchParam;
-            }
-        }
+        const unassignedText = /*[[#{status.unassigned}]]*/ 'Chưa gán';
+        const addLeadText = /*[[#{manage.btn.add}]]*/ 'Thêm Lead mới';
+        const updateLeadText = /*[[#{detail.btn.edit}]]*/ 'Cập nhật thông tin Lead';
 
         async function fetchLeads() {
             try {
                 const response = await fetch(apiBase);
-
-                // PHÒNG THỦ: Kiểm tra HTTP status trước khi ép kiểu JSON
-                if (!response.ok) {
-                    throw new Error(`API Lỗi: ${response.status} ${response.statusText}`);
-                }
-
-                const contentType = response.headers.get('content-type') || '';
-                if (!contentType.includes('application/json')) {
-                    window.location.href = '/login';
-                    return;
-                }
-
-                const data = await response.json();
-
-                // Đảm bảo dữ liệu nhận được thực sự là mảng
-                if (Array.isArray(data)) {
-                    allLeads = data;
-                } else {
-                    console.warn("Dữ liệu API không phải là mảng, gán mảng rỗng.");
-                    allLeads = [];
-                }
-
+                allLeads = await response.json();
                 filteredLeads = [...allLeads];
-                filterLeads(); // Lọc và render giao diện
-
-            } catch (error) {
-                console.error('Error fetching leads:', error);
-                allLeads = [];
-                filteredLeads = [];
                 renderLeads();
-            }
+            } catch (error) { console.error('Error fetching leads:', error); }
         }
 
         function renderLeads() {
-            const tbody = document.getElementById('leadsBody');
+            const tbody = document.getElementById('leadsTable').querySelector('tbody');
             tbody.innerHTML = '';
-
-            // Nếu mảng rỗng thì in ra thông báo trống
-            if (!filteredLeads || filteredLeads.length === 0) {
-                tbody.innerHTML = `
-                        <tr>
-                            <td colspan="9" class="py-10 text-center text-gray-400 font-medium italic">
-                                Không tìm thấy dữ liệu phù hợp.
-                            </td>
-                        </tr>
-                    `;
-                document.getElementById('recordCount').innerText = `Hiển thị 0/0 bản ghi`;
-                document.getElementById('paginationControls').innerHTML = '';
-                return;
-            }
-
-            const start = (currentPage - 1) * pageSize;
-            const end = start + pageSize;
-            const pagedLeads = filteredLeads.slice(start, end);
-
-            pagedLeads.forEach((lead) => {
+            filteredLeads.forEach(lead => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50/50 transition-colors";
-
-                let statusBadgeClass = 'bg-blue-50 text-blue-600';
-                if (lead.status === 'Won') statusBadgeClass = 'bg-emerald-50 text-emerald-600';
-                else if (lead.status === 'Lost') statusBadgeClass = 'bg-rose-50 text-rose-600';
-                else if (lead.status === 'In Progress') statusBadgeClass = 'bg-amber-50 text-amber-600';
+                tr.className = 'border-b border-gray-50 hover:bg-gray-50/50 transition-all group';
+                
+                const statusColors = {
+                    'New': 'bg-blue-50 text-blue-600 border-blue-100',
+                    'In Progress': 'bg-amber-50 text-amber-600 border-amber-100',
+                    'Won': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                    'Lost': 'bg-rose-50 text-rose-600 border-rose-100'
+                };
 
                 tr.innerHTML = `
-                        <td class="py-4 px-6 text-sm font-extrabold text-gray-900 uppercase">${lead.leadId || '-'}</td>
-                        <td class="py-4 px-6">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-bold text-gray-800">${lead.fullName || '-'}</span>
-                                <span class="text-[11px] font-medium text-gray-400 uppercase tracking-tight">${lead.account || '-'}</span>
-                            </div>
-                        </td>
-                        <td class="py-4 px-6 text-sm font-medium text-gray-600">${lead.customerGroup || '-'}</td>
-                        <td class="py-4 px-6 text-sm font-medium text-gray-600">${lead.industryType || '-'}</td>
-                        <td class="py-4 px-6 text-sm font-medium text-gray-600">${lead.region || '-'}</td>
-                        <td class="py-4 px-6">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${statusBadgeClass}">
-                                ${lead.status || 'NEW'}
-                            </span>
-                        </td>
-                        <td class="py-4 px-6">
-                            <div class="flex items-center gap-2.5">
-                                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-helu-red font-bold text-white text-[10px] shadow-sm shadow-red-100">${lead.userName ? lead.userName.charAt(0) : '?'}</div>
-                                <span class="text-sm font-bold text-gray-700">${lead.userName || 'Chưa gán'}</span>
-                            </div>
-                        </td>
-                        <td class="py-4 px-6">
-                            <div class="flex flex-col gap-1">
-                                <span class="text-[11px] font-bold text-gray-600 bg-gray-50 px-2 py-0.5 rounded border border-gray-100 w-fit">${lead.sourceName || '-'}</span>
-                                <span class="text-[11px] font-medium text-gray-400">${lead.productName || '-'}</span>
-                            </div>
-                        </td>
-                        <td class="py-4 px-6 text-right pr-10">
-                            <div class="flex items-center justify-end gap-2">
-                                <button class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" onclick="viewLeadDetail('${lead.leadId}')" title="Xem chi tiết">
-                                    <i data-lucide="eye" class="w-4 h-4"></i>
-                                </button>
-                                <button class="rounded-lg p-2 text-gray-400 hover:bg-rose-50 hover:text-rose-600 transition-all" onclick="deleteLead('${lead.leadId}')" title="Xóa">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                        </td>
-                    `;
+                    <td class="py-4 px-6">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">${lead.leadId}</span>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="font-bold text-gray-900">${lead.fullName}</div>
+                        <div class="text-xs font-medium text-gray-500">${lead.account}</div>
+                    </td>
+                    <td class="py-4 px-6">
+                        <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-[10px] font-bold text-gray-600">${lead.customerGroup || '-'}</span>
+                    </td>
+                    <td class="py-4 px-6 text-sm font-medium text-gray-600">${lead.industryType || '-'}</td>
+                    <td class="py-4 px-6 text-sm font-medium text-gray-600">${lead.region || '-'}</td>
+                    <td class="py-4 px-6">
+                        <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${statusColors[lead.status] || 'bg-gray-50 text-gray-600'}">
+                            ${lead.status}
+                        </span>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="flex items-center gap-2">
+                            <div class="flex h-6 w-6 items-center justify-center rounded bg-helu-red font-bold text-white text-[10px]">${lead.userName ? lead.userName.charAt(0) : '?'}</div>
+                            <span class="text-sm font-bold text-gray-700">${lead.userName || unassignedText}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="text-xs font-bold text-gray-800">${lead.sourceName || '-'}</div>
+                        <div class="text-[10px] font-medium text-gray-400">${lead.productName || '-'}</div>
+                    </td>
+                    <td class="py-4 px-6 text-right pr-10">
+                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="viewDetail('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Xem chi tiết"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                            <button onclick="openModal('edit', '${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Chỉnh sửa"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deleteLead('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </td>
+                `;
                 tbody.appendChild(tr);
             });
-
-            document.getElementById('recordCount').innerText = `Hiển thị ${start + 1}-${Math.min(end, filteredLeads.length)}/${filteredLeads.length} bản ghi`;
-            renderPagination();
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            lucide.createIcons();
         }
 
-        function renderPagination() {
-            const controls = document.getElementById('paginationControls');
-            controls.innerHTML = '';
-            const totalPages = Math.ceil(filteredLeads.length / pageSize);
-
-            if (totalPages <= 1) return;
-
-            // Previous
-            const prevBtn = document.createElement('button');
-            prevBtn.className = `inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 transition-all ${currentPage === 1 ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:bg-gray-50'}`;
-            prevBtn.innerHTML = '<i data-lucide="chevron-left" class="w-4 h-4"></i>';
-            if (currentPage > 1) prevBtn.onclick = () => { currentPage--; renderLeads(); };
-            controls.appendChild(prevBtn);
-
-            // Page numbers
-            for (let i = 1; i <= totalPages; i++) {
-                const pageBtn = document.createElement('button');
-                pageBtn.className = `inline-flex h-9 w-9 items-center justify-center rounded-lg text-sm font-bold transition-all ${currentPage === i ? 'bg-helu-red text-white shadow-md shadow-red-100' : 'border border-gray-200 text-gray-400 hover:bg-gray-50'}`;
-                pageBtn.innerText = i;
-                pageBtn.onclick = () => { currentPage = i; renderLeads(); };
-                controls.appendChild(pageBtn);
-            }
-
-            // Next
-            const nextBtn = document.createElement('button');
-            nextBtn.className = `inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 transition-all ${currentPage === totalPages ? 'text-gray-200 cursor-not-allowed' : 'text-gray-400 hover:bg-gray-50'}`;
-            nextBtn.innerHTML = '<i data-lucide="chevron-right" class="w-4 h-4"></i>';
-            if (currentPage < totalPages) nextBtn.onclick = () => { currentPage++; renderLeads(); };
-            controls.appendChild(nextBtn);
-
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        }
-
-        function viewLeadDetail(id) {
-            window.location.href = `/leads/${id}`;
-        }
+        function viewDetail(id) { window.location.href = `/leads/${id}`; }
 
         function filterLeads() {
-            if (!allLeads || allLeads.length === 0) {
-                filteredLeads = [];
-                currentPage = 1;
-                renderLeads();
-                return;
-            }
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            const date = document.getElementById('dateFilter').value;
 
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const statusFilter = document.getElementById('statusFilter').value;
-            const sortFilter = document.getElementById('sortFilter').value;
-
-            filteredLeads = allLeads.filter(lead => {
-                // Phòng thủ trường hợp trường đó null
-                const nameMatch = lead.fullName ? lead.fullName.toLowerCase().includes(searchTerm) : false;
-                const idMatch = lead.leadId ? lead.leadId.toLowerCase().includes(searchTerm) : false;
-                const phoneMatch = lead.phoneNumber ? lead.phoneNumber.includes(searchTerm) : false;
-                const sourceMatch = lead.sourceName ? lead.sourceName.toLowerCase().includes(searchTerm) : false;
-                const userMatch = lead.userName ? lead.userName.toLowerCase().includes(searchTerm) : false;
-                const accountMatch = lead.account ? lead.account.toLowerCase().includes(searchTerm) : false;
-
-                const matchesSearch = nameMatch || idMatch || phoneMatch || sourceMatch || userMatch || accountMatch;
-                const matchesStatus = !statusFilter || lead.status === statusFilter;
-
-                return matchesSearch && matchesStatus;
+            filteredLeads = allLeads.filter(l => {
+                const matchesSearch = l.fullName.toLowerCase().includes(search) || 
+                                     l.phoneNumber?.includes(search) || 
+                                     l.account.toLowerCase().includes(search) ||
+                                     l.leadId.toLowerCase().includes(search);
+                const matchesStatus = !status || l.status === status;
+                const matchesDate = !date || l.createdDate === date;
+                return matchesSearch && matchesStatus && matchesDate;
             });
 
-            if (sortFilter === 'newest') {
-                filteredLeads.sort((a, b) => new Date(b.createdDate || 0) - new Date(a.createdDate || 0));
-            } else {
-                filteredLeads.sort((a, b) => new Date(a.createdDate || 0) - new Date(b.createdDate || 0));
-            }
+            if (sort === 'newest') filteredLeads.sort((a, b) => b.leadId.localeCompare(a.leadId));
+            else filteredLeads.sort((a, b) => a.leadId.localeCompare(b.leadId));
 
-            currentPage = 1;
             renderLeads();
         }
 
         function openModal(mode, id = null) {
             const modal = document.getElementById('leadModal');
-            const title = document.getElementById('modalTitle');
             const form = document.getElementById('leadForm');
+            const title = document.getElementById('modalTitle');
             form.reset();
             document.getElementById('leadId').value = '';
 
             if (mode === 'edit' && id) {
-                title.innerText = 'Cập nhật thông tin Lead';
+                title.innerText = updateLeadText;
                 const lead = allLeads.find(l => l.leadId === id);
                 if (lead) {
-                    document.getElementById('leadId').value = lead.leadId || '';
-                    document.getElementById('leadIdInput').value = lead.leadId || '';
-                    document.getElementById('fullName').value = lead.fullName || '';
+                    document.getElementById('leadId').value = lead.leadId;
+                    document.getElementById('leadIdInput').value = lead.leadId;
+                    document.getElementById('fullName').value = lead.fullName;
                     document.getElementById('phoneNumber').value = lead.phoneNumber || '';
-                    document.getElementById('account').value = lead.account || '';
-                    document.getElementById('status').value = lead.status || 'New';
+                    document.getElementById('email').value = lead.email || '';
+                    document.getElementById('account').value = lead.account;
+                    document.getElementById('status').value = lead.status;
                     document.getElementById('customerGroup').value = lead.customerGroup || '';
                     document.getElementById('industryType').value = lead.industryType || '';
                     document.getElementById('region').value = lead.region || '';
@@ -383,14 +280,14 @@
                     document.getElementById('productName').value = lead.productName || '';
                 }
             } else {
-                title.innerText = 'Thêm lead mới';
-                document.getElementById('leadIdInput').removeAttribute('readonly');
+                title.innerText = addLeadText;
+                document.getElementById('leadIdInput').value = 'L-2026-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
             }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
 
-        function closeModal() {
+        function closeModal() { 
             const modal = document.getElementById('leadModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -398,14 +295,15 @@
 
         document.getElementById('leadForm').onsubmit = async (e) => {
             e.preventDefault();
-            const leadId = document.getElementById('leadId').value;
-            const method = leadId ? 'PUT' : 'POST';
-            const url = leadId ? `${apiBase}/${leadId}` : apiBase;
+            const id = document.getElementById('leadId').value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${apiBase}/${id}` : apiBase;
 
             const data = {
                 leadId: document.getElementById('leadIdInput').value,
                 fullName: document.getElementById('fullName').value,
                 phoneNumber: document.getElementById('phoneNumber').value,
+                email: document.getElementById('email').value,
                 account: document.getElementById('account').value,
                 status: document.getElementById('status').value,
                 customerGroup: document.getElementById('customerGroup').value,
@@ -414,45 +312,29 @@
                 productName: document.getElementById('productName').value,
                 sourceName: document.getElementById('sourceName').value,
                 createdDate: new Date().toISOString().split('T')[0],
-                userId: '498e0fc7-6278-45fc-a374-1a81096727d2', // Mock user ID for demo
-                customerRole: 'N/A',
-                location: 'N/A',
-                cost: 0,
-                businessResult: 0
+                userId: '498e0fc7-6278-45fc-a374-1a81096727d2' // Mock user ID
             };
 
             try {
                 const response = await fetch(url, {
-                    method: method,
+                    method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                if (response.ok) {
-                    closeModal();
-                    fetchLeads();
-                } else {
-                    alert(`Lỗi lưu dữ liệu: ${response.status}`);
-                }
-            } catch (error) {
-                console.error('Error saving lead:', error);
-                alert('Không thể kết nối với máy chủ!');
-            }
+                if (response.ok) { closeModal(); fetchLeads(); }
+            } catch (error) { console.error('Error saving lead:', error); }
         };
 
         async function deleteLead(id) {
-            if (confirm('Bạn có chắc chắn muốn xóa lead này?')) {
+            if (confirm('Bạn có muốn xóa lead này?')) {
                 try {
                     const response = await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
                     if (response.ok) fetchLeads();
-                    else alert(`Không thể xóa: ${response.status}`);
                 } catch (error) { console.error('Error deleting lead:', error); }
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            checkUrlParams();
-            fetchLeads();
-        });
+        document.addEventListener('DOMContentLoaded', fetchLeads);
     </script>
 </main>
 </body>

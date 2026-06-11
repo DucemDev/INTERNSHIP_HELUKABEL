@@ -9,13 +9,13 @@
                     <i data-lucide="arrow-left" class="w-5 h-5 text-gray-400 group-hover:text-helu-red transition-colors"></i>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight" id="detailLeadId">Đang tải...</h1>
-                    <p class="text-sm font-medium text-gray-500">Chi tiết thông tin khách hàng tiềm năng</p>
+                    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight" id="detailLeadId" th:text="#{status.loading}">Đang tải...</h1>
+                    <p class="text-sm font-medium text-gray-500" th:text="#{detail.leads.desc}">Chi tiết thông tin khách hàng tiềm năng</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="openModal('edit')" class="inline-flex items-center gap-2 rounded-xl bg-helu-red px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">
-                    <i data-lucide="edit-3" class="w-4 h-4"></i> Chỉnh sửa thông tin
+                    <i data-lucide="edit-3" class="w-4 h-4"></i> <span th:text="#{detail.btn.edit}">Chỉnh sửa thông tin</span>
                 </button>
             </div>
         </div>
@@ -25,31 +25,31 @@
             <div class="lg:col-span-2 space-y-8">
                 <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
                     <div class="border-b border-gray-100 bg-gray-50/50 px-8 py-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Thông tin khách hàng</h3>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400" th:text="#{detail.section.customer}">Thông tin khách hàng</h3>
                     </div>
                     <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold uppercase text-gray-400">Họ và tên</label>
+                            <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.fullname}">Họ và tên</label>
                             <p class="text-base font-bold text-gray-900" id="detailFullName">-</p>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold uppercase text-gray-400">Công ty / Tài khoản</label>
+                            <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.company}">Công ty / Tài khoản</label>
                             <p class="text-base font-bold text-gray-900" id="detailAccount">-</p>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold uppercase text-gray-400">Số điện thoại</label>
+                            <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.phone}">Số điện thoại</label>
                             <p class="text-base font-medium text-gray-600" id="detailPhone">-</p>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold uppercase text-gray-400">Email</label>
+                            <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.email}">Email</label>
                             <p class="text-base font-medium text-gray-600" id="detailEmail">-</p>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold uppercase text-gray-400">Vai trò</label>
+                            <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{label.role}">Vai trò</label>
                             <p class="text-base font-medium text-gray-600" id="detailRole">-</p>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold uppercase text-gray-400">Địa điểm</label>
+                            <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{dashboard.col.region}">Địa điểm</label>
                             <p class="text-base font-medium text-gray-600" id="detailLocation">-</p>
                         </div>
                     </div>
@@ -57,23 +57,23 @@
 
                 <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
                     <div class="border-b border-gray-100 bg-gray-50/50 px-8 py-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Phân loại & Thị trường</h3>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400" th:text="#{detail.section.market}">Phân loại & Thị trường</h3>
                     </div>
                     <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold uppercase text-gray-400">Nhóm khách hàng</label>
+                            <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.group}">Nhóm khách hàng</label>
                             <div class="mt-1">
                                 <span class="inline-flex items-center px-3 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-bold" id="detailCustomerGroup">-</span>
                             </div>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold uppercase text-gray-400">Ngành nghề</label>
+                            <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.industry}">Ngành nghề</label>
                             <div class="mt-1">
                                 <span class="inline-flex items-center px-3 py-1 rounded-lg bg-purple-50 text-purple-700 text-xs font-bold" id="detailIndustryType">-</span>
                             </div>
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[11px] font-bold uppercase text-gray-400">Khu vực</label>
+                            <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.region}">Khu vực</label>
                             <div class="mt-1">
                                 <span class="inline-flex items-center px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold" id="detailRegion">-</span>
                             </div>
@@ -83,26 +83,26 @@
 
                 <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
                     <div class="border-b border-gray-100 bg-gray-50/50 px-8 py-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Sản phẩm & Kinh doanh</h3>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400" th:text="#{detail.section.business}">Sản phẩm & Kinh doanh</h3>
                     </div>
                     <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
                         <div class="space-y-6">
                             <div class="space-y-1">
-                                <label class="text-[11px] font-bold uppercase text-gray-400">Sản phẩm quan tâm</label>
+                                <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.product}">Sản phẩm quan tâm</label>
                                 <p class="text-base font-bold text-gray-800" id="detailProduct">-</p>
                             </div>
                             <div class="space-y-1">
-                                <label class="text-[11px] font-bold uppercase text-gray-400">Nguồn Lead</label>
+                                <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.source}">Nguồn Lead</label>
                                 <p class="text-base font-medium text-gray-600" id="detailSource">-</p>
                             </div>
                         </div>
                         <div class="space-y-6">
                             <div class="space-y-1">
-                                <label class="text-[11px] font-bold uppercase text-gray-400">Chi phí dự kiến</label>
+                                <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.cost}">Chi phí dự kiến</label>
                                 <p class="text-xl font-extrabold text-helu-red" id="detailCost">0 VNĐ</p>
                             </div>
                             <div class="space-y-1">
-                                <label class="text-[11px] font-bold uppercase text-gray-400">Kết quả kinh doanh</label>
+                                <label class="text-[11px] font-bold uppercase text-gray-400" th:text="#{form.result}">Kết quả kinh doanh</label>
                                 <p class="text-base font-bold text-gray-800" id="detailBusinessResult">0 VNĐ</p>
                             </div>
                         </div>
@@ -113,17 +113,17 @@
             <!-- Sidebar Info -->
             <div class="space-y-8">
                 <div class="rounded-2xl border border-helu-border bg-white p-8 shadow-sm">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-6">Trạng thái hiện tại</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-6" th:text="#{detail.current_status}">Trạng thái hiện tại</h3>
                     <div id="detailStatusBadge" class="w-full py-4 rounded-xl text-center text-sm font-bold uppercase tracking-widest mb-6">
                         -
                     </div>
                     <div class="space-y-4 pt-6 border-t border-gray-100">
                         <div class="flex items-center justify-between text-sm">
-                            <span class="font-medium text-gray-500">Ngày tạo:</span>
+                            <span class="font-medium text-gray-500" th:text="#{label.created_date}">Ngày tạo:</span>
                             <span class="font-bold text-gray-900" id="detailCreatedDate">-</span>
                         </div>
                         <div class="flex items-center justify-between text-sm">
-                            <span class="font-medium text-gray-500">Người phụ trách:</span>
+                            <span class="font-medium text-gray-500" th:text="#{label.assigned_to}">Người phụ trách:</span>
                             <div class="flex items-center gap-2">
                                 <div id="detailUserAvatar" class="flex h-6 w-6 items-center justify-center rounded bg-helu-red font-bold text-white text-[10px]">?</div>
                                 <span class="font-bold text-gray-900" id="detailUserName">-</span>
@@ -133,7 +133,7 @@
                 </div>
 
                 <div class="rounded-2xl border border-helu-border bg-white p-8 shadow-sm" id="lossReasonSection" style="display: none;">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-rose-500 mb-4">Lý do thất bại</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-rose-500 mb-4" th:text="#{detail.loss_reason}">Lý do thất bại</h3>
                     <p class="text-sm font-medium text-gray-600 italic" id="detailLossReason">-</p>
                 </div>
             </div>
@@ -143,7 +143,7 @@
         <div id="leadModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
             <div class="w-full max-w-2xl rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200 overflow-y-auto max-h-[90vh]">
                 <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="modalTitle">Cập nhật thông tin Lead</h2>
+                    <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="modalTitle" th:text="#{detail.btn.edit}">Cập nhật thông tin Lead</h2>
                     <button onclick="closeModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all">
                         <i data-lucide="x" class="w-6 h-6"></i>
                     </button>
@@ -152,66 +152,66 @@
                     <input type="hidden" id="leadId">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Họ và tên <span class="text-helu-red">*</span></label>
-                            <input type="text" id="fullName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Nhập tên khách hàng">
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{form.fullname}">Họ và tên</span> <span class="text-helu-red">*</span></label>
+                            <input type="text" id="fullName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required th:placeholder="#{form.placeholder.name}">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Mã Lead <span class="text-helu-red">*</span></label>
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{form.lead_id}">Mã Lead</span> <span class="text-helu-red">*</span></label>
                             <input type="text" id="leadIdInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required readonly>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Số điện thoại</label>
+                            <label class="text-sm font-bold text-gray-700" th:text="#{form.phone}">Số điện thoại</label>
                             <input type="text" id="phoneNumber" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="0xxx.xxx.xxx">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Email</label>
-                            <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="customer@email.com">
+                            <label class="text-sm font-bold text-gray-700" th:text="#{form.email}">Email</label>
+                            <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" th:placeholder="#{form.placeholder.email}">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Công ty / Tổ chức <span class="text-helu-red">*</span></label>
-                            <input type="text" id="account" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Tên doanh nghiệp">
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{form.company}">Công ty / Tổ chức</span> <span class="text-helu-red">*</span></label>
+                            <input type="text" id="account" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Trạng thái <span class="text-helu-red">*</span></label>
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{form.status}">Trạng thái</span> <span class="text-helu-red">*</span></label>
                             <select id="status" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
-                                <option value="New">Mới</option>
-                                <option value="In Progress">Đang chăm sóc</option>
-                                <option value="Won">Thành công</option>
-                                <option value="Lost">Thất bại</option>
+                                <option value="New">New</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Won">Won</option>
+                                <option value="Lost">Lost</option>
                             </select>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Nhóm KH</label>
+                            <label class="text-sm font-bold text-gray-700" th:text="#{form.group}">Nhóm KH</label>
                             <input type="text" id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Ngành</label>
+                            <label class="text-sm font-bold text-gray-700" th:text="#{form.industry}">Ngành</label>
                             <input type="text" id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Khu vực</label>
+                            <label class="text-sm font-bold text-gray-700" th:text="#{form.region}">Khu vực</label>
                             <input type="text" id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Nguồn khách hàng</label>
+                            <label class="text-sm font-bold text-gray-700" th:text="#{form.source}">Nguồn khách hàng</label>
                             <input type="text" id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Sản phẩm quan tâm</label>
+                            <label class="text-sm font-bold text-gray-700" th:text="#{form.product}">Sản phẩm quan tâm</label>
                             <input type="text" id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
                         </div>
                     </div>
                     <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
-                        <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeModal()">Hủy bỏ</button>
-                        <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">Lưu thay đổi</button>
+                        <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeModal()" th:text="#{form.btn.cancel}">Hủy bỏ</button>
+                        <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all" th:text="#{form.btn.update}">Lưu thay đổi</button>
                     </div>
                 </form>
             </div>
@@ -221,6 +221,7 @@
             const leadId = [[${leadId}]];
             const apiBase = '/api/leads';
             let currentLead = null;
+            const unassignedText = /*[[#{status.unassigned}]]*/ 'Chưa gán';
 
             async function fetchLeadDetail() {
                 try {
@@ -243,10 +244,14 @@
                 document.getElementById('detailRegion').innerText = lead.region || '-';
                 document.getElementById('detailProduct').innerText = lead.productName || '-';
                 document.getElementById('detailSource').innerText = lead.sourceName || '-';
-                document.getElementById('detailCost').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(lead.cost || 0);
-                document.getElementById('detailBusinessResult').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(lead.businessResult || 0);
+                
+                const locale = /*[[${#locale.language}]]*/ 'vi';
+                const currency = locale === 'vi' ? 'VND' : 'USD';
+                document.getElementById('detailCost').innerText = new Intl.NumberFormat(locale === 'vi' ? 'vi-VN' : 'en-US', { style: 'currency', currency: currency }).format(lead.cost || 0);
+                document.getElementById('detailBusinessResult').innerText = new Intl.NumberFormat(locale === 'vi' ? 'vi-VN' : 'en-US', { style: 'currency', currency: currency }).format(lead.businessResult || 0);
+                
                 document.getElementById('detailCreatedDate').innerText = lead.createdDate;
-                document.getElementById('detailUserName').innerText = lead.userName || 'Chưa gán';
+                document.getElementById('detailUserName').innerText = lead.userName || unassignedText;
                 document.getElementById('detailUserAvatar').innerText = lead.userName ? lead.userName.charAt(0) : '?';
 
                 const statusBadge = document.getElementById('detailStatusBadge');

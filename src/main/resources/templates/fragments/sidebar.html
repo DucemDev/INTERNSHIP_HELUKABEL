@@ -13,7 +13,7 @@
         <div th:classappend="${activeMenu == 'dashboard' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/dashboard" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i>
-                <span>Dashboard</span>
+                <span th:text="#{nav.dashboard}">Dashboard</span>
             </a>
         </div>
 
@@ -21,7 +21,7 @@
         <div th:classappend="${activeMenu == 'leads' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/leads" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="users" class="mr-3 w-5 h-5"></i>
-                <span>Quản lý Lead</span>
+                <span th:text="#{nav.leads}">Quản lý Lead</span>
             </a>
         </div>
 
@@ -29,7 +29,7 @@
         <div th:classappend="${activeMenu == 'users' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/users" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="user-cog" class="mr-3 w-5 h-5"></i>
-                <span>Nhân sự (Admin)</span>
+                <span th:text="#{nav.users}">Nhân sự (Admin)</span>
             </a>
         </div>
     </div>
