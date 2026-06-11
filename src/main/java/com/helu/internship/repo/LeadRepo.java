@@ -1,10 +1,6 @@
 package com.helu.internship.repo;
 
-import com.helu.internship.dto.response.ConversionRateResponse;
-import com.helu.internship.dto.response.CostPerWinBySourceResponse;
-import com.helu.internship.dto.response.LeadByStatusResponse;
-import com.helu.internship.dto.response.LeadListProjection;
-import com.helu.internship.dto.response.WinRateBySalesResponse;
+import com.helu.internship.dto.response.*;
 import com.helu.internship.entity.LeadEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -129,6 +125,99 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     """, nativeQuery = true)
     List<WinRateBySalesResponse> getWinRateBySalesOwner();
 
+    @Query(value = """
+    SELECT
+        industry_type AS industryType,
+
+        CAST(SUM(
+            CASE
+                WHEN status IN ('Qualified','Won')
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS qualifiedLead,
+
+        CAST(SUM(
+            CASE
+                WHEN status = 'Won'
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS wonLead,
+
+        CAST((
+            SUM(
+                CASE
+                    WHEN status = 'Won'
+                    THEN 1
+                    ELSE 0
+                END
+            ) * 100.0
+            /
+            NULLIF(
+                SUM(
+                    CASE
+                        WHEN status IN ('Qualified','Won')
+                        THEN 1
+                        ELSE 0
+                    END
+                ),
+                0
+            )
+        ) AS DECIMAL(18,2)) AS winRate
+
+    FROM lead
+    GROUP BY industry_type
+    ORDER BY winRate DESC
+    """, nativeQuery = true)
+    List<WinRateByIndustryProjection> getWinRateByIndustry();
+
+    @Query(value = """
+    SELECT
+        region AS region,
+
+        CAST(SUM(
+            CASE
+                WHEN status IN ('Qualified','Won')
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS qualifiedLead,
+
+        CAST(SUM(
+            CASE
+                WHEN status = 'Won'
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS wonLead,
+
+        CAST((
+            SUM(
+                CASE
+                    WHEN status = 'Won'
+                    THEN 1
+                    ELSE 0
+                END
+            ) * 100.0
+            /
+            NULLIF(
+                SUM(
+                    CASE
+                        WHEN status IN ('Qualified','Won')
+                        THEN 1
+                        ELSE 0
+                    END
+                ),
+                0
+            )
+        ) AS DECIMAL(18,2)) AS winRate
+
+    FROM lead
+    GROUP BY region
+    ORDER BY winRate DESC
+    """, nativeQuery = true)
+    List<WinRateByRegionProjection> getWinRateByRegion();
     @Query(value = """
     SELECT
         ls.source_id AS sourceId,
