@@ -12,4 +12,8 @@ public interface PipelineCoverageProjection {
     BigDecimal getTarget();
 
     BigDecimal getPipelineCoverage();
+    
+    Integer getPeriodMonth();
+
+    Integer getPeriodYear();
 }

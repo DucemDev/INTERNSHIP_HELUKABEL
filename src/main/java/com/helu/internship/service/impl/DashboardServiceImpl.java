@@ -65,9 +65,9 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<PipelineCoverageProjection> getPipelineCoverage() {
-        return pipelineCoverageRepo.getPipelineCoverage();
-    }
+    public List<PipelineCoverageProjection> getPipelineCoverage(
+            String sellerCode
+    ) {return pipelineCoverageRepo.getPipelineCoverage(sellerCode);}
 
     @Override
     public ConversionRateResponse getConversionRate() {
