@@ -79,8 +79,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<LostReasonSummaryProjection> getLostReasonSummary() {
-        return leadRepo.getLostReasonSummary();
+    public List<LostReasonSummaryProjection> getLostReasonSummary(String productId) {
+        return leadRepo.getLostReasonSummary(productId);
     }
 }
 

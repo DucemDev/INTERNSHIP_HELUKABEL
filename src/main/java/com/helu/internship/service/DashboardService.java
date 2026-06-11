@@ -23,6 +23,6 @@ public interface DashboardService {
 
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
 
-    List<LostReasonSummaryProjection> getLostReasonSummary();
+    List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
 }
 
