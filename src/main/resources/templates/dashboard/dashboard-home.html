@@ -13,7 +13,6 @@
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
                 <div class="flex justify-between items-start mb-4">
                     <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i data-lucide="users" class="w-6 h-6"></i></div>
-                    <span id="conversionRateDetail" class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">Đang tải...</span>
                 </div>
                 <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wide">Tổng Leads thu về</h3>
                 <div id="totalLeads" class="mt-1 text-3xl font-black text-slate-800">0</div>
@@ -216,7 +215,6 @@
                     document.getElementById('totalLeads').innerText = (convData.totalLead || 0).toLocaleString('vi-VN');
                     document.getElementById('wonLeads').innerText = (convData.wonLead || 0).toLocaleString('vi-VN');
                     document.getElementById('conversionRate').innerText = `${(convData.conversionRate || 0).toFixed(1)}%`;
-                    document.getElementById('conversionRateDetail').innerText = `${(convData.wonLead || 0).toLocaleString('vi-VN')} / ${(convData.totalLead || 0).toLocaleString('vi-VN')}`;
 
                     const avgRes = await fetch(`${API_BASE}/average-days-to-won`);
                     const avgData = await avgRes.json();
