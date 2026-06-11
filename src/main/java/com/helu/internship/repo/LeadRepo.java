@@ -379,10 +379,11 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         """, nativeQuery = true)
             List<RevenueIndustryResponse> getRevenueByIndustry();
         
-}
 
-//    List<LostReasonSummaryProjection> getLostReasonSummary(
-//            @Param("productId") String productId
-//    );
+
+   List<LostReasonSummaryProjection> getLostReasonSummary(
+            @Param("productId") String productId
+   );
+}
 
 

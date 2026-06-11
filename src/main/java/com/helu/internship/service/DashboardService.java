@@ -43,7 +43,7 @@ public interface DashboardService {
             LocalDate timeTo
     );
 
-//    List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
+  List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
 
 }
 
