@@ -294,7 +294,10 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     ORDER BY totalLost DESC
     """, nativeQuery = true)
 
-    List<LostReasonSummaryProjection> getLostReasonSummary();
+//    List<LostReasonSummaryProjection> getLostReasonSummary();
+    List<LostReasonSummaryProjection> getLostReasonSummary(
+            @Param("productId") String productId
+    );
 
     @Query(value = """
                 SELECT
@@ -314,8 +317,8 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                   AND (:customerGroup IS NULL OR l.customer_group = :customerGroup)
                   AND (:timeFrom IS NULL OR l.created_date >= :timeFrom)
                   AND (:timeTo IS NULL OR l.created_date <= :timeTo)
-                GROUP BY ls.source_name, l.region
-                ORDER BY conversionRate DESC
+                GROUP BY ls.source_name, l.region, l.customer_group
+                ORDER BY conversionRate DESC-
             """, nativeQuery = true)
     List<ConversionRateResponse> getConversionRateFilter(
             @Param("sourceId") String sourceId,
@@ -329,42 +332,37 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     );
 
     @Query(value = """
-                SELECT
-                    ls.source_name AS label,
-            
-                    CAST(
-                        SUM(
-                            CASE
-                                WHEN l.status = 'Won'
-                                THEN 1
-                                ELSE 0
-                            END
-                        ) AS BIGINT
-                    ) AS wonLead,
-            
-                    SUM(l.cost) AS totalCost,
-            
-                    (
-                        SUM(
-                            CASE
-                                WHEN l.status = 'Won'
-                                THEN 1
-                                ELSE 0
-                            END
-                        ) * 1.0
-                        /
-                        NULLIF(SUM(l.cost), 0)
-                    ) AS roi
-            
-                FROM lead l
-            
-                JOIN lead_source ls
-                    ON l.source_id = ls.source_id
-            
-                GROUP BY ls.source_name
-            
-                ORDER BY roi DESC
-            """, nativeQuery = true)
+    SELECT
+        ls.source_name AS label,
+
+        CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) AS wonLead,
+
+        SUM(l.cost) AS totalCost,
+
+        SUM(CASE 
+            WHEN l.status = 'Won' 
+            THEN l.business_result 
+            ELSE 0 
+        END) AS totalWonValue,
+
+        (
+            SUM(CASE 
+                WHEN l.status = 'Won' 
+                THEN l.business_result 
+                ELSE 0 
+            END) * 1.0
+            /
+            NULLIF(SUM(l.cost), 0)
+        ) AS roi
+
+    FROM lead l
+    JOIN lead_source ls
+        ON l.source_id = ls.source_id
+
+    GROUP BY ls.source_name
+
+    ORDER BY roi DESC
+""", nativeQuery = true)
     List<RoiLeadSourceResponse> getROIByLeadSource();
     @Query(value = """
     SELECT
@@ -381,9 +379,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         
 
 
-   List<LostReasonSummaryProjection> getLostReasonSummary(
-            @Param("productId") String productId
-   );
+
 }
 
 

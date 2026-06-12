@@ -18,4 +18,7 @@ public class LeadSourceEntity {
 
     @Column(name = "source_name", length = 100, nullable = false)
     private String sourceName;
+
+    @Column(name = "source_type", length = 20)
+    private String sourceType;
 }

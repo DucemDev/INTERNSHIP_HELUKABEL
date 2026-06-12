@@ -29,7 +29,7 @@ public interface DashboardService {
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
 
 
-    List<LostReasonSummaryProjection> getLostReasonSummary();
+//    List<LostReasonSummaryProjection> getLostReasonSummary();
     List<RevenueIndustryResponse> getRevenueByIndustry();
     List<RoiLeadSourceResponse> getROIByLeadSource();
     List<ConversionRateResponse> getConversionRateFilter(

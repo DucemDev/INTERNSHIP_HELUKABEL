@@ -7,8 +7,5 @@ public interface ConversionRateResponse {
     Long getWonLead();
     String getLabel();
     String getRegion();
-    String getCustomerGroup();
-    LocalDate getTimeFrom();
-    LocalDate getTimeTo();
     Double getConversionRate();
 }
