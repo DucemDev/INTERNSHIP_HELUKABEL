@@ -386,15 +386,56 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
     @Query(value = """
         SELECT
-            CONCAT(l.industry_type, ' - ', l.region) AS segmentName,
+            l.industry_type AS segmentName,
             COUNT(l.lead_id) AS totalLeads,
             CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) AS wonLeads,
             CAST(SUM(CASE WHEN l.status = 'Lost' THEN 1 ELSE 0 END) AS BIGINT) AS lostLeads,
             SUM(CASE WHEN l.status = 'Won' THEN COALESCE(l.business_result, 0) ELSE 0 END) AS totalRevenue
         FROM lead l
-        GROUP BY l.industry_type, l.region
+        WHERE l.industry_type IS NOT NULL
+        GROUP BY l.industry_type
         """, nativeQuery = true)
-    List<UnderServedSegmentProjection> getRawUnderServedSegments();
+    List<UnderServedSegmentProjection> getRawUnderServedIndustries();
+
+    @Query(value = """
+        SELECT
+            l.region AS segmentName,
+            COUNT(l.lead_id) AS totalLeads,
+            CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) AS wonLeads,
+            CAST(SUM(CASE WHEN l.status = 'Lost' THEN 1 ELSE 0 END) AS BIGINT) AS lostLeads,
+            SUM(CASE WHEN l.status = 'Won' THEN COALESCE(l.business_result, 0) ELSE 0 END) AS totalRevenue
+        FROM lead l
+        WHERE l.region IS NOT NULL
+        GROUP BY l.region
+        """, nativeQuery = true)
+    List<UnderServedSegmentProjection> getRawUnderServedRegions();
+
+    @Query(value = """
+        SELECT
+            ls.source_name AS segmentName,
+            COUNT(l.lead_id) AS totalLeads,
+            CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) AS wonLeads,
+            CAST(SUM(CASE WHEN l.status = 'Lost' THEN 1 ELSE 0 END) AS BIGINT) AS lostLeads,
+            SUM(CASE WHEN l.status = 'Won' THEN COALESCE(l.business_result, 0) ELSE 0 END) AS totalRevenue
+        FROM lead l
+        JOIN lead_source ls ON l.source_id = ls.source_id
+        GROUP BY ls.source_name
+        """, nativeQuery = true)
+    List<UnderServedSegmentProjection> getRawUnderServedSources();
+
+    @Query(value = """
+        SELECT
+            p.product_name AS segmentName,
+            COUNT(DISTINCT l.lead_id) AS totalLeads,
+            CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) AS wonLeads,
+            CAST(SUM(CASE WHEN l.status = 'Lost' THEN 1 ELSE 0 END) AS BIGINT) AS lostLeads,
+            SUM(CASE WHEN l.status = 'Won' THEN COALESCE(l.business_result, 0) ELSE 0 END) AS totalRevenue
+        FROM lead l
+        JOIN lead_item li ON l.lead_id = li.lead_id
+        JOIN product p ON li.product_id = p.product_id
+        GROUP BY p.product_name
+        """, nativeQuery = true)
+    List<UnderServedSegmentProjection> getRawUnderServedProducts();
 }
 
 

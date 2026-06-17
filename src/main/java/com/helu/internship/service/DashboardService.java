@@ -43,9 +43,9 @@ public interface DashboardService {
             LocalDate timeTo
     );
 
-    List<UnderServedSegmentResponse> getUnderServedSegments();
+    UnderServedSummaryResponse getUnderServedSummary();
 
-  List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
+    List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
 
 }
 

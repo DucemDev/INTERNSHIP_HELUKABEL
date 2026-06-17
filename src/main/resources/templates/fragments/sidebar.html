@@ -10,11 +10,32 @@
 
     <div class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
         <!-- Dashboard -->
-        <div th:classappend="${activeMenu == 'dashboard' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
-            <a href="/dashboard" class="flex items-center px-4 py-3 font-medium">
-                <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i>
-                <span th:text="#{nav.dashboard}">Dashboard</span>
-            </a>
+        <div class="rounded-xl transition-all duration-200">
+            <div th:classappend="${activeMenu == 'dashboard' || activeMenu == 'underserved-segments' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl">
+                <div class="flex items-center justify-between px-4 py-3 cursor-pointer" onclick="toggleSubmenu(this.parentElement)">
+                    <div class="flex items-center font-medium">
+                        <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i>
+                        <span th:text="#{nav.dashboard}">Dashboard</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200 arrow-icon" th:classappend="${activeMenu == 'dashboard' || activeMenu == 'underserved-segments' ? 'rotate-90' : ''}"></i>
+                </div>
+            </div>
+            
+            <div class="mt-1 ml-4 space-y-1 overflow-hidden transition-all duration-300" 
+                 th:classappend="${activeMenu == 'dashboard' || activeMenu == 'underserved-segments' ? '' : 'hidden'}">
+                <a href="/dashboard" 
+                   th:classappend="${activeMenu == 'dashboard' ? 'text-helu-red font-semibold' : 'text-gray-500 hover:text-helu-red'}"
+                   class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
+                    <i data-lucide="pie-chart" class="mr-3 w-4 h-4"></i>
+                    <span th:text="#{nav.dashboard.overview}">Tổng quan</span>
+                </a>
+                <a href="/dashboard/underserved-segments" 
+                   th:classappend="${activeMenu == 'underserved-segments' ? 'text-helu-red font-semibold' : 'text-gray-500 hover:text-helu-red'}"
+                   class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
+                    <i data-lucide="target" class="mr-3 w-4 h-4"></i>
+                    <span th:text="#{nav.underserved_segments}">Spot under-served segments</span>
+                </a>
+            </div>
         </div>
 
         <!-- Quản lý Lead -->

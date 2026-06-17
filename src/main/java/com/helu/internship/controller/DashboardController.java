@@ -67,8 +67,8 @@ public class DashboardController {
     }
 
     // ktr API Spot under-served segments (Dashboard Phát hiện các phân khúc tiềm năng chưa được khai thác hiệu quả.)
-    @GetMapping("/underserved-segments")
-    public List<UnderServedSegmentResponse> getUnderServedSegments() {
-        return dashboardService.getUnderServedSegments();
+    @GetMapping("/underserved-summary")
+    public UnderServedSummaryResponse getUnderServedSummary() {
+        return dashboardService.getUnderServedSummary();
     }
 }

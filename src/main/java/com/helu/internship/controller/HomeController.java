@@ -28,6 +28,12 @@ public class HomeController {
         return "dashboard/dashboard-home";
     }
 
+    @GetMapping("/dashboard/underserved-segments")
+    public String underServedSegmentsPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "underserved-segments");
+        return "dashboard/Dashboard-underserved-segments";
+    }
+
     @GetMapping("/staff")
     public String staffPage() {
         return "staff-page";

@@ -132,24 +132,33 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<UnderServedSegmentResponse> getUnderServedSegments() {
-        List<UnderServedSegmentProjection> rawSegments = leadRepo.getRawUnderServedSegments();
+    public UnderServedSummaryResponse getUnderServedSummary() {
+        return UnderServedSummaryResponse.builder()
+                .industries(mapProjectionsToResponses(leadRepo.getRawUnderServedIndustries()))
+                .regions(mapProjectionsToResponses(leadRepo.getRawUnderServedRegions()))
+                .sources(mapProjectionsToResponses(leadRepo.getRawUnderServedSources()))
+                .products(mapProjectionsToResponses(leadRepo.getRawUnderServedProducts()))
+                .build();
+    }
 
-        return rawSegments.stream()
+    private List<UnderServedSegmentResponse> mapProjectionsToResponses(List<UnderServedSegmentProjection> projections) {
+        return projections.stream()
                 .map(seg -> {
                     long totalLeads = seg.getTotalLeads();
                     long wonLeads = seg.getWonLeads();
                     BigDecimal totalRevenue = seg.getTotalRevenue() != null ? seg.getTotalRevenue() : BigDecimal.ZERO;
 
-                    BigDecimal winRate = BigDecimal.valueOf(wonLeads)
-                            .multiply(BigDecimal.valueOf(100))
-                            .divide(BigDecimal.valueOf(totalLeads), 2, RoundingMode.HALF_UP);
+                    BigDecimal winRate = totalLeads == 0 ? BigDecimal.ZERO :
+                            BigDecimal.valueOf(wonLeads)
+                                    .multiply(BigDecimal.valueOf(100))
+                                    .divide(BigDecimal.valueOf(totalLeads), 2, RoundingMode.HALF_UP);
 
-                    BigDecimal revenuePerLead = totalRevenue
-                            .divide(BigDecimal.valueOf(totalLeads), 2, RoundingMode.HALF_UP);
+                    BigDecimal revenuePerLead = totalLeads == 0 ? BigDecimal.ZERO :
+                            totalRevenue.divide(BigDecimal.valueOf(totalLeads), 2, RoundingMode.HALF_UP);
 
                     // Score = (WinRate * RevenuePerLead) / SQRT(TotalLeads)
-                    double score = (winRate.doubleValue() * revenuePerLead.doubleValue()) / Math.sqrt(totalLeads);
+                    double score = totalLeads == 0 ? 0 :
+                            (winRate.doubleValue() * revenuePerLead.doubleValue()) / Math.sqrt(totalLeads);
 
                     return UnderServedSegmentResponse.builder()
                             .segmentName(seg.getSegmentName())
