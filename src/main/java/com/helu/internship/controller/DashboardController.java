@@ -66,5 +66,9 @@ public class DashboardController {
         return dashboardService.getROIByLeadSource();
     }
 
-
+    // ktr API Spot under-served segments (Dashboard Phát hiện các phân khúc tiềm năng chưa được khai thác hiệu quả.)
+    @GetMapping("/underserved-segments")
+    public List<UnderServedSegmentResponse> getUnderServedSegments() {
+        return dashboardService.getUnderServedSegments();
+    }
 }

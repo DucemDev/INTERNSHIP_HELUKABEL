@@ -10,7 +10,10 @@ import com.helu.internship.repo.PipelineCoveragerRepo;
 import com.helu.internship.service.DashboardService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -126,6 +129,41 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return leadRepo.getROIByLeadSource();
+    }
+
+    @Override
+    public List<UnderServedSegmentResponse> getUnderServedSegments() {
+        List<UnderServedSegmentProjection> rawSegments = leadRepo.getRawUnderServedSegments();
+
+        return rawSegments.stream()
+                .map(seg -> {
+                    long totalLeads = seg.getTotalLeads();
+                    long wonLeads = seg.getWonLeads();
+                    BigDecimal totalRevenue = seg.getTotalRevenue() != null ? seg.getTotalRevenue() : BigDecimal.ZERO;
+
+                    BigDecimal winRate = BigDecimal.valueOf(wonLeads)
+                            .multiply(BigDecimal.valueOf(100))
+                            .divide(BigDecimal.valueOf(totalLeads), 2, RoundingMode.HALF_UP);
+
+                    BigDecimal revenuePerLead = totalRevenue
+                            .divide(BigDecimal.valueOf(totalLeads), 2, RoundingMode.HALF_UP);
+
+                    // Score = (WinRate * RevenuePerLead) / SQRT(TotalLeads)
+                    double score = (winRate.doubleValue() * revenuePerLead.doubleValue()) / Math.sqrt(totalLeads);
+
+                    return UnderServedSegmentResponse.builder()
+                            .segmentName(seg.getSegmentName())
+                            .totalLeads(totalLeads)
+                            .wonLeads(wonLeads)
+                            .lostLeads(seg.getLostLeads())
+                            .winRate(winRate)
+                            .totalRevenue(totalRevenue)
+                            .revenuePerLead(revenuePerLead)
+                            .opportunityScore(BigDecimal.valueOf(score).setScale(2, RoundingMode.HALF_UP))
+                            .build();
+                })
+                .sorted(Comparator.comparing(UnderServedSegmentResponse::getOpportunityScore).reversed())
+                .toList();
     }
 }
 

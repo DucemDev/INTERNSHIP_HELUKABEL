@@ -383,6 +383,18 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             ORDER BY revenue DESC
         """, nativeQuery = true)
             List<RevenueIndustryResponse> getRevenueByIndustry();
+
+    @Query(value = """
+        SELECT
+            CONCAT(l.industry_type, ' - ', l.region) AS segmentName,
+            COUNT(l.lead_id) AS totalLeads,
+            CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) AS wonLeads,
+            CAST(SUM(CASE WHEN l.status = 'Lost' THEN 1 ELSE 0 END) AS BIGINT) AS lostLeads,
+            SUM(CASE WHEN l.status = 'Won' THEN COALESCE(l.business_result, 0) ELSE 0 END) AS totalRevenue
+        FROM lead l
+        GROUP BY l.industry_type, l.region
+        """, nativeQuery = true)
+    List<UnderServedSegmentProjection> getRawUnderServedSegments();
 }
 
 
