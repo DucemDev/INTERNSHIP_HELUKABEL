@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::div.dashboard-test-container})}">
+<body>
+    <div class="dashboard-test-container space-y-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight">Dashboard Analytics Preview</h1>
+                <p class="text-slate-500 font-medium">Trang xem trước các chỉ số phân tích bổ sung từ hệ thống.</p>
+            </div>
+            <button onclick="refreshTestData()" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+                <i data-lucide="refresh-cw" class="w-4 h-4" id="refresh-test-icon"></i>
+                <span>Làm mới dữ liệu</span>
+            </button>
+        </div>
+
+        <!-- Row 1: Win Rates -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Win Rate by Industry -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
+                    <span>Win Rate by Industry</span>
+                </h2>
+                <div class="relative w-full flex-1">
+                    <canvas id="industryWinRateChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Win Rate by Region -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span> 
+                    <span>Win Rate by Region</span>
+                </h2>
+                <div class="relative w-full flex-1">
+                    <canvas id="regionWinRateChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Revenue & ROI -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Revenue by Industry -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span> 
+                    <span>Revenue by Industry</span>
+                </h2>
+                <div class="relative w-full flex-1">
+                    <canvas id="revenueIndustryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- ROI by Lead Source -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-purple-500 rounded-full"></span> 
+                    <span>ROI by Lead Source (Conversion focus)</span>
+                </h2>
+                <div class="relative w-full flex-1">
+                    <canvas id="roiSourceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Lost Reasons -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-red-600 rounded-full"></span> 
+                <span>Lost Reason Analysis</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="h-[300px]">
+                    <canvas id="lostReasonsChart"></canvas>
+                </div>
+                <div class="overflow-hidden rounded-xl border border-slate-100">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr>
+                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider">Lý do thất bại</th>
+                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-right">Số lượng</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lostReasonsTableBody" class="divide-y divide-slate-50">
+                            <!-- JS render -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript Libraries -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script th:inline="javascript">
+            let testCharts = {};
+
+            document.addEventListener('DOMContentLoaded', () => {
+                refreshTestData();
+            });
+
+            async function refreshTestData() {
+                const icon = document.getElementById('refresh-test-icon');
+                if (icon) icon.classList.add('animate-spin');
+
+                await Promise.all([
+                    fetchAndDraw('/api/dashboard/win-rate-by-industry', 'industryWinRateChart', 'bar', d => d.industryType, d => d.winRate, '#3b82f6', '%'),
+                    fetchAndDraw('/api/dashboard/win-rate-by-region', 'regionWinRateChart', 'bar', d => d.region, d => d.winRate, '#10b981', '%'),
+                    fetchAndDraw('/api/dashboard/revenue-industry', 'revenueIndustryChart', 'pie', d => d.industry, d => d.revenue, ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6']),
+                    fetchAndDrawROI(),
+                    fetchAndDrawLostReasons()
+                ]);
+
+                if (icon) setTimeout(() => icon.classList.remove('animate-spin'), 500);
+            }
+
+            async function fetchAndDraw(url, chartId, type, labelMap, valueMap, color, unit = '') {
+                try {
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    
+                    if (testCharts[chartId]) testCharts[chartId].destroy();
+                    
+                    const ctx = document.getElementById(chartId).getContext('2d');
+                    testCharts[chartId] = new Chart(ctx, {
+                        type: type,
+                        data: {
+                            labels: data.map(labelMap),
+                            datasets: [{
+                                data: data.map(valueMap),
+                                backgroundColor: Array.isArray(color) ? color : color + 'cc',
+                                borderRadius: type === 'bar' ? 8 : 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: type === 'pie' },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (ctx) => `${ctx.label}: ${ctx.parsed.y || ctx.parsed}${unit}`
+                                    }
+                                }
+                            },
+                            scales: type === 'bar' ? {
+                                y: { beginAtZero: true }
+                            } : {}
+                        }
+                    });
+                } catch (e) { console.error(e); }
+            }
+
+            async function fetchAndDrawROI() {
+                try {
+                    const res = await fetch('/api/dashboard/roi-lead-source');
+                    const data = await res.json();
+                    
+                    if (testCharts['roiSourceChart']) testCharts['roiSourceChart'].destroy();
+                    
+                    const ctx = document.getElementById('roiSourceChart').getContext('2d');
+                    testCharts['roiSourceChart'] = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.map(d => d.label),
+                            datasets: [{
+                                label: 'ROI (Won Leads / Total Cost)',
+                                data: data.map(d => d.roi),
+                                borderColor: '#8b5cf6',
+                                backgroundColor: '#8b5cf633',
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 6,
+                                pointBackgroundColor: '#8b5cf6'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+                } catch (e) { console.error(e); }
+            }
+
+            async function fetchAndDrawLostReasons() {
+                try {
+                    const res = await fetch('/api/dashboard/lost-reasons');
+                    const data = await res.json();
+                    
+                    // Table
+                    const tbody = document.getElementById('lostReasonsTableBody');
+                    tbody.innerHTML = '';
+                    data.forEach(d => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 font-bold text-slate-700">${d.lossReason}</td>
+                            <td class="px-6 py-4 text-right font-black text-red-600">${d.totalLost}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    // Chart
+                    if (testCharts['lostReasonsChart']) testCharts['lostReasonsChart'].destroy();
+                    const ctx = document.getElementById('lostReasonsChart').getContext('2d');
+                    testCharts['lostReasonsChart'] = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.map(d => d.lossReason),
+                            datasets: [{
+                                data: data.map(d => d.totalLost),
+                                backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#fbbf24', '#64748b']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '60%'
+                        }
+                    });
+                } catch (e) { console.error(e); }
+            }
+        </script>
+    </div>
+</body>
+</html>

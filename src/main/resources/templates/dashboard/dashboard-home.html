@@ -49,32 +49,60 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
         <!-- [KHỐI 3] BIỂU ĐỒ DÒNG 1 (Trạng thái Leads & Tỷ lệ thắng) -->
-        <!-- ========================================== -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Biểu đồ: Trạng thái Leads (Doughnut) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[350px]">
+            <!-- Biểu đồ: Trạng thái Leads (Funnel) -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[450px]">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
                     <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
                 </h2>
-                <div class="relative w-full flex-1 min-h-[300px]">
-                    <canvas id="leadStatusChart"></canvas>
+                <div id="funnel-container" class="flex-1 flex flex-col items-center justify-center space-y-1 py-4">
+                    <!-- Funnel segments rendered by JS -->
                 </div>
             </div>
 
             <!-- Biểu đồ: Tỷ lệ thắng theo Sales (Bar) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[350px]">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[450px]">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span> 
                     <span th:text="#{dashboard.win_rate_by_sales}">Tỷ lệ thắng (Win Rate) theo Nhân viên</span>
                 </h2>
-                <div class="relative w-full flex-1 min-h-[300px]">
+                <div class="relative w-full flex-1">
                     <canvas id="winRateChart"></canvas>
                 </div>
             </div>
         </div>
+
+        <style>
+            .funnel-segment {
+                transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 900;
+                cursor: pointer;
+                border-radius: 16px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                border: 2px solid rgba(255,255,255,0.1);
+            }
+            .funnel-segment:hover {
+                filter: brightness(1.05);
+                transform: scale(1.03) translateY(-2px);
+                z-index: 10;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            }
+            .funnel-label-box {
+                text-align: center;
+                z-index: 2;
+                pointer-events: none;
+            }
+            .funnel-label-box .text-xl {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+        </style>
 
         <!-- ========================================== -->
         <!-- [KHỐI 4] BIỂU ĐỒ DÒNG 2 (Phân tích chi phí & Nguồn) -->
@@ -299,61 +327,68 @@
                 }
             }
 
-            // HÀM 2: Biểu đồ Cơ cấu Trạng thái
+            // HÀM 2: Biểu đồ Cơ cấu Trạng thái (Phễu)
             async function loadLeadStatusChart() {
                 try {
                     const res = await fetch(`${API_BASE}/lead-status`);
                     const data = await res.json();
+                    
+                    const container = document.getElementById('funnel-container');
+                    container.innerHTML = '';
+                    
+                    const counts = {};
+                    data.forEach(item => counts[item.status] = item.total);
 
-                    const labels = data.map(item => item.status);
-                    const values = data.map(item => item.total);
-                    const total = values.reduce((a, b) => a + b, 0);
+                    // Bảng màu tươi sáng & hiện đại
+                    const stages = [
+                        { label: 'New + Contacted', value: (counts['New'] || 0) + (counts['Contacted'] || 0), color: '#6366f1' }, // Indigo
+                        { label: 'Qualified', value: counts['Qualified'] || 0, color: '#3b82f6' }, // Blue
+                        { label: 'Proposal Sent', value: counts['Proposal Sent'] || 0, color: '#06b6d4' }, // Cyan
+                        { label: 'Negotiation', value: counts['In Negotiation'] || 0, color: '#f59e0b' }, // Amber
+                        { label: 'Won', value: counts['Won'] || 0, color: '#10b981' }  // Emerald
+                    ];
 
-                    // Màu sắc hiện đại, không trùng lặp
-                    const bgColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
+                    const totalLeads = stages[0].value;
 
-                    // Tính % dán thẳng vào Legend
-                    const labelsWithPercent = labels.map((label, i) => {
-                        const pct = total === 0 ? 0 : ((values[i] / total) * 100).toFixed(1);
-                        return `${label} (${pct}%)`;
-                    });
+                    stages.forEach((stage, index) => {
+                        const segment = document.createElement('div');
+                        segment.className = 'funnel-segment';
+                        
+                        // Độ dày theo % số lượng
+                        const percentage = totalLeads > 0 ? (stage.value / totalLeads) * 100 : 0;
+                        const minHeight = 45;
+                        const maxHeight = 110;
+                        const calculatedHeight = minHeight + ((maxHeight - minHeight) * (percentage / 100));
+                        
+                        // Chiều rộng bóp dần (Soft taper)
+                        const baseWidth = 100 - (index * 10);
+                        
+                        segment.style.backgroundColor = stage.color;
+                        segment.style.width = `${baseWidth}%`;
+                        segment.style.height = `${calculatedHeight}px`;
 
-                    renderChart('leadStatusChart', 'doughnut', {
-                        labels: labelsWithPercent,
-                        datasets: [{
-                            data: values,
-                            backgroundColor: bgColors,
-                            borderWidth: 2,
-                            borderColor: '#ffffff',
-                            hoverOffset: 6
-                        }]
-                    }, {
-                        cutout: '65%',
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: { 
-                                    usePointStyle: true, 
-                                    padding: 20, 
-                                    font: { size: 13, weight: '600' },
-                                    cursor: 'pointer'
-                                },
-                                // XỬ LÝ CLICK VÀO LEGEND ĐỂ MỞ MODAL
-                                onClick: (e, legendItem, legend) => {
-                                    // 1. Lấy tên status gốc (bỏ phần % trong ngoặc)
-                                    const statusName = labels[legendItem.index];
-                                    
-                                    // 2. Gọi hàm mở modal
-                                    openLeadStatusModal(statusName);
-                                    
-                                    // 3. Giữ hành vi mặc định (ẩn/hiện dataset)
-                                    Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
-                                }
+                        segment.innerHTML = `
+                            <div class="funnel-label-box">
+                                <div class="text-[10px] uppercase font-black opacity-80 tracking-tighter">${stage.label}</div>
+                                <div class="text-xl leading-none font-black">${stage.value.toLocaleString()}</div>
+                                <div class="text-[10px] font-black bg-white/25 inline-block px-2 rounded-full mt-1.5 shadow-sm">${percentage.toFixed(1)}%</div>
+                            </div>
+                        `;
+                        
+                        segment.onclick = () => {
+                            if (stage.label === 'New + Contacted') {
+                                openLeadStatusModal('New');
+                            } else if (stage.label === 'Negotiation') {
+                                openLeadStatusModal('In Negotiation');
+                            } else {
+                                openLeadStatusModal(stage.label);
                             }
-                        }
+                        };
+
+                        container.appendChild(segment);
                     });
                 } catch (error) {
-                    console.error('Error loading Lead Status chart:', error);
+                    console.error('Error loading Lead Status funnel:', error);
                 }
             }
 

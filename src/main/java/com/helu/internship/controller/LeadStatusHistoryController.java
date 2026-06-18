@@ -29,6 +29,7 @@ import java.util.List;
     public List<LeadSourceCostProjection> getLeadSourceCostDashboard() {
         return dashboardService.getLeadSourceCostDashboard();
     }
+//Dữ liệu cho biểu đồ Độ an toàn Target (Pipeline).
     @GetMapping("/pipeline-coverage")
     public List<PipelineCoverageProjection> getPipelineCoverage(
             @RequestParam(required = false) String sellerCode,
