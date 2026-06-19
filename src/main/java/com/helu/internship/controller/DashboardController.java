@@ -4,6 +4,7 @@ import com.helu.internship.dto.response.*;
 import com.helu.internship.service.DashboardService;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -31,6 +32,11 @@ public class DashboardController {
         return dashboardService.getConversionRate();
     }
 
+    @GetMapping("/average-days-to-won")
+    public Double getAverageDaysToWon() {
+        return dashboardService.getAverageDaysToWon();
+    }
+
     @GetMapping("/win-rate-by-saleowner")
     public List<WinRateBySalesResponse> getWinRateBySalesOwner(
             @RequestParam(required = false) String region,
@@ -53,21 +59,43 @@ public class DashboardController {
     public List<CostPerWinBySourceResponse> getCostPerWinByLeadSource() {
         return dashboardService.getCostPerWinByLeadSource();
     }
+
+    @GetMapping("/lead-source-cost")
+    public List<LeadSourceCostProjection> getLeadSourceCostDashboard() {
+        return dashboardService.getLeadSourceCostDashboard();
+    }
+
     @GetMapping("/lost-reasons")
     public List<LostReasonSummaryProjection> getLostReasonSummary(
             @RequestParam(required = false) String productId
-    )
-    {
+    ) {
         return dashboardService.getLostReasonSummary(productId);
     }
+
     @GetMapping("/revenue-industry")
     public List<RevenueIndustryResponse> getRevenueByIndustry() {
         return dashboardService.getRevenueByIndustry();
     }
+
     @GetMapping("/roi-lead-source")
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return dashboardService.getROIByLeadSource();
     }
 
+    @GetMapping("/pipeline-coverage")
+    public List<PipelineCoverageProjection> getPipelineCoverage() {
+        return dashboardService.getPipelineCoverage(null);
+    }
 
+    // --- STAFF ENDPOINTS ---
+
+    @GetMapping("/staff/stats")
+    public ConversionRateResponse getStaffStats(Principal principal) {
+        return dashboardService.getStaffStats(principal.getName());
+    }
+
+    @GetMapping("/staff/pipeline-coverage")
+    public List<PipelineCoverageProjection> getStaffPipelineCoverage(Principal principal) {
+        return dashboardService.getStaffPipelineCoverage(principal.getName());
+    }
 }

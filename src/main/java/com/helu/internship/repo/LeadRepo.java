@@ -83,7 +83,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     SELECT
         COUNT(l) AS totalLead,
         SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
-        SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / COUNT(l) AS conversionRate
+        SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(l), 0) AS conversionRate
     FROM LeadEntity l
     """)
     ConversionRateResponse getConversionRate();
@@ -354,17 +354,11 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             
                     SUM(l.cost) AS totalCost,
             
-                    (
-                        SUM(
-                            CASE
-                                WHEN l.status = 'Won'
-                                THEN 1
-                                ELSE 0
-                            END
-                        ) * 1.0
+                    CAST(
+                        SUM(l.business_result)
                         /
                         NULLIF(SUM(l.cost), 0)
-                    ) AS roi
+                    AS DECIMAL(18,2)) AS roi
             
                 FROM lead l
             
@@ -376,6 +370,16 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 ORDER BY roi DESC
             """, nativeQuery = true)
     List<RoiLeadSourceResponse> getROIByLeadSource();
+    @Query("""
+    SELECT
+        COUNT(l) AS totalLead,
+        SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
+        SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(l), 0) AS conversionRate
+    FROM LeadEntity l
+    WHERE l.user.email = :email
+    """)
+    ConversionRateResponse getStatsByEmail(@Param("email") String email);
+
     @Query(value = """
     SELECT
         l.industry_type AS industry,
