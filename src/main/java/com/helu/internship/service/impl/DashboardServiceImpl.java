@@ -133,16 +133,13 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public UnderServedSummaryResponse getUnderServedSummary() {
-        return UnderServedSummaryResponse.builder()
-                .industries(mapProjectionsToResponses(leadRepo.getRawUnderServedIndustries()))
-                .regions(mapProjectionsToResponses(leadRepo.getRawUnderServedRegions()))
-                .sources(mapProjectionsToResponses(leadRepo.getRawUnderServedSources()))
-                .products(mapProjectionsToResponses(leadRepo.getRawUnderServedProducts()))
-                .build();
-    }
+        List<UnderServedSegmentProjection> rawProjections = leadRepo.getRawCustomerConcentration();
+        
+        final BigDecimal totalWonRevenue = rawProjections.stream()
+                .map(p -> p.getTotalRevenue() != null ? p.getTotalRevenue() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    private List<UnderServedSegmentResponse> mapProjectionsToResponses(List<UnderServedSegmentProjection> projections) {
-        return projections.stream()
+        List<UnderServedSegmentResponse> customers = rawProjections.stream()
                 .map(seg -> {
                     long totalLeads = seg.getTotalLeads();
                     long wonLeads = seg.getWonLeads();
@@ -156,9 +153,10 @@ public class DashboardServiceImpl implements DashboardService {
                     BigDecimal revenuePerLead = totalLeads == 0 ? BigDecimal.ZERO :
                             totalRevenue.divide(BigDecimal.valueOf(totalLeads), 2, RoundingMode.HALF_UP);
 
-                    // Score = (WinRate * RevenuePerLead) / SQRT(TotalLeads)
-                    double score = totalLeads == 0 ? 0 :
-                            (winRate.doubleValue() * revenuePerLead.doubleValue()) / Math.sqrt(totalLeads);
+                    // Under customer concentration, "opportunityScore" holds the contributionPercentage
+                    BigDecimal contributionPercentage = totalWonRevenue.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO :
+                            totalRevenue.multiply(BigDecimal.valueOf(100))
+                                    .divide(totalWonRevenue, 2, RoundingMode.HALF_UP);
 
                     return UnderServedSegmentResponse.builder()
                             .segmentName(seg.getSegmentName())
@@ -168,11 +166,26 @@ public class DashboardServiceImpl implements DashboardService {
                             .winRate(winRate)
                             .totalRevenue(totalRevenue)
                             .revenuePerLead(revenuePerLead)
-                            .opportunityScore(BigDecimal.valueOf(score).setScale(2, RoundingMode.HALF_UP))
+                            .opportunityScore(contributionPercentage)
                             .build();
                 })
-                .sorted(Comparator.comparing(UnderServedSegmentResponse::getOpportunityScore).reversed())
+                .sorted((c1, c2) -> c2.getTotalRevenue().compareTo(c1.getTotalRevenue()))
                 .toList();
+
+        String topCustomerName = customers.isEmpty() ? "N/A" : customers.get(0).getSegmentName();
+        BigDecimal topCustomerShare = customers.isEmpty() ? BigDecimal.ZERO : customers.get(0).getOpportunityScore();
+        BigDecimal top3ConcentrationRatio = customers.stream()
+                .limit(3)
+                .map(UnderServedSegmentResponse::getOpportunityScore)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return UnderServedSummaryResponse.builder()
+                .customers(customers)
+                .totalWonRevenue(totalWonRevenue)
+                .topCustomerName(topCustomerName)
+                .topCustomerShare(topCustomerShare)
+                .top3ConcentrationRatio(top3ConcentrationRatio)
+                .build();
     }
 }
 

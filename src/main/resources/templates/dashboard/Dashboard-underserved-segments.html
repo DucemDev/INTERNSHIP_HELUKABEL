@@ -5,8 +5,8 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-black text-slate-800 tracking-tight" th:text="#{dashboard.underserved_segments.title}">Phát hiện Phân khúc Tiềm năng</h1>
-                <p class="text-slate-500 font-medium" th:text="#{dashboard.underserved_segments.desc}">Phân tích các phân khúc có tiềm năng cao nhưng chưa được khai thác hiệu quả.</p>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight" th:text="#{dashboard.customer_risk.title}">Phân tích Tập trung Khách hàng</h1>
+                <p class="text-slate-500 font-medium" th:text="#{dashboard.customer_risk.desc}">Thống kê tỉ lệ đóng góp doanh thu và đánh giá rủi ro thiệt hại nếu thất thoát khách hàng lớn.</p>
             </div>
             <button onclick="loadUnderServedSummary()" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm">
                 <i data-lucide="refresh-cw" class="w-4 h-4" id="refresh-icon"></i>
@@ -16,48 +16,48 @@
 
         <!-- KPI Cards Section -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Under-served Industry -->
+            <!-- Top Customer -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
                 <div class="flex justify-between items-start mb-4">
-                    <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i data-lucide="factory" class="w-6 h-6"></i></div>
-                    <div class="text-[10px] font-black px-2 py-1 bg-purple-100 text-purple-600 rounded-lg uppercase">Best Opportunity</div>
+                    <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i data-lucide="crown" class="w-6 h-6"></i></div>
+                    <div class="text-[10px] font-black px-2 py-1 bg-blue-100 text-blue-700 rounded-lg uppercase" th:text="#{dashboard.customer_risk.top_client}">Top Customer</div>
                 </div>
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Under-served Industry</h3>
-                <div id="topIndustry" class="mt-2 text-xl font-black text-slate-800">...</div>
-                <div id="topIndustryScore" class="mt-1 text-sm font-bold text-purple-600">Score: 0</div>
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.customer_risk.top_client_title}">Khách hàng lớn nhất</h3>
+                <div id="topCustomerName" class="mt-2 text-xl font-black text-slate-800 truncate">...</div>
+                <div id="topCustomerShare" class="mt-1 text-sm font-bold text-blue-600">Share: 0%</div>
             </div>
 
-            <!-- Under-served Region -->
+            <!-- Top 1 Share (Risk Status) -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
                 <div class="flex justify-between items-start mb-4">
-                    <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl"><i data-lucide="map-pin" class="w-6 h-6"></i></div>
-                    <div class="text-[10px] font-black px-2 py-1 bg-purple-100 text-purple-600 rounded-lg uppercase">Best Opportunity</div>
+                    <div class="p-3 rounded-xl transition-all duration-300" id="top1IconContainer"><i data-lucide="shield-alert" class="w-6 h-6"></i></div>
+                    <div class="text-[10px] font-black px-2 py-1 rounded-lg uppercase" id="top1Badge">...</div>
                 </div>
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Under-served Region</h3>
-                <div id="topRegion" class="mt-2 text-xl font-black text-slate-800">...</div>
-                <div id="topRegionScore" class="mt-1 text-sm font-bold text-purple-600">Score: 0</div>
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.customer_risk.top1_ratio}">Tỷ lệ Top 1 Khách hàng</h3>
+                <div id="top1ShareVal" class="mt-2 text-xl font-black text-slate-800">0%</div>
+                <div id="top1RiskDesc" class="mt-1 text-sm font-bold text-slate-500">Evaluating...</div>
             </div>
 
-            <!-- Under-served Product Line -->
+            <!-- Top 3 Share (CR3) -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
                 <div class="flex justify-between items-start mb-4">
-                    <div class="bg-amber-100 text-amber-600 p-3 rounded-xl"><i data-lucide="package" class="w-6 h-6"></i></div>
-                    <div class="text-[10px] font-black px-2 py-1 bg-purple-100 text-purple-600 rounded-lg uppercase">Best Opportunity</div>
+                    <div class="p-3 rounded-xl transition-all duration-300" id="cr3IconContainer"><i data-lucide="users" class="w-6 h-6"></i></div>
+                    <div class="text-[10px] font-black px-2 py-1 rounded-lg uppercase" id="cr3Badge">...</div>
                 </div>
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Under-served Product</h3>
-                <div id="topProduct" class="mt-2 text-xl font-black text-slate-800">...</div>
-                <div id="topProductScore" class="mt-1 text-sm font-bold text-purple-600">Score: 0</div>
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.customer_risk.cr3_ratio}">Chỉ số Tập trung CR3</h3>
+                <div id="cr3ShareVal" class="mt-2 text-xl font-black text-slate-800">0%</div>
+                <div id="cr3RiskDesc" class="mt-1 text-sm font-bold text-slate-500">Evaluating...</div>
             </div>
 
-            <!-- Under-served Lead Source -->
+            <!-- Total Won Revenue -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform">
                 <div class="flex justify-between items-start mb-4">
-                    <div class="bg-red-100 text-red-600 p-3 rounded-xl"><i data-lucide="link" class="w-6 h-6"></i></div>
-                    <div class="text-[10px] font-black px-2 py-1 bg-purple-100 text-purple-600 rounded-lg uppercase">Best Opportunity</div>
+                    <div class="bg-amber-100 text-amber-600 p-3 rounded-xl"><i data-lucide="wallet" class="w-6 h-6"></i></div>
+                    <div class="text-[10px] font-black px-2 py-1 bg-amber-100 text-amber-700 rounded-lg uppercase">Revenue</div>
                 </div>
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Under-served Source</h3>
-                <div id="topSource" class="mt-2 text-xl font-black text-slate-800">...</div>
-                <div id="topSourceScore" class="mt-1 text-sm font-bold text-purple-600">Score: 0</div>
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide" th:text="#{dashboard.customer_risk.total_revenue}">Tổng doanh thu (Won)</h3>
+                <div id="totalWonRev" class="mt-2 text-xl font-black text-slate-800">...</div>
+                <div class="mt-1 text-sm font-bold text-slate-500" th:text="#{dashboard.customer_risk.won_leads_count}">Từ các hợp đồng thắng</div>
             </div>
         </div>
 
@@ -66,36 +66,32 @@
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
-                    <span>Industry Opportunity Ranking</span>
+                    <span th:text="#{dashboard.customer_risk.chart1_title}">Top 5 Khách hàng doanh thu cao nhất</span>
                 </h2>
                 <div class="relative w-full flex-1">
-                    <canvas id="industryChart"></canvas>
+                    <canvas id="customerChart"></canvas>
                 </div>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span> 
-                    <span>Region Opportunity Ranking</span>
+                    <span th:text="#{dashboard.customer_risk.chart2_title}">Cơ cấu đóng góp doanh thu</span>
                 </h2>
-                <div class="relative w-full flex-1">
-                    <canvas id="regionChart"></canvas>
+                <div class="relative w-full flex-1 flex justify-center items-center">
+                    <div class="w-[280px] h-[280px] relative">
+                        <canvas id="shareChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Table Selection -->
+        <!-- Table Section -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
                 <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-slate-800 rounded-full"></span> 
-                    <span>Detailed Opportunity Analysis</span>
+                    <span th:text="#{dashboard.customer_risk.table_title}">Chi tiết tỷ lệ đóng góp & rủi ro thất thoát</span>
                 </h2>
-                <div class="flex bg-slate-100 p-1 rounded-xl">
-                    <button onclick="switchTab('industries')" id="tab-industries" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all bg-white shadow-sm text-slate-800">Industry</button>
-                    <button onclick="switchTab('regions')" id="tab-regions" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-700">Region</button>
-                    <button onclick="switchTab('products')" id="tab-products" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-700">Product</button>
-                    <button onclick="switchTab('sources')" id="tab-sources" class="tab-btn px-4 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-700">Source</button>
-                </div>
             </div>
             
             <div class="overflow-hidden rounded-xl border border-slate-100">
@@ -103,11 +99,12 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-100">
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider" th:text="#{dashboard.underserved_segments.col.segment}">Category</th>
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-center" th:text="#{dashboard.underserved_segments.col.total_leads}">Total Leads</th>
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-center" th:text="#{dashboard.underserved_segments.col.win_rate}">Win Rate</th>
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-right" th:text="#{dashboard.underserved_segments.col.revenue}">Revenue</th>
-                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-right" th:text="#{dashboard.underserved_segments.col.score}">Opp. Score</th>
+                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider" th:text="#{dashboard.customer_risk.col.customer}">Tên Khách hàng / Công ty</th>
+                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-center" th:text="#{dashboard.customer_risk.col.total_leads}">Tổng Leads</th>
+                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-center" th:text="#{dashboard.customer_risk.col.win_rate}">Tỷ lệ thắng</th>
+                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-right" th:text="#{dashboard.customer_risk.col.revenue}">Doanh thu Won</th>
+                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-right" th:text="#{dashboard.customer_risk.col.share}">Tỷ lệ Đóng góp (%)</th>
+                                <th class="px-6 py-4 font-bold text-slate-500 uppercase text-[11px] tracking-wider text-right text-red-600" th:text="#{dashboard.customer_risk.col.loss_risk}">Tổn thất nếu mất khách</th>
                             </tr>
                         </thead>
                         <tbody id="summaryTableBody" class="divide-y divide-slate-50 bg-white">
@@ -123,7 +120,6 @@
 
         <script th:inline="javascript">
             let summaryData = null;
-            let currentTab = 'industries';
             let charts = {};
 
             // Initial load
@@ -142,7 +138,7 @@
                     
                     updateKPIs();
                     renderCharts();
-                    switchTab(currentTab);
+                    renderTable();
                     
                     if (typeof lucide !== 'undefined') lucide.createIcons();
                 } catch (error) {
@@ -154,39 +150,89 @@
 
             function updateKPIs() {
                 if (!summaryData) return;
-                const updateKPI = (id, data) => {
-                    const item = data && data.length > 0 ? data[0] : null;
-                    document.getElementById(`top${id}`).innerText = item ? item.segmentName : 'N/A';
-                    document.getElementById(`top${id}Score`).innerText = item ? `Score: ${item.opportunityScore.toFixed(2)}` : 'Score: 0';
-                };
-                updateKPI('Industry', summaryData.industries);
-                updateKPI('Region', summaryData.regions);
-                updateKPI('Product', summaryData.products);
-                updateKPI('Source', summaryData.sources);
+
+                // 1. Top Customer
+                document.getElementById('topCustomerName').innerText = summaryData.topCustomerName || 'N/A';
+                document.getElementById('topCustomerShare').innerText = `Share: ${(summaryData.topCustomerShare || 0).toFixed(1)}%`;
+
+                // 2. Top 1 Share (Dependency Risk Evaluation)
+                const top1 = summaryData.topCustomerShare || 0;
+                const top1ShareVal = document.getElementById('top1ShareVal');
+                const top1Badge = document.getElementById('top1Badge');
+                const top1RiskDesc = document.getElementById('top1RiskDesc');
+                const top1IconContainer = document.getElementById('top1IconContainer');
+                
+                top1ShareVal.innerText = `${top1.toFixed(1)}%`;
+
+                if (top1 > 30) {
+                    top1Badge.className = 'text-[10px] font-black px-2 py-1 bg-red-100 text-red-700 rounded-lg uppercase';
+                    top1Badge.innerText = 'High Risk';
+                    top1RiskDesc.innerText = 'High dependency on single client';
+                    top1RiskDesc.className = 'mt-1 text-sm font-bold text-red-600';
+                    top1IconContainer.className = 'bg-red-100 text-red-600 p-3 rounded-xl';
+                } else if (top1 > 15) {
+                    top1Badge.className = 'text-[10px] font-black px-2 py-1 bg-yellow-100 text-yellow-700 rounded-lg uppercase';
+                    top1Badge.innerText = 'Moderate Risk';
+                    top1RiskDesc.innerText = 'Moderate dependency';
+                    top1RiskDesc.className = 'mt-1 text-sm font-bold text-yellow-600';
+                    top1IconContainer.className = 'bg-yellow-100 text-yellow-600 p-3 rounded-xl';
+                } else {
+                    top1Badge.className = 'text-[10px] font-black px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg uppercase';
+                    top1Badge.innerText = 'Low Risk';
+                    top1RiskDesc.innerText = 'Healthy diversification';
+                    top1RiskDesc.className = 'mt-1 text-sm font-bold text-emerald-600';
+                    top1IconContainer.className = 'bg-emerald-100 text-emerald-600 p-3 rounded-xl';
+                }
+
+                // 3. Top 3 Share (CR3 Concentration Index Evaluation)
+                const cr3 = summaryData.top3ConcentrationRatio || 0;
+                const cr3ShareVal = document.getElementById('cr3ShareVal');
+                const cr3Badge = document.getElementById('cr3Badge');
+                const cr3RiskDesc = document.getElementById('cr3RiskDesc');
+                const cr3IconContainer = document.getElementById('cr3IconContainer');
+
+                cr3ShareVal.innerText = `${cr3.toFixed(1)}%`;
+
+                if (cr3 > 60) {
+                    cr3Badge.className = 'text-[10px] font-black px-2 py-1 bg-red-100 text-red-700 rounded-lg uppercase';
+                    cr3Badge.innerText = 'High Conc.';
+                    cr3RiskDesc.innerText = 'Highly concentrated revenue';
+                    cr3RiskDesc.className = 'mt-1 text-sm font-bold text-red-600';
+                    cr3IconContainer.className = 'bg-red-100 text-red-600 p-3 rounded-xl';
+                } else if (cr3 > 30) {
+                    cr3Badge.className = 'text-[10px] font-black px-2 py-1 bg-yellow-100 text-yellow-700 rounded-lg uppercase';
+                    cr3Badge.innerText = 'Moderate Conc.';
+                    cr3RiskDesc.innerText = 'Moderately concentrated';
+                    cr3RiskDesc.className = 'mt-1 text-sm font-bold text-yellow-600';
+                    cr3IconContainer.className = 'bg-yellow-100 text-yellow-600 p-3 rounded-xl';
+                } else {
+                    cr3Badge.className = 'text-[10px] font-black px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg uppercase';
+                    cr3Badge.innerText = 'Well Diversified';
+                    cr3RiskDesc.innerText = 'Diversified revenue base';
+                    cr3RiskDesc.className = 'mt-1 text-sm font-bold text-emerald-600';
+                    cr3IconContainer.className = 'bg-emerald-100 text-emerald-600 p-3 rounded-xl';
+                }
+
+                // 4. Total Won Revenue
+                const locale = /*[[${#locale.language}]]*/ 'vi';
+                const currency = locale === 'vi' ? ' VNĐ' : ' VND';
+                document.getElementById('totalWonRev').innerText = (summaryData.totalWonRevenue || 0).toLocaleString() + currency;
             }
 
-            function switchTab(tab) {
-                if (!summaryData) return;
-                currentTab = tab;
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.classList.remove('bg-white', 'shadow-sm', 'text-slate-800');
-                    btn.classList.add('text-slate-500');
-                });
-                document.getElementById(`tab-${tab}`).classList.add('bg-white', 'shadow-sm', 'text-slate-800');
-                document.getElementById(`tab-${tab}`).classList.remove('text-slate-500');
-                renderTable(summaryData[tab]);
-            }
-
-            function renderTable(data) {
+            // Render table values
+            function renderTable() {
+                if (!summaryData || !summaryData.customers) return;
+                
                 const tbody = document.getElementById('summaryTableBody');
                 if (!tbody) return;
                 tbody.innerHTML = '';
+                
                 const locale = /*[[${#locale.language}]]*/ 'vi';
                 const currency = locale === 'vi' ? ' VNĐ' : ' VND';
 
-                data.forEach(item => {
+                summaryData.customers.forEach(item => {
                     const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50';
+                    tr.className = 'hover:bg-slate-50 border-b border-slate-100 transition-colors';
                     tr.innerHTML = `
                         <td class="px-6 py-4 font-bold text-slate-800">${item.segmentName}</td>
                         <td class="px-6 py-4 text-center text-slate-600">${item.totalLeads.toLocaleString()}</td>
@@ -194,36 +240,128 @@
                             <span class="px-2 py-1 rounded-full text-xs font-black bg-emerald-50 text-emerald-700">${item.winRate.toFixed(1)}%</span>
                         </td>
                         <td class="px-6 py-4 text-right font-bold text-slate-800">${item.totalRevenue.toLocaleString()}${currency}</td>
-                        <td class="px-6 py-4 text-right"><span class="text-lg font-black text-purple-600">${item.opportunityScore.toFixed(2)}</span></td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="px-2 py-1 rounded-full text-xs font-black bg-blue-50 text-blue-700">${item.opportunityScore.toFixed(1)}%</span>
+                        </td>
+                        <td class="px-6 py-4 text-right font-black text-red-600">
+                            -${item.totalRevenue.toLocaleString()}${currency} <span class="text-xs font-medium text-slate-400">(${(item.opportunityScore).toFixed(1)}%)</span>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
 
             function renderCharts() {
-                if (!summaryData) return;
-                renderBarChart('industryChart', summaryData.industries.slice(0, 5), '#3b82f6');
-                renderBarChart('regionChart', summaryData.regions.slice(0, 5), '#10b981');
-            }
+                if (!summaryData || !summaryData.customers) return;
 
-            function renderBarChart(id, data, color) {
-                const ctx = document.getElementById(id);
-                if (!ctx) return;
-                if (charts[id]) charts[id].destroy();
-                charts[id] = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.map(d => d.segmentName),
-                        datasets: [{ data: data.map(d => d.opportunityScore), backgroundColor: color + 'cc', borderRadius: 8 }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { x: { beginAtZero: true }, y: { grid: { display: false } } }
+                const top5 = summaryData.customers.slice(0, 5);
+                const otherRevenue = summaryData.customers.slice(5).reduce((acc, curr) => acc + curr.totalRevenue, 0);
+
+                // 1. Horizontal Bar Chart (Top 5 Customers by Revenue)
+                const barCtx = document.getElementById('customerChart');
+                if (barCtx) {
+                    if (charts['customerChart']) charts['customerChart'].destroy();
+                    charts['customerChart'] = new Chart(barCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: top5.map(d => d.segmentName),
+                            datasets: [{
+                                data: top5.map(d => d.totalRevenue),
+                                backgroundColor: 'rgba(59, 130, 246, 0.85)',
+                                hoverBackgroundColor: 'rgba(59, 130, 246, 1)',
+                                borderRadius: 8,
+                                borderSkipped: false
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return ' ' + context.raw.toLocaleString() + ' VND';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { 
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(val) {
+                                            if (val >= 1e9) return (val / 1e9).toFixed(1) + 'B';
+                                            if (val >= 1e6) return (val / 1e6).toFixed(0) + 'M';
+                                            return val;
+                                        }
+                                    }
+                                },
+                                y: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+
+                // 2. Doughnut Chart (Revenue Share Distribution)
+                const doughnutCtx = document.getElementById('shareChart');
+                if (doughnutCtx) {
+                    if (charts['shareChart']) charts['shareChart'].destroy();
+
+                    const labels = top5.map(d => d.segmentName);
+                    const data = top5.map(d => d.totalRevenue);
+                    
+                    if (otherRevenue > 0) {
+                        labels.push('Others');
+                        data.push(otherRevenue);
                     }
-                });
+
+                    charts['shareChart'] = new Chart(doughnutCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: [
+                                    'rgba(59, 130, 246, 0.85)',
+                                    'rgba(16, 185, 129, 0.85)',
+                                    'rgba(245, 158, 11, 0.85)',
+                                    'rgba(139, 92, 246, 0.85)',
+                                    'rgba(236, 72, 153, 0.85)',
+                                    'rgba(148, 163, 184, 0.6)'
+                                ],
+                                hoverOffset: 4,
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        boxWidth: 12,
+                                        font: { size: 11, weight: 'bold' },
+                                        padding: 12
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const pct = ((context.raw / total) * 100).toFixed(1) + '%';
+                                            return ' ' + context.label + ': ' + pct + ' (' + context.raw.toLocaleString() + ' VND)';
+                                        }
+                                    }
+                                }
+                            },
+                            cutout: '65%'
+                        }
+                    });
+                }
             }
         </script>
     </div>

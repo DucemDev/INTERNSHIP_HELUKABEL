@@ -436,6 +436,19 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         GROUP BY p.product_name
         """, nativeQuery = true)
     List<UnderServedSegmentProjection> getRawUnderServedProducts();
+
+    @Query(value = """
+        SELECT
+            l.account AS segmentName,
+            COUNT(l.lead_id) AS totalLeads,
+            CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) AS wonLeads,
+            CAST(SUM(CASE WHEN l.status = 'Lost' THEN 1 ELSE 0 END) AS BIGINT) AS lostLeads,
+            SUM(CASE WHEN l.status = 'Won' THEN COALESCE(l.business_result, 0) ELSE 0 END) AS totalRevenue
+        FROM lead l
+        WHERE l.account IS NOT NULL AND l.account <> ''
+        GROUP BY l.account
+        """, nativeQuery = true)
+    List<UnderServedSegmentProjection> getRawCustomerConcentration();
 }
 
 
