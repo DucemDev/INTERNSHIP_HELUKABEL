@@ -10,8 +10,6 @@ public interface DashboardService {
 
     Double getAverageDaysToWon();
 
-    List<LeadSourceCostProjection> getLeadSourceCostDashboard();
-
     List<PipelineCoverageProjection> getPipelineCoverage(String sellerCode);
 
     List<LeadStatusCountResponse> getLeadStatusCount();
@@ -20,7 +18,7 @@ public interface DashboardService {
 
     ConversionRateResponse getConversionRate();
 
-    List<WinRateBySalesResponse> getWinRateBySalesOwner();
+    List<WinRateBySalesResponse> getWinRateBySalesOwner(String region, String industry);
 
     List<WinRateByIndustryProjection> getWinRateByIndustry();
 
@@ -28,10 +26,12 @@ public interface DashboardService {
 
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
 
+    List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
 
-    List<LostReasonSummaryProjection> getLostReasonSummary();
     List<RevenueIndustryResponse> getRevenueByIndustry();
+
     List<RoiLeadSourceResponse> getROIByLeadSource();
+
     List<ConversionRateResponse> getConversionRateFilter(
             String sourceId,
             String sourceType,
@@ -43,7 +43,10 @@ public interface DashboardService {
             LocalDate timeTo
     );
 
-  List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
+    List<LeadSourceCostProjection> getLeadSourceCostDashboard();
+
+    ConversionRateResponse getStaffStats(String email);
+
+    List<PipelineCoverageProjection> getStaffPipelineCoverage(String email);
 
 }
-

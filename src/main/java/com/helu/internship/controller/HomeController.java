@@ -28,20 +28,9 @@ public class HomeController {
         return "dashboard/dashboard-home";
     }
 
-    @GetMapping("/dashboard/underserved-segments")
-    public String underServedSegmentsPage(org.springframework.ui.Model model) {
-        model.addAttribute("activeMenu", "underserved-segments");
-        return "dashboard/Dashboard-underserved-segments";
-    }
-
-    @GetMapping("/dashboard/test")
-    public String dashboardTestPage(org.springframework.ui.Model model) {
-        model.addAttribute("activeMenu", "dashboard-test");
-        return "dashboard/dashboard-test";
-    }
-
-    @GetMapping("/staff")
-    public String staffPage() {
-        return "staff-page";
+    @GetMapping("/staff/dashboard")
+    public String staffDashboard(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "dashboard");
+        return "dashboard/dashboard-seller";
     }
 }

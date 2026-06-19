@@ -19,18 +19,14 @@ public class SecurityConfig {
     private final CustomAuthenticationSuccessHandler successHandler;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/admin/**", "/dashboard/**", "/api/dashboard/**").hasAnyRole("Admin", "Staff", "Seller")
-                .requestMatchers("/staff/**").hasAnyRole("Staff", "Seller")
+                .requestMatchers("/users/**").hasRole("Admin")
+                .requestMatchers("/dashboard/**", "/api/dashboard/**").hasAnyRole("Admin", "Staff")
+                .requestMatchers("/staff/**").hasAnyRole("Staff")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

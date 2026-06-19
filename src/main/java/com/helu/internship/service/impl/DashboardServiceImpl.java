@@ -3,10 +3,7 @@ package com.helu.internship.service.impl;
 
 import com.helu.internship.dto.response.*;
 
-import com.helu.internship.repo.CostPerLeadRepo;
-import com.helu.internship.repo.LeadRepo;
-import com.helu.internship.repo.LeadStatusHistoryRepo;
-import com.helu.internship.repo.PipelineCoveragerRepo;
+import com.helu.internship.repo.*;
 import com.helu.internship.service.DashboardService;
 import org.springframework.stereotype.Service;
 
@@ -20,28 +17,32 @@ public class DashboardServiceImpl implements DashboardService {
     private final LeadStatusHistoryRepo leadStatusHistoryRepo;
     private final CostPerLeadRepo costPerLeadRepo;
     private final PipelineCoveragerRepo pipelineCoverageRepo;
+    private final UserRepo userRepo;
 
     public DashboardServiceImpl(
             LeadRepo leadRepo,
             LeadStatusHistoryRepo leadStatusHistoryRepo,
             CostPerLeadRepo costPerLeadRepo,
-            PipelineCoveragerRepo pipelineCoverageRepo) {
+            PipelineCoveragerRepo pipelineCoverageRepo,
+            UserRepo userRepo) {
 
         this.leadRepo = leadRepo;
         this.leadStatusHistoryRepo = leadStatusHistoryRepo;
         this.costPerLeadRepo = costPerLeadRepo;
         this.pipelineCoverageRepo = pipelineCoverageRepo;
+        this.userRepo = userRepo;
     }
 
     @Override
     public List<WinRateByIndustryProjection> getWinRateByIndustry() {
         return leadRepo.getWinRateByIndustry();
     }
+
     @Override
     public List<WinRateByRegionProjection> getWinRateByRegion() {
         return leadRepo.getWinRateByRegion();
     }
-    
+
     @Override
     public List<LeadStatusCountResponse> getLeadStatusCount() {
         return leadRepo.countLeadByStatus()
@@ -69,9 +70,9 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<PipelineCoverageProjection> getPipelineCoverage(
-            String sellerCode
-    ) {return pipelineCoverageRepo.getPipelineCoverage(sellerCode);}
+    public List<PipelineCoverageProjection> getPipelineCoverage(String sellerCode) {
+        return pipelineCoverageRepo.getPipelineCoverage(sellerCode);
+    }
 
     @Override
     public ConversionRateResponse getConversionRate() {
@@ -79,8 +80,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<WinRateBySalesResponse> getWinRateBySalesOwner() {
-        return leadRepo.getWinRateBySalesOwner();
+    public List<WinRateBySalesResponse> getWinRateBySalesOwner(String region, String industry) {
+        return leadRepo.getWinRateBySalesOwner(region, industry);
     }
 
     @Override
@@ -89,18 +90,15 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<LostReasonSummaryProjection> getLostReasonSummary() {
-        return leadRepo.getLostReasonSummary(null);
-    }
-
-    @Override
     public List<LostReasonSummaryProjection> getLostReasonSummary(String productId) {
         return leadRepo.getLostReasonSummary(productId);
     }
+
     @Override
     public List<RevenueIndustryResponse> getRevenueByIndustry() {
         return leadRepo.getRevenueByIndustry();
     }
+
     @Override
     public List<ConversionRateResponse> getConversionRateFilter(
             String sourceId,
@@ -108,7 +106,7 @@ public class DashboardServiceImpl implements DashboardService {
             String region,
             String industry,
             String salesOwnerId,
-            String  customerGroup,
+            String customerGroup,
             LocalDate timeFrom,
             LocalDate timeTo
     ) {
@@ -123,9 +121,22 @@ public class DashboardServiceImpl implements DashboardService {
                 timeTo
         );
     }
+
     @Override
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return leadRepo.getROIByLeadSource();
     }
-}
 
+    @Override
+    public ConversionRateResponse getStaffStats(String email) {
+        return leadRepo.getStatsByEmail(email);
+    }
+
+    @Override
+    public List<PipelineCoverageProjection> getStaffPipelineCoverage(String email) {
+        String userCode = userRepo.findByEmail(email)
+                .map(u -> u.getUserCode())
+                .orElse(null);
+        return pipelineCoverageRepo.getPipelineCoverage(userCode);
+    }
+}

@@ -4,6 +4,10 @@ import com.helu.internship.dto.response.*;
 import com.helu.internship.service.DashboardService;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.security.Principal;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -16,60 +20,107 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
-//Cung cấp dữ liệu cho Biểu đồ Phễu .
     @GetMapping("/lead-status")
     public List<LeadStatusCountResponse> getLeadStatusCount() {
         return dashboardService.getLeadStatusCount();
     }
 
-//Lấy danh sách khách hàng chi tiết khi click vào các phần của biểu đồ.
     @GetMapping("/leads-by-status")
     public List<LeadByStatusResponse> getLeadsByStatus(@RequestParam String status) {
-        return dashboardService.getLeadsByStatus(status);}
+        return dashboardService.getLeadsByStatus(status);
+    }
 
-// API Cung cấp số liệu cho 3 thẻ KPI (Tổng Lead, Won Lead, Tỉ lệ chuyển đổi).
     @GetMapping("/conversion-rate")
     public ConversionRateResponse getConversionRate() {
-        return dashboardService.getConversionRate();}
+        return dashboardService.getConversionRate();
+    }
 
-//Dữ liệu cho biểu đồ Tỉ lệ thắng theo nhân viên Sales. (win rate) [cần sửa]
+    @GetMapping("/average-days-to-won")
+    public Double getAverageDaysToWon() {
+        return dashboardService.getAverageDaysToWon();
+    }
+
     @GetMapping("/win-rate-by-saleowner")
-    public List<WinRateBySalesResponse> getWinRateBySalesOwner() {
-        return dashboardService.getWinRateBySalesOwner();}
-
+    public List<WinRateBySalesResponse> getWinRateBySalesOwner(
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String industry
+    ) {
+        return dashboardService.getWinRateBySalesOwner(region, industry);
+    }
 
     @GetMapping("/win-rate-by-industry")
     public List<WinRateByIndustryProjection> getWinRateByIndustry() {
-        return dashboardService.getWinRateByIndustry();}
-
+        return dashboardService.getWinRateByIndustry();
+    }
 
     @GetMapping("/win-rate-by-region")
     public List<WinRateByRegionProjection> getWinRateByRegion() {
-        return dashboardService.getWinRateByRegion();}
+        return dashboardService.getWinRateByRegion();
+    }
 
-
-//Dữ liệu cho biểu đồ Chi phí trên mỗi khách Won theo nguồn.
     @GetMapping("/cost-per-win-source")
     public List<CostPerWinBySourceResponse> getCostPerWinByLeadSource() {
-        return dashboardService.getCostPerWinByLeadSource();}
+        return dashboardService.getCostPerWinByLeadSource();
+    }
 
-
+    @GetMapping("/lead-source-cost")
+    public List<LeadSourceCostProjection> getLeadSourceCostDashboard() {
+        return dashboardService.getLeadSourceCostDashboard();
+    }
 
     @GetMapping("/lost-reasons")
     public List<LostReasonSummaryProjection> getLostReasonSummary(
             @RequestParam(required = false) String productId
-    ) {return dashboardService.getLostReasonSummary(productId);}
-
+    ) {
+        return dashboardService.getLostReasonSummary(productId);
+    }
 
     @GetMapping("/revenue-industry")
     public List<RevenueIndustryResponse> getRevenueByIndustry() {
-        return dashboardService.getRevenueByIndustry();}
-
+        return dashboardService.getRevenueByIndustry();
+    }
 
     @GetMapping("/roi-lead-source")
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
-        return dashboardService.getROIByLeadSource();}
+        return dashboardService.getROIByLeadSource();
+    }
+    @GetMapping("/conversion-rate/filter")
+    public List<ConversionRateResponse> getConversionRateFilter(
+            @RequestParam(required = false) String sourceId,
+            @RequestParam(required = false) String sourceType,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String industry,
+            @RequestParam(required = false) String salesOwnerId,
+            @RequestParam(required = false) String customerGroup,
+            @RequestParam(required = false) LocalDate timeFrom,
+            @RequestParam(required = false) LocalDate timeTo
+    ) {
+        return dashboardService.getConversionRateFilter(
+                sourceId,
+                sourceType,
+                region,
+                industry,
+                salesOwnerId,
+                customerGroup,
+                timeFrom,
+                timeTo
+        );
+    }
 
+    @GetMapping("/pipeline-coverage")
+    public List<PipelineCoverageProjection> getPipelineCoverage() {
+        return dashboardService.getPipelineCoverage(null);
+    }
 
+    // --- STAFF ENDPOINTS ---
 
+    @GetMapping("/staff/stats")
+    public ConversionRateResponse getStaffStats(Principal principal) {
+        return dashboardService.getStaffStats(principal.getName());
+    }
+
+    @GetMapping("/staff/pipeline-coverage")
+    public List<PipelineCoverageProjection> getStaffPipelineCoverage(Principal principal) {
+        return dashboardService.getStaffPipelineCoverage(principal.getName());
+    }
 }
