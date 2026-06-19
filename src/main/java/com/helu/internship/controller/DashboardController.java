@@ -4,7 +4,10 @@ import com.helu.internship.dto.response.*;
 import com.helu.internship.service.DashboardService;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.security.Principal;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -80,6 +83,28 @@ public class DashboardController {
     @GetMapping("/roi-lead-source")
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return dashboardService.getROIByLeadSource();
+    }
+    @GetMapping("/conversion-rate/filter")
+    public List<ConversionRateResponse> getConversionRateFilter(
+            @RequestParam(required = false) String sourceId,
+            @RequestParam(required = false) String sourceType,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String industry,
+            @RequestParam(required = false) String salesOwnerId,
+            @RequestParam(required = false) String customerGroup,
+            @RequestParam(required = false) LocalDate timeFrom,
+            @RequestParam(required = false) LocalDate timeTo
+    ) {
+        return dashboardService.getConversionRateFilter(
+                sourceId,
+                sourceType,
+                region,
+                industry,
+                salesOwnerId,
+                customerGroup,
+                timeFrom,
+                timeTo
+        );
     }
 
     @GetMapping("/pipeline-coverage")

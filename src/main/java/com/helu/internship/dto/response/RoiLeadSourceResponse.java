@@ -4,10 +4,8 @@ import java.math.BigDecimal;
 
 public interface RoiLeadSourceResponse {
     String getLabel();
-
     Long getWonLead();
-
     BigDecimal getTotalCost();
-
-    BigDecimal getRoi();
+    BigDecimal getTotalWonValue();
+    Double getRoi();
 }
