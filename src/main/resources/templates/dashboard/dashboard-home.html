@@ -2,6 +2,25 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
 <main class="p-4 md:p-8 space-y-8 bg-slate-50 min-h-screen">
+    <style>
+        .funnel-stage {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .funnel-stage:hover path {
+            filter: brightness(1.1) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.15));
+            opacity: 0.95;
+        }
+        .funnel-stage:hover text {
+            fill: #ef4444 !important;
+        }
+        .funnel-stage:hover line {
+            stroke: #ef4444;
+            stroke-width: 1.5px;
+        }
+        .funnel-stage:hover circle {
+            r: 5.5px;
+        }
+    </style>
 
 
 
@@ -57,7 +76,7 @@
                 <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
                 <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
             </h2>
-            <div class="relative w-full flex-1 min-h-[300px]"><canvas id="leadStatusChart"></canvas></div>
+            <div class="relative w-full flex-1 min-h-[350px] flex items-center justify-center" id="leadStatusFunnelContainer"></div>
         </div>
 
         <!-- BIỂU ĐỒ: TỶ LỆ THẮNG (SMART MULTI-FILTER) -->
@@ -320,71 +339,203 @@
             }
         }
 
-        // HÀM 2: Biểu đồ Cơ cấu Trạng thái
+        // HÀM 2: Biểu đồ Phễu 3D Cơ cấu Trạng thái Leads (Độ dày dọc theo % tỉ lệ, dáng phễu 3D chuẩn)
         async function loadLeadStatusChart() {
             try {
                 const res = await fetch(`${API_BASE}/lead-status`);
                 const data = await res.json();
 
-                const labels = data.map(item => item.status);
-                const values = data.map(item => item.total);
-                const total = values.reduce((a, b) => a + b, 0);
+                const getCount = (statuses) => {
+                    return data
+                        .filter(item => statuses.includes(item.status))
+                        .reduce((sum, item) => sum + item.total, 0);
+                };
 
-                // Màu sắc hiện đại, không trùng lặp
-                const bgColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
+                const v1 = getCount(['New', 'Contacted']);
+                const v2 = getCount(['Qualified']);
+                const v3 = getCount(['Proposal Sent']);
+                const v4 = getCount(['In Negotiation']);
+                const v5 = getCount(['Won']);
 
-                // Tính % dán thẳng vào Legend
-                const labelsWithPercent = labels.map((label, i) => {
-                    const pct = total === 0 ? 0 : ((values[i] / total) * 100).toFixed(1);
-                    return `${label} (${pct}%)`;
-                });
+                const values = [v1, v2, v3, v4, v5];
+                const totalActive = values.reduce((a, b) => a + b, 0);
 
-                renderChart('leadStatusChart', 'doughnut', {
-                    labels: labelsWithPercent,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: bgColors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        hoverOffset: 6
-                    }]
-                }, {
-                    cutout: '65%',
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20,
-                                font: { size: 13, weight: '600' },
-                                cursor: 'pointer'
-                            },
-                            // XỬ LÝ CLICK VÀO LEGEND ĐỂ MỞ MODAL
-                            onClick: (e, legendItem, legend) => {
-                                // 1. Lấy tên status gốc (bỏ phần % trong ngoặc)
-                                const statusName = labels[legendItem.index];
+                const stages = [
+                    { key: 'New_Contacted', label: 'New + Contacted', statuses: ['New', 'Contacted'], color: 'url(#grad-blue-3d)', topColor: 'url(#grad-funnel-interior)' },
+                    { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-purple-3d)' },
+                    { key: 'Proposal Sent', label: 'Proposal Sent', statuses: ['Proposal Sent'], color: 'url(#grad-amber-3d)' },
+                    { key: 'In Negotiation', label: 'In Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-teal-3d)' },
+                    { key: 'Won', label: 'Won', statuses: ['Won'], color: 'url(#grad-emerald-3d)' }
+                ];
 
-                                // 2. Gọi hàm mở modal
-                                openLeadStatusModal(statusName);
+                // Phân bổ chiều cao các tầng dọc theo tỉ lệ
+                const minH = 22;
+                const totalHeight = 260;
+                const gap = 6;
+                const startY = 34;
 
-                                // 3. Giữ hành vi mặc định (ẩn/hiện dataset)
-                                Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
-                            }
-                        },
-                        datalabels: {
-                            display: true,
-                            color: '#fff',
-                            font: { weight: 'bold', size: 12 },
-                            formatter: (value, ctx) => {
-                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = total === 0 ? 0 : ((value / total) * 100).toFixed(1);
-                                return percentage > 5 ? `${percentage}%` : ''; // Chỉ hiện nếu > 5% để tránh đè nhau
-                            }
-                        }
+                let heights = [];
+                if (totalActive === 0) {
+                    heights = [52, 52, 52, 52, 52];
+                } else {
+                    const remainingH = totalHeight - (5 * minH);
+                    heights = values.map(v => minH + remainingH * (v / totalActive));
+                }
+
+                // Hàm tính toán độ rộng phễu tại vị trí Y để giữ nguyên hình thái phễu chuẩn
+                const Y_start = startY;
+                const Y_end = startY + totalHeight + 4 * gap;
+                const getFunnelWidth = (y) => {
+                    const ratio = Math.max(0, Math.min(1, (y - Y_start) / (Y_end - Y_start)));
+                    return 220 - (220 - 45) * ratio;
+                };
+
+                let svgHtml = `
+                <svg viewBox="0 0 500 350" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Hiệu ứng chiều sâu bên trong miệng phễu -->
+                        <radialGradient id="grad-funnel-interior" cx="50%" cy="50%" r="50%" fx="50%" fy="30%">
+                            <stop offset="0%" stop-color="#0f172a" />
+                            <stop offset="100%" stop-color="#1e293b" />
+                        </radialGradient>
+                        
+                        <!-- Gradient 3D hình trụ (tạo vệt sáng ở giữa thân phễu) -->
+                        <linearGradient id="grad-blue-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#1e3a8a" />
+                            <stop offset="30%" stop-color="#3b82f6" />
+                            <stop offset="50%" stop-color="#60a5fa" />
+                            <stop offset="70%" stop-color="#3b82f6" />
+                            <stop offset="100%" stop-color="#1d4ed8" />
+                        </linearGradient>
+                        
+                        <linearGradient id="grad-purple-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#4c1d95" />
+                            <stop offset="30%" stop-color="#7c3aed" />
+                            <stop offset="50%" stop-color="#a78bfa" />
+                            <stop offset="70%" stop-color="#7c3aed" />
+                            <stop offset="100%" stop-color="#6d28d9" />
+                        </linearGradient>
+                        
+                        <linearGradient id="grad-amber-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#78350f" />
+                            <stop offset="30%" stop-color="#f59e0b" />
+                            <stop offset="50%" stop-color="#fcd34d" />
+                            <stop offset="70%" stop-color="#f59e0b" />
+                            <stop offset="100%" stop-color="#b45309" />
+                        </linearGradient>
+                        
+                        <linearGradient id="grad-teal-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#115e59" />
+                            <stop offset="30%" stop-color="#0d9488" />
+                            <stop offset="50%" stop-color="#2dd4bf" />
+                            <stop offset="70%" stop-color="#0d9488" />
+                            <stop offset="100%" stop-color="#0f766e" />
+                        </linearGradient>
+                        
+                        <linearGradient id="grad-emerald-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#064e3b" />
+                            <stop offset="30%" stop-color="#10b981" />
+                            <stop offset="50%" stop-color="#34d399" />
+                            <stop offset="70%" stop-color="#10b981" />
+                            <stop offset="100%" stop-color="#047857" />
+                        </linearGradient>
+                    </defs>
+                `;
+
+                const X_c = 140;
+                let currentY = startY;
+
+                for (let i = 0; i < 5; i++) {
+                    const stage = stages[i];
+                    const val = values[i];
+                    const pct = totalActive > 0 ? ((val / totalActive) * 100).toFixed(1) : '0.0';
+                    const h = heights[i];
+
+                    const yTop = currentY;
+                    const yBottom = yTop + h;
+                    currentY = yBottom + gap;
+
+                    // Tính bán kính ellipse dựa trên phối cảnh 3D góc nghiêng cố định (ry = rx * 0.12)
+                    const rXt = getFunnelWidth(yTop) / 2;
+                    const rYt = rXt * 0.12;
+
+                    const rXb = getFunnelWidth(yBottom) / 2;
+                    const rYb = rXb * 0.12;
+
+                    const xTl = X_c - rXt;
+                    const xTr = X_c + rXt;
+                    const xBr = X_c + rXb;
+                    const xBl = X_c - rXb;
+
+                    // Tạo path cong của thân hình nón 3D (Cả cung đỉnh và cung đáy đều hướng cong xuống dưới: sweep-flag = 1)
+                    const pathD = `M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop} L ${xBr} ${yBottom} A ${rXb} ${rYb} 0 0 1 ${xBl} ${yBottom} Z`;
+                    const xMid = X_c + (rXt + rXb) / 2;
+                    const yMid = yTop + h / 2;
+
+                    const statusesJson = JSON.stringify(stage.statuses);
+
+                    svgHtml += `
+                    <g class="funnel-stage" cursor="pointer" onclick='openLeadStatusModal(${statusesJson})'>
+                        <!-- Thân phân đoạn -->
+                        <path d="${pathD}" fill="${stage.color}" />
+                    `;
+
+                    // Vẽ viền mặt trên tương ứng với góc nhìn từ trên xuống
+                    if (i === 0) {
+                        // Tầng đầu tiên vẽ ellipse trọn vẹn mô phỏng lòng miệng phễu
+                        svgHtml += `
+                        <ellipse cx="${X_c}" cy="${yTop}" rx="${rXt}" ry="${rYt}" fill="${stage.topColor}" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" />
+                        `;
+                    } else {
+                        // Các tầng tiếp theo chỉ vẽ viền sáng (lip highlight) để phân cách các khúc phễu chồng lên nhau
+                        svgHtml += `
+                        <path d="M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop}" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" />
+                        `;
                     }
-                });
+
+                    // Nếu là giai đoạn Won cuối cùng, vẽ thêm cổ phễu thẳng xuống dưới
+                    if (i === 4) {
+                        const neckHeight = 18;
+                        const yNeckBottom = yBottom + neckHeight;
+                        const rXn = rXb;
+                        const rYn = rYb;
+                        const xNl = X_c - rXn;
+                        const xNr = X_c + rXn;
+
+                        const neckPathD = `M ${xBl} ${yBottom} L ${xBl} ${yNeckBottom} A ${rXn} ${rYn} 0 0 1 ${xNr} ${yNeckBottom} L ${xBr} ${yBottom} A ${rXb} ${rYb} 0 0 1 ${xBl} ${yBottom} Z`;
+
+                        svgHtml += `
+                        <!-- Thân cổ phễu -->
+                        <path d="${neckPathD}" fill="${stage.color}" />
+                        <!-- Lỗ mở đáy cổ phễu -->
+                        <ellipse cx="${X_c}" cy="${yNeckBottom}" rx="${rXn}" ry="${rYn}" fill="#0f172a" opacity="0.7" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />
+                        `;
+                    }
+
+                    svgHtml += `
+                        <circle cx="${xMid}" cy="${yMid}" r="3.5" fill="${i === 0 ? '#3b82f6' : i === 1 ? '#8b5cf6' : i === 2 ? '#f59e0b' : i === 3 ? '#0d9488' : '#10b981'}" />
+                        <line x1="${xMid + 4}" y1="${yMid}" x2="270" y2="${yMid}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
+                    `;
+
+                    if (h >= 35) {
+                        svgHtml += `
+                        <text x="280" y="${yMid - 3}" font-family="'Inter', sans-serif" font-size="13" font-weight="bold" fill="#1e293b">${stage.label}</text>
+                        <text x="280" y="${yMid + 13}" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#64748b">${val.toLocaleString()} Leads (${pct}%)</text>
+                        `;
+                    } else {
+                        svgHtml += `
+                        <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${val.toLocaleString()} (${pct}%)</tspan></text>
+                        `;
+                    }
+
+                    svgHtml += `</g>`;
+                }
+
+                svgHtml += `</svg>`;
+                document.getElementById('leadStatusFunnelContainer').innerHTML = svgHtml;
             } catch (error) {
-                console.error('Error loading Lead Status chart:', error);
+                console.error('Error loading Lead Status funnel:', error);
+                document.getElementById('leadStatusFunnelContainer').innerHTML = `<p class="text-red-500 font-bold text-center">Không thể tải biểu đồ phễu</p>`;
             }
         }
 
@@ -752,7 +903,7 @@
             const container = document.getElementById('modalTableContainer');
 
             // Setup giao diện ban đầu
-            title.innerText = status;
+            title.innerText = Array.isArray(status) ? status.join(' + ') : status;
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Khóa cuộn trang chính
 
@@ -765,10 +916,21 @@
 
             try {
                 // Gọi API lấy dữ liệu
-                const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
-                if (!res.ok) throw new Error('Network response was not ok');
-
-                const data = await res.json();
+                let data = [];
+                if (Array.isArray(status)) {
+                    const promises = status.map(st => 
+                        fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(st)}`).then(r => {
+                            if (!r.ok) throw new Error('API error');
+                            return r.json();
+                        })
+                    );
+                    const results = await Promise.all(promises);
+                    data = results.flat();
+                } else {
+                    const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    data = await res.json();
+                }
                 loading.classList.add('hidden');
 
                 if (!data || !Array.isArray(data) || data.length === 0) {
