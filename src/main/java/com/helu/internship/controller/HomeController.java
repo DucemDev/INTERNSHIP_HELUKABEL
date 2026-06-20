@@ -33,4 +33,10 @@ public class HomeController {
         model.addAttribute("activeMenu", "dashboard");
         return "dashboard/dashboard-seller";
     }
+
+    @GetMapping("/dashboard/test")
+    public String dashboardTestPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "dashboard-test");
+        return "dashboard/dashboard-test";
+    }
 }

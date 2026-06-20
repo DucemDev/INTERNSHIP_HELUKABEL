@@ -25,6 +25,14 @@
             </a>
         </div>
 
+        <!-- Dashboard Test / Analytics Preview -->
+        <div th:classappend="${activeMenu == 'dashboard-test' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+            <a href="/dashboard/test" class="flex items-center px-4 py-3 font-medium">
+                <i data-lucide="flask-conical" class="mr-3 w-5 h-5"></i>
+                <span>Analytics Preview</span>
+            </a>
+        </div>
+
         <!-- Quản lý Lead -->
         <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'leads' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/leads" class="flex items-center px-4 py-3 font-medium">
