@@ -56,8 +56,7 @@
             <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                 <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
                 <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
-            </h2>
-            <div class="relative w-full flex-1 min-h-[300px]"><canvas id="leadStatusChart"></canvas></div>
+            <div class="relative w-full flex-1 min-h-[300px]" id="leadStatusFunnelContainer"></div>
         </div>
 
         <!-- BIỂU ĐỒ: TỶ LỆ THẮNG (SMART MULTI-FILTER) -->
@@ -320,71 +319,152 @@
             }
         }
 
-        // HÀM 2: Biểu đồ Cơ cấu Trạng thái
+        // HÀM 2: Biểu đồ Cơ cấu Trạng thái (Phễu Leads)
         async function loadLeadStatusChart() {
             try {
                 const res = await fetch(`${API_BASE}/lead-status`);
                 const data = await res.json();
 
-                const labels = data.map(item => item.status);
-                const values = data.map(item => item.total);
-                const total = values.reduce((a, b) => a + b, 0);
+                const getCount = (statusName) => {
+                    const item = data.find(d => d.status.toLowerCase() === statusName.toLowerCase());
+                    return item ? item.total : 0;
+                };
 
-                // Màu sắc hiện đại, không trùng lặp
-                const bgColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
+                const newCount = getCount('New');
+                const contactedCount = getCount('Contacted');
+                const qualifiedCount = getCount('Qualified');
+                const proposalCount = getCount('Proposal Sent');
+                const negoCount = getCount('In Negotiation');
+                const wonCount = getCount('Won');
 
-                // Tính % dán thẳng vào Legend
-                const labelsWithPercent = labels.map((label, i) => {
-                    const pct = total === 0 ? 0 : ((values[i] / total) * 100).toFixed(1);
-                    return `${label} (${pct}%)`;
+                // Dữ liệu cho 5 tầng của phễu chuyển đổi
+                const stageData = [
+                    { name: 'New & Contacted', originalName: 'New & Contacted', count: newCount + contactedCount, color: '#3b82f6' },
+                    { name: 'Qualified', originalName: 'Qualified', count: qualifiedCount, color: '#8b5cf6' },
+                    { name: 'Proposal Sent', originalName: 'Proposal Sent', count: proposalCount, color: '#f59e0b' },
+                    { name: 'In Negotiation', originalName: 'In Negotiation', count: negoCount, color: '#ec4899' },
+                    { name: 'Won', originalName: 'Won', count: wonCount, color: '#10b981' }
+                ];
+
+                const totalCount = stageData.reduce((acc, curr) => acc + curr.count, 0);
+
+                // Vẽ phễu bằng SVG
+                const container = document.getElementById('leadStatusFunnelContainer');
+                if (!container) return;
+                container.innerHTML = '';
+
+                // Kích thước SVG
+                const svgW = 480;
+                const svgH = 320;
+
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('width', '100%');
+                svg.setAttribute('height', '100%');
+                svg.setAttribute('viewBox', `0 0 ${svgW} ${svgH}`);
+                svg.style.maxHeight = '320px';
+
+                const minHeight = 35;
+                const totalAvailableHeight = svgH - 20; // 300px cho phễu
+                const remainingHeight = totalAvailableHeight - (stageData.length * minHeight);
+
+                // Tính toán chiều cao cho từng tầng theo tỷ lệ % số lượng leads
+                stageData.forEach(stage => {
+                    const proportion = totalCount > 0 ? (stage.count / totalCount) : 0;
+                    stage.height = minHeight + (proportion * remainingHeight);
                 });
 
-                renderChart('leadStatusChart', 'doughnut', {
-                    labels: labelsWithPercent,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: bgColors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        hoverOffset: 6
-                    }]
-                }, {
-                    cutout: '65%',
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20,
-                                font: { size: 13, weight: '600' },
-                                cursor: 'pointer'
-                            },
-                            // XỬ LÝ CLICK VÀO LEGEND ĐỂ MỞ MODAL
-                            onClick: (e, legendItem, legend) => {
-                                // 1. Lấy tên status gốc (bỏ phần % trong ngoặc)
-                                const statusName = labels[legendItem.index];
+                // Cấu hình chiều rộng phễu
+                const centerX = 160;
+                const maxWidth = 240;
+                const minWidth = 70;
 
-                                // 2. Gọi hàm mở modal
-                                openLeadStatusModal(statusName);
+                const getWidthAtY = (y) => {
+                    return maxWidth - (y / totalAvailableHeight) * (maxWidth - minWidth);
+                };
 
-                                // 3. Giữ hành vi mặc định (ẩn/hiện dataset)
-                                Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
-                            }
-                        },
-                        datalabels: {
-                            display: true,
-                            color: '#fff',
-                            font: { weight: 'bold', size: 12 },
-                            formatter: (value, ctx) => {
-                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = total === 0 ? 0 : ((value / total) * 100).toFixed(1);
-                                return percentage > 5 ? `${percentage}%` : ''; // Chỉ hiện nếu > 5% để tránh đè nhau
-                            }
-                        }
-                    }
+                let currentY = 10; // Bắt đầu cách lề trên 10px
+
+                // Đưa các tầng vào vẽ
+                stageData.forEach((stage, idx) => {
+                    const yStart = currentY;
+                    const yEnd = currentY + stage.height;
+                    
+                    const wTop = getWidthAtY(yStart - 10);
+                    const wBot = getWidthAtY(yEnd - 10);
+
+                    // Toạ độ hình thang
+                    const xTopLeft = centerX - wTop / 2;
+                    const xTopRight = centerX + wTop / 2;
+                    const xBotRight = centerX + wBot / 2;
+                    const xBotLeft = centerX - wBot / 2;
+
+                    // Vẽ hình thang
+                    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    polygon.setAttribute('points', `${xTopLeft},${yStart} ${xTopRight},${yStart} ${xBotRight},${yEnd} ${xBotLeft},${yEnd}`);
+                    polygon.setAttribute('fill', stage.color);
+                    polygon.setAttribute('stroke', '#ffffff');
+                    polygon.setAttribute('stroke-width', '2');
+                    polygon.setAttribute('class', 'cursor-pointer hover:opacity-90 transition-all');
+                    polygon.style.transition = 'all 0.2s';
+                    
+                    polygon.onclick = () => openLeadStatusModal(stage.originalName);
+
+                    // Tooltip
+                    const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                    const pct = totalCount > 0 ? ((stage.count / totalCount) * 100).toFixed(1) : 0;
+                    title.textContent = `${stage.name}: ${stage.count} leads (${pct}%)`;
+                    polygon.appendChild(title);
+                    svg.appendChild(polygon);
+
+                    // Đường nối nhãn bên phải
+                    const yMid = (yStart + yEnd) / 2;
+                    const xEdgeRight = centerX + (wTop + wBot) / 4;
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', xEdgeRight + 6);
+                    line.setAttribute('y1', yMid);
+                    line.setAttribute('x2', 290);
+                    line.setAttribute('y2', yMid);
+                    line.setAttribute('stroke', '#cbd5e1');
+                    line.setAttribute('stroke-width', '1');
+                    line.setAttribute('stroke-dasharray', '3,3');
+                    svg.appendChild(line);
+
+                    // Chấm tròn nhỏ
+                    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    dot.setAttribute('cx', xEdgeRight + 6);
+                    dot.setAttribute('cy', yMid);
+                    dot.setAttribute('r', '3');
+                    dot.setAttribute('fill', stage.color);
+                    svg.appendChild(dot);
+
+                    // Nhãn
+                    const textLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    textLabel.setAttribute('x', 300);
+                    textLabel.setAttribute('y', yMid - 4);
+                    textLabel.setAttribute('fill', '#1e293b');
+                    textLabel.setAttribute('font-size', '12');
+                    textLabel.setAttribute('font-weight', 'bold');
+                    textLabel.setAttribute('class', 'cursor-pointer hover:fill-blue-600');
+                    textLabel.onclick = () => openLeadStatusModal(stage.originalName);
+                    textLabel.textContent = stage.name;
+                    svg.appendChild(textLabel);
+
+                    const textValue = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    textValue.setAttribute('x', 300);
+                    textValue.setAttribute('y', yMid + 10);
+                    textValue.setAttribute('fill', '#64748b');
+                    textValue.setAttribute('font-size', '11');
+                    textValue.setAttribute('font-weight', '600');
+                    textValue.textContent = `${stage.count} leads (${pct}%)`;
+                    svg.appendChild(textValue);
+
+                    currentY = yEnd;
                 });
+
+                container.appendChild(svg);
             } catch (error) {
-                console.error('Error loading Lead Status chart:', error);
+                console.error('Error loading Lead Status funnel:', error);
             }
         }
 
@@ -765,10 +845,21 @@
 
             try {
                 // Gọi API lấy dữ liệu
-                const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
-                if (!res.ok) throw new Error('Network response was not ok');
-
-                const data = await res.json();
+                let data = [];
+                if (status === 'New & Contacted') {
+                    const [res1, res2] = await Promise.all([
+                        fetch(`${API_BASE}/leads-by-status?status=New`),
+                        fetch(`${API_BASE}/leads-by-status?status=Contacted`)
+                    ]);
+                    if (!res1.ok || !res2.ok) throw new Error('API Error');
+                    const d1 = await res1.json();
+                    const d2 = await res2.json();
+                    data = [...d1, ...d2];
+                } else {
+                    const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    data = await res.json();
+                }
                 loading.classList.add('hidden');
 
                 if (!data || !Array.isArray(data) || data.length === 0) {
