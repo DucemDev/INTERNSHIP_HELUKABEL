@@ -123,13 +123,141 @@
             </div>
         </div>
 
+        <!-- Row 5: Conversion Rate Dynamic Filter Analysis -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-1.5 h-5 bg-indigo-600 rounded-full"></span> 
+                        <span>Conversion Rate Dynamic Filter Analysis (Báo cáo Phân tích Tỉ lệ Chuyển đổi Động)</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 font-medium mt-1">Giao diện minh họa sử dụng API <code>/api/dashboard/conversion-rate/filter</code> để lọc và so sánh tỉ lệ chuyển đổi.</p>
+                </div>
+                <button onclick="clearFilterDashboard()" class="text-xs font-bold text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 border border-indigo-100">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    <span>Làm mới lọc</span>
+                </button>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 p-4 bg-slate-50 rounded-xl">
+                <!-- Region Filter -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Khu vực</label>
+                    <select id="convRegionFilter" onchange="loadFilteredConversionRate()" class="w-full text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg p-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+
+                <!-- Industry Filter -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ngành hàng</label>
+                    <select id="convIndustryFilter" onchange="loadFilteredConversionRate()" class="w-full text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg p-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+
+                <!-- Sales Owner Filter -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nhân viên</label>
+                    <select id="convOwnerFilter" onchange="loadFilteredConversionRate()" class="w-full text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg p-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+
+                <!-- Customer Group Filter -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nhóm KH</label>
+                    <select id="convGroupFilter" onchange="loadFilteredConversionRate()" class="w-full text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg p-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10">
+                        <option value="">Tất cả</option>
+                        <option value="SME">SME</option>
+                        <option value="Enterprise">Enterprise</option>
+                        <option value="Key Account">Key Account</option>
+                        <option value="Partner">Partner</option>
+                    </select>
+                </div>
+
+                <!-- Date From Filter -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Từ ngày</label>
+                    <input type="date" id="convDateFromFilter" onchange="loadFilteredConversionRate()" class="w-full text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg p-1.5 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10" />
+                </div>
+
+                <!-- Date To Filter -->
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Đến ngày</label>
+                    <input type="date" id="convDateToFilter" onchange="loadFilteredConversionRate()" class="w-full text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg p-1.5 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10" />
+                </div>
+            </div>
+
+            <!-- Giao diện 3: Dynamic KPI Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1: Filtered Total Leads -->
+                <div class="bg-indigo-50/40 p-4 rounded-xl border border-indigo-100/50 flex flex-col justify-center">
+                    <h4 class="text-xs font-bold text-indigo-700 uppercase tracking-wider">Tổng Leads (Đã Lọc)</h4>
+                    <div id="filterTotalLeads" class="mt-1 text-2xl font-black text-slate-800">0</div>
+                </div>
+
+                <!-- Card 2: Filtered Won Leads -->
+                <div class="bg-emerald-50/40 p-4 rounded-xl border border-emerald-100/50 flex flex-col justify-center">
+                    <h4 class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Leads Thắng (Won)</h4>
+                    <div id="filterWonLeads" class="mt-1 text-2xl font-black text-slate-800">0</div>
+                </div>
+
+                <!-- Card 3: Filtered Average Conversion Rate -->
+                <div class="bg-amber-50/40 p-4 rounded-xl border border-amber-100/50 flex flex-col justify-center">
+                    <h4 class="text-xs font-bold text-amber-700 uppercase tracking-wider">Tỉ lệ chuyển đổi TB</h4>
+                    <div id="filterAvgConvRate" class="mt-1 text-2xl font-black text-slate-800">0%</div>
+                </div>
+            </div>
+
+            <!-- Visualization Grid: Table (Giao diện 1) & Bar Chart (Giao diện 2) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Giao diện 2: Conversion Rate by Lead Source (Bar Chart) -->
+                <div class="border border-slate-100 rounded-xl p-4 flex flex-col h-[380px]">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-indigo-600"></i>
+                        <span>Biểu đồ so sánh tỉ lệ chuyển đổi chéo</span>
+                    </h3>
+                    <div class="relative w-full flex-1 min-h-0">
+                        <canvas id="filterConversionRateChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Giao diện 1: Lead Source Performance Matrix (Table) -->
+                <div class="border border-slate-100 rounded-xl p-4 flex flex-col h-[380px]">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                        <i data-lucide="table" class="w-4 h-4 text-indigo-600"></i>
+                        <span>Bảng phân tích hiệu quả nguồn Lead</span>
+                    </h3>
+                    <div class="overflow-y-auto flex-1 min-h-0 rounded-lg border border-slate-50">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="sticky top-0 bg-slate-50 border-b border-slate-100 z-10">
+                                <tr>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-wider">Nguồn Lead</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-wider">Khu vực</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-wider text-right">Tổng Leads</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-wider text-right">Won Leads</th>
+                                    <th class="px-4 py-3 font-bold text-slate-500 uppercase tracking-wider text-right">Tỉ lệ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="filterTableBody" class="divide-y divide-slate-50 bg-white">
+                                <!-- JS render -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- JavaScript Libraries -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <script th:inline="javascript">
             let testCharts = {};
 
-            document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('DOMContentLoaded', async () => {
+                await initFilterOptions();
                 refreshTestData();
             });
 
@@ -143,7 +271,8 @@
                     fetchAndDraw('/api/dashboard/revenue-industry', 'revenueIndustryChart', 'pie', d => d.industry, d => d.revenue, ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6']),
                     fetchAndDrawROI(),
                     fetchAndDrawLostReasons(),
-                    fetchAndDrawMatrixChart()
+                    fetchAndDrawMatrixChart(),
+                    loadFilteredConversionRate()
                 ]);
 
                 if (icon) setTimeout(() => icon.classList.remove('animate-spin'), 500);
@@ -453,6 +582,172 @@
                     }
                     svg.appendChild(labelText);
                 });
+            }
+
+            // --- JAVASCRIPT LOGIC FOR DYNAMIC CONVERSION RATE FILTER DEMO ---
+
+            async function initFilterOptions() {
+                try {
+                    const [regRes, indRes, userRes] = await Promise.all([
+                        fetch('/api/dashboard/win-rate-by-region'),
+                        fetch('/api/dashboard/win-rate-by-industry'),
+                        fetch('/api/users')
+                    ]);
+
+                    if (regRes.ok) {
+                        const regions = await regRes.json();
+                        const select = document.getElementById('convRegionFilter');
+                        regions.forEach(r => {
+                            if (r.region) {
+                                const opt = document.createElement('option');
+                                opt.value = r.region;
+                                opt.textContent = r.region;
+                                select.appendChild(opt);
+                            }
+                        });
+                    }
+
+                    if (indRes.ok) {
+                        const industries = await indRes.json();
+                        const select = document.getElementById('convIndustryFilter');
+                        industries.forEach(i => {
+                            if (i.industryType) {
+                                const opt = document.createElement('option');
+                                opt.value = i.industryType;
+                                opt.textContent = i.industryType;
+                                select.appendChild(opt);
+                            }
+                        });
+                    }
+
+                    if (userRes.ok) {
+                        const users = await userRes.json();
+                        const select = document.getElementById('convOwnerFilter');
+                        users.forEach(u => {
+                            if (u.userId && u.fullName) {
+                                const opt = document.createElement('option');
+                                opt.value = u.userId;
+                                opt.textContent = u.fullName + ' (' + u.userCode + ')';
+                                select.appendChild(opt);
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error loading filter dropdown options:", e);
+                }
+            }
+
+            async function loadFilteredConversionRate() {
+                try {
+                    const region = document.getElementById('convRegionFilter').value;
+                    const industry = document.getElementById('convIndustryFilter').value;
+                    const owner = document.getElementById('convOwnerFilter').value;
+                    const group = document.getElementById('convGroupFilter').value;
+                    const dateFrom = document.getElementById('convDateFromFilter').value;
+                    const dateTo = document.getElementById('convDateToFilter').value;
+
+                    const params = new URLSearchParams();
+                    if (region) params.append('region', region);
+                    if (industry) params.append('industry', industry);
+                    if (owner) params.append('salesOwnerId', owner);
+                    if (group) params.append('customerGroup', group);
+                    if (dateFrom) params.append('timeFrom', dateFrom);
+                    if (dateTo) params.append('timeTo', dateTo);
+
+                    const url = `/api/dashboard/conversion-rate/filter` + (params.toString() ? `?${params.toString()}` : '');
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error("Fetch failed");
+                    const data = await res.json();
+
+                    // 1. Update KPI Cards (Giao diện 3)
+                    let totalLeads = 0;
+                    let totalWon = 0;
+                    data.forEach(item => {
+                        totalLeads += (item.totalLead || 0);
+                        totalWon += (item.wonLead || 0);
+                    });
+                    const avgRate = totalLeads > 0 ? (totalWon * 100.0 / totalLeads) : 0;
+
+                    document.getElementById('filterTotalLeads').textContent = totalLeads.toLocaleString();
+                    document.getElementById('filterWonLeads').textContent = totalWon.toLocaleString();
+                    document.getElementById('filterAvgConvRate').textContent = avgRate.toFixed(1) + '%';
+
+                    // 2. Update Table (Giao diện 1)
+                    const tbody = document.getElementById('filterTableBody');
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">Không có dữ liệu phù hợp</td></tr>`;
+                    } else {
+                        data.forEach(item => {
+                            const tr = document.createElement('tr');
+                            tr.className = 'hover:bg-slate-50 transition-colors';
+                            tr.innerHTML = `
+                                <td class="px-4 py-2.5 font-bold text-slate-700">${item.label || 'N/A'}</td>
+                                <td class="px-4 py-2.5 text-slate-500">${item.region || '-'}</td>
+                                <td class="px-4 py-2.5 text-right font-semibold text-slate-600">${(item.totalLead || 0).toLocaleString()}</td>
+                                <td class="px-4 py-2.5 text-right font-semibold text-slate-600">${(item.wonLead || 0).toLocaleString()}</td>
+                                <td class="px-4 py-2.5 text-right font-bold text-indigo-600">${(item.conversionRate || 0).toFixed(1)}%</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                    }
+
+                    // 3. Update Chart (Giao diện 2)
+                    if (testCharts['filterConversionRateChart']) {
+                        testCharts['filterConversionRateChart'].destroy();
+                    }
+
+                    const ctx = document.getElementById('filterConversionRateChart').getContext('2d');
+                    testCharts['filterConversionRateChart'] = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(item => item.label || 'N/A'),
+                            datasets: [{
+                                label: 'Tỉ lệ chuyển đổi (%)',
+                                data: data.map(item => item.conversionRate || 0),
+                                backgroundColor: 'rgba(79, 70, 229, 0.85)', // Indigo
+                                borderColor: 'rgb(79, 70, 229)',
+                                borderWidth: 1,
+                                borderRadius: 6,
+                                barThickness: 28
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    suggestedMax: 100,
+                                    ticks: {
+                                        callback: (value) => value + '%'
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Update Lucide Icons in this section
+                    if (window.lucide) {
+                        window.lucide.createIcons();
+                    }
+
+                } catch (e) {
+                    console.error("Error loading filtered conversion rate:", e);
+                }
+            }
+
+            function clearFilterDashboard() {
+                document.getElementById('convRegionFilter').value = '';
+                document.getElementById('convIndustryFilter').value = '';
+                document.getElementById('convOwnerFilter').value = '';
+                document.getElementById('convGroupFilter').value = '';
+                document.getElementById('convDateFromFilter').value = '';
+                document.getElementById('convDateToFilter').value = '';
+                loadFilteredConversionRate();
             }
         </script>
     </div>
