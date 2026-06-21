@@ -7,15 +7,12 @@ GO
 
 IF DB_ID('Internship_2026') IS NOT NULL
 BEGIN
-    ALTER
-DATABASE [Internship_2026] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP
-DATABASE [Internship_2026];
+    ALTER DATABASE [Internship_2026] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE [Internship_2026];
 END
 GO
 
-CREATE
-DATABASE [Internship_2026];
+CREATE DATABASE [Internship_2026];
 GO
 
 USE [Internship_2026];
@@ -34,28 +31,18 @@ GO
 CREATE TABLE [user]
 (user_id
  UNIQUEIDENTIFIER
- DEFAULT
- NEWSEQUENTIALID
-() NOT NULL,
-    user_code VARCHAR
-(50) NOT NULL UNIQUE,
-    username VARCHAR
-(50) NOT NULL UNIQUE, -- Phục hồi cột username vì bạn dùng mã này để login
-    password VARCHAR
-(255) NOT NULL,
-    full_name NVARCHAR
-(100) NOT NULL,
-    email VARCHAR
-(100) NULL,
+ DEFAULT NEWSEQUENTIALID() NOT NULL,
+    user_code VARCHAR (50) NOT NULL UNIQUE,
+    username VARCHAR (50) NOT NULL UNIQUE,
+    password VARCHAR (255) NOT NULL,
+    full_name NVARCHAR (100) NOT NULL,
+    email VARCHAR (100) NULL,
     role_id INT NOT NULL,
     is_active BIT DEFAULT 1 NOT NULL,
-    created_at DATETIME2 DEFAULT SYSDATETIME
-() NOT NULL,
-    CONSTRAINT PK_user PRIMARY KEY
-(user_id),
-    CONSTRAINT FK_user_role FOREIGN KEY
-(role_id) REFERENCES role
-(role_id));
+    created_at DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+    avatar_url VARCHAR(500) NULL,
+    CONSTRAINT PK_user PRIMARY KEY (user_id),
+    CONSTRAINT FK_user_role FOREIGN KEY (role_id) REFERENCES role (role_id));
 GO
 
 CREATE TABLE lead_source
@@ -164,7 +151,6 @@ GO
 
 -- =================================================================================
 -- CREATE TABLE: lead_bant_point (Mô hình chấm điểm B-A-N-T)
--- Thang điểm: 0 đến 100 cho mỗi tiêu chí (Tổng tối đa 400)
 -- =================================================================================
 CREATE TABLE lead_bant_point
 (lead_id     VARCHAR(50) NOT NULL,
@@ -180,10 +166,37 @@ CREATE TABLE lead_bant_point
  CONSTRAINT FK_bant_lead FOREIGN KEY (lead_id) REFERENCES lead (lead_id) ON DELETE CASCADE,
 
     -- Ràng buộc dữ liệu: Đảm bảo điểm nhập vào nằm trong khoảng 0-100
- CONSTRAINT CHK_bant_score CHECK (budget >= 0 AND budget <= 100 AND
-                                  authority >= 0 AND authority <= 100 AND
-                                  need >= 0 AND need <= 100 AND
-                                  timeline >= 0 AND timeline <= 100));
+ CONSTRAINT CHK_bant_score CHECK (budget >= 0 AND budget <= 25 AND
+                                  authority >= 0 AND authority <= 25 AND
+                                  need >= 0 AND need <= 25 AND
+                                  timeline >= 0 AND timeline <= 25));
+GO
+
+
+
+
+-- =================================================================================
+-- COMPANY TARGETS
+-- =================================================================================
+CREATE TABLE company_target
+(
+    target_id      BIGINT IDENTITY(1,1) NOT NULL,
+    target_type    VARCHAR(20) NOT NULL,
+    period_quarter INT NULL,
+    period_year    INT NOT NULL,
+    revenue_target DECIMAL(18, 2) NOT NULL,
+    created_by     UNIQUEIDENTIFIER NOT NULL,
+    created_at     DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+
+    CONSTRAINT PK_company_target PRIMARY KEY (target_id),
+    CONSTRAINT FK_company_target_creator FOREIGN KEY (created_by) REFERENCES [user] (user_id),
+    CONSTRAINT CHK_company_target_type CHECK (target_type IN ('YEARLY', 'QUARTERLY')),
+    CONSTRAINT CHK_company_target_logic CHECK
+        (
+        (target_type = 'YEARLY' AND period_quarter IS NULL)
+            OR (target_type = 'QUARTERLY' AND period_quarter BETWEEN 1 AND 4)
+        )
+);
 GO
 
 -- Thêm Index để Power BI dễ dàng truy vấn theo tháng/năm
@@ -228,6 +241,12 @@ GO
 -- =================================================================================
 
 -- 3.1 INSERT ROLES
+
+
+
+CREATE UNIQUE NONCLUSTERED INDEX UQ_company_target_period
+    ON company_target (period_year, target_type, period_quarter);
+GO
 INSERT INTO role (role_name, description) VALUES
 ('Admin', N'Quản trị viên hệ thống'),
 ('Seller', N'Nhân viên kinh doanh');
@@ -1318,10 +1337,6 @@ INSERT INTO lead_status_history (lead_id, old_status, new_status, changed_at, ch
 GO
 
 
--- =================================================================================
--- INSERT MOCK DATA: lead_bant_point (150 Leads)
--- Đã scale: Mỗi yếu tố tối đa 25 điểm (Tổng BANT tối đa = 100 điểm)
--- =================================================================================
 INSERT INTO lead_bant_point (lead_id, budget, authority, need, timeline) VALUES
 ('L-2026-0001', 21, 19, 23, 20),
 ('L-2026-0002', 24, 20, 21, 23),
@@ -1473,4 +1488,18 @@ INSERT INTO lead_bant_point (lead_id, budget, authority, need, timeline) VALUES
 ('L-2026-0148', 19, 20, 18, 21),
 ('L-2026-0149', 13, 14, 11, 16),
 ('L-2026-0150', 14, 10, 13, 14);
+GO
+
+
+
+
+-- =================================================================================
+-- COMPANY TARGET SAMPLE DATA
+-- =================================================================================
+INSERT INTO company_target (target_type, period_quarter, period_year, revenue_target, created_by)
+VALUES
+    ('YEARLY', NULL, 2026, 250000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'),
+    ('QUARTERLY', 1, 2026, 50000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'),
+    ('QUARTERLY', 2, 2026, 65000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'),
+    ('QUARTERLY', 3, 2026, 80000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991');
 GO
