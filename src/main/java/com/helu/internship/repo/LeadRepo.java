@@ -395,6 +395,298 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             ORDER BY revenue DESC
         """, nativeQuery = true)
             List<RevenueIndustryResponse> getRevenueByIndustry();
+    @Query(value = """
+SELECT
+    CAST(ISNULL(SUM(business_result),0) AS DECIMAL(18,2)) AS totalRevenue,
+    CAST(COUNT(*) AS BIGINT) AS wonLead,
+    CAST(
+        ISNULL(SUM(business_result),0)
+        /
+        NULLIF(COUNT(*),0)
+        AS DECIMAL(18,2)
+    ) AS avgRevenuePerWonLead
+FROM lead
+WHERE status = 'Won'
+""", nativeQuery = true)
+    RevenueSummaryProjection getRevenueSummary();
+
+    @Query(value = """
+SELECT
+    l.region AS region,
+    CAST(ISNULL(SUM(l.business_result),0) AS DECIMAL(18,2)) AS revenue,
+    CAST(COUNT(*) AS BIGINT) AS wonLead
+FROM lead l
+WHERE l.status = 'Won'
+GROUP BY l.region
+ORDER BY revenue DESC
+""", nativeQuery = true)
+    List<RevenueRegionProjection> getRevenueByRegion();
+
+    @Query(value = """
+SELECT
+    p.product_id AS productId,
+    p.product_name AS productName,
+    CAST(ISNULL(SUM(li.expected_revenue),0) AS DECIMAL(18,2)) AS revenue,
+    CAST(COUNT(DISTINCT l.lead_id) AS BIGINT) AS totalWonLead
+FROM lead l
+JOIN lead_item li
+    ON l.lead_id = li.lead_id
+JOIN product p
+    ON li.product_id = p.product_id
+WHERE l.status = 'Won'
+GROUP BY
+    p.product_id,
+    p.product_name
+ORDER BY revenue DESC
+""", nativeQuery = true)
+    List<RevenueProductLineProjection> getRevenueByProductLine();
+
+    @Query(value = """
+SELECT
+    u.user_code AS userCode,
+    u.full_name AS salesOwner,
+    COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) AS lostLead,
+    CAST(
+        COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) * 100.0
+        / NULLIF(COUNT(*),0)
+    AS DECIMAL(18,2)
+    ) AS lostRate
+FROM lead l
+JOIN [user] u
+    ON l.user_id = u.user_id
+GROUP BY u.user_code, u.full_name
+ORDER BY lostRate DESC
+""", nativeQuery = true)
+    List<LostBySellerProjection> getLostBySeller();
+    @Query(value = """
+SELECT
+    ls.source_id AS sourceId,
+    ls.source_name AS sourceName,
+    COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) AS lostLead,
+    CAST(
+        COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) * 100.0
+        / NULLIF(COUNT(*),0)
+    AS DECIMAL(18,2)
+    ) AS lostRate
+FROM lead l
+JOIN lead_source ls
+    ON l.source_id = ls.source_id
+GROUP BY ls.source_id, ls.source_name
+ORDER BY lostRate DESC
+""", nativeQuery = true)
+    List<LostBySourceProjection> getLostBySource();
+    @Query(value = """
+SELECT
+    l.region AS region,
+    COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) AS lostLead,
+    CAST(
+        COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) * 100.0
+        / NULLIF(COUNT(*),0)
+    AS DECIMAL(18,2)
+    ) AS lostRate
+FROM lead l
+GROUP BY l.region
+ORDER BY lostRate DESC
+""", nativeQuery = true)
+    List<LostByRegionProjection> getLostByRegion();
+    @Query(value = """
+SELECT
+    l.industry_type AS industryType,
+    COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) AS lostLead,
+    CAST(
+        COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) * 100.0
+        / NULLIF(COUNT(*),0)
+    AS DECIMAL(18,2)
+    ) AS lostRate
+FROM lead l
+GROUP BY l.industry_type
+ORDER BY lostRate DESC
+""", nativeQuery = true)
+    List<LostByIndustryProjection> getLostByIndustry();
+
+    @Query(value = """
+SELECT
+    YEAR(l.created_date) AS year,
+    MONTH(l.created_date) AS month,
+    SUM(l.business_result) AS revenue
+FROM lead l
+WHERE l.status = 'Won'
+GROUP BY
+    YEAR(l.created_date),
+    MONTH(l.created_date)
+ORDER BY
+    year,
+    month
+""", nativeQuery = true)
+    List<RevenueMonthlyProjection> getRevenueMonthly();
+
+    @Query(value = """
+SELECT
+    YEAR(l.created_date) AS year,
+    DATEPART(QUARTER, l.created_date) AS quarter,
+    SUM(l.business_result) AS revenue
+FROM lead l
+WHERE l.status = 'Won'
+GROUP BY
+    YEAR(l.created_date),
+    DATEPART(QUARTER, l.created_date)
+ORDER BY
+    year,
+    quarter
+""", nativeQuery = true)
+    List<RevenueQuarterlyProjection> getRevenueQuarterly();
+
+    @Query(value = """
+SELECT
+    YEAR(l.created_date) AS year,
+    MONTH(l.created_date) AS month,
+
+    COUNT(*) AS totalLead,
+
+    SUM(
+        CASE
+            WHEN l.status = 'Won'
+            THEN 1
+            ELSE 0
+        END
+    ) AS wonLead,
+
+    SUM(
+        CASE
+            WHEN l.status = 'Lost'
+            THEN 1
+            ELSE 0
+        END
+    ) AS lostLead
+
+FROM lead l
+GROUP BY
+    YEAR(l.created_date),
+    MONTH(l.created_date)
+ORDER BY
+    year,
+    month
+""", nativeQuery = true)
+    List<LeadMonthlyProjection> getLeadMonthly();
+
+    @Query(value = """
+SELECT
+    YEAR(l.created_date) AS year,
+    DATEPART(QUARTER, l.created_date) AS quarter,
+
+    COUNT(*) AS totalLead,
+
+    SUM(
+        CASE
+            WHEN l.status = 'Won'
+            THEN 1
+            ELSE 0
+        END
+    ) AS wonLead,
+
+    SUM(
+        CASE
+            WHEN l.status = 'Lost'
+            THEN 1
+            ELSE 0
+        END
+    ) AS lostLead
+
+FROM lead l
+GROUP BY
+    YEAR(l.created_date),
+    DATEPART(QUARTER, l.created_date)
+ORDER BY
+    year,
+    quarter
+""", nativeQuery = true)
+    List<LeadQuarterlyProjection> getLeadQuarterly();
+
+    @Query(value = """
+SELECT
+    YEAR(l.created_date) AS year,
+    MONTH(l.created_date) AS month,
+    u.full_name AS sellerName,
+    SUM(l.business_result) AS revenue
+FROM lead l
+JOIN users u
+    ON l.sales_owner_id = u.user_id
+WHERE l.status = 'Won'
+GROUP BY
+    YEAR(l.created_date),
+    MONTH(l.created_date),
+    u.full_name
+ORDER BY year, month
+""", nativeQuery = true)
+    List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly();
+
+    @Query(value = """
+SELECT
+    YEAR(l.created_date) AS year,
+    MONTH(l.created_date) AS month,
+    ls.source_name AS leadSource,
+    SUM(l.business_result) AS revenue
+FROM lead l
+JOIN lead_source ls
+    ON l.source_id = ls.source_id
+WHERE l.status = 'Won'
+GROUP BY
+    YEAR(l.created_date),
+    MONTH(l.created_date),
+    ls.source_name
+ORDER BY year, month
+""", nativeQuery = true)
+    List<RevenueSourceMonthlyProjection> getRevenueSourceMonthly();
+
+    @Query(value = """
+SELECT
+    YEAR(created_date) AS year,
+    MONTH(created_date) AS month,
+    region AS region,
+    SUM(business_result) AS revenue
+FROM lead
+WHERE status = 'Won'
+GROUP BY
+    YEAR(created_date),
+    MONTH(created_date),
+    region
+ORDER BY year, month
+""", nativeQuery = true)
+    List<RevenueRegionMonthlyProjection> getRevenueRegionMonthly();
+
+    @Query(value = """
+SELECT
+    YEAR(created_date) AS year,
+    MONTH(created_date) AS month,
+    industry AS industry,
+    SUM(business_result) AS revenue
+FROM lead
+WHERE status = 'Won'
+GROUP BY
+    YEAR(created_date),
+    MONTH(created_date),
+    industry
+ORDER BY year, month
+""", nativeQuery = true)
+    List<RevenueIndustryMonthlyProjection> getRevenueIndustryMonthly();
+
+    @Query(value = """
+SELECT
+    YEAR(l.created_date) AS year,
+    MONTH(l.created_date) AS month,
+    p.product_line_name AS productLine,
+    SUM(l.business_result) AS revenue
+FROM lead l
+JOIN product_line p
+    ON l.product_line_id = p.product_line_id
+WHERE l.status = 'Won'
+GROUP BY
+    YEAR(l.created_date),
+    MONTH(l.created_date),
+    p.product_line_name
+ORDER BY year, month
+""", nativeQuery = true)
+    List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly();
 }
 
 

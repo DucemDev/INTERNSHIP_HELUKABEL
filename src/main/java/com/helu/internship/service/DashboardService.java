@@ -28,6 +28,14 @@ public interface DashboardService {
 
     List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
 
+    List<LostBySellerProjection> getLostBySeller();
+
+    List<LostBySourceProjection> getLostBySource();
+
+    List<LostByRegionProjection> getLostByRegion();
+
+    List<LostByIndustryProjection> getLostByIndustry();
+
     List<RevenueIndustryResponse> getRevenueByIndustry();
 
     List<RoiLeadSourceResponse> getROIByLeadSource();
@@ -42,11 +50,33 @@ public interface DashboardService {
             LocalDate timeFrom,
             LocalDate timeTo
     );
+    List<SalesOwnerDashboardProjection> getSalesOwnerDashboard();
+    RevenueSummaryProjection getRevenueSummary();
 
+    List<RevenueRegionProjection> getRevenueByRegion();
+
+    List<RevenueProductLineProjection> getRevenueByProductLine();
     List<LeadSourceCostProjection> getLeadSourceCostDashboard();
 
     ConversionRateResponse getStaffStats(String email);
 
     List<PipelineCoverageProjection> getStaffPipelineCoverage(String email);
 
+    List<RevenueMonthlyProjection> getRevenueMonthly();
+
+    List<RevenueQuarterlyProjection> getRevenueQuarterly();
+
+    List<LeadMonthlyProjection> getLeadMonthly();
+
+    List<LeadQuarterlyProjection> getLeadQuarterly();
+
+    List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly();
+
+    List<RevenueSourceMonthlyProjection> getRevenueSourceMonthly();
+
+    List<RevenueRegionMonthlyProjection> getRevenueRegionMonthly();
+
+    List<RevenueIndustryMonthlyProjection> getRevenueIndustryMonthly();
+
+    List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly();
 }
