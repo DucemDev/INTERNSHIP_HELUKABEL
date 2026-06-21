@@ -22,13 +22,18 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/users/**").hasRole("Admin")
-                .requestMatchers("/dashboard/**", "/api/dashboard/**").hasAnyRole("Admin", "Staff")
-                .requestMatchers("/staff/**").hasAnyRole("Staff")
-                .anyRequest().authenticated()
-            )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+
+                        // Cho chatbot Python gọi API dashboard không cần đăng nhập
+                        .requestMatchers("/api/dashboard/**").permitAll()
+
+                        .requestMatchers("/users/**").hasRole("Admin")
+                        .requestMatchers("/dashboard/**").hasAnyRole("Admin", "Staff")
+                        .requestMatchers("/staff/**").hasAnyRole("Staff")
+
+                        .anyRequest().authenticated()
+                )
             .formLogin(form -> form
                 .loginPage("/login")
                 .successHandler(successHandler)
