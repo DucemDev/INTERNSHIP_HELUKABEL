@@ -199,6 +199,7 @@ bộ lọc tìm kiếm tỉ lệ chuyển đổi theo source, sourceType, region
 Mức độ an toàn của target so với doanh thu dự kiến từ các lead đang nuôi dưỡng
 */
 
+ //pipeline-coverage: Xem độ bao phủ phễu của toàn hệ thống/tùy chọn.
     @GetMapping("/pipeline-coverage")
     public List<PipelineCoverageProjection> getPipelineCoverage() {
         return dashboardService.getPipelineCoverage(null);
@@ -206,15 +207,17 @@ Mức độ an toàn của target so với doanh thu dự kiến từ các lead 
 
     // --- STAFF ENDPOINTS ---
 
-//    @GetMapping("/staff/stats")
-//    public ConversionRateResponse getStaffStats(Principal principal) {
-//        return dashboardService.getStaffStats(principal.getName());
-//    }
-//
-//    @GetMapping("/staff/pipeline-coverage")
-//    public List<PipelineCoverageProjection> getStaffPipelineCoverage(Principal principal) {
-//        return dashboardService.getStaffPipelineCoverage(principal.getName());
-//    }
+
+//staff/stats: Xem tỷ lệ chốt đơn của bản thân.
+    @GetMapping("/staff/stats")
+    public ConversionRateResponse getStaffStats(Principal principal) {
+        return dashboardService.getStaffStats(principal.getName());
+    }
+    //staff/pipeline-coverage: Xem mức độ đạt KPI doanh thu của bản thân.
+    @GetMapping("/staff/pipeline-coverage")
+    public List<PipelineCoverageProjection> getStaffPipelineCoverage(Principal principal) {
+        return dashboardService.getStaffPipelineCoverage(principal.getName());
+    }
 
 /*/
 Dashboard - power bi của role seller gồm wonLead, totalLead, totalRevenue, winRate, avgDaysToWon, openLead
