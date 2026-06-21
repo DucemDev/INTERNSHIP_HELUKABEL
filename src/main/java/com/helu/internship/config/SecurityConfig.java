@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/dashboard/**").permitAll()
 
                         .requestMatchers("/users/**").hasRole("Admin")
+                        .requestMatchers("/dashboard/test").hasRole("Admin")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "Staff")
                         .requestMatchers("/staff/**").hasAnyRole("Staff")
 

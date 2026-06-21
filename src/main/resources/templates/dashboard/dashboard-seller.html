@@ -2,9 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
     <main class="space-y-8 p-4 md:p-8 bg-slate-50 min-h-screen">
+        <div id="debug-error-log" class="text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-100 hidden"></div>
         <div>
             <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Bảng điều khiển Nhân viên</h1>
-            <p class="mt-1 text-sm font-medium text-gray-500">Theo dõi hiệu suất cá nhân và so sánh với khu vực.</p>
+            <p class="mt-1 text-sm font-medium text-gray-500">Theo dõi hiệu suất cá nhân và thống kê chi tiết.</p>
         </div>
 
         <!-- KPI Cards -->
@@ -15,16 +16,16 @@
                 </div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Leads của tôi</h3>
                 <div id="myTotalLeads" class="mt-4 text-4xl font-extrabold text-gray-900 tracking-tight">0</div>
-                <p class="mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">Đang theo dõi</p>
+                <p class="mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">Tổng quan cá nhân</p>
             </div>
 
             <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-helu-red">
                 <div class="flex justify-between items-start mb-4">
                     <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl"><i data-lucide="award" class="w-6 h-6"></i></div>
                 </div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Chỉ tiêu Won</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tổng Deal Thắng (Won)</h3>
                 <div id="myWonLeads" class="mt-4 text-4xl font-extrabold text-helu-red tracking-tight">0</div>
-                <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Tổng cộng</p>
+                <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Đã chốt thành công</p>
             </div>
 
             <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
@@ -33,159 +34,176 @@
                 </div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tỷ lệ chuyển đổi</h3>
                 <div id="myConversionRate" class="mt-4 text-4xl font-extrabold text-blue-600 tracking-tight">0%</div>
-                <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Hiệu quả chốt đơn</p>
+                <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Hiệu quả chốt đơn (Win Rate)</p>
             </div>
         </div>
 
         <!-- Charts Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Pipeline Coverage Chart -->
-            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-red-600 rounded-full"></span> 
-                    Tiến độ Target
-                </h2>
-                <div class="relative h-[300px]">
-                    <canvas id="staffPipelineChart"></canvas>
-                </div>
+        <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm">
+            <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-red-600 rounded-full"></span> 
+                Tiến độ Target <span class="text-sm font-normal text-gray-500 font-mono ml-2">(/api/dashboard/staff/pipeline-coverage)</span>
+            </h2>
+            <div class="relative h-[300px]">
+                <canvas id="staffPipelineChart"></canvas>
             </div>
+        </div>
 
-            <!-- Win Rate By Sales (Leaderboard) with Region Filter -->
-            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span> 
-                        Tỷ lệ thắng theo Nhân viên
-                    </h2>
-                    <!-- Region Filter -->
-                    <div class="relative w-full sm:w-auto">
-                        <select id="regionFilter" onchange="loadWinRateChart(this.value)" class="w-full appearance-none pl-4 pr-10 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer">
-                            <option value="">Tất cả khu vực</option>
-                            <!-- Options populated by JS -->
-                        </select>
-                        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
-                    </div>
-                </div>
-                <div class="relative flex-1 min-h-[300px]">
-                    <canvas id="winRateChart"></canvas>
-                </div>
+        <!-- Additional Seller Charts -->
+        <div class="grid grid-cols-1 gap-8 mt-8">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-helu-border flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Doanh thu tháng <br><span class="text-xs text-gray-500 font-mono">/api/dashboard/revenue-monthly</span></h3>
+                <div class="relative h-[400px] w-full"><canvas id="revMonthlyChart"></canvas></div>
             </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-helu-border flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Leads tháng <br><span class="text-xs text-gray-500 font-mono">/api/dashboard/lead-monthly</span></h3>
+                <div class="relative h-[400px] w-full"><canvas id="leadMonthlyChart"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-helu-border flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Doanh thu khu vực (tháng) <br><span class="text-xs text-gray-500 font-mono">/api/dashboard/revenue-region-monthly</span></h3>
+                <div class="relative h-[400px] w-full"><canvas id="revRegionChart"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-helu-border flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Doanh thu theo nguồn (tháng) <br><span class="text-xs text-gray-500 font-mono">/api/dashboard/revenue-source-monthly</span></h3>
+                <div class="relative h-[400px] w-full"><canvas id="revSourceChart"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-helu-border flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Doanh thu dòng SP (tháng) <br><span class="text-xs text-gray-500 font-mono">/api/dashboard/revenue-product-line-monthly</span></h3>
+                <div class="relative h-[400px] w-full"><canvas id="revProductChart"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-helu-border flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Doanh thu theo ngành (tháng) <br><span class="text-xs text-gray-500 font-mono">/api/dashboard/revenue-industry-monthly</span></h3>
+                <div class="relative h-[400px] w-full"><canvas id="revIndustryChart"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-helu-border flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Doanh thu quý <br><span class="text-xs text-gray-500 font-mono">/api/dashboard/revenue-quarterly</span></h3>
+                <div class="relative h-[400px] w-full"><canvas id="revQuarterChart"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-helu-border flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Leads quý <br><span class="text-xs text-gray-500 font-mono">/api/dashboard/lead-quarterly</span></h3>
+                <div class="relative h-[400px] w-full"><canvas id="leadQuarterChart"></canvas></div>
+            </div>
+            <!-- Dư một ô trống cho cân đối nếu cần -->
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            let winRateChart = null;
-
-            document.addEventListener('DOMContentLoaded', async () => {
-                loadStats();
-                loadPipelineChart();
-                loadRegions();
-                loadWinRateChart('');
-            });
-
-            async function loadStats() {
+            // Utility for formatting
+            const fmtCurrency = (val) => Number(val || 0).toLocaleString('vi-VN') + ' VNĐ';
+            
+            // Auto-load seller charts when page loads
+            async function loadSellerCharts() {
                 try {
-                    const response = await fetch('/api/dashboard/staff/stats');
-                    if (response.ok) {
-                        const data = await response.json();
-                        document.getElementById('myTotalLeads').innerText = (data.totalLead || 0).toLocaleString();
-                        document.getElementById('myWonLeads').innerText = (data.wonLead || 0).toLocaleString();
-                        document.getElementById('myConversionRate').innerText = (data.conversionRate || 0).toFixed(1) + '%';
-                    }
-                } catch (error) {
-                    console.error('Error loading staff stats:', error);
-                }
-            }
+                    // 1. Tải KPI Cards
+                    fetch('/api/dashboard/staff/stats')
+                        .then(r => r.json())
+                        .then(stats => {
+                            document.getElementById('myTotalLeads').innerText = (stats.totalLead || 0).toLocaleString('vi-VN');
+                            document.getElementById('myWonLeads').innerText = (stats.wonLead || 0).toLocaleString('vi-VN');
+                            document.getElementById('myConversionRate').innerText = (stats.conversionRate || 0).toFixed(1) + '%';
+                        })
+                        .catch(e => console.error('Error loading stats:', e));
 
-            async function loadPipelineChart() {
-                try {
-                    const response = await fetch('/api/dashboard/staff/pipeline-coverage');
-                    if (!response.ok) return;
-                    const data = await response.json();
-                    if (data.length === 0) return;
-                    const item = data[0];
-                    const ctx = document.getElementById('staffPipelineChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Tiến độ doanh số'],
-                            datasets: [
-                                { label: 'Open Pipeline', data: [item.openPipeline || 0], backgroundColor: 'rgba(59, 130, 246, 0.8)', borderRadius: 8 },
-                                { label: 'Target', data: [item.target || 0], backgroundColor: 'rgba(239, 68, 68, 0.8)', borderRadius: 8 }
-                            ]
-                        },
-                        options: {
-                            indexAxis: 'y',
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom' } },
-                            scales: { x: { beginAtZero: true, ticks: { callback: (v) => v.toLocaleString() } } }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading pipeline chart:', error);
-                }
-            }
-
-            async function loadRegions() {
-                try {
-                    const res = await fetch('/api/dashboard/win-rate-by-region');
-                    if (!res.ok) return;
-                    const data = await res.json();
-                    const filter = document.getElementById('regionFilter');
-                    data.forEach(item => {
-                        if (item.region) {
-                            const opt = document.createElement('option');
-                            opt.value = item.region;
-                            opt.textContent = item.region;
-                            filter.appendChild(opt);
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading regions:', error);
-                }
-            }
-
-            async function loadWinRateChart(region) {
-                try {
-                    // Mặc dù Backend chưa hỗ trợ filter, chúng ta vẫn truyền param theo yêu cầu Front-end
-                    const url = region ? `/api/dashboard/win-rate-by-saleowner?region=${encodeURIComponent(region)}` : '/api/dashboard/win-rate-by-saleowner';
-                    const res = await fetch(url);
-                    if (!res.ok) return;
-                    const data = await res.json();
-
-                    const labels = data.map(item => item.userName || 'N/A');
-                    const values = data.map(item => item.winRate || 0);
-
-                    if (winRateChart) winRateChart.destroy();
-
-                    const ctx = document.getElementById('winRateChart').getContext('2d');
-                    winRateChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Tỷ lệ thắng (%)',
-                                data: values,
-                                backgroundColor: '#10b981',
-                                borderRadius: 6
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: { beginAtZero: true, max: 100 }
-                            },
-                            plugins: {
-                                legend: { display: false }
+                    // 2. Tải Pipeline Chart
+                    fetch('/api/dashboard/staff/pipeline-coverage')
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                const item = data[0];
+                                const ctx = document.getElementById('staffPipelineChart').getContext('2d');
+                                new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: ['Tiến độ doanh số'],
+                                        datasets: [
+                                            { label: 'Open Pipeline', data: [item.openPipeline || 0], backgroundColor: 'rgba(59, 130, 246, 0.8)', borderRadius: 8 },
+                                            { label: 'Target', data: [item.target || 0], backgroundColor: 'rgba(239, 68, 68, 0.8)', borderRadius: 8 }
+                                        ]
+                                    },
+                                    options: {
+                                        indexAxis: 'y',
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: { legend: { position: 'bottom' } },
+                                        scales: { x: { beginAtZero: true, ticks: { callback: (v) => v.toLocaleString() } } }
+                                    }
+                                });
                             }
-                        }
+                        })
+                        .catch(e => console.error('Error loading pipeline:', e));
+
+                    // 3. Doanh thu tháng (Line)
+                    const revM = await fetch('/api/dashboard/revenue-monthly').then(r=>r.json());
+                    new Chart(document.getElementById('revMonthlyChart').getContext('2d'), {
+                        type: 'line',
+                        data: { labels: revM.map(v=>v.month), datasets: [{ label: 'Doanh thu', data: revM.map(v=>v.amount), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.2)', fill: true, tension: 0.3 }] },
+                        options: { responsive:true, maintainAspectRatio:false }
                     });
-                } catch (error) {
-                    console.error('Error loading win rate chart:', error);
+
+                    // 4. Leads tháng (Bar)
+                    const leadM = await fetch('/api/dashboard/lead-monthly').then(r=>r.json());
+                    new Chart(document.getElementById('leadMonthlyChart').getContext('2d'), {
+                        type: 'bar',
+                        data: { labels: leadM.map(v=>v.month), datasets: [{ label: 'Leads', data: leadM.map(v=>v.count), backgroundColor: '#10b981', borderRadius: 4 }] },
+                        options: { responsive:true, maintainAspectRatio:false }
+                    });
+
+                    // 5. Doanh thu khu vực tháng (Pie)
+                    const revRegion = await fetch('/api/dashboard/revenue-region-monthly').then(r=>r.json());
+                    new Chart(document.getElementById('revRegionChart').getContext('2d'), {
+                        type: 'pie',
+                        data: { labels: revRegion.map(v=>v.region), datasets: [{ data: revRegion.map(v=>v.amount), backgroundColor: ['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6'] }] },
+                        options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { position: 'right' } } }
+                    });
+
+                    // 6. Doanh thu theo nguồn (Doughnut)
+                    const revSource = await fetch('/api/dashboard/revenue-source-monthly').then(r=>r.json());
+                    new Chart(document.getElementById('revSourceChart').getContext('2d'), {
+                        type: 'doughnut',
+                        data: { labels: revSource.map(v=>v.source), datasets: [{ data: revSource.map(v=>v.amount), backgroundColor: ['#8b5cf6','#ec4899','#f43f5e','#f59e0b','#10b981'] }] },
+                        options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { position: 'right' } } }
+                    });
+
+                    // 7. Doanh thu theo dòng SP (Doughnut)
+                    const revProd = await fetch('/api/dashboard/revenue-product-line-monthly').then(r=>r.json());
+                    new Chart(document.getElementById('revProductChart').getContext('2d'), {
+                        type: 'doughnut',
+                        data: { labels: revProd.map(v=>v.productLine), datasets: [{ data: revProd.map(v=>v.amount), backgroundColor: ['#06b6d4','#3b82f6','#6366f1','#8b5cf6','#a855f7'] }] },
+                        options: { responsive:true, maintainAspectRatio:false, plugins: { legend: { position: 'right' } } }
+                    });
+
+                    // 8. Doanh thu theo ngành (Bar)
+                    const revInd = await fetch('/api/dashboard/revenue-industry-monthly').then(r=>r.json());
+                    new Chart(document.getElementById('revIndustryChart').getContext('2d'), {
+                        type: 'bar',
+                        data: { labels: revInd.map(v=>v.industry), datasets: [{ label: 'Doanh thu', data: revInd.map(v=>v.amount), backgroundColor: '#6366f1', borderRadius: 4 }] },
+                        options: { responsive:true, maintainAspectRatio:false }
+                    });
+
+                    // 9. Doanh thu quý (Bar)
+                    const revQ = await fetch('/api/dashboard/revenue-quarterly').then(r=>r.json());
+                    new Chart(document.getElementById('revQuarterChart').getContext('2d'), {
+                        type: 'bar',
+                        data: { labels: revQ.map(v=>v.quarter), datasets: [{ label: 'Doanh thu Q', data: revQ.map(v=>v.amount), backgroundColor: '#f59e0b', borderRadius: 4 }] },
+                        options: { responsive:true, maintainAspectRatio:false }
+                    });
+
+                    // 10. Leads quý (Line)
+                    const leadQ = await fetch('/api/dashboard/lead-quarterly').then(r=>r.json());
+                    new Chart(document.getElementById('leadQuarterChart').getContext('2d'), {
+                        type: 'line',
+                        data: { labels: leadQ.map(v=>v.quarter), datasets: [{ label: 'Leads Q', data: leadQ.map(v=>v.count), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.2)', fill:true, tension: 0.3 }] },
+                        options: { responsive:true, maintainAspectRatio:false }
+                    });
+
+                } catch (err) {
+                    console.error('Error loading seller charts:', err);
+                    const log = document.getElementById('debug-error-log');
+                    log.innerText = 'Lỗi khi tải dữ liệu biểu đồ: ' + err.message;
+                    log.classList.remove('hidden');
                 }
             }
+            document.addEventListener('DOMContentLoaded', loadSellerCharts);
         </script>
     </main>
 </body>

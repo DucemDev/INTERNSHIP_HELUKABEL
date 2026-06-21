@@ -609,8 +609,8 @@ SELECT
     u.full_name AS sellerName,
     SUM(l.business_result) AS revenue
 FROM lead l
-JOIN users u
-    ON l.sales_owner_id = u.user_id
+JOIN [user] u
+    ON l.user_id = u.user_id
 WHERE l.status = 'Won'
 GROUP BY
     YEAR(l.created_date),
@@ -658,14 +658,14 @@ ORDER BY year, month
 SELECT
     YEAR(created_date) AS year,
     MONTH(created_date) AS month,
-    industry AS industry,
+    industry_type AS industry,
     SUM(business_result) AS revenue
 FROM lead
 WHERE status = 'Won'
 GROUP BY
     YEAR(created_date),
     MONTH(created_date),
-    industry
+    industry_type
 ORDER BY year, month
 """, nativeQuery = true)
     List<RevenueIndustryMonthlyProjection> getRevenueIndustryMonthly();
@@ -674,16 +674,16 @@ ORDER BY year, month
 SELECT
     YEAR(l.created_date) AS year,
     MONTH(l.created_date) AS month,
-    p.product_line_name AS productLine,
-    SUM(l.business_result) AS revenue
+    p.product_name AS productLine,
+    SUM(li.expected_revenue) AS revenue
 FROM lead l
-JOIN product_line p
-    ON l.product_line_id = p.product_line_id
+JOIN lead_item li ON l.lead_id = li.lead_id
+JOIN product p ON li.product_id = p.product_id
 WHERE l.status = 'Won'
 GROUP BY
     YEAR(l.created_date),
     MONTH(l.created_date),
-    p.product_line_name
+    p.product_name
 ORDER BY year, month
 """, nativeQuery = true)
     List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly();
