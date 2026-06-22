@@ -616,7 +616,9 @@ GROUP BY
     YEAR(l.created_date),
     MONTH(l.created_date),
     u.full_name
-ORDER BY year, month
+ORDER BY
+    YEAR(l.created_date),
+    MONTH(l.created_date)
 """, nativeQuery = true)
     List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly();
 
@@ -675,10 +677,12 @@ SELECT
     YEAR(l.created_date) AS year,
     MONTH(l.created_date) AS month,
     p.product_name AS productLine,
-    SUM(li.expected_revenue) AS revenue
+    SUM(l.business_result) AS revenue
 FROM lead l
-JOIN lead_item li ON l.lead_id = li.lead_id
-JOIN product p ON li.product_id = p.product_id
+JOIN lead_item li
+    ON l.lead_id = li.lead_id
+JOIN product p
+    ON li.product_id = p.product_id
 WHERE l.status = 'Won'
 GROUP BY
     YEAR(l.created_date),
