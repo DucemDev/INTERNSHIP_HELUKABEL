@@ -300,26 +300,26 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     );
 
     @Query(value = """
-                SELECT
-                    ls.source_name AS label,
-                    l.region AS region,
-                    COUNT(*) AS totalLead,
-                    SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
-                    SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS conversionRate
-                FROM lead l
-                JOIN lead_source ls
-                    ON l.source_id = ls.source_id
-                WHERE (:sourceId IS NULL OR l.source_id = :sourceId)
-                  AND (:sourceType IS NULL OR ls.source_type = :sourceType)
-                  AND (:region IS NULL OR l.region = :region)
-                  AND (:industry IS NULL OR l.industry_type = :industry)
-                  AND (:salesOwnerId IS NULL OR CAST(l.user_id AS VARCHAR(36)) = :salesOwnerId)
-                  AND (:customerGroup IS NULL OR l.customer_group = :customerGroup)
-                  AND (:timeFrom IS NULL OR l.created_date >= :timeFrom)
-                  AND (:timeTo IS NULL OR l.created_date <= :timeTo)
-                GROUP BY ls.source_name, l.region, l.customer_group
-                ORDER BY conversionRate DESC-
-            """, nativeQuery = true)
+            SELECT
+                                            ls.source_name AS label,
+                                            COUNT(*) AS totalLead,
+                                            SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
+                                            SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS conversionRate
+                                        FROM lead l
+                                        JOIN lead_source ls
+                                            ON l.source_id = ls.source_id
+                                        WHERE (:sourceId IS NULL OR l.source_id = :sourceId)
+                                          AND (:sourceType IS NULL OR ls.source_type = :sourceType)
+                                          AND (:region IS NULL OR l.region = :region)
+                                          AND (:industry IS NULL OR l.industry_type = :industry)
+                                          AND (:salesOwnerId IS NULL OR CAST(l.user_id AS VARCHAR(36)) = :salesOwnerId)
+                                          AND (:customerGroup IS NULL OR l.customer_group = :customerGroup)
+                                          AND (:timeFrom IS NULL OR l.created_date >= :timeFrom)
+                                          AND (:timeTo IS NULL OR l.created_date <= :timeTo)
+            
+                                        GROUP BY ls.source_name
+                                        ORDER BY conversionRate DESC
+""", nativeQuery = true)
     List<ConversionRateResponse> getConversionRateFilter(
             @Param("sourceId") String sourceId,
             @Param("sourceType") String sourceType,

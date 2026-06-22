@@ -6,6 +6,5 @@ public interface ConversionRateResponse {
     Long getTotalLead();
     Long getWonLead();
     String getLabel();
-    String getRegion();
     Double getConversionRate();
 }
