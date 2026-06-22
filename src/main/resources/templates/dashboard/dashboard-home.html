@@ -200,9 +200,9 @@
         <!-- ========================================== -->
         <!-- [HÀNG 3] PHỄU (giữ) + MARKET MATRIX + TOP ACCOUNTS -->
         <!-- ========================================== -->
-        <div class="grid grid-cols-1 gap-8">
-            <!-- Cột trái: Biểu đồ Phễu Cơ cấu Trạng thái Leads (GIỮ NGUYÊN) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[500px]">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Cột trái: Biểu đồ Phễu Cơ cấu Trạng thái Leads -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[520px]">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
                     <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
@@ -211,89 +211,89 @@
                 <div class="relative w-full flex-1 min-h-[400px] flex items-center justify-center" id="leadStatusFunnelContainer"></div>
             </div>
 
-            <!-- Cột phải: Market Segment Matrix + Top Accounts -->
-            <div class="flex flex-col gap-6">
-                <!-- Market Segment Performance Matrix (Light Theme) -->
-                <div class="p-6 rounded-2xl shadow-sm border bg-white border-slate-100 flex flex-col">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-                        <div>
-                            <h2 class="text-base font-bold flex items-center gap-2 text-slate-800">
-                                <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
-                                <span th:text="#{dashboard.market_segment_matrix}">Market Segment Performance Matrix</span>
-                                <span class="text-xs font-normal text-slate-400 font-mono ml-2">(/win-rate-by-region)</span>
-                            </h2>
-                            <p class="text-[10px] text-slate-400 font-medium mt-1" th:text="#{dashboard.matrix_desc}">Phân tích Win Rate...</p>
-                        </div>
-                        <div class="flex items-center gap-3 text-[10px] font-semibold bg-slate-50 p-2 rounded-lg border border-slate-200">
-                            <div class="flex items-center gap-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full" style="background-color: #2b5cf6;"></span>
-                                <span class="text-slate-600" th:text="#{dashboard.high_wr}">High (≥ 15%)</span>
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full" style="background-color: #81b3f7;"></span>
-                                <span class="text-slate-600" th:text="#{dashboard.medium_wr}">Medium</span>
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="w-2.5 h-2.5 rounded-full" style="background-color: #00df9a;"></span>
-                                <span class="text-slate-600" th:text="#{dashboard.low_wr}">Low (< 11%)</span>
-                            </div>
-                        </div>
+            <!-- Cột phải: Market Segment Performance Matrix (Light Theme) -->
+            <div class="p-6 rounded-2xl shadow-sm border bg-white border-slate-100 flex flex-col min-h-[520px]">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="text-base font-bold flex items-center gap-2 text-slate-800">
+                            <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                            <span th:text="#{dashboard.market_segment_matrix}">Market Segment Performance Matrix</span>
+                            <span class="text-xs font-normal text-slate-400 font-mono ml-2">(/win-rate-by-region)</span>
+                        </h2>
+                        <p class="text-[10px] text-slate-400 font-medium mt-1" th:text="#{dashboard.matrix_desc}">Phân tích Win Rate...</p>
                     </div>
-                    <div class="w-full overflow-x-auto flex justify-center items-center py-2">
-                        <div class="min-w-[500px] w-full max-w-[700px] h-[400px] relative">
-                            <svg id="matrixBubbleChart" class="w-full h-full" viewBox="0 0 700 400"></svg>
+                    <div class="flex items-center gap-3 text-[10px] font-semibold bg-slate-50 p-2 rounded-lg border border-slate-200">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #2b5cf6;"></span>
+                            <span class="text-slate-600" th:text="#{dashboard.high_wr}">High (≥ 15%)</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #81b3f7;"></span>
+                            <span class="text-slate-600" th:text="#{dashboard.medium_wr}">Medium</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #00df9a;"></span>
+                            <span class="text-slate-600" th:text="#{dashboard.low_wr}">Low (< 11%)</span>
                         </div>
                     </div>
                 </div>
+                <div class="w-full overflow-x-auto flex justify-center items-center py-2 flex-1">
+                    <div class="min-w-[400px] w-full max-w-[700px] h-[350px] relative">
+                        <svg id="matrixBubbleChart" class="w-full h-full" viewBox="0 0 700 400"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <!-- Top 10 Accounts by Revenue -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
-                    <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
-                        <span th:text="#{dashboard.top_accounts}">Top 10 Accounts by Revenue</span>
-                        <span class="text-xs font-normal text-slate-400 font-mono ml-2">(/api/leads)</span>
-                    </h2>
-                    <div class="relative w-full flex-1 min-h-[400px]"><canvas id="topAccountsChart"></canvas></div>
-                </div>
+        <!-- [HÀNG PHỤ] TOP ACCOUNTS BY REVENUE -->
+        <div class="grid grid-cols-1 gap-8">
+            <!-- Top 10 Accounts by Revenue -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
+                <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
+                    <span th:text="#{dashboard.top_accounts}">Top 10 Accounts by Revenue</span>
+                    <span class="text-xs font-normal text-slate-400 font-mono ml-2">(/api/leads)</span>
+                </h2>
+                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="topAccountsChart"></canvas></div>
             </div>
         </div>
 
 
         <!-- ========================================== -->
-        <!-- [HÀNG 4] SALES OWNER SUMMARY (3 biểu đồ) -->
+        <!-- [HÀNG 4] SALES OWNER SUMMARY (QUARTERLY COMPARISONS) -->
         <!-- ========================================== -->
-        <div class="grid grid-cols-1 gap-8">
-            <!-- Chart 1: Total Leads vs Won by Sales Owner -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
-                <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
-                    <span th:text="#{dashboard.total_leads_vs_won}">Leads & Won by Sales Owner</span>
-                    <span class="text-[11px] font-normal text-slate-400 font-mono ml-2 block">(/sales-owner-dashboard)</span>
-                </h2>
-                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="salesLeadsWonChart"></canvas></div>
+        <div class="mt-8">
+            <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-indigo-500 rounded-full"></span>
+                <span>Sales Owner Summary: Total Leads & Wins (This vs Last Quarter)</span>
+                <span class="text-[11px] font-normal text-slate-400 font-mono ml-2 block">(/sales-owner-dashboard-by-quarter)</span>
+            </h2>
+            <div id="quarterlyLeadsComparisonCardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Populated via JavaScript -->
             </div>
+        </div>
 
-            <!-- Chart 2: Win Rate Comparison -->
+        <div class="grid grid-cols-1 gap-8 mt-8">
+            <!-- Chart 1: Win Rate by Sales Owner (This quarter) vs Win Rate by Sales Owner (Last quarter) -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
-                        <span th:text="#{dashboard.win_rate_comparison}">Win Rate Comparison</span>
-                        <span class="text-[11px] font-normal text-slate-400 font-mono ml-2 block">(/win-rate-by-saleowner)</span>
+                    <span>Win Rate by Sales Owner (This vs Last Quarter)</span>
+                    <span class="text-[11px] font-normal text-slate-400 font-mono ml-2 block">(/win-rate-by-saleowner-by-quarter)</span>
                 </h2>
-                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="salesWinRateChart"></canvas></div>
+                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="salesWinRateQuarterlyComparisonChart"></canvas></div>
             </div>
 
-            <!-- Chart 3: Target Comparison -->
+            <!-- Chart 2: Target by Sales Owner (This quarter) vs Target by Sales Owner (Last quarter) -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
-                        <span th:text="#{dashboard.target_comparison}">Target Comparison</span>
-                        <span class="text-[11px] font-normal text-slate-400 font-mono ml-2 block">(/pipeline-coverage)</span>
+                    <span>Target by Sales Owner (This vs Last Quarter)</span>
+                    <span class="text-[11px] font-normal text-slate-400 font-mono ml-2 block">(/pipeline-coverage-by-quarter)</span>
                 </h2>
-                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="salesTargetChart"></canvas></div>
+                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="salesTargetQuarterlyComparisonChart"></canvas></div>
             </div>
         </div>
-
 
         <!-- ========================================== -->
         <!-- MODAL: DANH SÁCH LEADS THEO TRẠNG THÁI (GIỮ NGUYÊN) -->
@@ -457,7 +457,7 @@
                     loadLeadSourceProfitability(),
                     loadLeadSourceEfficiency(),
                     loadAllLeadsForMatrix(),
-                    loadSalesOwnerSummary()
+                    loadQuarterlyComparisons()
                 ]);
             }
 
@@ -1036,7 +1036,7 @@
                         const total = seg.length;
                         const won = seg.filter(l => l.status === 'Won').length;
                         const wr = total > 0 ? Math.round((won / total) * 100) : 0;
-                        const revenue = seg.filter(l => l.status === 'Won').reduce((s, l) => s + Number(l.estimatedCost || 0), 0);
+                        const revenue = seg.filter(l => l.status === 'Won').reduce((s, l) => s + Number(l.businessResult || 0), 0);
                         cells.push({ industry: ind, region: reg, value: total, winRate: wr, wonLead: won, revenue });
                         if (total > maxVal) maxVal = total;
                     });
@@ -1051,7 +1051,7 @@
                 leads.filter(l => l.status === 'Won').forEach(l => {
                     const acc = l.account || 'N/A';
                     if (!accountMap[acc]) accountMap[acc] = 0;
-                    accountMap[acc] += Number(l.estimatedCost || 0);
+                    accountMap[acc] += Number(l.businessResult || 0);
                 });
 
                 const sorted = Object.entries(accountMap)
@@ -1253,93 +1253,113 @@
             }
 
 
+
+
+
             // ==========================================
-            // HÀM 6: Sales Owner Summary (3 Charts)
+            // HÀM 7: Quarterly Comparisons (Table & 2 Charts)
             // ==========================================
-            async function loadSalesOwnerSummary() {
+            async function loadQuarterlyComparisons() {
                 try {
-                    const [soRes, wrRes, pcRes] = await Promise.all([
-                        fetch(`${API_BASE}/sales-owner-dashboard`),
-                        fetch(`${API_BASE}/win-rate-by-saleowner`),
-                        fetch(`${API_BASE}/pipeline-coverage`)
+                    const [soThis, soLast, wrThis, wrLast, pcThis, pcLast] = await Promise.all([
+                        fetch(`${API_BASE}/sales-owner-dashboard-by-quarter?quarter=this`).then(r => r.json()),
+                        fetch(`${API_BASE}/sales-owner-dashboard-by-quarter?quarter=last`).then(r => r.json()),
+                        fetch(`${API_BASE}/win-rate-by-saleowner-by-quarter?quarter=this`).then(r => r.json()),
+                        fetch(`${API_BASE}/win-rate-by-saleowner-by-quarter?quarter=last`).then(r => r.json()),
+                        fetch(`${API_BASE}/pipeline-coverage-by-quarter?quarter=this`).then(r => r.json()),
+                        fetch(`${API_BASE}/pipeline-coverage-by-quarter?quarter=last`).then(r => r.json())
                     ]);
 
-                    const soData = await soRes.json();
-                    const wrData = await wrRes.json();
-                    const pcData = await pcRes.json();
+                    // 1. KPI Cards
+                    let sumLeadsThis = 0;
+                    let sumWonThis = 0;
+                    let sumLeadsLast = 0;
 
-                    // ---- Chart 1: Total Leads vs Won ----
-                    const soLabels = soData.map(d => d.userName || 'N/A');
-                    const soTotalLeads = soData.map(d => d.totalLead || 0);
-                    const soWonLeads = soData.map(d => d.wonLead || 0);
-
-                    renderChart('salesLeadsWonChart', 'bar', {
-                        labels: soLabels,
-                        datasets: [
-                            {
-                                label: i18n.totalLeads + ' (' + i18n.thisQuarter + ')',
-                                data: soTotalLeads,
-                                backgroundColor: 'rgba(59, 130, 246, 0.75)',
-                                borderColor: '#3b82f6',
-                                borderWidth: 1,
-                                borderRadius: 5,
-                                barPercentage: 0.7
-                            },
-                            {
-                                label: i18n.totalWon,
-                                data: soWonLeads,
-                                backgroundColor: 'rgba(16, 185, 129, 0.75)',
-                                borderColor: '#10b981',
-                                borderWidth: 1,
-                                borderRadius: 5,
-                                barPercentage: 0.7
-                            },
-                            {
-                                label: i18n.totalLeads + ' (' + i18n.lastQuarter + ')',
-                                data: soTotalLeads.map(v => Math.round(v * (0.7 + Math.random() * 0.6))), // TODO: Replace with real last quarter data
-                                backgroundColor: 'rgba(59, 130, 246, 0.25)',
-                                borderColor: 'rgba(59, 130, 246, 0.4)',
-                                borderWidth: 1,
-                                borderDash: [4, 4],
-                                borderRadius: 5,
-                                barPercentage: 0.7
-                            }
-                        ]
-                    }, {
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: { beginAtZero: true, border: { display: false }, grid: { color: '#f1f5f9' } }
-                        },
-                        plugins: {
-                            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 } } }
-                        }
+                    soThis.forEach(d => {
+                        sumLeadsThis += (d.totalLead || 0);
+                        sumWonThis += (d.wonLead || 0);
                     });
 
-                    // ---- Chart 2: Win Rate Comparison ----
-                    const wrLabels = wrData.map(d => d.userName || 'N/A');
-                    const wrValues = wrData.map(d => d.winRate || 0);
+                    soLast.forEach(d => {
+                        sumLeadsLast += (d.totalLead || 0);
+                    });
 
-                    renderChart('salesWinRateChart', 'bar', {
+                    const today = new Date();
+                    const currentMonth = today.getMonth();
+                    const thisQ = Math.floor(currentMonth / 3) + 1;
+                    const lastQ = thisQ === 1 ? 4 : thisQ - 1;
+
+                    let cardsHtml = `
+                        <!-- Card 1: Total Leads This Quarter -->
+                        <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                            <div class="accent-bar bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                            <div class="flex items-center gap-2 mb-3 mt-1">
+                                <div class="bg-blue-50 text-blue-600 p-1.5 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i></div>
+                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Leads (Q${thisQ})</h3>
+                            </div>
+                            <div class="text-3xl font-black text-slate-800">${sumLeadsThis.toLocaleString()}</div>
+                        </div>
+
+                        <!-- Card 2: Total Won This Quarter -->
+                        <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                            <div class="accent-bar bg-gradient-to-r from-emerald-500 to-teal-600"></div>
+                            <div class="flex items-center gap-2 mb-3 mt-1">
+                                <div class="bg-emerald-50 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="trophy" class="w-4 h-4"></i></div>
+                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Won (Q${thisQ})</h3>
+                            </div>
+                            <div class="text-3xl font-black text-slate-800">${sumWonThis.toLocaleString()}</div>
+                        </div>
+
+                        <!-- Card 3: Total Leads Last Quarter -->
+                        <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                            <div class="accent-bar bg-gradient-to-r from-slate-400 to-slate-500"></div>
+                            <div class="flex items-center gap-2 mb-3 mt-1">
+                                <div class="bg-slate-50 text-slate-600 p-1.5 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i></div>
+                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Leads (Q${lastQ})</h3>
+                            </div>
+                            <div class="text-3xl font-black text-slate-800">${sumLeadsLast.toLocaleString()}</div>
+                        </div>
+                    `;
+
+                    document.getElementById('quarterlyLeadsComparisonCardsContainer').innerHTML = cardsHtml;
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+
+                    // 2. Win Rate Chart
+                    const allUsersSet = new Set();
+                    wrThis.forEach(d => { if (d.userName) allUsersSet.add(d.userName); });
+                    wrLast.forEach(d => { if (d.userName) allUsersSet.add(d.userName); });
+                    const wrLabels = Array.from(allUsersSet);
+
+                    const wrThisMap = {};
+                    wrThis.forEach(d => { wrThisMap[d.userName] = d.winRate || 0; });
+                    const wrThisValues = wrLabels.map(name => wrThisMap[name] || 0);
+
+                    const wrLastMap = {};
+                    wrLast.forEach(d => { wrLastMap[d.userName] = d.winRate || 0; });
+                    const wrLastValues = wrLabels.map(name => wrLastMap[name] || 0);
+
+                    renderChart('salesWinRateQuarterlyComparisonChart', 'bar', {
                         labels: wrLabels,
                         datasets: [
                             {
-                                label: i18n.winRate + ' (' + i18n.thisQuarter + ')',
-                                data: wrValues,
-                                backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                                label: 'Win Rate (This Quarter)',
+                                data: wrThisValues,
+                                backgroundColor: 'rgba(16, 185, 129, 0.85)',
                                 borderColor: '#10b981',
                                 borderWidth: 1,
-                                borderRadius: 5,
-                                barPercentage: 0.65
+                                borderRadius: 6,
+                                barPercentage: 0.6
                             },
                             {
-                                label: i18n.winRate + ' (' + i18n.lastQuarter + ')',
-                                data: wrValues.map(v => Math.max(0, v + (Math.random() - 0.5) * 15)), // TODO: Replace with real last quarter data
-                                backgroundColor: 'rgba(16, 185, 129, 0.25)',
-                                borderColor: 'rgba(16, 185, 129, 0.4)',
+                                label: 'Win Rate (Last Quarter)',
+                                data: wrLastValues,
+                                backgroundColor: 'rgba(99, 102, 241, 0.85)',
+                                borderColor: '#6366f1',
                                 borderWidth: 1,
-                                borderDash: [4, 4],
-                                borderRadius: 5,
-                                barPercentage: 0.65
+                                borderRadius: 6,
+                                barPercentage: 0.6
                             }
                         ]
                     }, {
@@ -1354,43 +1374,52 @@
                             }
                         },
                         plugins: {
-                            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 } } },
+                            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11, weight: 'bold' } } },
                             datalabels: {
                                 display: true,
                                 anchor: 'end',
                                 align: 'top',
                                 font: { weight: 'bold', size: 10 },
-                                color: '#10b981',
+                                color: '#475569',
                                 formatter: v => (v || 0).toFixed(1) + '%'
                             }
                         }
                     });
 
-                    // ---- Chart 3: Target Comparison ----
-                    const pcLabels = pcData.map(d => d.salesOwner || d.userCode || 'N/A');
-                    const pcTarget = pcData.map(d => Number(d.target || 0));
+                    // 3. Target Chart
+                    const allPcUsersSet = new Set();
+                    pcThis.forEach(d => { if (d.salesOwner || d.userCode) allPcUsersSet.add(d.salesOwner || d.userCode); });
+                    pcLast.forEach(d => { if (d.salesOwner || d.userCode) allPcUsersSet.add(d.salesOwner || d.userCode); });
+                    const pcLabels = Array.from(allPcUsersSet);
 
-                    renderChart('salesTargetChart', 'bar', {
+                    const pcThisMap = {};
+                    pcThis.forEach(d => { pcThisMap[d.salesOwner || d.userCode] = Number(d.targetRevenue || d.target || 0); });
+                    const pcThisTarget = pcLabels.map(name => pcThisMap[name] || 0);
+
+                    const pcLastMap = {};
+                    pcLast.forEach(d => { pcLastMap[d.salesOwner || d.userCode] = Number(d.targetRevenue || d.target || 0); });
+                    const pcLastTarget = pcLabels.map(name => pcLastMap[name] || 0);
+
+                    renderChart('salesTargetQuarterlyComparisonChart', 'bar', {
                         labels: pcLabels,
                         datasets: [
                             {
-                                label: i18n.target + ' (' + i18n.thisQuarter + ')',
-                                data: pcTarget,
-                                backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                                label: 'Target (This Quarter)',
+                                data: pcThisTarget,
+                                backgroundColor: 'rgba(245, 158, 11, 0.85)',
                                 borderColor: '#f59e0b',
                                 borderWidth: 1,
-                                borderRadius: 5,
-                                barPercentage: 0.65
+                                borderRadius: 6,
+                                barPercentage: 0.6
                             },
                             {
-                                label: i18n.target + ' (' + i18n.lastQuarter + ')',
-                                data: pcTarget.map(v => Math.round(v * (0.75 + Math.random() * 0.5))), // TODO: Replace with real last quarter data
-                                backgroundColor: 'rgba(245, 158, 11, 0.25)',
-                                borderColor: 'rgba(245, 158, 11, 0.4)',
+                                label: 'Target (Last Quarter)',
+                                data: pcLastTarget,
+                                backgroundColor: 'rgba(59, 130, 246, 0.85)',
+                                borderColor: '#3b82f6',
                                 borderWidth: 1,
-                                borderDash: [4, 4],
-                                borderRadius: 5,
-                                barPercentage: 0.65
+                                borderRadius: 6,
+                                barPercentage: 0.6
                             }
                         ]
                     }, {
@@ -1404,17 +1433,25 @@
                             }
                         },
                         plugins: {
-                            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 } } },
+                            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11, weight: 'bold' } } },
                             tooltip: {
                                 callbacks: {
                                     label: ctx => ` ${ctx.dataset.label}: ${fmtCurrency(ctx.parsed.y)}`
                                 }
+                            },
+                            datalabels: {
+                                display: true,
+                                anchor: 'end',
+                                align: 'top',
+                                font: { weight: 'bold', size: 10 },
+                                color: '#475569',
+                                formatter: v => v > 0 ? fmtNum(v) : '0'
                             }
                         }
                     });
 
                 } catch (error) {
-                    console.error('Error loading Sales Owner Summary:', error);
+                    console.error('Error loading Quarterly Comparisons:', error);
                 }
             }
 

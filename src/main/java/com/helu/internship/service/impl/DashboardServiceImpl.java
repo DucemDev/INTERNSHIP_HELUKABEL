@@ -178,6 +178,18 @@ public class DashboardServiceImpl implements DashboardService {
         return salesOwnerDashboardRepo.getSalesOwnerDashboard();
     }
     @Override
+    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter) {
+        return salesOwnerDashboardRepo.getSalesOwnerDashboardByQuarter(quarter);
+    }
+    @Override
+    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter) {
+        return leadRepo.getWinRateBySalesOwnerByQuarter(quarter);
+    }
+    @Override
+    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter) {
+        return pipelineCoverageRepo.getPipelineCoverageByQuarter(quarter);
+    }
+    @Override
     public List<RevenueMonthlyProjection> getRevenueMonthly() {
         return leadRepo.getRevenueMonthly();
     }

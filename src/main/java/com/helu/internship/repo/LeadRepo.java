@@ -139,6 +139,53 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
     @Query(value = """
     SELECT
+        l.user_id AS userId,
+        u.full_name AS userName,
+        CAST(SUM(
+            CASE
+                WHEN l.status IN ('Qualified','Won')
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS qualifiedLead,
+        CAST(SUM(
+            CASE
+                WHEN l.status = 'Won'
+                THEN 1
+                ELSE 0
+            END
+        ) AS BIGINT) AS wonLead,
+        CAST((
+            SUM(
+                CASE
+                    WHEN l.status = 'Won'
+                    THEN 1
+                    ELSE 0
+                END
+            ) * 100.0
+            /
+            NULLIF(
+                SUM(
+                    CASE
+                        WHEN l.status IN ('Qualified','Won')
+                        THEN 1
+                        ELSE 0
+                    END
+                ),
+                0
+            )
+        ) AS DECIMAL(18,2)) AS winRate
+    FROM lead l
+    LEFT JOIN [user] u ON l.user_id = u.user_id
+    WHERE
+        (:quarter = 'this' AND DATEPART(QUARTER, l.created_date) = DATEPART(QUARTER, GETDATE()) AND YEAR(l.created_date) = YEAR(GETDATE()))
+        OR (:quarter = 'last' AND DATEPART(QUARTER, l.created_date) = DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) AND YEAR(l.created_date) = YEAR(DATEADD(QUARTER, -1, GETDATE())))
+    GROUP BY l.user_id, u.full_name
+    """, nativeQuery = true)
+    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(@Param("quarter") String quarter);
+
+    @Query(value = """
+    SELECT
         industry_type AS industryType,
 
         CAST(SUM(

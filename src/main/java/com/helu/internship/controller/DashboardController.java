@@ -228,6 +228,21 @@ Dashboard - power bi của role seller gồm wonLead, totalLead, totalRevenue, w
         return dashboardService.getSalesOwnerDashboard();
     }
 
+    @GetMapping("/sales-owner-dashboard-by-quarter")
+    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(@RequestParam String quarter) {
+        return dashboardService.getSalesOwnerDashboardByQuarter(quarter);
+    }
+
+    @GetMapping("/win-rate-by-saleowner-by-quarter")
+    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(@RequestParam String quarter) {
+        return dashboardService.getWinRateBySalesOwnerByQuarter(quarter);
+    }
+
+    @GetMapping("/pipeline-coverage-by-quarter")
+    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(@RequestParam String quarter) {
+        return dashboardService.getPipelineCoverageByQuarter(quarter);
+    }
+
 /*/
 Tổng doanh thu và tổng leadwon của toàn bộ 150 lead
 */
