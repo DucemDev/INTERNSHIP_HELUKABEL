@@ -199,7 +199,7 @@ bộ lọc tìm kiếm tỉ lệ chuyển đổi theo source, sourceType, region
 Mức độ an toàn của target so với doanh thu dự kiến từ các lead đang nuôi dưỡng
 */
 
- //pipeline-coverage: Xem độ bao phủ phễu của toàn hệ thống/tùy chọn.
+    //pipeline-coverage: Xem độ bao phủ phễu của toàn hệ thống/tùy chọn.
     @GetMapping("/pipeline-coverage")
     public List<PipelineCoverageProjection> getPipelineCoverage() {
         return dashboardService.getPipelineCoverage(null);
@@ -208,7 +208,7 @@ Mức độ an toàn của target so với doanh thu dự kiến từ các lead 
     // --- STAFF ENDPOINTS ---
 
 
-//staff/stats: Xem tỷ lệ chốt đơn của bản thân.
+    //staff/stats: Xem tỷ lệ chốt đơn của bản thân.
     @GetMapping("/staff/stats")
     public ConversionRateResponse getStaffStats(Principal principal) {
         return dashboardService.getStaffStats(principal.getName());
@@ -274,9 +274,9 @@ Tổng doanh thu theo từng quý
         return dashboardService.getRevenueQuarterly();
     }
 
-/*/
-Tổng số lead theo từng tháng
-*/
+    /*/
+    Tổng số lead theo từng tháng
+    */
     @GetMapping("/lead-monthly")
     public List<LeadMonthlyProjection> getLeadMonthly() {
         return dashboardService.getLeadMonthly();
@@ -291,17 +291,17 @@ Tổng số lead theo từng quý
         return dashboardService.getLeadQuarterly();
     }
 
-/*/
-Tổng doanh thu của từng seller theo tháng
-*/
+    /*/
+    Tổng doanh thu của từng seller theo tháng
+    */
     @GetMapping("/revenue-seller-monthly")
     public List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly() {
         return dashboardService.getRevenueSellerMonthly();
     }
 
-/*/
-Tổng doanh thu của từng nguồn theo tháng
-*/
+    /*/
+    Tổng doanh thu của từng nguồn theo tháng
+    */
     @GetMapping("/revenue-source-monthly")
     public List<RevenueSourceMonthlyProjection> getRevenueSourceMonthly() {
         return dashboardService.getRevenueSourceMonthly();
