@@ -19,20 +19,21 @@ public class SecurityConfig {
     private final CustomAuthenticationSuccessHandler successHandler;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/css/**", "/js/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("Admin")
-                .requestMatchers("/staff/**").hasAnyRole("Staff", "Seller")
-                .anyRequest().authenticated()
-            )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+
+                        // Cho chatbot Python gọi API dashboard không cần đăng nhập
+                        .requestMatchers("/api/dashboard/**").permitAll()
+
+                        .requestMatchers("/users/**").hasRole("Admin")
+                        .requestMatchers("/dashboard/**").hasAnyRole("Admin", "Staff")
+                        .requestMatchers("/staff/**").hasAnyRole("Staff")
+
+                        .anyRequest().authenticated()
+                )
             .formLogin(form -> form
                 .loginPage("/login")
                 .successHandler(successHandler)

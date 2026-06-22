@@ -4,15 +4,12 @@
     <main class="space-y-8">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Quản lý Nhân sự</h1>
-                <p class="mt-1 text-sm font-medium text-gray-500">Quản lý danh sách nhân viên và phân quyền truy cập hệ thống.</p>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight" th:text="#{manage.users.title}">Quản lý Nhân sự</h1>
+                <p class="mt-1 text-sm font-medium text-gray-500" th:text="#{manage.users.desc}">Quản lý danh sách nhân viên và phân quyền truy cập hệ thống.</p>
             </div>
             <div class="flex items-center gap-3">
-                <button class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all">
-                    <i data-lucide="download" class="w-4 h-4"></i> Xuất danh sách
-                </button>
                 <button class="inline-flex items-center gap-2 rounded-xl bg-helu-red px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all" onclick="openModal('add')">
-                    <i data-lucide="user-plus" class="w-4 h-4"></i> Thêm nhân viên
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> <span th:text="#{manage.btn.add}">Thêm nhân viên</span>
                 </button>
             </div>
         </div>
@@ -21,33 +18,33 @@
         <div class="rounded-2xl border border-helu-border bg-white p-6 shadow-sm">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
                 <div class="space-y-2">
-                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Tìm kiếm nhân viên</label>
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{manage.search.placeholder}">Tìm kiếm nhân viên</label>
                     <div class="relative group">
                         <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-helu-red transition-colors"></i>
-                        <input type="text" id="searchInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="Mã NV, Tên, Email..." onkeyup="filterUsers()">
+                        <input type="text" id="searchInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" th:placeholder="#{manage.search.placeholder}" onkeyup="filterUsers()">
                     </div>
                 </div>
                 <div class="space-y-2">
-                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Vai trò</label>
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.role}">Vai trò</label>
                     <select id="roleFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterUsers()">
-                        <option value="">Tất cả vai trò</option>
+                        <option value="" th:text="#{manage.filter.all}">Tất cả vai trò</option>
                         <option value="Admin">Admin</option>
                         <option value="Seller">Seller</option>
                     </select>
                 </div>
                 <div class="space-y-2">
-                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</label>
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.status}">Trạng thái</label>
                     <select id="statusFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterUsers()">
-                        <option value="">Tất cả</option>
-                        <option value="true">Đang hoạt động</option>
-                        <option value="false">Đã khóa</option>
+                        <option value="" th:text="#{manage.filter.all}">Tất cả</option>
+                        <option value="true" th:text="#{status.filter.active}">Đang hoạt động</option>
+                        <option value="false" th:text="#{status.filter.locked}">Đã khóa</option>
                     </select>
                 </div>
                 <div class="space-y-2">
-                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Sắp xếp</label>
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{manage.sort.label}">Sắp xếp</label>
                     <select id="sortFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterUsers()">
-                        <option value="name">Tên (A-Z)</option>
-                        <option value="code">Mã NV</option>
+                        <option value="name" th:text="#{manage.sort.name}">Tên (A-Z)</option>
+                        <option value="code" th:text="#{manage.sort.code}">Mã NV</option>
                     </select>
                 </div>
             </div>
@@ -58,13 +55,13 @@
                 <table class="w-full text-left" id="userTable">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50/50">
-                            <th class="w-16 py-4 px-6 text-center text-xs font-bold uppercase tracking-wider text-gray-400">STT</th>
-                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Mã NV</th>
-                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Họ và Tên</th>
-                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Email</th>
-                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Vai trò</th>
-                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</th>
-                            <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10">Thao tác</th>
+                            <th class="w-16 py-4 px-6 text-center text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{manage.stt}">STT</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.id}">Mã NV</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.name}">Họ và Tên</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.email}">Email</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.role}">Vai trò</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.status}">Trạng thái</th>
+                            <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10" th:text="#{manage.col.actions}">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody id="userBody" class="divide-y divide-gray-50">
@@ -88,7 +85,7 @@
         <div id="userModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
             <div class="w-full max-w-xl rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
                 <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="modalTitle">Thêm nhân sự mới</h2>
+                    <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight" id="modalTitle" th:text="#{manage.btn.add}">Thêm nhân sự mới</h2>
                     <button onclick="closeModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all">
                         <i data-lucide="x" class="w-6 h-6"></i>
                     </button>
@@ -97,44 +94,48 @@
                     <input type="hidden" id="userId">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Mã nhân viên <span class="text-helu-red">*</span></label>
-                            <input type="text" id="userCode" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="VD: NV001">
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{form.user_code}">Mã nhân viên</span> <span class="text-helu-red">*</span></label>
+                            <input type="text" id="userCode" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required th:placeholder="#{form.placeholder.name}">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700">Vai trò <span class="text-helu-red">*</span></label>
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{form.role}">Vai trò</span> <span class="text-helu-red">*</span></label>
                             <select id="roleId" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required></select>
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Họ và Tên <span class="text-helu-red">*</span></label>
-                        <input type="text" id="fullName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Nhập đầy đủ họ tên">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.fullname}">Họ và Tên</span> <span class="text-helu-red">*</span></label>
+                        <input type="text" id="fullName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required th:placeholder="#{form.placeholder.name}">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Email <span class="text-helu-red">*</span></label>
-                        <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="username@helukabel.vn">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.email}">Email</span> <span class="text-helu-red">*</span></label>
+                        <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required th:placeholder="#{form.placeholder.email}">
                     </div>
                     <div id="passwordField" class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700">Mật khẩu <span class="text-helu-red">*</span></label>
-                        <input type="password" id="password" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="Để trống nếu không muốn thay đổi">
+                        <label class="text-sm font-bold text-gray-700" th:text="#{form.password}">Mật khẩu</label>
+                        <input type="password" id="password" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" th:placeholder="#{form.placeholder.password}">
                     </div>
                     <div class="flex items-center gap-3">
                         <input type="checkbox" id="isActive" checked class="h-5 w-5 rounded-md border-gray-200 text-helu-red focus:ring-helu-red cursor-pointer">
-                        <label for="isActive" class="text-sm font-bold text-gray-700 cursor-pointer">Kích hoạt tài khoản</label>
+                        <label for="isActive" class="text-sm font-bold text-gray-700 cursor-pointer" th:text="#{form.active}">Kích hoạt tài khoản</label>
                     </div>
                     <div class="flex items-center justify-end gap-3 pt-4">
-                        <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeModal()">Hủy bỏ</button>
-                        <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">Lưu thông tin</button>
+                        <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeModal()" th:text="#{form.btn.cancel}">Hủy bỏ</button>
+                        <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all" th:text="#{form.btn.save}">Lưu thông tin</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <script>
+        <script th:inline="javascript">
             const apiBase = '/api/users';
             let allUsers = [];
             let filteredUsers = [];
             let currentPage = 1;
             const pageSize = 10;
+            const activeText = /*[[#{status.active}]]*/ 'Đang hoạt động';
+            const lockedText = /*[[#{status.locked}]]*/ 'Đã khóa';
+            const addUserText = /*[[#{manage.btn.add}]]*/ 'Thêm nhân sự mới';
+            const updateUserText = /*[[#{detail.btn.edit}]]*/ 'Cập nhật nhân sự';
 
             async function fetchUsers() {
                 try {
@@ -177,7 +178,7 @@
                         </td>
                         <td class="py-4 px-6">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider ${statusBadgeClass}">
-                                ${user.isActive ? 'Đang hoạt động' : 'Đã khóa'}
+                                ${user.isActive ? activeText : lockedText}
                             </span>
                         </td>
                         <td class="py-4 px-6 text-right pr-10">
@@ -268,7 +269,7 @@
                 await loadRoles();
 
                 if (mode === 'edit' && id) {
-                    title.innerText = 'Cập nhật nhân sự';
+                    title.innerText = updateUserText;
                     const user = allUsers.find(u => u.userId === id);
                     if (user) {
                         document.getElementById('userId').value = user.userId;
@@ -279,7 +280,7 @@
                         document.getElementById('isActive').checked = user.isActive;
                     }
                 } else {
-                    title.innerText = 'Thêm nhân sự mới';
+                    title.innerText = addUserText;
                 }
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');

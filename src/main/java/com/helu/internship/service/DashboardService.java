@@ -10,8 +10,6 @@ public interface DashboardService {
 
     Double getAverageDaysToWon();
 
-    List<LeadSourceCostProjection> getLeadSourceCostDashboard();
-
     List<PipelineCoverageProjection> getPipelineCoverage(String sellerCode);
 
     List<LeadStatusCountResponse> getLeadStatusCount();
@@ -20,7 +18,7 @@ public interface DashboardService {
 
     ConversionRateResponse getConversionRate();
 
-    List<WinRateBySalesResponse> getWinRateBySalesOwner();
+    List<WinRateBySalesResponse> getWinRateBySalesOwner(String region, String industry);
 
     List<WinRateByIndustryProjection> getWinRateByIndustry();
 
@@ -28,10 +26,20 @@ public interface DashboardService {
 
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
 
+    List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
 
-//    List<LostReasonSummaryProjection> getLostReasonSummary();
+    List<LostBySellerProjection> getLostBySeller();
+
+    List<LostBySourceProjection> getLostBySource();
+
+    List<LostByRegionProjection> getLostByRegion();
+
+    List<LostByIndustryProjection> getLostByIndustry();
+
     List<RevenueIndustryResponse> getRevenueByIndustry();
+
     List<RoiLeadSourceResponse> getROIByLeadSource();
+
     List<ConversionRateResponse> getConversionRateFilter(
             String sourceId,
             String sourceType,
@@ -42,8 +50,33 @@ public interface DashboardService {
             LocalDate timeFrom,
             LocalDate timeTo
     );
+    List<SalesOwnerDashboardProjection> getSalesOwnerDashboard();
+    RevenueSummaryProjection getRevenueSummary();
 
-  List<LostReasonSummaryProjection> getLostReasonSummary(String productId);
+    List<RevenueRegionProjection> getRevenueByRegion();
 
+    List<RevenueProductLineProjection> getRevenueByProductLine();
+    List<LeadSourceCostProjection> getLeadSourceCostDashboard();
+
+    ConversionRateResponse getStaffStats(String email);
+
+    List<PipelineCoverageProjection> getStaffPipelineCoverage(String email);
+
+    List<RevenueMonthlyProjection> getRevenueMonthly();
+
+    List<RevenueQuarterlyProjection> getRevenueQuarterly();
+
+    List<LeadMonthlyProjection> getLeadMonthly();
+
+    List<LeadQuarterlyProjection> getLeadQuarterly();
+
+    List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly();
+
+    List<RevenueSourceMonthlyProjection> getRevenueSourceMonthly();
+
+    List<RevenueRegionMonthlyProjection> getRevenueRegionMonthly();
+
+    List<RevenueIndustryMonthlyProjection> getRevenueIndustryMonthly();
+
+    List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly();
 }
-

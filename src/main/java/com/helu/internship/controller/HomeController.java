@@ -18,12 +18,19 @@ public class HomeController {
 
     @GetMapping("/admin")
     public String adminPage(org.springframework.ui.Model model) {
-        model.addAttribute("activeMenu", "dashboard");
+        model.addAttribute("activeMenu", "admin");
         return "admin-page";
     }
 
-    @GetMapping("/staff")
-    public String staffPage() {
-        return "staff-page";
+    @GetMapping("/dashboard")
+    public String dashboardPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "dashboard");
+        return "dashboard/dashboard-home";
+    }
+
+    @GetMapping("/staff/dashboard")
+    public String staffDashboard(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "dashboard");
+        return "dashboard/dashboard-seller";
     }
 }

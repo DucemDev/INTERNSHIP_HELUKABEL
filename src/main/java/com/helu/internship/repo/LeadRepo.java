@@ -61,178 +61,190 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     List<Object[]> countLeadByStatus();
 
     @Query("""
-        SELECT new com.helu.internship.dto.response.LeadByStatusResponse(
-            l.leadId,
-            l.fullName,
-            l.account,
-            l.status,
-            l.region,
-            l.industryType,
-            l.customerGroup
-        )
-        FROM LeadEntity l
-        WHERE l.status = :status
-        """)
+            SELECT new com.helu.internship.dto.response.LeadByStatusResponse(
+                l.leadId,
+                l.fullName,
+                l.account,
+                l.status,
+                l.region,
+                l.industryType,
+                l.customerGroup,
+                CAST(NULL AS string),
+                CAST(NULL AS string),
+                l.user.fullName,
+                l.createdDate
+            )
+            FROM LeadEntity l
+            WHERE l.status = :status
+            """)
     List<LeadByStatusResponse> findLeadsByStatus(@Param("status") String status);
 
     @Query("""
-    SELECT
-        COUNT(l) AS totalLead,
-        SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
-        SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / COUNT(l) AS conversionRate
-    FROM LeadEntity l
-    """)
+            SELECT
+                COUNT(l) AS totalLead,
+                SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
+                SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(l), 0) AS conversionRate
+            FROM LeadEntity l
+            """)
     ConversionRateResponse getConversionRate();
 
     @Query(value = """
-    SELECT
-        user_id AS userId,
-        SUM(
-            CASE
-                WHEN status IN ('Qualified','Won')
-                THEN 1
-                ELSE 0
-            END
-        ) AS qualifiedLead,
-        SUM(
-            CASE
-                WHEN status = 'Won'
-                THEN 1
-                ELSE 0
-            END
-        ) AS wonLead,
-        (
-            SUM(
-                CASE
-                    WHEN status = 'Won'
-                    THEN 1
-                    ELSE 0
-                END
-            ) * 100.0
-            /
-            NULLIF(
+            SELECT
+                l.user_id AS userId,
+                u.full_name AS userName,
                 SUM(
                     CASE
-                        WHEN status IN ('Qualified','Won')
+                        WHEN l.status IN ('Qualified','Won')
                         THEN 1
                         ELSE 0
                     END
-                ),
-                0
-            )
-        ) AS winRate
-    FROM lead
-    GROUP BY user_id
-    """, nativeQuery = true)
-    List<WinRateBySalesResponse> getWinRateBySalesOwner();
+                ) AS qualifiedLead,
+                SUM(
+                    CASE
+                        WHEN l.status = 'Won'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS wonLead,
+                (
+                    SUM(
+                        CASE
+                            WHEN l.status = 'Won'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) * 100.0
+                    /
+                    NULLIF(
+                        SUM(
+                            CASE
+                                WHEN l.status IN ('Qualified','Won')
+                                THEN 1
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )
+                ) AS winRate
+            FROM lead l
+            LEFT JOIN [user] u ON l.user_id = u.user_id
+            WHERE (:region IS NULL OR l.region = :region)
+              AND (:industry IS NULL OR l.industry_type = :industry)
+            GROUP BY l.user_id, u.full_name
+            """, nativeQuery = true)
+    List<WinRateBySalesResponse> getWinRateBySalesOwner(
+            @Param("region") String region,
+            @Param("industry") String industry
+    );
 
     @Query(value = """
-    SELECT
-        industry_type AS industryType,
-
-        CAST(SUM(
-            CASE
-                WHEN status IN ('Qualified','Won')
-                THEN 1
-                ELSE 0
-            END
-        ) AS BIGINT) AS qualifiedLead,
-
-        CAST(SUM(
-            CASE
-                WHEN status = 'Won'
-                THEN 1
-                ELSE 0
-            END
-        ) AS BIGINT) AS wonLead,
-
-        CAST((
-            SUM(
-                CASE
-                    WHEN status = 'Won'
-                    THEN 1
-                    ELSE 0
-                END
-            ) * 100.0
-            /
-            NULLIF(
-                SUM(
+            SELECT
+                industry_type AS industryType,
+            
+                CAST(SUM(
                     CASE
                         WHEN status IN ('Qualified','Won')
                         THEN 1
                         ELSE 0
                     END
-                ),
-                0
-            )
-        ) AS DECIMAL(18,2)) AS winRate
-
-    FROM lead
-    GROUP BY industry_type
-    ORDER BY winRate DESC
-    """, nativeQuery = true)
+                ) AS BIGINT) AS qualifiedLead,
+            
+                CAST(SUM(
+                    CASE
+                        WHEN status = 'Won'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS BIGINT) AS wonLead,
+            
+                CAST((
+                    SUM(
+                        CASE
+                            WHEN status = 'Won'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) * 100.0
+                    /
+                    NULLIF(
+                        SUM(
+                            CASE
+                                WHEN status IN ('Qualified','Won')
+                                THEN 1
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )
+                ) AS DECIMAL(18,2)) AS winRate
+            
+            FROM lead
+            GROUP BY industry_type
+            ORDER BY winRate DESC
+            """, nativeQuery = true)
     List<WinRateByIndustryProjection> getWinRateByIndustry();
 
     @Query(value = """
-    SELECT
-        region AS region,
-
-        CAST(SUM(
-            CASE
-                WHEN status IN ('Qualified','Won')
-                THEN 1
-                ELSE 0
-            END
-        ) AS BIGINT) AS qualifiedLead,
-
-        CAST(SUM(
-            CASE
-                WHEN status = 'Won'
-                THEN 1
-                ELSE 0
-            END
-        ) AS BIGINT) AS wonLead,
-
-        CAST((
-            SUM(
-                CASE
-                    WHEN status = 'Won'
-                    THEN 1
-                    ELSE 0
-                END
-            ) * 100.0
-            /
-            NULLIF(
-                SUM(
+            SELECT
+                region AS region,
+            
+                CAST(SUM(
                     CASE
                         WHEN status IN ('Qualified','Won')
                         THEN 1
                         ELSE 0
                     END
-                ),
-                0
-            )
-        ) AS DECIMAL(18,2)) AS winRate
-
-    FROM lead
-    GROUP BY region
-    ORDER BY winRate DESC
-    """, nativeQuery = true)
+                ) AS BIGINT) AS qualifiedLead,
+            
+                CAST(SUM(
+                    CASE
+                        WHEN status = 'Won'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS BIGINT) AS wonLead,
+            
+                CAST((
+                    SUM(
+                        CASE
+                            WHEN status = 'Won'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) * 100.0
+                    /
+                    NULLIF(
+                        SUM(
+                            CASE
+                                WHEN status IN ('Qualified','Won')
+                                THEN 1
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )
+                ) AS DECIMAL(18,2)) AS winRate
+            
+            FROM lead
+            GROUP BY region
+            ORDER BY winRate DESC
+            """, nativeQuery = true)
     List<WinRateByRegionProjection> getWinRateByRegion();
+
     @Query(value = """
-    SELECT
-        ls.source_id AS sourceId,
-        ls.source_name AS sourceName,
-        SUM(l.cost) AS totalCost,
-        SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
-        SUM(l.cost) * 1.0 /
-        NULLIF(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END), 0) AS costPerWin
-    FROM lead l
-    JOIN lead_source ls
-        ON l.source_id = ls.source_id
-    GROUP BY ls.source_id, ls.source_name
-    ORDER BY costPerWin ASC
-    """, nativeQuery = true)
+            SELECT
+                ls.source_id AS sourceId,
+                ls.source_name AS sourceName,
+                SUM(l.cost) AS totalCost,
+                SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
+                SUM(l.cost) * 1.0 /
+                NULLIF(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END), 0) AS costPerWin
+            FROM lead l
+            JOIN lead_source ls
+                ON l.source_id = ls.source_id
+            GROUP BY ls.source_id, ls.source_name
+            ORDER BY costPerWin ASC
+            """, nativeQuery = true)
     List<CostPerWinBySourceResponse> getCostPerWinByLeadSource();
 
     @Query(value = """
@@ -278,48 +290,47 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 u.full_name
             """, nativeQuery = true)
     Optional<LeadListProjection> findLeadByIdForView(@Param("id") String id);
-    @Query(value = """
-    SELECT
-        l.loss_reason AS lossReason,
-        COUNT(DISTINCT l.lead_id) AS totalLost
-    FROM lead l
-    INNER JOIN lead_item li
-        ON l.lead_id = li.lead_id
-    INNER JOIN product p
-        ON li.product_id = p.product_id
-    WHERE l.status = 'Lost'
-        AND l.loss_reason IS NOT NULL
-        AND (:productId IS NULL OR p.product_id = :productId)
-    GROUP BY l.loss_reason
-    ORDER BY totalLost DESC
-    """, nativeQuery = true)
 
-//    List<LostReasonSummaryProjection> getLostReasonSummary();
+    @Query(value = """
+            SELECT
+                l.loss_reason AS lossReason,
+                COUNT(DISTINCT l.lead_id) AS totalLost
+            FROM lead l
+            INNER JOIN lead_item li
+                ON l.lead_id = li.lead_id
+            INNER JOIN product p
+                ON li.product_id = p.product_id
+            WHERE l.status = 'Lost'
+                AND l.loss_reason IS NOT NULL
+                AND (:productId IS NULL OR p.product_id = :productId)
+            GROUP BY l.loss_reason
+            ORDER BY totalLost DESC
+            """, nativeQuery = true)
     List<LostReasonSummaryProjection> getLostReasonSummary(
             @Param("productId") String productId
     );
 
     @Query(value = """
-            SELECT
-                                            ls.source_name AS label,
-                                            COUNT(*) AS totalLead,
-                                            SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
-                                            SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS conversionRate
-                                        FROM lead l
-                                        JOIN lead_source ls
-                                            ON l.source_id = ls.source_id
-                                        WHERE (:sourceId IS NULL OR l.source_id = :sourceId)
-                                          AND (:sourceType IS NULL OR ls.source_type = :sourceType)
-                                          AND (:region IS NULL OR l.region = :region)
-                                          AND (:industry IS NULL OR l.industry_type = :industry)
-                                          AND (:salesOwnerId IS NULL OR CAST(l.user_id AS VARCHAR(36)) = :salesOwnerId)
-                                          AND (:customerGroup IS NULL OR l.customer_group = :customerGroup)
-                                          AND (:timeFrom IS NULL OR l.created_date >= :timeFrom)
-                                          AND (:timeTo IS NULL OR l.created_date <= :timeTo)
-            
-                                        GROUP BY ls.source_name
-                                        ORDER BY conversionRate DESC
-""", nativeQuery = true)
+                SELECT
+                    ls.source_name AS label,
+                    l.region AS region,
+                    COUNT(*) AS totalLead,
+                    SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
+                    SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS conversionRate
+                FROM lead l
+                JOIN lead_source ls
+                    ON l.source_id = ls.source_id
+                WHERE (:sourceId IS NULL OR l.source_id = :sourceId)
+                  AND (:sourceType IS NULL OR ls.source_type = :sourceType)
+                  AND (:region IS NULL OR l.region = :region)
+                  AND (:industry IS NULL OR l.industry_type = :industry)
+                  AND (:salesOwnerId IS NULL OR CAST(l.user_id AS VARCHAR(36)) = :salesOwnerId)
+                  AND (:customerGroup IS NULL OR l.customer_group = :customerGroup)
+                  AND (:timeFrom IS NULL OR l.created_date >= :timeFrom)
+                  AND (:timeTo IS NULL OR l.created_date <= :timeTo)
+                GROUP BY ls.source_name, l.region, l.customer_group
+                ORDER BY conversionRate DESC
+            """, nativeQuery = true)
     List<ConversionRateResponse> getConversionRateFilter(
             @Param("sourceId") String sourceId,
             @Param("sourceType") String sourceType,
@@ -332,54 +343,359 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     );
 
     @Query(value = """
-    SELECT
-        ls.source_name AS label,
-
-        CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) AS wonLead,
-
-        SUM(l.cost) AS totalCost,
-
-        SUM(CASE 
-            WHEN l.status = 'Won' 
-            THEN l.business_result 
-            ELSE 0 
-        END) AS totalWonValue,
-
-        (
-            SUM(CASE 
-                WHEN l.status = 'Won' 
-                THEN l.business_result 
-                ELSE 0 
-            END) * 1.0
-            /
-            NULLIF(SUM(l.cost), 0)
-        ) AS roi
-
-    FROM lead l
-    JOIN lead_source ls
-        ON l.source_id = ls.source_id
-
-    GROUP BY ls.source_name
-
-    ORDER BY roi DESC
-""", nativeQuery = true)
+                SELECT
+                    ls.source_name AS label,
+            
+                    CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) AS wonLead,
+            
+                    SUM(l.cost) AS totalCost,
+            
+                    SUM(CASE
+                        WHEN l.status = 'Won'
+                        THEN l.business_result
+                        ELSE 0
+                    END) AS totalWonValue,
+            
+                    (
+                        SUM(CASE
+                            WHEN l.status = 'Won'
+                            THEN l.business_result
+                            ELSE 0
+                        END) * 1.0
+                        /
+                        NULLIF(SUM(l.cost), 0)
+                    ) AS roi
+            
+                FROM lead l
+                JOIN lead_source ls
+                    ON l.source_id = ls.source_id
+            
+                GROUP BY ls.source_name
+            
+                ORDER BY roi DESC
+            """, nativeQuery = true)
     List<RoiLeadSourceResponse> getROIByLeadSource();
+
+    @Query("""
+            SELECT
+                COUNT(l) AS totalLead,
+                SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
+                SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(l), 0) AS conversionRate
+            FROM LeadEntity l
+            WHERE l.user.email = :email
+            """)
+    ConversionRateResponse getStatsByEmail(@Param("email") String email);
+
     @Query(value = """
-    SELECT
-        l.industry_type AS industry,
+            SELECT
+                l.industry_type AS industry,
+            
+                SUM(l.business_result) AS revenue
+                FROM lead l
+            
+                    GROUP BY l.industry_type
+            
+                    ORDER BY revenue DESC
+            """, nativeQuery = true)
+    List<RevenueIndustryResponse> getRevenueByIndustry();
 
-        SUM(l.business_result) AS revenue
-        FROM lead l
-        
-            GROUP BY l.industry_type
-        
+    @Query(value = """
+            SELECT
+                CAST(ISNULL(SUM(business_result),0) AS DECIMAL(18,2)) AS totalRevenue,
+                CAST(COUNT(*) AS BIGINT) AS wonLead,
+                CAST(
+                    ISNULL(SUM(business_result),0)
+                    /
+                    NULLIF(COUNT(*),0)
+                    AS DECIMAL(18,2)
+                ) AS avgRevenuePerWonLead
+            FROM lead
+            WHERE status = 'Won'
+            """, nativeQuery = true)
+    RevenueSummaryProjection getRevenueSummary();
+
+    @Query(value = """
+            SELECT
+                l.region AS region,
+                CAST(ISNULL(SUM(l.business_result),0) AS DECIMAL(18,2)) AS revenue,
+                CAST(COUNT(*) AS BIGINT) AS wonLead
+            FROM lead l
+            WHERE l.status = 'Won'
+            GROUP BY l.region
             ORDER BY revenue DESC
-        """, nativeQuery = true)
-            List<RevenueIndustryResponse> getRevenueByIndustry();
-        
+            """, nativeQuery = true)
+    List<RevenueRegionProjection> getRevenueByRegion();
 
+    @Query(value = """
+            SELECT
+                p.product_id AS productId,
+                p.product_name AS productName,
+                CAST(ISNULL(SUM(li.expected_revenue),0) AS DECIMAL(18,2)) AS revenue,
+                CAST(COUNT(DISTINCT l.lead_id) AS BIGINT) AS totalWonLead
+            FROM lead l
+            JOIN lead_item li
+                ON l.lead_id = li.lead_id
+            JOIN product p
+                ON li.product_id = p.product_id
+            WHERE l.status = 'Won'
+            GROUP BY
+                p.product_id,
+                p.product_name
+            ORDER BY revenue DESC
+            """, nativeQuery = true)
+    List<RevenueProductLineProjection> getRevenueByProductLine();
 
+    @Query(value = """
+            SELECT
+                u.user_code AS userCode,
+                u.full_name AS salesOwner,
+                COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) AS lostLead,
+                CAST(
+                    COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) * 100.0
+                    / NULLIF(COUNT(*),0)
+                AS DECIMAL(18,2)
+                ) AS lostRate
+            FROM lead l
+            JOIN [user] u
+                ON l.user_id = u.user_id
+            GROUP BY u.user_code, u.full_name
+            ORDER BY lostRate DESC
+            """, nativeQuery = true)
+    List<LostBySellerProjection> getLostBySeller();
 
+    @Query(value = """
+            SELECT
+                ls.source_id AS sourceId,
+                ls.source_name AS sourceName,
+                COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) AS lostLead,
+                CAST(
+                    COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) * 100.0
+                    / NULLIF(COUNT(*),0)
+                AS DECIMAL(18,2)
+                ) AS lostRate
+            FROM lead l
+            JOIN lead_source ls
+                ON l.source_id = ls.source_id
+            GROUP BY ls.source_id, ls.source_name
+            ORDER BY lostRate DESC
+            """, nativeQuery = true)
+    List<LostBySourceProjection> getLostBySource();
+
+    @Query(value = """
+            SELECT
+                l.region AS region,
+                COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) AS lostLead,
+                CAST(
+                    COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) * 100.0
+                    / NULLIF(COUNT(*),0)
+                AS DECIMAL(18,2)
+                ) AS lostRate
+            FROM lead l
+            GROUP BY l.region
+            ORDER BY lostRate DESC
+            """, nativeQuery = true)
+    List<LostByRegionProjection> getLostByRegion();
+
+    @Query(value = """
+            SELECT
+                l.industry_type AS industryType,
+                COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) AS lostLead,
+                CAST(
+                    COUNT(CASE WHEN l.status = 'Lost' THEN 1 END) * 100.0
+                    / NULLIF(COUNT(*),0)
+                AS DECIMAL(18,2)
+                ) AS lostRate
+            FROM lead l
+            GROUP BY l.industry_type
+            ORDER BY lostRate DESC
+            """, nativeQuery = true)
+    List<LostByIndustryProjection> getLostByIndustry();
+
+    @Query(value = """
+            SELECT
+                YEAR(l.created_date) AS year,
+                MONTH(l.created_date) AS month,
+                SUM(l.business_result) AS revenue
+            FROM lead l
+            WHERE l.status = 'Won'
+            GROUP BY
+                YEAR(l.created_date),
+                MONTH(l.created_date)
+            ORDER BY
+                year,
+                month
+            """, nativeQuery = true)
+    List<RevenueMonthlyProjection> getRevenueMonthly();
+
+    @Query(value = """
+            SELECT
+                YEAR(l.created_date) AS year,
+                DATEPART(QUARTER, l.created_date) AS quarter,
+                SUM(l.business_result) AS revenue
+            FROM lead l
+            WHERE l.status = 'Won'
+            GROUP BY
+                YEAR(l.created_date),
+                DATEPART(QUARTER, l.created_date)
+            ORDER BY
+                year,
+                quarter
+            """, nativeQuery = true)
+    List<RevenueQuarterlyProjection> getRevenueQuarterly();
+
+    @Query(value = """
+            SELECT
+                YEAR(l.created_date) AS year,
+                MONTH(l.created_date) AS month,
+            
+                COUNT(*) AS totalLead,
+            
+                SUM(
+                    CASE
+                        WHEN l.status = 'Won'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS wonLead,
+            
+                SUM(
+                    CASE
+                        WHEN l.status = 'Lost'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS lostLead
+            
+            FROM lead l
+            GROUP BY
+                YEAR(l.created_date),
+                MONTH(l.created_date)
+            ORDER BY
+                year,
+                month
+            """, nativeQuery = true)
+    List<LeadMonthlyProjection> getLeadMonthly();
+
+    @Query(value = """
+            SELECT
+                YEAR(l.created_date) AS year,
+                DATEPART(QUARTER, l.created_date) AS quarter,
+            
+                COUNT(*) AS totalLead,
+            
+                SUM(
+                    CASE
+                        WHEN l.status = 'Won'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS wonLead,
+            
+                SUM(
+                    CASE
+                        WHEN l.status = 'Lost'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS lostLead
+            
+            FROM lead l
+            GROUP BY
+                YEAR(l.created_date),
+                DATEPART(QUARTER, l.created_date)
+            ORDER BY
+                year,
+                quarter
+            """, nativeQuery = true)
+    List<LeadQuarterlyProjection> getLeadQuarterly();
+
+    @Query(value = """
+            SELECT
+                YEAR(l.created_date) AS year,
+                MONTH(l.created_date) AS month,
+                u.full_name AS sellerName,
+                SUM(l.business_result) AS revenue
+            FROM lead l
+            JOIN [user] u
+                ON l.user_id = u.user_id
+            WHERE l.status = 'Won'
+            GROUP BY
+                YEAR(l.created_date),
+                MONTH(l.created_date),
+                u.full_name
+            ORDER BY
+                YEAR(l.created_date),
+                MONTH(l.created_date)
+            """, nativeQuery = true)
+    List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly();
+
+    @Query(value = """
+            SELECT
+                YEAR(l.created_date) AS year,
+                MONTH(l.created_date) AS month,
+                ls.source_name AS leadSource,
+                SUM(l.business_result) AS revenue
+            FROM lead l
+            JOIN lead_source ls
+                ON l.source_id = ls.source_id
+            WHERE l.status = 'Won'
+            GROUP BY
+                YEAR(l.created_date),
+                MONTH(l.created_date),
+                ls.source_name
+            ORDER BY year, month
+            """, nativeQuery = true)
+    List<RevenueSourceMonthlyProjection> getRevenueSourceMonthly();
+
+    @Query(value = """
+            SELECT
+                YEAR(created_date) AS year,
+                MONTH(created_date) AS month,
+                region AS region,
+                SUM(business_result) AS revenue
+            FROM lead
+            WHERE status = 'Won'
+            GROUP BY
+                YEAR(created_date),
+                MONTH(created_date),
+                region
+            ORDER BY year, month
+            """, nativeQuery = true)
+    List<RevenueRegionMonthlyProjection> getRevenueRegionMonthly();
+
+    @Query(value = """
+            SELECT
+                YEAR(created_date) AS year,
+                MONTH(created_date) AS month,
+                industry_type AS industry,
+                SUM(business_result) AS revenue
+            FROM lead
+            WHERE status = 'Won'
+            GROUP BY
+                YEAR(created_date),
+                MONTH(created_date),
+                industry_type
+            ORDER BY year, month
+            """, nativeQuery = true)
+    List<RevenueIndustryMonthlyProjection> getRevenueIndustryMonthly();
+
+    @Query(value = """
+            SELECT
+                YEAR(l.created_date) AS year,
+                MONTH(l.created_date) AS month,
+                p.product_name AS productLine,
+                SUM(l.business_result) AS revenue
+            FROM lead l
+            JOIN lead_item li
+                ON l.lead_id = li.lead_id
+            JOIN product p
+                ON li.product_id = p.product_id
+            WHERE l.status = 'Won'
+            GROUP BY
+                YEAR(l.created_date),
+                MONTH(l.created_date),
+                p.product_name
+            ORDER BY year, month
+            """, nativeQuery = true)
+    List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly();
 }
-
-

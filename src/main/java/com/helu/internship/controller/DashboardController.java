@@ -4,6 +4,9 @@ import com.helu.internship.dto.response.*;
 import com.helu.internship.service.DashboardService;
 import org.springframework.web.bind.annotation.*;
 
+
+import java.security.Principal;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,9 +35,17 @@ public class DashboardController {
         return dashboardService.getConversionRate();
     }
 
+    @GetMapping("/average-days-to-won")
+    public Double getAverageDaysToWon() {
+        return dashboardService.getAverageDaysToWon();
+    }
+
     @GetMapping("/win-rate-by-saleowner")
-    public List<WinRateBySalesResponse> getWinRateBySalesOwner() {
-        return dashboardService.getWinRateBySalesOwner();
+    public List<WinRateBySalesResponse> getWinRateBySalesOwner(
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String industry
+    ) {
+        return dashboardService.getWinRateBySalesOwner(region, industry);
     }
 
     @GetMapping("/win-rate-by-industry")
@@ -51,17 +62,39 @@ public class DashboardController {
     public List<CostPerWinBySourceResponse> getCostPerWinByLeadSource() {
         return dashboardService.getCostPerWinByLeadSource();
     }
+
+    @GetMapping("/lead-source-cost")
+    public List<LeadSourceCostProjection> getLeadSourceCostDashboard() {
+        return dashboardService.getLeadSourceCostDashboard();
+    }
+
     @GetMapping("/lost-reasons")
     public List<LostReasonSummaryProjection> getLostReasonSummary(
             @RequestParam(required = false) String productId
-    )
-    {
+    ) {
         return dashboardService.getLostReasonSummary(productId);
+    }
+    @GetMapping("/lost-by-seller")
+    public List<LostBySellerProjection> getLostBySeller() {
+        return dashboardService.getLostBySeller();
+    }
+    @GetMapping("/lost-by-source")
+    public List<LostBySourceProjection> getLostBySource() {
+        return dashboardService.getLostBySource();
+    }
+    @GetMapping("/lost-by-region")
+    public List<LostByRegionProjection> getLostByRegion() {
+        return dashboardService.getLostByRegion();
+    }
+    @GetMapping("/lost-by-industry")
+    public List<LostByIndustryProjection> getLostByIndustry() {
+        return dashboardService.getLostByIndustry();
     }
     @GetMapping("/revenue-industry")
     public List<RevenueIndustryResponse> getRevenueByIndustry() {
         return dashboardService.getRevenueByIndustry();
     }
+
     @GetMapping("/roi-lead-source")
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return dashboardService.getROIByLeadSource();
@@ -89,5 +122,81 @@ public class DashboardController {
         );
     }
 
+    @GetMapping("/pipeline-coverage")
+    public List<PipelineCoverageProjection> getPipelineCoverage() {
+        return dashboardService.getPipelineCoverage(null);
+    }
 
+    // --- STAFF ENDPOINTS ---
+
+    @GetMapping("/staff/stats")
+    public ConversionRateResponse getStaffStats(Principal principal) {
+        return dashboardService.getStaffStats(principal.getName());
+    }
+
+    @GetMapping("/staff/pipeline-coverage")
+    public List<PipelineCoverageProjection> getStaffPipelineCoverage(Principal principal) {
+        return dashboardService.getStaffPipelineCoverage(principal.getName());
+    }
+    @GetMapping("/sales-owner-dashboard")
+    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboard() {
+        return dashboardService.getSalesOwnerDashboard();
+    }
+    @GetMapping("/revenue-summary")
+    public RevenueSummaryProjection getRevenueSummary() {
+        return dashboardService.getRevenueSummary();
+    }
+
+    @GetMapping("/revenue-region")
+    public List<RevenueRegionProjection> getRevenueByRegion() {
+        return dashboardService.getRevenueByRegion();
+    }
+
+    @GetMapping("/revenue-product-line")
+    public List<RevenueProductLineProjection> getRevenueByProductLine() {
+        return dashboardService.getRevenueByProductLine();
+    }
+    @GetMapping("/revenue-monthly")
+    public List<RevenueMonthlyProjection> getRevenueMonthly() {
+        return dashboardService.getRevenueMonthly();
+    }
+
+    @GetMapping("/revenue-quarterly")
+    public List<RevenueQuarterlyProjection> getRevenueQuarterly() {
+        return dashboardService.getRevenueQuarterly();
+    }
+
+    @GetMapping("/lead-monthly")
+    public List<LeadMonthlyProjection> getLeadMonthly() {
+        return dashboardService.getLeadMonthly();
+    }
+
+    @GetMapping("/lead-quarterly")
+    public List<LeadQuarterlyProjection> getLeadQuarterly() {
+        return dashboardService.getLeadQuarterly();
+    }
+    @GetMapping("/revenue-seller-monthly")
+    public List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly() {
+        return dashboardService.getRevenueSellerMonthly();
+    }
+
+    @GetMapping("/revenue-source-monthly")
+    public List<RevenueSourceMonthlyProjection> getRevenueSourceMonthly() {
+        return dashboardService.getRevenueSourceMonthly();
+    }
+
+    @GetMapping("/revenue-region-monthly")
+    public List<RevenueRegionMonthlyProjection> getRevenueRegionMonthly() {
+        return dashboardService.getRevenueRegionMonthly();
+    }
+
+    @GetMapping("/revenue-industry-monthly")
+    public List<RevenueIndustryMonthlyProjection> getRevenueIndustryMonthly() {
+        return dashboardService.getRevenueIndustryMonthly();
+    }
+
+    @GetMapping("/revenue-product-line-monthly")
+    public List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly() {
+        return dashboardService.getRevenueProductLineMonthly();
+    }
 }
