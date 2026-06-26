@@ -203,11 +203,16 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Cột trái: Biểu đồ Phễu Cơ cấu Trạng thái Leads -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[520px]">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
-                    <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
-                    <span class="text-sm font-normal text-slate-400 font-mono ml-2">(/lead-status)</span>
-                </h2>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                        <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
+                        <span class="text-sm font-normal text-slate-400 font-mono ml-2">(/lead-status)</span>
+                    </h2>
+                    <button onclick="testFunnelMockData()" class="px-2.5 py-1 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all border border-blue-100 shadow-sm">
+                        Test Phễu Ảo (Tỷ lệ lệch)
+                    </button>
+                </div>
                 <div class="relative w-full flex-1 min-h-[400px] flex items-center justify-center" id="leadStatusFunnelContainer"></div>
             </div>
 
@@ -562,11 +567,21 @@
                         { key: 'Won', label: 'Won', statuses: ['Won'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
                     ];
 
-                    const minH = 22;
                     const totalHeight = 260;
                     const gap = 6;
                     const startY = 34;
 
+                    // Trả lại chiều rộng (chiều ngang) giảm dần đều để tạo dáng phễu chuẩn
+                    const Y_start = startY;
+                    const Y_end = startY + totalHeight + 4 * gap;
+                    const getFunnelWidth = (y) => {
+                        const ratio = Math.max(0, Math.min(1, (y - Y_start) / (Y_end - Y_start)));
+                        return 220 - (220 - 45) * ratio;
+                    };
+
+                    // Độ dày (chiều cao h thẳng đứng) tỉ lệ trực tiếp với số lượng (%)
+                    // Đặt minH = 8px để các giai đoạn 0% vẫn hiển thị thành một lát mỏng không biến mất hoàn toàn
+                    const minH = 8;
                     let heights = [];
                     if (totalActive === 0) {
                         heights = [52, 52, 52, 52, 52];
@@ -574,13 +589,6 @@
                         const remainingH = totalHeight - (5 * minH);
                         heights = values.map(v => minH + remainingH * (v / totalActive));
                     }
-
-                    const Y_start = startY;
-                    const Y_end = startY + totalHeight + 4 * gap;
-                    const getFunnelWidth = (y) => {
-                        const ratio = Math.max(0, Math.min(1, (y - Y_start) / (Y_end - Y_start)));
-                        return 220 - (220 - 45) * ratio;
-                    };
 
                     let svgHtml = `
                     <svg viewBox="0 0 500 350" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -721,6 +729,45 @@
                     console.error('Error loading Lead Status funnel:', error);
                     document.getElementById('leadStatusFunnelContainer').innerHTML = `<p class="text-red-500 font-bold text-center">Không thể tải biểu đồ phễu</p>`;
                 }
+            }
+
+            // ==========================================
+            // HÀM TEST PHỄU ẢO (Tỉ lệ lệch để thấy độ dày mỏng)
+            // ==========================================
+            async function testFunnelMockData() {
+                // Định nghĩa dữ liệu ảo lệch cực lớn:
+                // Tầng đầu: 900 Leads (Dày)
+                // Các tầng sau: 30, 20, 10, 5 Leads (Rất mỏng)
+                const mockData = [
+                    { status: 'New', total: 850 },
+                    { status: 'Contacted', total: 50 },
+                    { status: 'Qualified', total: 30 },
+                    { status: 'Proposal Sent', total: 20 },
+                    { status: 'In Negotiation', total: 10 },
+                    { status: 'Won', total: 8 }
+                ];
+                
+                // Lưu fetch gốc
+                if (!window.originalFetch) {
+                    window.originalFetch = window.fetch;
+                }
+                
+                // Mock tạm thời API /lead-status
+                window.fetch = async (url) => {
+                    if (url.includes('/lead-status')) {
+                        return {
+                            ok: true,
+                            json: async () => mockData
+                        };
+                    }
+                    return window.originalFetch(url);
+                };
+                
+                // Vẽ lại phễu
+                await loadLeadStatusChart();
+                
+                // Khôi phục lại fetch gốc sau khi vẽ để không ảnh hưởng các chức năng khác
+                window.fetch = window.originalFetch;
             }
 
 
@@ -1290,14 +1337,24 @@
                     const lastQ = thisQ === 1 ? 4 : thisQ - 1;
 
                     let cardsHtml = `
-                        <!-- Card 1: Total Leads This Quarter -->
-                        <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                        <!-- Card 1: Total Leads (This vs Last Quarter Comparison) -->
+                        <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[140px] relative overflow-hidden md:col-span-2">
                             <div class="accent-bar bg-gradient-to-r from-blue-500 to-indigo-600"></div>
                             <div class="flex items-center gap-2 mb-3 mt-1">
                                 <div class="bg-blue-50 text-blue-600 p-1.5 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i></div>
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Leads (Q${thisQ})</h3>
+                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Leads: This Quarter (Q${thisQ}) vs Last Quarter (Q${lastQ})</h3>
                             </div>
-                            <div class="text-3xl font-black text-slate-800">${sumLeadsThis.toLocaleString()}</div>
+                            <div class="flex items-center gap-8 py-2">
+                                <div>
+                                    <span class="text-xs text-slate-400 font-bold block mb-1">THIS QUARTER (Q${thisQ})</span>
+                                    <span class="text-3xl font-black text-slate-800">${sumLeadsThis.toLocaleString()}</span>
+                                </div>
+                                <div class="h-10 w-[1px] bg-slate-200"></div>
+                                <div>
+                                    <span class="text-xs text-slate-400 font-bold block mb-1">LAST QUARTER (Q${lastQ})</span>
+                                    <span class="text-3xl font-black text-slate-500">${sumLeadsLast.toLocaleString()}</span>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Card 2: Total Won This Quarter -->
@@ -1308,16 +1365,6 @@
                                 <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Won (Q${thisQ})</h3>
                             </div>
                             <div class="text-3xl font-black text-slate-800">${sumWonThis.toLocaleString()}</div>
-                        </div>
-
-                        <!-- Card 3: Total Leads Last Quarter -->
-                        <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[140px] relative overflow-hidden">
-                            <div class="accent-bar bg-gradient-to-r from-slate-400 to-slate-500"></div>
-                            <div class="flex items-center gap-2 mb-3 mt-1">
-                                <div class="bg-slate-50 text-slate-600 p-1.5 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i></div>
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Leads (Q${lastQ})</h3>
-                            </div>
-                            <div class="text-3xl font-black text-slate-800">${sumLeadsLast.toLocaleString()}</div>
                         </div>
                     `;
 

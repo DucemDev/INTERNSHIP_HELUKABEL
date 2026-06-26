@@ -574,6 +574,7 @@ SELECT
     SUM(l.business_result) AS revenue
 FROM lead l
 WHERE l.status = 'Won'
+  AND (:year IS NULL OR YEAR(l.created_date) = :year)
 GROUP BY
     YEAR(l.created_date),
     DATEPART(QUARTER, l.created_date)
@@ -581,7 +582,7 @@ ORDER BY
     year,
     quarter
 """, nativeQuery = true)
-    List<RevenueQuarterlyProjection> getRevenueQuarterly();
+    List<RevenueQuarterlyProjection> getRevenueQuarterly(@Param("year") Integer year);
 
     @Query(value = """
 SELECT
@@ -640,6 +641,7 @@ SELECT
     ) AS lostLead
 
 FROM lead l
+WHERE (:year IS NULL OR YEAR(l.created_date) = :year)
 GROUP BY
     YEAR(l.created_date),
     DATEPART(QUARTER, l.created_date)
@@ -647,7 +649,7 @@ ORDER BY
     year,
     quarter
 """, nativeQuery = true)
-    List<LeadQuarterlyProjection> getLeadQuarterly();
+    List<LeadQuarterlyProjection> getLeadQuarterly(@Param("year") Integer year);
 
     @Query(value = """
 SELECT

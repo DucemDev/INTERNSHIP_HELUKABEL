@@ -67,11 +67,11 @@ public interface DashboardService {
 
     List<RevenueMonthlyProjection> getRevenueMonthly();
 
-    List<RevenueQuarterlyProjection> getRevenueQuarterly();
+    List<RevenueQuarterlyProjection> getRevenueQuarterly(Integer year);
 
     List<LeadMonthlyProjection> getLeadMonthly();
 
-    List<LeadQuarterlyProjection> getLeadQuarterly();
+    List<LeadQuarterlyProjection> getLeadQuarterly(Integer year);
 
     List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly();
 

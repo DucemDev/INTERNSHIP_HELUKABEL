@@ -285,8 +285,8 @@ Tổng doanh thu theo từng quý
 */
 
     @GetMapping("/revenue-quarterly")
-    public List<RevenueQuarterlyProjection> getRevenueQuarterly() {
-        return dashboardService.getRevenueQuarterly();
+    public List<RevenueQuarterlyProjection> getRevenueQuarterly(@RequestParam(value = "year", required = false) Integer year) {
+        return dashboardService.getRevenueQuarterly(year);
     }
 
     /*/
@@ -302,8 +302,8 @@ Tổng số lead theo từng quý
 */
 
     @GetMapping("/lead-quarterly")
-    public List<LeadQuarterlyProjection> getLeadQuarterly() {
-        return dashboardService.getLeadQuarterly();
+    public List<LeadQuarterlyProjection> getLeadQuarterly(@RequestParam(value = "year", required = false) Integer year) {
+        return dashboardService.getLeadQuarterly(year);
     }
 
     /*/
