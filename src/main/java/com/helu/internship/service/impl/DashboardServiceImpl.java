@@ -152,7 +152,14 @@ public class DashboardServiceImpl implements DashboardService {
         String userCode = userRepo.findByEmail(email)
                 .map(u -> u.getUserCode())
                 .orElse(null);
-        return pipelineCoverageRepo.getPipelineCoverage(userCode);
+        List<PipelineCoverageProjection> list = pipelineCoverageRepo.getPipelineCoverage(userCode);
+        return list.stream()
+                .sorted((a, b) -> {
+                    int yearComp = Integer.compare(b.getPeriodYear(), a.getPeriodYear());
+                    if (yearComp != 0) return yearComp;
+                    return Integer.compare(b.getPeriodMonth(), a.getPeriodMonth());
+                })
+                .toList();
     }
     @Override
     public List<LostBySellerProjection> getLostBySeller() {

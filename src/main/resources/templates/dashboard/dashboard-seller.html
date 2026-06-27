@@ -8,7 +8,7 @@
         </div>
 
         <!-- KPI Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-gray-900">
                 <div class="flex justify-between items-start mb-4">
                     <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i data-lucide="users" class="w-6 h-6"></i></div>
@@ -18,81 +18,161 @@
                 <p class="mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">Đang theo dõi</p>
             </div>
 
-            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-helu-red">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="bg-emerald-100 text-emerald-600 p-3 rounded-xl"><i data-lucide="award" class="w-6 h-6"></i></div>
-                </div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Chỉ tiêu Won</h3>
-                <div id="myWonLeads" class="mt-4 text-4xl font-extrabold text-helu-red tracking-tight">0</div>
-                <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Tổng cộng</p>
-            </div>
-
             <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
                 <div class="flex justify-between items-start mb-4">
                     <div class="bg-purple-100 text-purple-600 p-3 rounded-xl"><i data-lucide="pie-chart" class="w-6 h-6"></i></div>
                 </div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tỷ lệ chuyển đổi</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tỷ lệ thắng</h3>
                 <div id="myConversionRate" class="mt-4 text-4xl font-extrabold text-blue-600 tracking-tight">0%</div>
                 <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Hiệu quả chốt đơn</p>
             </div>
         </div>
 
-        <!-- Charts Row -->
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <!-- Leads Status Distribution -->
-            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
-                    Cơ cấu Trạng thái Leads
-                </h2>
-                <div class="relative flex-1 min-h-[300px] flex items-center justify-center">
-                    <canvas id="leadsStatusChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Pipeline Coverage Chart -->
-            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm">
+        <!-- Row 1: KPI Progress Circle & Funnel Chart -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- SVG Progress Ring -->
+            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col justify-between">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-red-600 rounded-full"></span> 
-                    Tiến độ Target
+                    Tiến độ Target & Chỉ tiêu KPI
                 </h2>
-                <div class="relative h-[300px]">
-                    <canvas id="staffPipelineChart"></canvas>
+                <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-4 flex-1">
+                    <!-- Circle Gauge -->
+                    <div class="relative w-40 h-40 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle cx="80" cy="80" r="65" class="stroke-slate-100 fill-none" stroke-width="12" />
+                            <circle id="kpiProgressCircle" cx="80" cy="80" r="65" class="stroke-helu-red fill-none transition-all duration-1000" stroke-width="12" stroke-dasharray="408" stroke-dashoffset="408" stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute text-center">
+                            <span id="kpiPercent" class="text-3xl font-black text-slate-800">0%</span>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Đạt chỉ tiêu</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress details -->
+                    <div class="space-y-4 flex-1 w-full max-w-xs">
+                        <!-- Doanh số đã chốt (Won) -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <span>Doanh số đã chốt (Won)</span>
+                                <span id="txtWonRevenue" class="text-slate-800 font-extrabold">0 đ</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div id="barWonRevenue" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Cơ hội (Pipeline) -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <span>Cơ hội (Pipeline)</span>
+                                <span id="txtPipeline" class="text-slate-800 font-extrabold">0 đ</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div id="barPipeline" class="bg-gradient-to-r from-blue-500 to-cyan-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Chỉ tiêu (Target) -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <span>Chỉ tiêu (Target)</span>
+                                <span id="txtTarget" class="text-slate-800 font-extrabold">0 đ</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div id="barTarget" class="bg-gradient-to-r from-red-500 to-rose-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Win Rate By Sales (Leaderboard) with Region Filter -->
-            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span> 
-                        Tỷ lệ thắng theo Nhân viên
-                    </h2>
-                    <!-- Region Filter -->
-                    <div class="relative w-full sm:w-auto">
-                        <select id="regionFilter" onchange="loadWinRateChart(this.value)" class="w-full appearance-none pl-4 pr-10 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all cursor-pointer">
-                            <option value="">Tất cả khu vực</option>
-                            <!-- Options populated by JS -->
-                        </select>
-                        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+            <!-- Leads Conversion Funnel Chart -->
+            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col justify-between">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
+                    Phễu Chuyển đổi Khách hàng (SLA Stages)
+                </h2>
+                <div class="funnel-container flex flex-col items-center justify-center space-y-1 py-1 flex-1">
+                    <!-- Stage 1: New -->
+                    <div class="funnel-stage w-full max-w-[340px] bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
+                        <span class="font-extrabold text-[9px] uppercase tracking-wider">1. Mới nhận (New)</span>
+                        <span class="text-xs font-black" id="funnelNew">0 Leads</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                        <span id="rateNewToContacted">0%</span>
+                    </div>
+
+                    <!-- Stage 2: Contacted -->
+                    <div class="funnel-stage w-[88%] max-w-[300px] bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
+                        <span class="font-extrabold text-[9px] uppercase tracking-wider">2. Đã tiếp cận (Contacted)</span>
+                        <span class="text-xs font-black" id="funnelContacted">0 Leads</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                        <span id="rateContactedToQualified">0%</span>
+                    </div>
+
+                    <!-- Stage 3: Qualified -->
+                    <div class="funnel-stage w-[76%] max-w-[260px] bg-gradient-to-r from-purple-600 to-purple-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
+                        <span class="font-extrabold text-[9px] uppercase tracking-wider">3. Thẩm định (Qualified)</span>
+                        <span class="text-xs font-black" id="funnelQualified">0 Leads</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                        <span id="rateQualifiedToProposal">0%</span>
+                    </div>
+
+                    <!-- Stage 4: Proposal Sent -->
+                    <div class="funnel-stage w-[64%] max-w-[220px] bg-gradient-to-r from-pink-600 to-pink-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
+                        <span class="font-extrabold text-[9px] uppercase tracking-wider">4. Đã báo giá (Proposal)</span>
+                        <span class="text-xs font-black" id="funnelProposal">0 Leads</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                        <span id="rateProposalToNegotiation">0%</span>
+                    </div>
+
+                    <!-- Stage 5: In Negotiation -->
+                    <div class="funnel-stage w-[52%] max-w-[180px] bg-gradient-to-r from-amber-600 to-amber-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
+                        <span class="font-extrabold text-[9px] uppercase tracking-wider">5. Thương thảo (Negotiation)</span>
+                        <span class="text-xs font-black" id="funnelNegotiation">0 Leads</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+                        <span id="rateNegotiationToWon">0%</span>
+                    </div>
+
+                    <!-- Stage 6: Won -->
+                    <div class="funnel-stage w-[40%] max-w-[140px] bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
+                        <span class="font-extrabold text-[9px] uppercase tracking-wider">6. Chốt thắng (Won)</span>
+                        <span class="text-xs font-black" id="funnelWon">0 Leads</span>
                     </div>
                 </div>
-                <div class="relative flex-1 min-h-[300px]">
-                    <canvas id="winRateChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Row 2: BANT Scatter Plot -->
+        <div class="w-full mt-6">
+            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col justify-between">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span> 
+                    Bản đồ Phân tán Leads (BANT vs Giá trị)
+                </h2>
+                <div class="relative h-[350px]">
+                    <canvas id="bantScatterChart"></canvas>
                 </div>
             </div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            let winRateChart = null;
-
             document.addEventListener('DOMContentLoaded', async () => {
                 loadStats();
-                loadLeadsStatusChart();
-                loadPipelineChart();
-                loadRegions();
-                loadWinRateChart('');
+                loadKpiProgress();
+                loadFunnelChart();
+                loadBantScatterChart();
             });
 
             async function loadStats() {
@@ -101,7 +181,6 @@
                     if (response.ok) {
                         const data = await response.json();
                         document.getElementById('myTotalLeads').innerText = (data.totalLead || 0).toLocaleString();
-                        document.getElementById('myWonLeads').innerText = (data.wonLead || 0).toLocaleString();
                         document.getElementById('myConversionRate').innerText = (data.conversionRate || 0).toFixed(1) + '%';
                     }
                 } catch (error) {
@@ -109,149 +188,205 @@
                 }
             }
 
-            async function loadPipelineChart() {
+            async function loadKpiProgress() {
                 try {
                     const response = await fetch('/api/dashboard/seller/pipeline-coverage');
                     if (!response.ok) return;
                     const data = await response.json();
                     if (data.length === 0) return;
                     const item = data[0];
-                    const ctx = document.getElementById('staffPipelineChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Tiến độ doanh số'],
-                            datasets: [
-                                { label: 'Open Pipeline', data: [item.openPipeline || 0], backgroundColor: 'rgba(59, 130, 246, 0.8)', borderRadius: 8 },
-                                { label: 'Target', data: [item.target || 0], backgroundColor: 'rgba(239, 68, 68, 0.8)', borderRadius: 8 }
-                            ]
-                        },
-                        options: {
-                            indexAxis: 'y',
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom' } },
-                            scales: { x: { beginAtZero: true, ticks: { callback: (v) => v.toLocaleString() } } }
-                        }
-                    });
+
+                    const openPipeline = item.openPipeline || 0;
+                    const wonRevenue = item.wonRevenue || 0;
+                    const targetRevenue = item.targetRevenue || 0;
+
+                    document.getElementById('txtWonRevenue').innerText = wonRevenue.toLocaleString('vi-VN') + ' đ';
+                    document.getElementById('txtPipeline').innerText = openPipeline.toLocaleString('vi-VN') + ' đ';
+                    document.getElementById('txtTarget').innerText = targetRevenue.toLocaleString('vi-VN') + ' đ';
+
+                    // 1. Tính tỷ lệ đạt chỉ tiêu thực tế từ deal chốt thắng (Won)
+                    let percentWon = 0;
+                    if (targetRevenue > 0) {
+                        percentWon = Math.round((wonRevenue / targetRevenue) * 100);
+                    }
+
+                    document.getElementById('kpiPercent').innerText = percentWon + '%';
+
+                    // Vẽ vòng SVG progress của Deal Won (chu vi là 408)
+                    const circle = document.getElementById('kpiProgressCircle');
+                    const drawPercentWon = Math.min(percentWon, 100);
+                    const offset = 408 - (408 * drawPercentWon) / 100;
+                    circle.style.strokeDashoffset = offset;
+
+                    // Cập nhật thanh tiến trình Won Revenue
+                    document.getElementById('barWonRevenue').style.width = drawPercentWon + '%';
+
+                    // 2. Tính tỷ lệ bao phủ của Cơ hội hiện tại (Pipeline)
+                    let percentPipeline = 0;
+                    if (targetRevenue > 0) {
+                        percentPipeline = Math.round((openPipeline / targetRevenue) * 100);
+                    }
+                    document.getElementById('barPipeline').style.width = Math.min(percentPipeline, 100) + '%';
+
+                    // 3. Chỉ tiêu Target luôn ở mốc 100%
+                    document.getElementById('barTarget').style.width = '100%';
+
                 } catch (error) {
-                    console.error('Error loading pipeline chart:', error);
+                    console.error('Error loading KPI progress:', error);
                 }
             }
 
-            async function loadRegions() {
-                try {
-                    const res = await fetch('/api/dashboard/win-rate-by-region');
-                    if (!res.ok) return;
-                    const data = await res.json();
-                    const filter = document.getElementById('regionFilter');
-                    data.forEach(item => {
-                        if (item.region) {
-                            const opt = document.createElement('option');
-                            opt.value = item.region;
-                            opt.textContent = item.region;
-                            filter.appendChild(opt);
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading regions:', error);
-                }
-            }
-
-            async function loadWinRateChart(region) {
-                try {
-                    // Mặc dù Backend chưa hỗ trợ filter, chúng ta vẫn truyền param theo yêu cầu Front-end
-                    const url = region ? `/api/dashboard/win-rate-by-saleowner?region=${encodeURIComponent(region)}` : '/api/dashboard/win-rate-by-saleowner';
-                    const res = await fetch(url);
-                    if (!res.ok) return;
-                    const data = await res.json();
-
-                    const labels = data.map(item => item.userName || 'N/A');
-                    const values = data.map(item => item.winRate || 0);
-
-                    if (winRateChart) winRateChart.destroy();
-
-                    const ctx = document.getElementById('winRateChart').getContext('2d');
-                    winRateChart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Tỷ lệ thắng (%)',
-                                data: values,
-                                backgroundColor: '#10b981',
-                                borderRadius: 6
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: { beginAtZero: true, max: 100 }
-                            },
-                            plugins: {
-                                legend: { display: false }
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading win rate chart:', error);
-                }
-            }
-
-            async function loadLeadsStatusChart() {
+            async function loadFunnelChart() {
                 try {
                     const response = await fetch('/api/dashboard/seller/leads-by-status-count');
                     if (!response.ok) return;
                     const data = await response.json();
 
-                    const labels = data.map(item => item.status || 'N/A');
-                    const values = data.map(item => item.count || 0);
+                    let countNew = 0;
+                    let countContacted = 0;
+                    let countQualified = 0;
+                    let countProposal = 0;
+                    let countNegotiation = 0;
+                    let countWon = 0;
 
-                    // Mảng màu sắc dịu nhẹ dạng Power-BI chuyên nghiệp
-                    const colors = {
-                        'New': 'rgba(59, 130, 246, 0.85)',
-                        'In Progress': 'rgba(245, 158, 11, 0.85)',
-                        'In Negotiation': 'rgba(139, 92, 246, 0.85)',
-                        'Proposal Sent': 'rgba(6, 182, 212, 0.85)',
-                        'Contacted': 'rgba(236, 72, 153, 0.85)',
-                        'Won': 'rgba(16, 185, 129, 0.85)',
-                        'Lost': 'rgba(239, 68, 68, 0.85)',
-                        'Disqualified': 'rgba(107, 114, 128, 0.85)'
+                    data.forEach(item => {
+                        const status = item.status ? item.status.trim() : '';
+                        const total = item.total || 0;
+                        if (status === 'New') {
+                            countNew = total;
+                        } else if (status === 'Contacted') {
+                            countContacted = total;
+                        } else if (status === 'Qualified') {
+                            countQualified = total;
+                        } else if (status === 'Proposal Sent') {
+                            countProposal = total;
+                        } else if (status === 'In Negotiation') {
+                            countNegotiation = total;
+                        } else if (status === 'Won') {
+                            countWon = total;
+                        }
+                    });
+
+                    document.getElementById('funnelNew').innerText = countNew + ' Leads';
+                    document.getElementById('funnelContacted').innerText = countContacted + ' Leads';
+                    document.getElementById('funnelQualified').innerText = countQualified + ' Leads';
+                    document.getElementById('funnelProposal').innerText = countProposal + ' Leads';
+                    document.getElementById('funnelNegotiation').innerText = countNegotiation + ' Leads';
+                    document.getElementById('funnelWon').innerText = countWon + ' Leads';
+
+                    // Hàm phụ tính tỷ lệ chuyển đổi an toàn
+                    const calcRate = (curr, prev) => {
+                        if (prev <= 0) return curr > 0 ? 100 : 0;
+                        return Math.round((curr / prev) * 100);
                     };
 
-                    const backgroundColors = labels.map(label => colors[label] || 'rgba(156, 163, 175, 0.85)');
+                    document.getElementById('rateNewToContacted').innerText = calcRate(countContacted, countNew) + '% Chuyển đổi';
+                    document.getElementById('rateContactedToQualified').innerText = calcRate(countQualified, countContacted) + '% Chuyển đổi';
+                    document.getElementById('rateQualifiedToProposal').innerText = calcRate(countProposal, countQualified) + '% Chuyển đổi';
+                    document.getElementById('rateProposalToNegotiation').innerText = calcRate(countNegotiation, countProposal) + '% Chuyển đổi';
+                    document.getElementById('rateNegotiationToWon').innerText = calcRate(countWon, countNegotiation) + '% Chuyển đổi';
 
-                    const ctx = document.getElementById('leadsStatusChart').getContext('2d');
+                    // Vẽ lại icon Lucide
+                    if (window.lucide) {
+                        window.lucide.createIcons();
+                    }
+
+                } catch (error) {
+                    console.error('Error loading funnel chart:', error);
+                }
+            }
+
+            async function loadBantScatterChart() {
+                try {
+                    const response = await fetch('/api/seller/leads');
+                    if (!response.ok) return;
+                    const leads = await response.json();
+
+                    const hotData = [];
+                    const warmData = [];
+                    const coldData = [];
+
+                    leads.forEach(lead => {
+                        const totalBant = (lead.bantBudget || 0) + (lead.bantAuthority || 0) + (lead.bantNeed || 0) + (lead.bantTimeline || 0);
+                        const point = {
+                            x: totalBant,
+                            y: lead.cost || 0,
+                            label: `${lead.fullName} (${lead.account})`
+                        };
+
+                        if (lead.leadHeat === 'HOT') {
+                            hotData.push(point);
+                        } else if (lead.leadHeat === 'WARM') {
+                            warmData.push(point);
+                        } else {
+                            coldData.push(point);
+                        }
+                    });
+
+                    const ctx = document.getElementById('bantScatterChart').getContext('2d');
                     new Chart(ctx, {
-                        type: 'doughnut',
+                        type: 'scatter',
                         data: {
-                            labels: labels,
-                            datasets: [{
-                                data: values,
-                                backgroundColor: backgroundColors,
-                                borderWidth: 2,
-                                borderColor: '#ffffff'
-                            }]
+                            datasets: [
+                                {
+                                    label: 'Leads HOT',
+                                    data: hotData,
+                                    backgroundColor: 'rgba(239, 68, 68, 0.85)',
+                                    pointRadius: 8,
+                                    pointHoverRadius: 10
+                                },
+                                {
+                                    label: 'Leads WARM',
+                                    data: warmData,
+                                    backgroundColor: 'rgba(245, 158, 11, 0.85)',
+                                    pointRadius: 8,
+                                    pointHoverRadius: 10
+                                },
+                                {
+                                    label: 'Leads COLD',
+                                    data: coldData,
+                                    backgroundColor: 'rgba(148, 163, 184, 0.85)',
+                                    pointRadius: 8,
+                                    pointHoverRadius: 10
+                                }
+                            ]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: {
-                                    position: 'bottom',
-                                    labels: {
-                                        boxWidth: 12,
-                                        font: { size: 11, weight: 'bold' },
-                                        padding: 15
+                                legend: { position: 'bottom' },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const leadInfo = context.raw.label || 'N/A';
+                                            return ` ${leadInfo}: BANT: ${context.parsed.x}/100, Giá trị: ${context.parsed.y.toLocaleString('vi-VN')} đ`;
+                                        }
                                     }
                                 }
                             },
-                            cutout: '65%'
+                            scales: {
+                                x: {
+                                    title: { display: true, text: 'Điểm số BANT (0 - 100)', font: { weight: 'bold' } },
+                                    min: 0,
+                                    max: 100
+                                },
+                                y: {
+                                    title: { display: true, text: 'Giá trị Lead (VNĐ)', font: { weight: 'bold' } },
+                                    ticks: {
+                                        callback: function(value) {
+                                            if (value >= 1000000) {
+                                                return (value / 1000000).toLocaleString() + 'M';
+                                            }
+                                            return value.toLocaleString();
+                                        }
+                                    }
+                                }
+                            }
                         }
                     });
                 } catch (error) {
-                    console.error('Error loading leads status chart:', error);
+                    console.error('Error loading BANT scatter chart:', error);
                 }
             }
         </script>

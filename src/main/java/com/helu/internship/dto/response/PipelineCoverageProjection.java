@@ -10,6 +10,8 @@ public interface PipelineCoverageProjection {
 
     BigDecimal getOpenPipeline();
 
+    BigDecimal getWonRevenue();
+
     BigDecimal getTargetRevenue();
 
     BigDecimal getPipelineCoverage();
