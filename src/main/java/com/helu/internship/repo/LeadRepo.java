@@ -14,6 +14,9 @@ import java.util.Optional;
 @Repository
 public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
+    @Query("SELECT l FROM LeadEntity l JOIN FETCH l.user u LEFT JOIN FETCH l.bantPoint WHERE u.email = :email")
+    List<LeadEntity> findBySellerEmail(@Param("email") String email);
+
     @Query(value = """
             SELECT
                 l.lead_id AS leadId,

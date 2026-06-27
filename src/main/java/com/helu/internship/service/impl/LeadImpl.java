@@ -19,6 +19,7 @@ public class LeadImpl implements LeadService {
 
     private final LeadRepo leadRepo;
     private final UserRepo userRepo;
+    private final LeadBantPointRepo leadBantPointRepo;
 
     @Override
     @Transactional(readOnly = true)
@@ -137,6 +138,35 @@ public class LeadImpl implements LeadService {
             userName = lead.getUser().getFullName();
         }
 
+        Integer budget = null;
+        Integer authority = null;
+        Integer need = null;
+        Integer timeline = null;
+        Integer totalScore = null;
+        String leadHeat = "COLD"; // Mặc định nếu chưa chấm điểm
+
+        if (lead.getBantPoint() != null) {
+            LeadBantPointEntity bp = lead.getBantPoint();
+            budget = bp.getBudget();
+            authority = bp.getAuthority();
+            need = bp.getNeed();
+            timeline = bp.getTimeline();
+            totalScore = bp.getTotalScore();
+            if (totalScore == null) {
+                totalScore = (budget != null ? budget : 0) +
+                             (authority != null ? authority : 0) +
+                             (need != null ? need : 0) +
+                             (timeline != null ? timeline : 0);
+            }
+            if (totalScore >= 80) {
+                leadHeat = "HOT";
+            } else if (totalScore >= 60) {
+                leadHeat = "WARM";
+            } else {
+                leadHeat = "COLD";
+            }
+        }
+
         return LeadResponse.builder()
                 .leadId(lead.getLeadId())
                 .createdDate(lead.getCreatedDate())
@@ -155,7 +185,68 @@ public class LeadImpl implements LeadService {
                 .businessResult(lead.getBusinessResult())
                 .productName(lead.getProductName())
                 .sourceName(lead.getSourceName())
-                .userName(userName) // Đã được xử lý Null an toàn ở trên
+                .userName(userName)
+                .bantBudget(budget)
+                .bantAuthority(authority)
+                .bantNeed(need)
+                .bantTimeline(timeline)
+                .bantTotalScore(totalScore)
+                .leadHeat(leadHeat)
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<LeadResponse> getSellerLeads(String email, String heatFilter) {
+        List<LeadEntity> leads = leadRepo.findBySellerEmail(email);
+        return leads.stream()
+                .map(this::mapToResponse)
+                .filter(res -> {
+                    if (heatFilter == null || heatFilter.trim().isEmpty()) {
+                        return true;
+                    }
+                    return heatFilter.equalsIgnoreCase(res.getLeadHeat());
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public LeadResponse updateSellerLeadStatus(String email, String leadId, String status) {
+        LeadEntity lead = leadRepo.findById(leadId)
+                .orElseThrow(() -> new RuntimeException("Lead not found with id: " + leadId));
+        if (lead.getUser() == null || !lead.getUser().getEmail().equalsIgnoreCase(email)) {
+            throw new RuntimeException("You do not have permission to update this lead");
+        }
+        lead.setStatus(status);
+        return mapToResponse(leadRepo.save(lead));
+    }
+
+    @Override
+    @Transactional
+    public LeadResponse updateSellerLeadBant(String email, String leadId, int budget, int authority, int need, int timeline) {
+        if (budget < 0 || budget > 25 || authority < 0 || authority > 25 ||
+            need < 0 || need > 25 || timeline < 0 || timeline > 25) {
+            throw new IllegalArgumentException("Each BANT component score must be between 0 and 25 (inclusive)");
+        }
+        LeadEntity lead = leadRepo.findById(leadId)
+                .orElseThrow(() -> new RuntimeException("Lead not found with id: " + leadId));
+        if (lead.getUser() == null || !lead.getUser().getEmail().equalsIgnoreCase(email)) {
+            throw new RuntimeException("You do not have permission to update this lead");
+        }
+        LeadBantPointEntity bp = lead.getBantPoint();
+        if (bp == null) {
+            bp = LeadBantPointEntity.builder()
+                    .leadId(leadId)
+                    .lead(lead)
+                    .build();
+            lead.setBantPoint(bp);
+        }
+        bp.setBudget(budget);
+        bp.setAuthority(authority);
+        bp.setNeed(need);
+        bp.setTimeline(timeline);
+        leadRepo.save(lead);
+        return mapToResponse(lead);
     }
 }

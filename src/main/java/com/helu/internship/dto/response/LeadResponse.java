@@ -30,4 +30,12 @@ public class LeadResponse {
     private String productName;
     private String sourceName;
     private String userName;
+
+    // BANT Points and Heat Classification
+    private Integer bantBudget;
+    private Integer bantAuthority;
+    private Integer bantNeed;
+    private Integer bantTimeline;
+    private Integer bantTotalScore;
+    private String leadHeat;
 }
