@@ -28,9 +28,15 @@ public class HomeController {
         return "dashboard/dashboard-home";
     }
 
-    @GetMapping("/staff/dashboard")
-    public String staffDashboard(org.springframework.ui.Model model) {
+    @GetMapping("/seller/dashboard")
+    public String sellerDashboard(org.springframework.ui.Model model) {
         model.addAttribute("activeMenu", "dashboard");
         return "dashboard/dashboard-seller";
+    }
+
+    @GetMapping("/seller/leads")
+    public String sellerLeadsPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "leads");
+        return "seller/lead-management";
     }
 }

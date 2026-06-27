@@ -21,11 +21,11 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Đổi tên role 'Seller' thành 'Staff' nếu tồn tại
-        roleRepo.findByRoleName("Seller").ifPresent(role -> {
-            role.setRoleName("Staff");
+        // Đổi tên role 'Staff' thành 'Seller' nếu tồn tại
+        roleRepo.findByRoleName("Staff").ifPresent(role -> {
+            role.setRoleName("Seller");
             roleRepo.save(role);
-            System.out.println("Renamed role 'Seller' to 'Staff'");
+            System.out.println("Renamed role 'Staff' to 'Seller'");
         });
 
         List<UserEntity> users = userRepo.findAll();

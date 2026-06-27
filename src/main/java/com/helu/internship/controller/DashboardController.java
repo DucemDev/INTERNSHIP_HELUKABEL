@@ -127,14 +127,14 @@ public class DashboardController {
         return dashboardService.getPipelineCoverage(null);
     }
 
-    // --- STAFF ENDPOINTS ---
+    // --- SELLER ENDPOINTS ---
 
-    @GetMapping("/staff/stats")
+    @GetMapping("/seller/stats")
     public ConversionRateResponse getStaffStats(Principal principal) {
         return dashboardService.getStaffStats(principal.getName());
     }
 
-    @GetMapping("/staff/pipeline-coverage")
+    @GetMapping("/seller/pipeline-coverage")
     public List<PipelineCoverageProjection> getStaffPipelineCoverage(Principal principal) {
         return dashboardService.getStaffPipelineCoverage(principal.getName());
     }
