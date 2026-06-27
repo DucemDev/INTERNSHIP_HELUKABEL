@@ -385,7 +385,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
                 SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(l), 0) AS conversionRate
             FROM LeadEntity l
-            WHERE l.user.email = :email
+            WHERE l.user.email = :email 
             """)
     ConversionRateResponse getStatsByEmail(@Param("email") String email);
 
