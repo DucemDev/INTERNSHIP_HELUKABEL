@@ -698,4 +698,1205 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             ORDER BY year, month
             """, nativeQuery = true)
     List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly();
+
+    @Query(value = """
+                SELECT
+                    l.account AS account,
+            
+                    CAST(
+                        SUM(
+                            CASE
+                                WHEN l.status = 'Won'
+                                THEN 1
+                                ELSE 0
+                            END
+                        ) AS BIGINT
+                    ) AS wonLead,
+            
+                    SUM(
+                        CASE
+                            WHEN l.status = 'Won'
+                            THEN l.business_result
+                            ELSE 0
+                        END
+                    ) AS totalRevenue
+            
+                FROM lead l
+            
+                GROUP BY l.account
+            
+                ORDER BY totalRevenue DESC
+            """, nativeQuery = true)
+    List<RevenueByAccountResponse> getRevenueByAccount();
+
+    @Query(value = """
+                SELECT
+                    l.industry_type AS industryType,
+            
+                    COUNT(*) AS totalLead
+            
+                FROM lead l
+            
+                WHERE l.status IN (
+                    'New',
+                    'Contacted',
+                    'Qualified',
+                    'Proposal Sent',
+                    'In Negotiation'
+                )
+            
+                GROUP BY l.industry_type
+            
+                ORDER BY totalLead DESC
+            """, nativeQuery = true)
+    List<LeadByIndustryResponse> getPotentialLeadByIndustry();
+
+    @Query(value = """
+                SELECT
+                    ls.source_name AS sourceName,
+            
+                    SUM(CASE WHEN l.status = 'New' THEN 1 ELSE 0 END) AS newLead,
+            
+                    SUM(CASE WHEN l.status = 'Contacted' THEN 1 ELSE 0 END) AS contactedLead,
+            
+                    SUM(CASE WHEN l.status = 'Qualified' THEN 1 ELSE 0 END) AS qualifiedLead,
+            
+                    SUM(CASE WHEN l.status = 'Proposal Sent' THEN 1 ELSE 0 END) AS proposalSentLead,
+            
+                    SUM(CASE WHEN l.status = 'In Negotiation' THEN 1 ELSE 0 END) AS negotiationLead
+            
+                FROM lead l
+                JOIN lead_source ls
+                    ON l.source_id = ls.source_id
+            
+                WHERE (:sourceId IS NULL OR l.source_id = :sourceId)
+            
+                GROUP BY ls.source_name
+            
+                ORDER BY ls.source_name
+            """, nativeQuery = true)
+    List<LeadFunnelBySourceResponse> getLeadFunnelBySource(
+            @Param("sourceId") String sourceId
+    );
+
+    @Query(value = """
+                SELECT
+                    p.product_name AS productName,
+                    ls.source_name AS sourceName,
+                    COUNT(l.lead_id) AS totalLead
+                FROM lead l
+                JOIN product p
+                    ON l.product_id = p.product_id
+                JOIN lead_source ls
+                    ON l.source_id = ls.source_id
+                GROUP BY
+                    p.product_name,
+                    ls.source_name
+                ORDER BY
+                    p.product_name,
+                    totalLead DESC
+            """, nativeQuery = true)
+    List<LeadSourceByProductProjection> getLeadSourceByProduct();
+
+    @Query(value = """
+            SELECT
+                ls.source_name AS sourceName,
+                p.product_name AS productLine,
+                SUM(l.business_result) AS totalRevenue
+            FROM lead l
+            JOIN lead_source ls
+                ON l.source_id = ls.source_id
+            JOIN lead_item li
+                ON l.lead_id = li.lead_id
+            JOIN product p
+                ON li.product_id = p.product_id
+            WHERE l.status = 'Won'
+            GROUP BY
+                ls.source_name,
+                p.product_name
+            ORDER BY
+                totalRevenue DESC
+            """, nativeQuery = true)
+    List<RevenueBySourceProductResponse> getRevenueBySourceProduct();
+
+    @Query(value = """
+            SELECT
+                ls.source_name AS sourceName,
+                p.product_name AS productLine,
+                COUNT(DISTINCT l.lead_id) AS wonLead
+            FROM lead l
+            JOIN lead_source ls
+                ON l.source_id = ls.source_id
+            JOIN lead_item li
+                ON l.lead_id = li.lead_id
+            JOIN product p
+                ON li.product_id = p.product_id
+            WHERE l.status = 'Won'
+            GROUP BY
+                ls.source_name,
+                p.product_name
+            ORDER BY
+                wonLead DESC
+            """, nativeQuery = true)
+    List<WonLeadBySourceProductResponse> getWonLeadBySourceProduct();
+
+    @Query(value = """
+                SELECT
+                    ls.source_name AS sourceName,
+            
+                    p.product_name AS productName,
+            
+                    l.loss_reason AS lossReason,
+            
+                    COUNT(DISTINCT l.lead_id) AS totalLost
+            
+                FROM lead l
+            
+                JOIN lead_source ls
+                    ON l.source_id = ls.source_id
+            
+                JOIN lead_item li
+                    ON l.lead_id = li.lead_id
+            
+                JOIN product p
+                    ON li.product_id = p.product_id
+            
+                WHERE l.status = 'Lost'
+                  AND l.loss_reason IS NOT NULL
+            
+                GROUP BY
+                    ls.source_name,
+                    p.product_name,
+                    l.loss_reason
+            
+                ORDER BY totalLost DESC
+            """, nativeQuery = true)
+    List<LostLeadBySourceResponse> getLostLeadBySource();
+
+    @Query(value = """
+    SELECT TOP 1
+        l.account AS account,
+
+        COUNT(*) AS wonDeal,
+
+        SUM(l.business_result) AS totalRevenue
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.account
+
+    ORDER BY totalRevenue DESC
+""", nativeQuery = true)
+    BestAccountRevenueResponse getBestAccountByRevenue();
+
+    @Query(value = """
+    SELECT TOP 1
+        l.industry_type AS industryType,
+
+        COUNT(*) AS wonDeal
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.industry_type
+
+    ORDER BY wonDeal DESC
+""", nativeQuery = true)
+    BestIndustryByWonDealResponse getBestIndustryByWonDeal();
+
+    @Query(value = """
+    SELECT TOP 1
+        l.industry_type AS industryType,
+
+        SUM(l.business_result) AS totalRevenue
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.industry_type
+
+    ORDER BY totalRevenue DESC
+""", nativeQuery = true)
+    BestIndustryByRevenueResponse getBestIndustryByRevenue();
+
+    @Query(value = """
+    SELECT TOP 1
+        l.region AS region,
+
+        COUNT(*) AS wonDeal
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.region
+
+    ORDER BY wonDeal DESC
+""", nativeQuery = true)
+    BestRegionByWonDealResponse getBestRegionByWonDeal();
+
+    @Query(value = """
+    SELECT TOP 1
+        l.region AS region,
+
+        SUM(l.business_result) AS totalRevenue
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.region
+
+    ORDER BY totalRevenue DESC
+""", nativeQuery = true)
+    BestRegionByRevenueResponse getBestRegionByRevenue();
+
+    @Query(value = """
+    SELECT TOP 1
+        l.customer_group AS customerGroup,
+
+        COUNT(*) AS totalLead
+
+    FROM lead l
+
+    GROUP BY l.customer_group
+
+    ORDER BY totalLead DESC
+""", nativeQuery = true)
+    BestCustomerGroupByLeadResponse getBestCustomerGroupByLead();
+
+    @Query(value = """
+    SELECT TOP 1
+        l.customer_group AS customerGroup,
+
+        SUM(l.business_result) AS totalRevenue
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.customer_group
+
+    ORDER BY totalRevenue DESC
+""", nativeQuery = true)
+    BestCustomerGroupByRevenueResponse getBestCustomerGroupByRevenue();
+
+    @Query(value = """
+    SELECT
+        l.industry_type AS industryType,
+        COUNT(*) AS totalLead
+    FROM lead l
+    WHERE (:industry IS NULL OR l.industry_type = :industry)
+    GROUP BY l.industry_type
+    """, nativeQuery = true)
+    TotalLeadByIndustryResponse getTotalLeadByIndustry(
+            @Param("industry") String industry
+    );
+
+    @Query(value = """
+    SELECT
+        l.industry_type AS industry,
+        COUNT(*) AS wonLead
+    FROM lead l
+    WHERE l.status = 'Won'
+    GROUP BY l.industry_type
+    ORDER BY wonLead DESC
+    """, nativeQuery = true)
+    List<WonLeadByIndustryResponse> getWonLeadByIndustry();
+
+    @Query(value = """
+    SELECT
+        l.industry_type AS industry,
+
+        COUNT(*) AS totalLead,
+
+        SUM(
+            CASE
+                WHEN l.status = 'Won' THEN 1
+                ELSE 0
+            END
+        ) AS wonLead,
+
+        ROUND(
+            SUM(
+                CASE
+                    WHEN l.status = 'Won' THEN 1
+                    ELSE 0
+                END
+            ) * 100.0 / COUNT(*),
+            2
+        ) AS conversionRate
+
+    FROM lead l
+
+    GROUP BY l.industry_type
+
+    ORDER BY conversionRate DESC
+    """, nativeQuery = true)
+    List<IndustryConversionRateResponse> getIndustryConversionRate();
+
+    @Query(value = """
+    SELECT
+        l.industry_type AS industry,
+
+        ROUND(
+            AVG(
+                DATEDIFF(
+                    DAY,
+                    l.created_date,
+                    CAST(h.changed_at AS DATE)
+                ) * 1.0
+            ),
+            2
+        ) AS avgSalesCycle
+
+    FROM lead l
+
+    JOIN lead_status_history h
+        ON l.lead_id = h.lead_id
+
+    WHERE h.new_status = 'Won'
+
+    GROUP BY l.industry_type
+
+    ORDER BY avgSalesCycle ASC
+    """, nativeQuery = true)
+    List<AvgSalesCycleByIndustryResponse> getAvgSalesCycleByIndustry();
+
+    @Query(value = """
+    SELECT
+        t.industry AS industry,
+        t.lossReason AS lossReason,
+        t.lostLead AS lostLead
+    FROM (
+        SELECT
+            l.industry_type AS industry,
+            l.loss_reason AS lossReason,
+            COUNT(*) AS lostLead,
+            ROW_NUMBER() OVER (
+                PARTITION BY l.industry_type
+                ORDER BY COUNT(*) DESC
+            ) AS rn
+        FROM lead l
+        WHERE l.status = 'Lost'
+          AND l.loss_reason IS NOT NULL
+        GROUP BY l.industry_type, l.loss_reason
+    ) t
+    WHERE t.rn = 1
+    ORDER BY t.lostLead DESC
+    """, nativeQuery = true)
+    List<BestLostReasonByIndustryResponse> getBestLostReasonByIndustry();
+
+    @Query(value = """
+    SELECT
+        l.customer_role AS customerRole,
+
+        COUNT(*) AS totalLead
+
+    FROM lead l
+
+    GROUP BY l.customer_role
+
+    ORDER BY totalLead DESC
+    """, nativeQuery = true)
+    List<TotalLeadByCustomerRoleResponse> getTotalLeadByCustomerRole();
+
+    @Query(value = """
+    SELECT
+        l.customer_role AS customerRole,
+
+        SUM(
+            CASE
+                WHEN l.status = 'Won'
+                THEN l.business_result
+                ELSE 0
+            END
+        ) AS revenue
+
+    FROM lead l
+
+    GROUP BY l.customer_role
+
+    ORDER BY revenue DESC
+    """, nativeQuery = true)
+    List<RevenueByCustomerRoleResponse> getRevenueByCustomerRole();
+
+    @Query(value = """
+    SELECT
+        l.customer_role AS customerRole,
+
+        COUNT(*) AS wonLead
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.customer_role
+
+    ORDER BY wonLead DESC
+    """, nativeQuery = true)
+    List<WonLeadByCustomerRoleResponse> getWonLeadByCustomerRole();
+
+    @Query(value = """
+    SELECT
+        l.customer_role AS customerRole,
+
+        COUNT(*) AS totalLead,
+
+        SUM(
+            CASE
+                WHEN l.status = 'Won' THEN 1
+                ELSE 0
+            END
+        ) AS wonLead,
+
+        ROUND(
+            SUM(
+                CASE
+                    WHEN l.status = 'Won' THEN 1
+                    ELSE 0
+                END
+            ) * 100.0 / COUNT(*),
+            2
+        ) AS conversionRate
+
+    FROM lead l
+
+    GROUP BY l.customer_role
+
+    ORDER BY conversionRate DESC
+    """, nativeQuery = true)
+    List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate();
+
+    @Query(value = """
+    SELECT
+        l.customer_role AS customerRole,
+
+        COUNT(*) AS wonLead,
+
+        SUM(l.business_result) AS totalRevenue,
+
+        ROUND(
+            AVG(CAST(l.business_result AS FLOAT)),
+            2
+        ) AS avgRevenueWon
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.customer_role
+
+    ORDER BY avgRevenueWon DESC
+    """, nativeQuery = true)
+    List<AvgRevenueWonByCustomerRoleResponse> getAvgRevenueWonByCustomerRole();
+
+    @Query(value = """
+    SELECT
+        l.customer_role AS customerRole,
+
+        COUNT(*) AS lostLead
+
+    FROM lead l
+
+    WHERE l.status = 'Lost'
+
+    GROUP BY l.customer_role
+
+    ORDER BY lostLead DESC
+    """, nativeQuery = true)
+    List<LostLeadByCustomerRoleResponse> getLostLeadByCustomerRole();
+
+    @Query(value = """
+    SELECT
+        t.customerRole AS customerRole,
+        t.lossReason AS lossReason,
+        t.lostLead AS lostLead
+    FROM (
+        SELECT
+            l.customer_role AS customerRole,
+            l.loss_reason AS lossReason,
+            COUNT(*) AS lostLead,
+
+            ROW_NUMBER() OVER (
+                PARTITION BY l.customer_role
+                ORDER BY COUNT(*) DESC
+            ) AS rn
+
+        FROM lead l
+
+        WHERE l.status = 'Lost'
+          AND l.loss_reason IS NOT NULL
+
+        GROUP BY l.customer_role, l.loss_reason
+    ) t
+
+    WHERE t.rn = 1
+
+    ORDER BY t.lostLead DESC
+    """, nativeQuery = true)
+    List<BestLostReasonByCustomerRoleResponse> getBestLostReasonByCustomerRole();
+
+    @Query(value = """
+    SELECT
+        l.customer_role AS customerRole,
+
+        ROUND(
+            AVG(
+                CAST(
+                    DATEDIFF(
+                        DAY,
+                        l.created_date,
+                        CAST(h.changed_at AS DATE)
+                    ) AS FLOAT
+                )
+            ),
+            2
+        ) AS avgSalesCycle
+
+    FROM lead l
+
+    JOIN lead_status_history h
+        ON l.lead_id = h.lead_id
+
+    WHERE h.new_status = 'Won'
+
+    GROUP BY l.customer_role
+
+    ORDER BY avgSalesCycle ASC
+    """, nativeQuery = true)
+    List<AvgSalesCycleByCustomerRoleResponse> getAvgSalesCycleByCustomerRole();
+
+    @Query(value = """
+    SELECT
+        l.region AS region,
+
+        COUNT(*) AS totalLead
+
+    FROM lead l
+
+    GROUP BY l.region
+
+    ORDER BY totalLead DESC
+    """, nativeQuery = true)
+    List<TotalLeadByRegionResponse> getTotalLeadByRegion();
+
+    @Query(value = """
+    SELECT
+        l.region AS region,
+
+        COUNT(*) AS wonLead
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.region
+
+    ORDER BY wonLead DESC
+    """, nativeQuery = true)
+    List<WonLeadByRegionResponse> getWonLeadByRegion();
+
+    @Query(value = """
+    SELECT
+        l.region AS region,
+
+        COUNT(*) AS totalLead,
+
+        SUM(
+            CASE
+                WHEN l.status = 'Won' THEN 1
+                ELSE 0
+            END
+        ) AS wonLead,
+
+        ROUND(
+            SUM(
+                CASE
+                    WHEN l.status = 'Won' THEN 1
+                    ELSE 0
+                END
+            ) * 100.0 / COUNT(*),
+            2
+        ) AS conversionRate
+
+    FROM lead l
+
+    GROUP BY l.region
+
+    ORDER BY conversionRate DESC
+    """, nativeQuery = true)
+    List<RegionConversionRateResponse> getRegionConversionRate();
+
+    @Query(value = """
+    SELECT
+        l.region AS region,
+
+        COUNT(*) AS wonLead,
+
+        SUM(l.business_result) AS totalRevenue,
+
+        ROUND(
+            AVG(CAST(l.business_result AS FLOAT)),
+            2
+        ) AS avgRevenueWon
+
+    FROM lead l
+
+    WHERE l.status = 'Won'
+
+    GROUP BY l.region
+
+    ORDER BY avgRevenueWon DESC
+    """, nativeQuery = true)
+    List<AvgRevenueWonByRegionResponse> getAvgRevenueWonByRegion();
+
+    @Query(value = """
+    SELECT
+        l.region AS region,
+
+        COUNT(*) AS lostLead
+
+    FROM lead l
+
+    WHERE l.status = 'Lost'
+
+    GROUP BY l.region
+
+    ORDER BY lostLead DESC
+    """, nativeQuery = true)
+    List<LostLeadByRegionResponse> getLostLeadByRegion();
+
+    @Query(value = """
+    SELECT
+        t.region AS region,
+        t.lossReason AS lossReason,
+        t.lostLead AS lostLead
+    FROM (
+        SELECT
+            l.region AS region,
+
+            l.loss_reason AS lossReason,
+
+            COUNT(*) AS lostLead,
+
+            ROW_NUMBER() OVER (
+                PARTITION BY l.region
+                ORDER BY COUNT(*) DESC
+            ) AS rn
+
+        FROM lead l
+
+        WHERE l.status = 'Lost'
+          AND l.loss_reason IS NOT NULL
+
+        GROUP BY l.region, l.loss_reason
+    ) t
+
+    WHERE t.rn = 1
+
+    ORDER BY t.lostLead DESC
+    """, nativeQuery = true)
+    List<BestLostReasonByRegionResponse> getBestLostReasonByRegion();
+
+    @Query(value = """
+    SELECT
+        p.product_name AS productName,
+
+        COUNT(DISTINCT l.lead_id) AS totalLead
+
+    FROM lead l
+
+    INNER JOIN lead_item li
+        ON l.lead_id = li.lead_id
+
+    INNER JOIN product p
+        ON li.product_id = p.product_id
+
+    GROUP BY p.product_name
+
+    ORDER BY totalLead DESC
+    """, nativeQuery = true)
+    List<TotalLeadByProductLineResponse> getTotalLeadByProductLine();
+
+    @Query(value = """
+    SELECT
+        p.product_name AS productName,
+
+        COUNT(DISTINCT l.lead_id) AS wonLead
+
+    FROM lead l
+
+    INNER JOIN lead_item li
+        ON l.lead_id = li.lead_id
+
+    INNER JOIN product p
+        ON li.product_id = p.product_id
+
+    WHERE l.status = 'Won'
+
+    GROUP BY p.product_name
+
+    ORDER BY wonLead DESC
+    """, nativeQuery = true)
+    List<WonLeadByProductLineResponse> getWonLeadByProductLine();
+
+    @Query(value = """
+    SELECT
+        p.product_name AS productName,
+
+        COUNT(DISTINCT l.lead_id) AS totalLead,
+
+        COUNT(DISTINCT CASE
+            WHEN l.status = 'Won'
+            THEN l.lead_id
+        END) AS wonLead,
+
+        ROUND(
+            COUNT(DISTINCT CASE
+                WHEN l.status = 'Won'
+                THEN l.lead_id
+            END) * 100.0
+            /
+            COUNT(DISTINCT l.lead_id),
+            2
+        ) AS conversionRate
+
+    FROM lead l
+
+    INNER JOIN lead_item li
+        ON l.lead_id = li.lead_id
+
+    INNER JOIN product p
+        ON li.product_id = p.product_id
+
+    GROUP BY p.product_name
+
+    ORDER BY conversionRate DESC
+    """, nativeQuery = true)
+    List<ProductLineConversionRateResponse> getProductLineConversionRate();
+
+    @Query(value = """
+    SELECT
+        p.product_name AS productName,
+
+        COUNT(DISTINCT l.lead_id) AS wonLead,
+
+        SUM(l.business_result) AS totalRevenue,
+
+        ROUND(
+            AVG(CAST(l.business_result AS FLOAT)),
+            2
+        ) AS avgRevenueWon
+
+    FROM lead l
+
+    INNER JOIN lead_item li
+        ON l.lead_id = li.lead_id
+
+    INNER JOIN product p
+        ON li.product_id = p.product_id
+
+    WHERE l.status = 'Won'
+
+    GROUP BY p.product_name
+
+    ORDER BY avgRevenueWon DESC
+    """, nativeQuery = true)
+    List<AvgRevenueWonByProductLineResponse> getAvgRevenueWonByProductLine();
+
+    @Query(value = """
+    SELECT
+        p.product_name AS productName,
+
+        COUNT(DISTINCT l.lead_id) AS lostLead
+
+    FROM lead l
+
+    INNER JOIN lead_item li
+        ON l.lead_id = li.lead_id
+
+    INNER JOIN product p
+        ON li.product_id = p.product_id
+
+    WHERE l.status = 'Lost'
+
+    GROUP BY p.product_name
+
+    ORDER BY lostLead DESC
+    """, nativeQuery = true)
+    List<LostLeadByProductLineResponse> getLostLeadByProductLine();
+
+    @Query(value = """
+    SELECT
+        t.productName,
+        t.lossReason,
+        t.lostLead
+    FROM (
+        SELECT
+            p.product_name AS productName,
+
+            l.loss_reason AS lossReason,
+
+            COUNT(DISTINCT l.lead_id) AS lostLead,
+
+            ROW_NUMBER() OVER (
+                PARTITION BY p.product_name
+                ORDER BY COUNT(DISTINCT l.lead_id) DESC
+            ) AS rn
+
+        FROM lead l
+
+        INNER JOIN lead_item li
+            ON l.lead_id = li.lead_id
+
+        INNER JOIN product p
+            ON li.product_id = p.product_id
+
+        WHERE l.status = 'Lost'
+          AND l.loss_reason IS NOT NULL
+
+        GROUP BY
+            p.product_name,
+            l.loss_reason
+    ) t
+
+    WHERE t.rn = 1
+
+    ORDER BY t.lostLead DESC
+    """, nativeQuery = true)
+    List<BestLostReasonByProductLineResponse> getBestLostReasonByProductLine();
+
+    @Query(value = """
+    SELECT
+        l.customer_group AS customerGroup,
+
+        SUM(
+            ISNULL(l.business_result, 0)
+        ) AS revenue,
+
+        SUM(
+            ISNULL(l.cost, 0)
+        ) AS cost,
+
+        ROUND(
+            CASE
+                WHEN SUM(l.cost) = 0 THEN 0
+                ELSE
+                    (SUM(ISNULL(l.business_result,0)) * 100.0)
+                    /
+                    SUM(ISNULL(l.cost,0))
+            END,
+            2
+        ) AS roi
+
+    FROM lead l
+
+    GROUP BY l.customer_group
+
+    ORDER BY roi DESC
+    """, nativeQuery = true)
+    List<CustomerGroupROIResponse> getCustomerGroupROI();
+
+    @Query(value = """
+    SELECT
+        l.customer_group AS customerGroup,
+
+        COUNT(*) AS totalLead,
+
+        SUM(ISNULL(l.cost, 0)) AS totalCost,
+
+        ROUND(
+            CASE
+                WHEN COUNT(*) = 0 THEN 0
+                ELSE
+                    SUM(ISNULL(l.cost, 0)) * 1.0
+                    / COUNT(*)
+            END,
+            2
+        ) AS costPerLead
+
+    FROM lead l
+
+    GROUP BY l.customer_group
+
+    ORDER BY costPerLead DESC
+    """, nativeQuery = true)
+    List<CustomerGroupCPLResponse> getCustomerGroupCostPerLead();
+
+    @Query(value = """
+    SELECT TOP (10)
+
+        l.account AS account,
+
+        l.industry_type AS industry,
+
+        STRING_AGG(DISTINCT p.product_name, ', ') AS productLine,
+
+        l.customer_group AS customerGroup,
+
+        l.region AS region,
+
+        l.customer_role AS customerRole,
+
+        ROUND(
+            SUM(ISNULL(l.cost,0)) * 1.0
+            /
+            COUNT(DISTINCT l.lead_id),
+            2
+        ) AS costPerLead,
+
+        SUM(ISNULL(l.business_result,0)) AS revenue
+
+    FROM lead l
+
+    LEFT JOIN lead_item li
+        ON l.lead_id = li.lead_id
+
+    LEFT JOIN product p
+        ON li.product_id = p.product_id
+
+    WHERE l.status = 'Won'
+
+    GROUP BY
+        l.account,
+        l.industry_type,
+        l.customer_group,
+        l.region,
+        l.customer_role
+
+    ORDER BY revenue DESC
+    """, nativeQuery = true)
+    List<Top10AccountRevenueResponse> getTop10Accounts();
+
+    @Query(value = """
+    SELECT TOP (1)
+
+        u.user_code AS userCode,
+
+        u.full_name AS fullName,
+
+        COUNT(l.lead_id) AS wonDeal,
+
+        SUM(ISNULL(l.business_result, 0)) AS revenue
+
+    FROM lead l
+
+    INNER JOIN [user] u
+        ON l.user_id = u.user_id
+
+    WHERE l.status = 'Won'
+
+    GROUP BY
+        u.user_code,
+        u.full_name
+
+    ORDER BY revenue DESC
+    """, nativeQuery = true)
+    TopSalesOwnerRevenueResponse getTopSalesOwnerRevenue();
+
+    @Query(value = """
+    SELECT TOP (1)
+
+        u.user_code AS userCode,
+
+        u.full_name AS fullName,
+
+        COUNT(l.lead_id) AS totalLead,
+
+        SUM(
+            CASE
+                WHEN l.status = 'Won' THEN 1
+                ELSE 0
+            END
+        ) AS wonLead,
+
+        ROUND(
+            SUM(
+                CASE
+                    WHEN l.status = 'Won' THEN 1
+                    ELSE 0
+                END
+            ) * 100.0
+            /
+            COUNT(l.lead_id),
+            2
+        ) AS winRate
+
+    FROM lead l
+
+    INNER JOIN [user] u
+        ON l.user_id = u.user_id
+
+    GROUP BY
+        u.user_code,
+        u.full_name
+
+    HAVING COUNT(l.lead_id) > 0
+
+    ORDER BY winRate DESC,
+             wonLead DESC
+    """, nativeQuery = true)
+    TopSalesOwnerWinRateResponse getTopSalesOwnerWinRate();
+
+    @Query(value = """
+    SELECT TOP (1)
+
+        u.user_code AS userCode,
+
+        u.full_name AS fullName,
+
+        COUNT(DISTINCT l.lead_id) AS wonDeal,
+
+        ROUND(
+            AVG(
+                CAST(
+                    DATEDIFF(
+                        DAY,
+                        l.created_date,
+                        h.wonDate
+                    ) AS FLOAT
+                )
+            ),
+            2
+        ) AS avgSalesCycle
+
+    FROM lead l
+
+    INNER JOIN [user] u
+        ON l.user_id = u.user_id
+
+    INNER JOIN (
+
+        SELECT
+            lead_id,
+            MIN(CAST(changed_at AS DATE)) AS wonDate
+
+        FROM lead_status_history
+
+        WHERE new_status = 'Won'
+
+        GROUP BY lead_id
+
+    ) h
+        ON l.lead_id = h.lead_id
+
+    WHERE l.status = 'Won'
+
+    GROUP BY
+        u.user_code,
+        u.full_name
+
+    HAVING COUNT(DISTINCT l.lead_id) > 0
+
+    ORDER BY avgSalesCycle ASC,
+             wonDeal DESC
+    """, nativeQuery = true)
+    FastestSalesOwnerResponse getFastestSalesOwner();
+
+    @Query(value = """
+    SELECT
+
+        u.user_code AS userCode,
+
+        u.full_name AS fullName,
+
+        ROUND(
+            AVG(
+                CAST(
+                    DATEDIFF(
+                        DAY,
+                        l.created_date,
+                        h.wonDate
+                    ) AS FLOAT
+                )
+            ),
+            2
+        ) AS avgSalesCycle
+
+    FROM lead l
+
+    INNER JOIN [user] u
+        ON l.user_id = u.user_id
+
+    INNER JOIN (
+
+        SELECT
+            lead_id,
+            MIN(CAST(changed_at AS DATE)) AS wonDate
+
+        FROM lead_status_history
+
+        WHERE new_status = 'Won'
+
+        GROUP BY lead_id
+
+    ) h
+        ON l.lead_id = h.lead_id
+
+    WHERE l.status = 'Won'
+
+    GROUP BY
+        u.user_code,
+        u.full_name
+
+    ORDER BY avgSalesCycle ASC
+    """, nativeQuery = true)
+    List<SalesOwnerAvgSalesCycleResponse> getSalesOwnerAvgSalesCycle();
+
+    @Query(value = """
+    SELECT
+
+        u.user_code AS userCode,
+
+        u.full_name AS fullName,
+
+        COUNT(DISTINCT l.lead_id) AS totalLead,
+
+        COUNT(DISTINCT CASE
+            WHEN b.budget > 0
+             AND b.authority > 0
+             AND b.need > 0
+             AND b.timeline > 0
+            THEN l.lead_id
+        END) AS completeLead,
+
+        ROUND(
+
+            COUNT(DISTINCT CASE
+                WHEN b.budget > 0
+                 AND b.authority > 0
+                 AND b.need > 0
+                 AND b.timeline > 0
+                THEN l.lead_id
+            END)
+
+            *100.0
+
+            /
+
+            COUNT(DISTINCT l.lead_id)
+
+        ,2) AS bantCompleteRate
+
+    FROM lead l
+
+    INNER JOIN [user] u
+        ON l.user_id = u.user_id
+
+    LEFT JOIN lead_bant_point b
+        ON l.lead_id = b.lead_id
+
+    GROUP BY
+        u.user_code,
+        u.full_name
+
+    ORDER BY bantCompleteRate DESC
+    """, nativeQuery = true)
+    List<SalesOwnerBantCompleteRateResponse> getSalesOwnerBantCompleteRate();
+
 }
