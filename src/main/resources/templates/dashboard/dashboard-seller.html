@@ -310,7 +310,7 @@
                         const totalBant = (lead.bantBudget || 0) + (lead.bantAuthority || 0) + (lead.bantNeed || 0) + (lead.bantTimeline || 0);
                         const point = {
                             x: totalBant,
-                            y: lead.cost || 0,
+                            y: lead.expectedRevenue || 0,
                             label: `${lead.fullName} (${lead.account})`
                         };
 

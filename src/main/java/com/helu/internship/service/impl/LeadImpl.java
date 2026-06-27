@@ -10,8 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import com.helu.internship.dto.response.LeadRevenueProjection;
 
 @Service
 @RequiredArgsConstructor
@@ -199,8 +202,26 @@ public class LeadImpl implements LeadService {
     @Transactional(readOnly = true)
     public List<LeadResponse> getSellerLeads(String email, String heatFilter) {
         List<LeadEntity> leads = leadRepo.findBySellerEmail(email);
+
+        List<LeadRevenueProjection> revs = leadRepo.getLeadsExpectedRevenue();
+        Map<String, BigDecimal> revenueMap = revs.stream()
+                .collect(Collectors.toMap(
+                    LeadRevenueProjection::getLeadId,
+                    p -> p.getExpectedRevenue() != null ? p.getExpectedRevenue() : BigDecimal.ZERO,
+                    (a, b) -> a
+                ));
+
         return leads.stream()
-                .map(this::mapToResponse)
+                .map(lead -> {
+                    LeadResponse res = this.mapToResponse(lead);
+                    BigDecimal expected = revenueMap.getOrDefault(lead.getLeadId(), BigDecimal.ZERO);
+                    if (lead.getStatus() != null && lead.getStatus().trim().equalsIgnoreCase("Won") && lead.getBusinessResult() != null) {
+                        res.setExpectedRevenue(lead.getBusinessResult());
+                    } else {
+                        res.setExpectedRevenue(expected);
+                    }
+                    return res;
+                })
                 .filter(res -> {
                     if (heatFilter == null || heatFilter.trim().isEmpty()) {
                         return true;

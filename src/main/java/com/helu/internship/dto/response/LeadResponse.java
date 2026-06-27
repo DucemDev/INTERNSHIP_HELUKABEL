@@ -27,6 +27,7 @@ public class LeadResponse {
     private BigDecimal cost;
     private String lossReason;
     private BigDecimal businessResult;
+    private BigDecimal expectedRevenue;
     private String productName;
     private String sourceName;
     private String userName;

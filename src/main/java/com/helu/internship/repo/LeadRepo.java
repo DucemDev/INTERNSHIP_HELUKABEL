@@ -696,6 +696,14 @@ ORDER BY year, month
 
     @Query("SELECT l.status, COUNT(l) FROM LeadEntity l WHERE l.user.email = :email GROUP BY l.status")
     List<Object[]> countLeadByStatusAndSellerEmail(@Param("email") String email);
+
+    @Query(value = """
+    SELECT l.lead_id AS leadId, ISNULL(SUM(li.expected_revenue), 0) AS expectedRevenue
+    FROM lead l
+    LEFT JOIN lead_item li ON l.lead_id = li.lead_id
+    GROUP BY l.lead_id
+    """, nativeQuery = true)
+    List<LeadRevenueProjection> getLeadsExpectedRevenue();
 }
 
 
