@@ -138,6 +138,11 @@ public class DashboardController {
     public List<PipelineCoverageProjection> getStaffPipelineCoverage(Principal principal) {
         return dashboardService.getStaffPipelineCoverage(principal.getName());
     }
+
+    @GetMapping("/seller/leads-by-status-count")
+    public List<LeadStatusCountResponse> getSellerLeadsByStatusCount(Principal principal) {
+        return dashboardService.getSellerLeadsByStatusCount(principal.getName());
+    }
     @GetMapping("/sales-owner-dashboard")
     public List<SalesOwnerDashboardProjection> getSalesOwnerDashboard() {
         return dashboardService.getSalesOwnerDashboard();

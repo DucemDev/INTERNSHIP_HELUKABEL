@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.List;
 
 @Component
@@ -16,11 +17,29 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
-
     private final RoleRepo roleRepo;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public void run(String... args) throws Exception {
+        // Tự động kiểm tra và thêm các cột thiếu trong bảng lead
+        String[] columns = {
+            "email VARCHAR(100) NULL",
+            "phone_number VARCHAR(20) NULL",
+            "product_name VARCHAR(100) NULL",
+            "source_name VARCHAR(100) NULL"
+        };
+
+        for (String col : columns) {
+            String colName = col.split(" ")[0];
+            try {
+                jdbcTemplate.execute("ALTER TABLE lead ADD " + col);
+                System.out.println("Added missing column '" + colName + "' to 'lead' table.");
+            } catch (Exception e) {
+                // Bỏ qua nếu cột đã tồn tại
+            }
+        }
+
         // Đổi tên role 'Staff' thành 'Seller' nếu tồn tại
         roleRepo.findByRoleName("Staff").ifPresent(role -> {
             role.setRoleName("Seller");

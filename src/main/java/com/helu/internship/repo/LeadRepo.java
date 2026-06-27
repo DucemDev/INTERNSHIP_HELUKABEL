@@ -693,6 +693,9 @@ GROUP BY
 ORDER BY year, month
 """, nativeQuery = true)
     List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly();
+
+    @Query("SELECT l.status, COUNT(l) FROM LeadEntity l WHERE l.user.email = :email GROUP BY l.status")
+    List<Object[]> countLeadByStatusAndSellerEmail(@Param("email") String email);
 }
 
 

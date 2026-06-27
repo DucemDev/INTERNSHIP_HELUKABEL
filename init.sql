@@ -255,7 +255,7 @@ GO
 -- 3.2 INSERT USERS (ADMIN & SELLERS)
 INSERT INTO [user] (user_id, user_code, username, password, full_name, email, role_id, is_active) VALUES
 ('21cf3ed1-c2eb-410c-8098-bf3020e06991', 'AD001', 'admin', '123', N'Administrator', 'admin@helukabel.vn', 1, 1),
-('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 'NV001', 'seller_thanh', '123', N'Vo Duc Thanh', 'seller_thanh@helukabel.vn', 2, 1),
+('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 'NV001', 'seller_thanh', '123', N'Vo Duc Thanh', 'thanh0@helukabel.vn', 2, 1),
 ('f3f1ab23-29da-4ea3-8377-befc37b314f1', 'NV002', 'seller_huong', '123', N'Nguyen Thi Thu Huong', 'seller_huong@helukabel.vn', 2, 1),
 ('45f0d7fa-7580-4d9e-98e2-495aa86f75c9', 'NV003', 'seller_minh', '123', N'Tran Quoc Minh', 'seller_minh@helukabel.vn', 2, 1),
 ('655612cb-fc04-4fa8-a2de-87a6a55d30c7', 'NV004', 'seller_lan', '123', N'Pham Thi Ngoc Lan', 'seller_lan@helukabel.vn', 2, 1),

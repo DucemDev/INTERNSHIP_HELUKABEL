@@ -79,4 +79,6 @@ public interface DashboardService {
     List<RevenueIndustryMonthlyProjection> getRevenueIndustryMonthly();
 
     List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly();
+
+    List<LeadStatusCountResponse> getSellerLeadsByStatusCount(String email);
 }

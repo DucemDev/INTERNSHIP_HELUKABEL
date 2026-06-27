@@ -220,4 +220,15 @@ public class DashboardServiceImpl implements DashboardService {
     public List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly() {
         return leadRepo.getRevenueProductLineMonthly();
     }
+
+    @Override
+    public List<LeadStatusCountResponse> getSellerLeadsByStatusCount(String email) {
+        return leadRepo.countLeadByStatusAndSellerEmail(email)
+                .stream()
+                .map(row -> new LeadStatusCountResponse(
+                        String.valueOf(row[0]),
+                        (Long) row[1]
+                ))
+                .toList();
+    }
 }

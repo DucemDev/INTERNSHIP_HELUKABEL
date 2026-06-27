@@ -38,7 +38,18 @@
         </div>
 
         <!-- Charts Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <!-- Leads Status Distribution -->
+            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
+                    Cơ cấu Trạng thái Leads
+                </h2>
+                <div class="relative flex-1 min-h-[300px] flex items-center justify-center">
+                    <canvas id="leadsStatusChart"></canvas>
+                </div>
+            </div>
+
             <!-- Pipeline Coverage Chart -->
             <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
@@ -78,6 +89,7 @@
 
             document.addEventListener('DOMContentLoaded', async () => {
                 loadStats();
+                loadLeadsStatusChart();
                 loadPipelineChart();
                 loadRegions();
                 loadWinRateChart('');
@@ -184,6 +196,62 @@
                     });
                 } catch (error) {
                     console.error('Error loading win rate chart:', error);
+                }
+            }
+
+            async function loadLeadsStatusChart() {
+                try {
+                    const response = await fetch('/api/dashboard/seller/leads-by-status-count');
+                    if (!response.ok) return;
+                    const data = await response.json();
+
+                    const labels = data.map(item => item.status || 'N/A');
+                    const values = data.map(item => item.count || 0);
+
+                    // Mảng màu sắc dịu nhẹ dạng Power-BI chuyên nghiệp
+                    const colors = {
+                        'New': 'rgba(59, 130, 246, 0.85)',
+                        'In Progress': 'rgba(245, 158, 11, 0.85)',
+                        'In Negotiation': 'rgba(139, 92, 246, 0.85)',
+                        'Proposal Sent': 'rgba(6, 182, 212, 0.85)',
+                        'Contacted': 'rgba(236, 72, 153, 0.85)',
+                        'Won': 'rgba(16, 185, 129, 0.85)',
+                        'Lost': 'rgba(239, 68, 68, 0.85)',
+                        'Disqualified': 'rgba(107, 114, 128, 0.85)'
+                    };
+
+                    const backgroundColors = labels.map(label => colors[label] || 'rgba(156, 163, 175, 0.85)');
+
+                    const ctx = document.getElementById('leadsStatusChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: values,
+                                backgroundColor: backgroundColors,
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        boxWidth: 12,
+                                        font: { size: 11, weight: 'bold' },
+                                        padding: 15
+                                    }
+                                }
+                            },
+                            cutout: '65%'
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading leads status chart:', error);
                 }
             }
         </script>
