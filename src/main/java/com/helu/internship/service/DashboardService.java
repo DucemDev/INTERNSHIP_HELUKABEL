@@ -129,4 +129,7 @@ public interface DashboardService {
     FastestSalesOwnerResponse getFastestSalesOwner();
     List<SalesOwnerAvgSalesCycleResponse> getSalesOwnerAvgSalesCycle();
     List<SalesOwnerBantCompleteRateResponse> getSalesOwnerBantCompleteRate();
+    List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore();
+    List<LossReasonByProductLineResponse> getLossReasonByProductLine();
+    SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
 }
