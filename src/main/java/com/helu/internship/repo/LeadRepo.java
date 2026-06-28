@@ -1915,4 +1915,141 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     """, nativeQuery = true)
     List<SalesOwnerBantCompleteRateResponse> getSalesOwnerBantCompleteRate();
 
+    @Query(value = """
+    SELECT
+
+        u.user_code AS userCode,
+
+        u.full_name AS fullName,
+
+        ROUND(
+            AVG(
+                CAST(b.total_score AS FLOAT)
+            ),
+            2
+        ) AS avgBantScore
+
+    FROM lead l
+
+    INNER JOIN [user] u
+        ON l.user_id = u.user_id
+
+    INNER JOIN lead_bant_point b
+        ON l.lead_id = b.lead_id
+
+    GROUP BY
+        u.user_code,
+        u.full_name
+
+    ORDER BY avgBantScore DESC
+    """, nativeQuery = true)
+    List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore();
+
+    @Query(value = """
+    SELECT
+
+        p.product_name AS productName,
+
+        l.loss_reason AS lossReason,
+
+        COUNT(DISTINCT l.lead_id) AS lostLead
+
+    FROM lead l
+
+    INNER JOIN lead_item li
+        ON l.lead_id = li.lead_id
+
+    INNER JOIN product p
+        ON li.product_id = p.product_id
+
+    WHERE l.status = 'Lost'
+      AND l.loss_reason IS NOT NULL
+
+    GROUP BY
+        p.product_name,
+        l.loss_reason
+
+    ORDER BY
+        p.product_name,
+        lostLead DESC
+    """, nativeQuery = true)
+    List<LossReasonByProductLineResponse> getLossReasonByProductLine();
+
+    @Query(value = """
+    SELECT
+
+        COUNT(DISTINCT CASE
+            WHEN l.status IN ('Qualified','Proposal','Negotiation','Won')
+            THEN l.lead_id
+        END) AS qualifiedLeads,
+
+        COUNT(DISTINCT CASE
+            WHEN l.status = 'Won'
+            THEN l.lead_id
+        END) AS wonLeads,
+
+        COUNT(DISTINCT CASE
+            WHEN l.status = 'Lost'
+            THEN l.lead_id
+        END) AS lostLeads,
+
+        ROUND(
+            COUNT(DISTINCT CASE
+                WHEN l.status = 'Won'
+                THEN l.lead_id
+            END) * 100.0
+            /
+            COUNT(DISTINCT l.lead_id)
+        ,2) AS winRate,
+
+        ROUND(
+            AVG(
+                CASE
+                    WHEN l.status = 'Won'
+                    THEN CAST(l.business_result AS FLOAT)
+                END
+            )
+        ,2) AS avgDealSize,
+
+        ROUND(
+            AVG(
+                CASE
+                    WHEN l.status = 'Won'
+                    THEN CAST(
+                        DATEDIFF(
+                            DAY,
+                            l.created_date,
+                            h.wonDate
+                        ) AS FLOAT
+                    )
+                END
+            )
+        ,2) AS avgSalesCycle
+
+    FROM lead l
+
+    INNER JOIN [user] u
+        ON l.user_id = u.user_id
+
+    LEFT JOIN (
+
+        SELECT
+            lead_id,
+            MIN(CAST(changed_at AS DATE)) AS wonDate
+
+        FROM lead_status_history
+
+        WHERE new_status = 'Won'
+
+        GROUP BY lead_id
+
+    ) h
+        ON l.lead_id = h.lead_id
+
+    WHERE u.user_code = :userCode
+    """, nativeQuery = true)
+    SalesOwnerDetailResponse getSalesOwnerDetail(
+            @Param("userCode") String userCode
+    );
+
 }
