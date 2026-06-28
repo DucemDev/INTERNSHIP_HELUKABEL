@@ -51,9 +51,9 @@ public interface DashboardService {
             LocalDate timeTo
     );
     List<SalesOwnerDashboardProjection> getSalesOwnerDashboard();
-    List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter);
-    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter);
-    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter);
+    List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter, Integer year);
+    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter, Integer year);
+    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter, Integer year);
     RevenueSummaryProjection getRevenueSummary();
 
     List<RevenueRegionProjection> getRevenueByRegion();
@@ -132,4 +132,5 @@ public interface DashboardService {
     FastestSalesOwnerResponse getFastestSalesOwner();
     List<SalesOwnerAvgSalesCycleResponse> getSalesOwnerAvgSalesCycle();
     List<SalesOwnerBantCompleteRateResponse> getSalesOwnerBantCompleteRate();
+    DailyCompareResponse getDailyCompare();
 }

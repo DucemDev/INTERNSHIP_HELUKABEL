@@ -142,6 +142,53 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
     @Query(value = """
             SELECT
+                l.user_id AS userId,
+                u.full_name AS userName,
+                SUM(
+                    CASE
+                        WHEN l.status IN ('Qualified','Won')
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS qualifiedLead,
+                SUM(
+                    CASE
+                        WHEN l.status = 'Won'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS wonLead,
+                (
+                    SUM(
+                        CASE
+                            WHEN l.status = 'Won'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) * 100.0
+                    /
+                    NULLIF(
+                        SUM(
+                            CASE
+                                WHEN l.status IN ('Qualified','Won')
+                                THEN 1
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )
+                ) AS winRate
+            FROM lead l
+            LEFT JOIN [user] u ON l.user_id = u.user_id
+            WHERE
+                (:quarter = 'this' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, GETDATE()) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = COALESCE(:year, YEAR(GETDATE())))
+                OR (:quarter = 'last' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = (COALESCE(:year, YEAR(GETDATE())) - (CASE WHEN DATEPART(QUARTER, GETDATE()) = 1 THEN 1 ELSE 0 END)))
+            GROUP BY l.user_id, u.full_name
+            """, nativeQuery = true)
+    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(@Param("quarter") String quarter, @Param("year") Integer year);
+
+    @Query(value = """
+            SELECT
                 industry_type AS industryType,
             
                 CAST(SUM(
@@ -448,6 +495,15 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             """, nativeQuery = true)
     List<RevenueProductLineProjection> getRevenueByProductLine();
 
+    @Query("SELECT COUNT(l) FROM LeadEntity l WHERE l.createdDate = :date")
+    long countTotalLeadsByDate(@Param("date") LocalDate date);
+
+    @Query("SELECT COUNT(l) FROM LeadEntity l WHERE l.createdDate = :date AND l.status = 'New'")
+    long countNewLeadsByDate(@Param("date") LocalDate date);
+
+    @Query("SELECT COALESCE(SUM(l.businessResult), 0) FROM LeadEntity l WHERE l.createdDate = :date AND l.status = 'Won'")
+    java.math.BigDecimal sumRevenueWonByDate(@Param("date") LocalDate date);
+
     @Query(value = """
             SELECT
                 u.user_code AS userCode,
@@ -537,6 +593,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 SUM(l.business_result) AS revenue
             FROM lead l
             WHERE l.status = 'Won'
+              AND (:year IS NULL OR YEAR(l.created_date) = :year)
             GROUP BY
                 YEAR(l.created_date),
                 DATEPART(QUARTER, l.created_date)
@@ -544,7 +601,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 year,
                 quarter
             """, nativeQuery = true)
-    List<RevenueQuarterlyProjection> getRevenueQuarterly();
+    List<RevenueQuarterlyProjection> getRevenueQuarterly(@Param("year") Integer year);
 
     @Query(value = """
             SELECT
@@ -603,6 +660,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 ) AS lostLead
             
             FROM lead l
+            WHERE (:year IS NULL OR YEAR(l.created_date) = :year)
             GROUP BY
                 YEAR(l.created_date),
                 DATEPART(QUARTER, l.created_date)
@@ -610,7 +668,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 year,
                 quarter
             """, nativeQuery = true)
-    List<LeadQuarterlyProjection> getLeadQuarterly();
+    List<LeadQuarterlyProjection> getLeadQuarterly(@Param("year") Integer year);
 
     @Query(value = """
             SELECT
