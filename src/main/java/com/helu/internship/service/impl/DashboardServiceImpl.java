@@ -444,4 +444,16 @@ public class DashboardServiceImpl implements DashboardService {
     public List<SalesOwnerBantCompleteRateResponse> getSalesOwnerBantCompleteRate() {
         return leadRepo.getSalesOwnerBantCompleteRate();
     }
+    @Override
+    public List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore() {
+        return leadRepo.getSalesOwnerAvgBantScore();
+    }
+    @Override
+    public List<LossReasonByProductLineResponse> getLossReasonByProductLine() {
+        return leadRepo.getLossReasonByProductLine();
+    }
+    @Override
+    public SalesOwnerDetailResponse getSalesOwnerDetail(String userCode) {
+        return leadRepo.getSalesOwnerDetail(userCode);
+    }
 }
