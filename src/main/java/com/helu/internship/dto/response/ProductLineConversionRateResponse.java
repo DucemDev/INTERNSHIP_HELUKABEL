@@ -1,10 +1,11 @@
 package com.helu.internship.dto.response;
 
-import java.time.LocalDate;
+public interface ProductLineConversionRateResponse {
+    String getProductName();
 
-public interface ConversionRateResponse {
     Long getTotalLead();
+
     Long getWonLead();
-    String getLabel();
+
     Double getConversionRate();
 }

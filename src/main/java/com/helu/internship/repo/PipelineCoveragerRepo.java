@@ -16,15 +16,39 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
         st.period_month AS periodMonth,
         st.period_year AS periodYear,
 
-        ISNULL(SUM(li.expected_revenue),0) AS openPipeline,
+        (
+            SELECT ISNULL(SUM(li.expected_revenue), 0)
+            FROM lead l
+            LEFT JOIN lead_item li ON l.lead_id = li.lead_id
+            WHERE l.user_id = u.user_id
+              AND l.status NOT IN ('Won', 'Lost')
+              AND YEAR(l.created_date) = st.period_year
+              AND MONTH(l.created_date) = st.period_month
+        ) AS openPipeline,
+
+        (
+            SELECT ISNULL(SUM(l.business_result), 0)
+            FROM lead l
+            WHERE l.user_id = u.user_id
+              AND l.status = 'Won'
+              AND YEAR(l.created_date) = st.period_year
+              AND MONTH(l.created_date) = st.period_month
+        ) AS wonRevenue,
 
         st.revenue_target AS targetRevenue,
 
         CASE
             WHEN st.revenue_target = 0 THEN 0
             ELSE CAST(
-                ISNULL(SUM(li.expected_revenue),0)
-                / st.revenue_target
+                (
+                    SELECT ISNULL(SUM(li.expected_revenue), 0)
+                    FROM lead l
+                    LEFT JOIN lead_item li ON l.lead_id = li.lead_id
+                    WHERE l.user_id = u.user_id
+                      AND l.status NOT IN ('Won', 'Lost')
+                      AND YEAR(l.created_date) = st.period_year
+                      AND MONTH(l.created_date) = st.period_month
+                ) / st.revenue_target
             AS DECIMAL(18,2))
         END AS pipelineCoverage
 
@@ -33,16 +57,10 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
     INNER JOIN [user] u
         ON st.user_id = u.user_id
 
-    LEFT JOIN lead l
-        ON u.user_id = l.user_id
-        AND l.status NOT IN ('Won','Lost')
-
-    LEFT JOIN lead_item li
-        ON l.lead_id = li.lead_id
-
     WHERE (:sellerCode IS NULL OR u.user_code = :sellerCode)
 
     GROUP BY
+        u.user_id,
         u.user_code,
         u.full_name,
         st.period_month,
