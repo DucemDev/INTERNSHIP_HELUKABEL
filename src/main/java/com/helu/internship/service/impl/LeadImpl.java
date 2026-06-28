@@ -6,6 +6,7 @@ import com.helu.internship.dto.response.LeadResponse;
 import com.helu.internship.entity.*;
 import com.helu.internship.repo.*;
 import com.helu.internship.service.LeadService;
+import com.helu.internship.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class LeadImpl implements LeadService {
     private final LeadRepo leadRepo;
     private final UserRepo userRepo;
     private final LeadBantPointRepo leadBantPointRepo;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -80,6 +82,11 @@ public class LeadImpl implements LeadService {
         LeadEntity lead = leadRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Lead not found"));
 
+        String oldStatus = lead.getStatus();
+        String newStatus = request.getStatus();
+        boolean isLostNow = newStatus != null && newStatus.equalsIgnoreCase("Lost");
+        boolean wasLostBefore = oldStatus != null && oldStatus.equalsIgnoreCase("Lost");
+
         if (request.getUserId() != null) {
             UserEntity user = userRepo.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
@@ -102,7 +109,34 @@ public class LeadImpl implements LeadService {
         lead.setProductName(request.getProductName());
         lead.setSourceName(request.getSourceName());
 
-        return mapToResponse(leadRepo.save(lead));
+        LeadEntity saved = leadRepo.save(lead);
+
+        if (isLostNow && !wasLostBefore) {
+            String sellerName = saved.getUser() != null ? saved.getUser().getFullName() : "Chưa gán";
+            String reason = saved.getLossReason() != null ? saved.getLossReason() : "Không có lý do cụ thể";
+            String message = String.format("Lead '%s' đã bị chuyển sang trạng thái Lost. Lý do: %s.", saved.getFullName(), reason);
+            
+            // Thông báo cho Seller phụ trách
+            if (saved.getUser() != null) {
+                notificationService.createNotification(
+                    saved.getUser().getEmail(), 
+                    "Cảnh báo: Lead bị Lost", 
+                    message, 
+                    "LEAD_LOST", 
+                    "/seller/leads"
+                );
+            }
+            
+            // Thông báo cho các Admins
+            notificationService.createNotificationToAdmins(
+                "Cảnh báo: Lead bị Lost (" + sellerName + ")", 
+                String.format("Seller %s làm mất Lead '%s'. Lý do: %s.", sellerName, saved.getFullName(), reason), 
+                "LEAD_LOST", 
+                "/dashboard"
+            );
+        }
+
+        return mapToResponse(saved);
     }
 
     @Override
@@ -239,8 +273,40 @@ public class LeadImpl implements LeadService {
         if (lead.getUser() == null || !lead.getUser().getEmail().equalsIgnoreCase(email)) {
             throw new RuntimeException("You do not have permission to update this lead");
         }
+
+        String oldStatus = lead.getStatus();
+        boolean isLostNow = status != null && status.equalsIgnoreCase("Lost");
+        boolean wasLostBefore = oldStatus != null && oldStatus.equalsIgnoreCase("Lost");
+
         lead.setStatus(status);
-        return mapToResponse(leadRepo.save(lead));
+        LeadEntity saved = leadRepo.save(lead);
+
+        if (isLostNow && !wasLostBefore) {
+            String sellerName = saved.getUser() != null ? saved.getUser().getFullName() : "Không xác định";
+            String reason = saved.getLossReason() != null ? saved.getLossReason() : "Không có lý do cụ thể";
+            String message = String.format("Lead '%s' đã bị chuyển sang trạng thái Lost. Lý do: %s.", saved.getFullName(), reason);
+            
+            // Thông báo cho Seller phụ trách
+            if (saved.getUser() != null) {
+                notificationService.createNotification(
+                    saved.getUser().getEmail(), 
+                    "Cảnh báo: Lead bị Lost", 
+                    message, 
+                    "LEAD_LOST", 
+                    "/seller/leads"
+                );
+            }
+            
+            // Thông báo cho các Admins
+            notificationService.createNotificationToAdmins(
+                "Cảnh báo: Lead bị Lost (" + sellerName + ")", 
+                String.format("Seller %s làm mất Lead '%s'. Lý do: %s.", sellerName, saved.getFullName(), reason), 
+                "LEAD_LOST", 
+                "/dashboard"
+            );
+        }
+
+        return mapToResponse(saved);
     }
 
     @Override
