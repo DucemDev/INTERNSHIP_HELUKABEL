@@ -202,8 +202,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<RevenueQuarterlyProjection> getRevenueQuarterly(Integer year) {
-        return leadRepo.getRevenueQuarterly(year);
+    public List<RevenueQuarterlyProjection> getRevenueQuarterly() {
+        return leadRepo.getRevenueQuarterly();
     }
 
     @Override
@@ -212,8 +212,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<LeadQuarterlyProjection> getLeadQuarterly(Integer year) {
-        return leadRepo.getLeadQuarterly(year);
+    public List<LeadQuarterlyProjection> getLeadQuarterly() {
+        return leadRepo.getLeadQuarterly();
     }
     @Override
     public List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly() {
