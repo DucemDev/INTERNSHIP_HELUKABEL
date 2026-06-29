@@ -446,6 +446,29 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
     public List<SalesOwnerBantCompleteRateResponse> getSalesOwnerBantCompleteRate() {
         return dashboardService.getSalesOwnerBantCompleteRate();
     }
+// dashboard trung bình điểm bant theo sale //
+    @GetMapping("/sales-owner/avg-bant-score")
+    public List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore() {
+        return dashboardService.getSalesOwnerAvgBantScore();
+    }
+// dashboard các lý do thua theo sản phẩm //
+    @GetMapping("/product-line/loss-reasons")
+    public List<LossReasonByProductLineResponse> getLossReasonByProductLine() {
+        return dashboardService.getLossReasonByProductLine();
+    }
+// dashboard sale bảrng chi tiết (- Qualified Leads
+//- Won Leads
+//- Lost Leads
+//- Win Rate
+//- Avg Deal Size
+//- Avg Sales Cycle )
+    @GetMapping("/sales-owner/detail")
+    public SalesOwnerDetailResponse getSalesOwnerDetail(
+            @RequestParam String userCode
+    ) {
+        return dashboardService.getSalesOwnerDetail(userCode);
+    }
+
 
     @GetMapping("/daily-compare")
     public DailyCompareResponse getDailyCompare() {
