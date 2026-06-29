@@ -53,9 +53,9 @@ public interface DashboardService {
             LocalDate timeTo
     );
     List<SalesOwnerDashboardProjection> getSalesOwnerDashboard();
-    List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter);
-    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter);
-    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter);
+    List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter, Integer year);
+    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter, Integer year);
+    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter, Integer year);
     RevenueSummaryProjection getRevenueSummary();
 
     List<RevenueRegionProjection> getRevenueByRegion();
@@ -69,11 +69,11 @@ public interface DashboardService {
 
     List<RevenueMonthlyProjection> getRevenueMonthly();
 
-    List<RevenueQuarterlyProjection> getRevenueQuarterly();
+    List<RevenueQuarterlyProjection> getRevenueQuarterly(Integer year);
 
     List<LeadMonthlyProjection> getLeadMonthly();
 
-    List<LeadQuarterlyProjection> getLeadQuarterly();
+    List<LeadQuarterlyProjection> getLeadQuarterly(Integer year);
 
     List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly();
 
@@ -141,5 +141,6 @@ public interface DashboardService {
     // Retrieves data for Customer Value Matrix chart
     SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
     List<com.helu.internship.entity.LeadSourceEntity> getAllLeadSources();
+    DailyCompareResponse getDailyCompare();
 }
 

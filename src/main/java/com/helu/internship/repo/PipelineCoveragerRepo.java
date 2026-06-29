@@ -101,16 +101,16 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
         ON u.user_id = l.user_id
         AND l.status NOT IN ('Won','Lost')
         AND (
-            (:quarter = 'this' AND DATEPART(QUARTER, l.created_date) = DATEPART(QUARTER, GETDATE()) AND YEAR(l.created_date) = YEAR(GETDATE()))
-            OR (:quarter = 'last' AND DATEPART(QUARTER, l.created_date) = DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) AND YEAR(l.created_date) = YEAR(DATEADD(QUARTER, -1, GETDATE())))
+            (:quarter = 'this' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, GETDATE()) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = COALESCE(:year, YEAR(GETDATE())))
+            OR (:quarter = 'last' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = (COALESCE(:year, YEAR(GETDATE())) - (CASE WHEN DATEPART(QUARTER, GETDATE()) = 1 THEN 1 ELSE 0 END)))
         )
 
     LEFT JOIN lead_item li
         ON l.lead_id = li.lead_id
 
     WHERE
-        (:quarter = 'this' AND st.period_year = YEAR(GETDATE()) AND st.period_month IN ((DATEPART(QUARTER, GETDATE()) - 1) * 3 + 1, (DATEPART(QUARTER, GETDATE()) - 1) * 3 + 2, (DATEPART(QUARTER, GETDATE()) - 1) * 3 + 3))
-        OR (:quarter = 'last' AND st.period_year = YEAR(DATEADD(QUARTER, -1, GETDATE())) AND st.period_month IN ((DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) - 1) * 3 + 1, (DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) - 1) * 3 + 2, (DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) - 1) * 3 + 3))
+        (:quarter = 'this' AND st.period_year = COALESCE(:year, YEAR(GETDATE())) AND st.period_month IN ((DATEPART(QUARTER, GETDATE()) - 1) * 3 + 1, (DATEPART(QUARTER, GETDATE()) - 1) * 3 + 2, (DATEPART(QUARTER, GETDATE()) - 1) * 3 + 3))
+        OR (:quarter = 'last' AND st.period_year = (COALESCE(:year, YEAR(GETDATE())) - (CASE WHEN DATEPART(QUARTER, GETDATE()) = 1 THEN 1 ELSE 0 END)) AND st.period_month IN ((DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) - 1) * 3 + 1, (DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) - 1) * 3 + 2, (DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) - 1) * 3 + 3))
 
     GROUP BY
         u.user_code,
@@ -118,5 +118,5 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
 
     ORDER BY pipelineCoverage DESC
     """, nativeQuery = true)
-    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(@Param("quarter") String quarter);
+    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(@Param("quarter") String quarter, @Param("year") Integer year);
 }

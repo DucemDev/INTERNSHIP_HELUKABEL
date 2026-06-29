@@ -153,6 +153,18 @@ public class DashboardController {
     public List<SalesOwnerDashboardProjection> getSalesOwnerDashboard() {
         return dashboardService.getSalesOwnerDashboard();
     }
+    @GetMapping("/sales-owner-dashboard-by-quarter")
+    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(@RequestParam String quarter, @RequestParam(required = false) Integer year) {
+        return dashboardService.getSalesOwnerDashboardByQuarter(quarter, year);
+    }
+    @GetMapping("/win-rate-by-saleowner-by-quarter")
+    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(@RequestParam String quarter, @RequestParam(required = false) Integer year) {
+        return dashboardService.getWinRateBySalesOwnerByQuarter(quarter, year);
+    }
+    @GetMapping("/pipeline-coverage-by-quarter")
+    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(@RequestParam String quarter, @RequestParam(required = false) Integer year) {
+        return dashboardService.getPipelineCoverageByQuarter(quarter, year);
+    }
     @GetMapping("/revenue-summary")
     public RevenueSummaryProjection getRevenueSummary() {
         return dashboardService.getRevenueSummary();
@@ -173,8 +185,8 @@ public class DashboardController {
     }
 
     @GetMapping("/revenue-quarterly")
-    public List<RevenueQuarterlyProjection> getRevenueQuarterly() {
-        return dashboardService.getRevenueQuarterly();
+    public List<RevenueQuarterlyProjection> getRevenueQuarterly(@RequestParam(required = false) Integer year) {
+        return dashboardService.getRevenueQuarterly(year);
     }
 
     @GetMapping("/lead-monthly")
@@ -183,8 +195,8 @@ public class DashboardController {
     }
 
     @GetMapping("/lead-quarterly")
-    public List<LeadQuarterlyProjection> getLeadQuarterly() {
-        return dashboardService.getLeadQuarterly();
+    public List<LeadQuarterlyProjection> getLeadQuarterly(@RequestParam(required = false) Integer year) {
+        return dashboardService.getLeadQuarterly(year);
     }
     @GetMapping("/revenue-seller-monthly")
     public List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly() {
@@ -471,6 +483,11 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
         return dashboardService.getSalesOwnerDetail(userCode);
     }
 
+
+    @GetMapping("/daily-compare")
+    public DailyCompareResponse getDailyCompare() {
+        return dashboardService.getDailyCompare();
+    }
 
 
 

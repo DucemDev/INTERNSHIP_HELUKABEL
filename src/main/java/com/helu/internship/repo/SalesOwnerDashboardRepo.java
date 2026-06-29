@@ -72,10 +72,10 @@ public interface SalesOwnerDashboardRepo extends JpaRepository<LeadEntity, Strin
             ORDER BY h.changed_at ASC
         ) won_stage
         WHERE
-            (:quarter = 'this' AND DATEPART(QUARTER, l.created_date) = DATEPART(QUARTER, GETDATE()) AND YEAR(l.created_date) = YEAR(GETDATE()))
-            OR (:quarter = 'last' AND DATEPART(QUARTER, l.created_date) = DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) AND YEAR(l.created_date) = YEAR(DATEADD(QUARTER, -1, GETDATE())))
+            (:quarter = 'this' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, GETDATE()) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = COALESCE(:year, YEAR(GETDATE())))
+            OR (:quarter = 'last' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = (COALESCE(:year, YEAR(GETDATE())) - (CASE WHEN DATEPART(QUARTER, GETDATE()) = 1 THEN 1 ELSE 0 END)))
         GROUP BY u.user_id, u.full_name
         ORDER BY totalRevenue DESC
         """, nativeQuery = true)
-    List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(@Param("quarter") String quarter);
+    List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(@Param("quarter") String quarter, @Param("year") Integer year);
 }
