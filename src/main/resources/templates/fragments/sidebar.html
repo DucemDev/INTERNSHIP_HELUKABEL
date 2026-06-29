@@ -1,7 +1,7 @@
-<aside xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="fixed left-0 top-0 z-[1001] flex h-screen w-64 flex-col border-r border-helu-border bg-white transition-all duration-300 sidebar" th:fragment="sidebar">
-    <div class="flex h-20 items-center justify-between px-6 border-bottom border-helu-border">
+<aside xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="fixed left-0 top-0 z-[1001] flex h-screen w-64 flex-col border-r border-white/40 bg-white/45 backdrop-blur-xl transition-all duration-300 sidebar shadow-[4px_0_24px_rgba(0,0,0,0.02)]" th:fragment="sidebar">
+    <div class="flex h-20 items-center justify-between px-6 border-b border-white/30">
         <a th:href="@{/dashboard}" class="flex items-center">
-            <img th:src="@{/images/logo.png}" alt="HELUKABEL" class="h-9 w-auto object-contain">
+            <img th:src="@{/images/helu-logo.png}" alt="HELUKABEL" class="h-7 w-auto object-contain">
         </a>
         <button class="p-2 text-gray-400 hover:text-helu-red lg:hidden" onclick="toggleSidebar()">
             <i data-lucide="menu" class="w-6 h-6"></i>
@@ -10,7 +10,7 @@
 
     <div class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
         <!-- Dashboard Admin -->
-        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'dashboard' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'dashboard' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/dashboard" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i>
                 <span th:text="#{nav.dashboard}">Dashboard</span>
@@ -18,31 +18,64 @@
         </div>
 
         <!-- Dashboard Seller -->
-        <div sec:authorize="hasRole('Seller')" th:classappend="${activeMenu == 'dashboard' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+        <div sec:authorize="hasRole('Seller')" th:classappend="${activeMenu == 'dashboard' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/seller/dashboard" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i>
                 <span th:text="#{nav.dashboard}">Dashboard</span>
             </a>
         </div>
 
-        <!-- Quản lý Lead (Seller) -->
-        <div sec:authorize="hasRole('Seller')" th:classappend="${activeMenu == 'leads' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
-            <a href="/seller/leads" class="flex items-center px-4 py-3 font-medium">
-                <i data-lucide="users" class="mr-3 w-5 h-5"></i>
-                <span th:text="#{nav.leads}">Quản lý Lead</span>
+        <!-- Lead Source Analysis -->
+        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'lead-source-analysis' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+            <a href="/dashboard/lead-source-analysis" class="flex items-center px-4 py-3 font-medium">
+                <i data-lucide="bar-chart-3" class="mr-3 w-5 h-5"></i>
+                <span>Lead Source Analysis</span>
             </a>
         </div>
 
-        <!-- Quản lý Lead -->
-        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'leads' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+        <!-- Sales Performance Analysis -->
+        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'sales-performance-analysis' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+            <a href="/dashboard/sales-performance-analysis" class="flex items-center px-4 py-3 font-medium">
+                <i data-lucide="line-chart" class="mr-3 w-5 h-5"></i>
+                <span>Sales Performance Analysis</span>
+            </a>
+        </div>
+
+
+        <!-- Quản lý Lead (Admin) -->
+        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'leads' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/leads" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="users" class="mr-3 w-5 h-5"></i>
                 <span th:text="#{nav.leads}">Quản lý Lead</span>
             </a>
         </div>
 
+        <!-- Quản lý Lead (Seller) -->
+        <div sec:authorize="hasRole('Seller')" th:classappend="${activeMenu == 'leads' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+            <a href="/seller/leads" class="flex items-center px-4 py-3 font-medium">
+                <i data-lucide="users" class="mr-3 w-5 h-5"></i>
+                <span th:text="#{nav.leads}">Quản lý Lead</span>
+            </a>
+        </div>
+
+        <!-- Customer Analysis -->
+        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'customer-analysis' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+            <a href="/customer-analysis" class="flex items-center px-4 py-3 font-medium">
+                <i data-lucide="pie-chart" class="mr-3 w-5 h-5"></i>
+                <span>Customer Analysis</span>
+            </a>
+        </div>
+
+        <!-- Trợ lý AI Chatbot -->
+        <div th:classappend="${activeMenu == 'chatbot' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+            <a href="/chatbot" class="flex items-center px-4 py-3 font-medium">
+                <i data-lucide="message-square" class="mr-3 w-5 h-5"></i>
+                <span>Trợ lý AI Chatbot</span>
+            </a>
+        </div>
+
         <!-- Nhân sự (Admin) -->
-        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'users' ? 'bg-helu-red text-white shadow-lg' : 'text-gray-500 hover:bg-red-50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'users' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/users" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="user-cog" class="mr-3 w-5 h-5"></i>
                 <span th:text="#{nav.users}">Nhân sự (Admin)</span>

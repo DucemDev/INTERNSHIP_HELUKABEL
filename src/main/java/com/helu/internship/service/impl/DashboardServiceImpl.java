@@ -19,13 +19,16 @@ public class DashboardServiceImpl implements DashboardService {
     private final PipelineCoveragerRepo pipelineCoverageRepo;
     private final UserRepo userRepo;
     private final SalesOwnerDashboardRepo salesOwnerDashboardRepo;
+    private final LeadSourceRepo leadSourceRepo;
+
     public DashboardServiceImpl(
             LeadRepo leadRepo,
             LeadStatusHistoryRepo leadStatusHistoryRepo,
             CostPerLeadRepo costPerLeadRepo,
             PipelineCoveragerRepo pipelineCoverageRepo,
             UserRepo userRepo,
-            SalesOwnerDashboardRepo salesOwnerDashboardRepo) {
+            SalesOwnerDashboardRepo salesOwnerDashboardRepo,
+            LeadSourceRepo leadSourceRepo) {
 
         this.leadRepo = leadRepo;
         this.leadStatusHistoryRepo = leadStatusHistoryRepo;
@@ -33,7 +36,9 @@ public class DashboardServiceImpl implements DashboardService {
         this.pipelineCoverageRepo = pipelineCoverageRepo;
         this.userRepo = userRepo;
         this.salesOwnerDashboardRepo = salesOwnerDashboardRepo;
+        this.leadSourceRepo = leadSourceRepo;
     }
+
 
     @Override
     public List<WinRateByIndustryProjection> getWinRateByIndustry() {
@@ -140,7 +145,13 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return leadRepo.getROIByLeadSource();
+     }
+
+    @Override
+    public List<LeadSourceSummaryResponse> getLeadSourceSummary() {
+        return leadRepo.getLeadSourceSummary();
     }
+
 
     @Override
     public ConversionRateResponse getStaffStats(String email) {
@@ -185,13 +196,25 @@ public class DashboardServiceImpl implements DashboardService {
         return salesOwnerDashboardRepo.getSalesOwnerDashboard();
     }
     @Override
+    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter, Integer year) {
+        return salesOwnerDashboardRepo.getSalesOwnerDashboardByQuarter(quarter, year);
+    }
+    @Override
+    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter, Integer year) {
+        return leadRepo.getWinRateBySalesOwnerByQuarter(quarter, year);
+    }
+    @Override
+    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter, Integer year) {
+        return pipelineCoverageRepo.getPipelineCoverageByQuarter(quarter, year);
+    }
+    @Override
     public List<RevenueMonthlyProjection> getRevenueMonthly() {
         return leadRepo.getRevenueMonthly();
     }
 
     @Override
-    public List<RevenueQuarterlyProjection> getRevenueQuarterly() {
-        return leadRepo.getRevenueQuarterly();
+    public List<RevenueQuarterlyProjection> getRevenueQuarterly(Integer year) {
+        return leadRepo.getRevenueQuarterly(year);
     }
 
     @Override
@@ -200,8 +223,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<LeadQuarterlyProjection> getLeadQuarterly() {
-        return leadRepo.getLeadQuarterly();
+    public List<LeadQuarterlyProjection> getLeadQuarterly(Integer year) {
+        return leadRepo.getLeadQuarterly(year);
     }
     @Override
     public List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly() {
@@ -450,4 +473,55 @@ public class DashboardServiceImpl implements DashboardService {
     public SalesOwnerDetailResponse getSalesOwnerDetail(String userCode) {
         return leadRepo.getSalesOwnerDetail(userCode);
     }
+
+    @Override
+    public List<com.helu.internship.entity.LeadSourceEntity> getAllLeadSources() {
+        return leadSourceRepo.findAll();
+    }
+
+    @Override
+    public DailyCompareResponse getDailyCompare() {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+
+        // 1. Total Leads
+        long todayTotal = leadRepo.countTotalLeadsByDate(today);
+        long yesterdayTotal = leadRepo.countTotalLeadsByDate(yesterday);
+        double totalLeadsChange = 0.0;
+        if (yesterdayTotal > 0) {
+            totalLeadsChange = ((double) (todayTotal - yesterdayTotal) * 100.0) / yesterdayTotal;
+        } else if (todayTotal > 0) {
+            totalLeadsChange = 100.0;
+        }
+
+        // 2. New Leads
+        long todayNew = leadRepo.countNewLeadsByDate(today);
+        long yesterdayNew = leadRepo.countNewLeadsByDate(yesterday);
+        double newLeadsChange = 0.0;
+        if (yesterdayNew > 0) {
+            newLeadsChange = ((double) (todayNew - yesterdayNew) * 100.0) / yesterdayNew;
+        } else if (todayNew > 0) {
+            newLeadsChange = 100.0;
+        }
+
+        // 3. Revenue Won
+        java.math.BigDecimal todayRev = leadRepo.sumRevenueWonByDate(today);
+        java.math.BigDecimal yesterdayRev = leadRepo.sumRevenueWonByDate(yesterday);
+        double revenueWonChange = 0.0;
+        if (yesterdayRev != null && yesterdayRev.compareTo(java.math.BigDecimal.ZERO) > 0) {
+            java.math.BigDecimal diff = todayRev.subtract(yesterdayRev);
+            revenueWonChange = diff.multiply(new java.math.BigDecimal("100")).divide(yesterdayRev, 2, java.math.RoundingMode.HALF_UP).doubleValue();
+        } else if (todayRev != null && todayRev.compareTo(java.math.BigDecimal.ZERO) > 0) {
+            revenueWonChange = 100.0;
+        }
+
+        return new DailyCompareResponse(
+                todayTotal, yesterdayTotal, totalLeadsChange,
+                todayNew, yesterdayNew, newLeadsChange,
+                todayRev != null ? todayRev : java.math.BigDecimal.ZERO,
+                yesterdayRev != null ? yesterdayRev : java.math.BigDecimal.ZERO,
+                revenueWonChange
+        );
+    }
 }
+

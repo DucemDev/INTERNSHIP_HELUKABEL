@@ -6,6 +6,7 @@ import com.helu.internship.dto.response.LeadResponse;
 import com.helu.internship.entity.*;
 import com.helu.internship.repo.*;
 import com.helu.internship.service.LeadService;
+import com.helu.internship.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class LeadImpl implements LeadService {
     private final LeadRepo leadRepo;
     private final UserRepo userRepo;
     private final LeadBantPointRepo leadBantPointRepo;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -71,7 +73,18 @@ public class LeadImpl implements LeadService {
                 .user(user)
                 .build();
 
-        return mapToResponse(leadRepo.save(lead));
+        LeadEntity saved = leadRepo.save(lead);
+        if (saved.getUser() != null) {
+            notificationService.createNotification(
+                saved.getUser().getEmail(),
+                "Khách hàng mới được gán",
+                String.format("Bạn được gán phụ trách khách hàng tiềm năng mới: %s (%s).", saved.getFullName(), saved.getAccount() != null ? saved.getAccount() : "Không có công ty"),
+                "NEW_LEAD",
+                "/seller/leads"
+            );
+        }
+
+        return mapToResponse(saved);
     }
 
     @Override
@@ -80,10 +93,22 @@ public class LeadImpl implements LeadService {
         LeadEntity lead = leadRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Lead not found"));
 
+        String oldStatus = lead.getStatus();
+        String newStatus = request.getStatus();
+        boolean isLostNow = newStatus != null && newStatus.equalsIgnoreCase("Lost");
+        boolean wasLostBefore = oldStatus != null && oldStatus.equalsIgnoreCase("Lost");
+        boolean isWonNow = newStatus != null && newStatus.equalsIgnoreCase("Won");
+        boolean wasWonBefore = oldStatus != null && oldStatus.equalsIgnoreCase("Won");
+
+        UserEntity oldUser = lead.getUser();
+        UserEntity newUser = null;
+
         if (request.getUserId() != null) {
-            UserEntity user = userRepo.findById(request.getUserId())
+            newUser = userRepo.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
-            lead.setUser(user);
+            lead.setUser(newUser);
+        } else {
+            lead.setUser(null);
         }
 
         lead.setFullName(request.getFullName());
@@ -102,7 +127,67 @@ public class LeadImpl implements LeadService {
         lead.setProductName(request.getProductName());
         lead.setSourceName(request.getSourceName());
 
-        return mapToResponse(leadRepo.save(lead));
+        LeadEntity saved = leadRepo.save(lead);
+
+        if (isLostNow && !wasLostBefore) {
+            String sellerName = saved.getUser() != null ? saved.getUser().getFullName() : "Chưa gán";
+            String reason = saved.getLossReason() != null ? saved.getLossReason() : "Không có lý do cụ thể";
+            String message = String.format("Lead '%s' đã bị chuyển sang trạng thái Lost. Lý do: %s.", saved.getFullName(), reason);
+            
+            // Thông báo cho Seller phụ trách
+            if (saved.getUser() != null) {
+                notificationService.createNotification(
+                    saved.getUser().getEmail(), 
+                    "Cảnh báo: Lead bị Lost", 
+                    message, 
+                    "LEAD_LOST", 
+                    "/seller/leads"
+                );
+            }
+            
+            // Thông báo cho các Admins
+            notificationService.createNotificationToAdmins(
+                "Cảnh báo: Lead bị Lost (" + sellerName + ")", 
+                String.format("Seller %s làm mất Lead '%s'. Lý do: %s.", sellerName, saved.getFullName(), reason), 
+                "LEAD_LOST", 
+                "/dashboard"
+            );
+        }
+
+        if (isWonNow && !wasWonBefore) {
+            String sellerName = saved.getUser() != null ? saved.getUser().getFullName() : "Không xác định";
+            String resultStr = saved.getBusinessResult() != null ? saved.getBusinessResult().toString() : "0";
+            String message = String.format("Khách hàng '%s' của seller %s đã ký hợp đồng thành công (Won). Doanh số: %s.", saved.getFullName(), sellerName, resultStr);
+            
+            if (saved.getUser() != null) {
+                notificationService.createNotification(
+                    saved.getUser().getEmail(),
+                    "Chúc mừng: Ký hợp đồng thành công!",
+                    String.format("Chúc mừng bạn đã chốt thành công khách hàng '%s'. Kết quả: %s.", saved.getFullName(), resultStr),
+                    "LEAD_WON",
+                    "/seller/leads"
+                );
+            }
+            
+            notificationService.createNotificationToAdmins(
+                "Khách hàng chốt thành công: " + saved.getFullName(),
+                message,
+                "LEAD_WON",
+                "/dashboard"
+            );
+        }
+
+        if (newUser != null && (oldUser == null || !oldUser.getUserId().equals(newUser.getUserId()))) {
+            notificationService.createNotification(
+                newUser.getEmail(),
+                "Yêu cầu phụ trách khách hàng",
+                String.format("Bạn đã được chuyển quyền phụ trách khách hàng: %s (%s).", saved.getFullName(), saved.getAccount() != null ? saved.getAccount() : "Không có công ty"),
+                "LEAD_ASSIGNED",
+                "/seller/leads"
+            );
+        }
+
+        return mapToResponse(saved);
     }
 
     @Override
@@ -239,8 +324,65 @@ public class LeadImpl implements LeadService {
         if (lead.getUser() == null || !lead.getUser().getEmail().equalsIgnoreCase(email)) {
             throw new RuntimeException("You do not have permission to update this lead");
         }
+
+        String oldStatus = lead.getStatus();
+        boolean isLostNow = status != null && status.equalsIgnoreCase("Lost");
+        boolean wasLostBefore = oldStatus != null && oldStatus.equalsIgnoreCase("Lost");
+        boolean isWonNow = status != null && status.equalsIgnoreCase("Won");
+        boolean wasWonBefore = oldStatus != null && oldStatus.equalsIgnoreCase("Won");
+
         lead.setStatus(status);
-        return mapToResponse(leadRepo.save(lead));
+        LeadEntity saved = leadRepo.save(lead);
+
+        if (isLostNow && !wasLostBefore) {
+            String sellerName = saved.getUser() != null ? saved.getUser().getFullName() : "Không xác định";
+            String reason = saved.getLossReason() != null ? saved.getLossReason() : "Không có lý do cụ thể";
+            String message = String.format("Lead '%s' đã bị chuyển sang trạng thái Lost. Lý do: %s.", saved.getFullName(), reason);
+            
+            // Thông báo cho Seller phụ trách
+            if (saved.getUser() != null) {
+                notificationService.createNotification(
+                    saved.getUser().getEmail(), 
+                    "Cảnh báo: Lead bị Lost", 
+                    message, 
+                    "LEAD_LOST", 
+                    "/seller/leads"
+                );
+            }
+            
+            // Thông báo cho các Admins
+            notificationService.createNotificationToAdmins(
+                "Cảnh báo: Lead bị Lost (" + sellerName + ")", 
+                String.format("Seller %s làm mất Lead '%s'. Lý do: %s.", sellerName, saved.getFullName(), reason), 
+                "LEAD_LOST", 
+                "/dashboard"
+            );
+        }
+
+        if (isWonNow && !wasWonBefore) {
+            String sellerName = saved.getUser() != null ? saved.getUser().getFullName() : "Không xác định";
+            String resultStr = saved.getBusinessResult() != null ? saved.getBusinessResult().toString() : "0";
+            String message = String.format("Khách hàng '%s' của seller %s đã ký hợp đồng thành công (Won). Doanh số: %s.", saved.getFullName(), sellerName, resultStr);
+            
+            if (saved.getUser() != null) {
+                notificationService.createNotification(
+                    saved.getUser().getEmail(),
+                    "Chúc mừng: Ký hợp đồng thành công!",
+                    String.format("Chúc mừng bạn đã chốt thành công khách hàng '%s'. Kết quả: %s.", saved.getFullName(), resultStr),
+                    "LEAD_WON",
+                    "/seller/leads"
+                );
+            }
+            
+            notificationService.createNotificationToAdmins(
+                "Khách hàng chốt thành công: " + saved.getFullName(),
+                message,
+                "LEAD_WON",
+                "/dashboard"
+            );
+        }
+
+        return mapToResponse(saved);
     }
 
     @Override

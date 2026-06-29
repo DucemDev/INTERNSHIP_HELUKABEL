@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::div.sales-analysis-container})}">
+<body>
+    <div class="sales-analysis-container space-y-8 p-4 md:p-6 bg-slate-50 min-h-screen relative">
+        <!-- Dot Matrix Background Overlay -->
+        <div class="absolute inset-0 pointer-events-none opacity-[0.4]" style="background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1.2px, transparent 1.2px); background-size: 24px 24px;"></div>
+
+        <!-- Notification / Error log for debugging -->
+        <div id="debug-error-log" class="text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-100 hidden relative z-10"></div>
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight text-[#0f0f11]">Sales Performance Analysis</h1>
+                <p class="text-slate-500 font-medium">Phân tích hiệu quả hoạt động và hiệu suất bán hàng của đội ngũ Sales.</p>
+            </div>
+            <button onclick="reloadData()" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition-all shadow-sm">
+                <i data-lucide="refresh-cw" class="w-4 h-4" id="refresh-icon"></i>
+                <span>Làm mới dữ liệu</span>
+            </button>
+        </div>
+
+        <!-- ROW 1: KPI CARDS (At this time) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 relative z-10">
+            <!-- Top Sales Owner by Revenue -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-5 relative overflow-hidden flex flex-col justify-between h-[135px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Top Revenue Sales</span>
+                    <span id="kpi-top-rev-val" class="text-lg font-black text-emerald-600 mt-1 block truncate">0 VNĐ</span>
+                    <span id="kpi-top-rev-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-[50px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #10b981); clip-path: path('M0,25 Q30,5 60,25 T120,25 T180,25 T240,25 T300,25 L300,50 L0,50 Z');"></div>
+            </div>
+
+            <!-- Top Sales Owner by Won Leads -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-5 relative overflow-hidden flex flex-col justify-between h-[135px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Top Won Deals</span>
+                    <span id="kpi-top-won-val" class="text-lg font-black text-[#f6171b] mt-1 block truncate">0 Deals</span>
+                    <span id="kpi-top-won-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-[50px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f6171b); clip-path: path('M0,20 Q20,5 40,20 T80,20 T120,20 T160,20 T200,20 T240,20 T280,20 L280,50 L0,50 Z');"></div>
+            </div>
+
+            <!-- Top Sales Owner by Win Rate -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-5 relative overflow-hidden flex flex-col justify-between h-[135px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Best Win Rate</span>
+                    <span id="kpi-top-wr-val" class="text-lg font-black text-indigo-600 mt-1 block truncate">0%</span>
+                    <span id="kpi-top-wr-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-[50px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #6366f1); clip-path: path('M0,22 Q25,8 50,22 T100,22 T150,22 T200,22 T250,22 T300,22 L300,50 L0,50 Z');"></div>
+            </div>
+
+            <!-- Sales Owner with Highest Pipeline -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-5 relative overflow-hidden flex flex-col justify-between h-[135px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Highest Pipeline</span>
+                    <span id="kpi-top-pipe-val" class="text-lg font-black text-amber-600 mt-1 block truncate">0 VNĐ</span>
+                    <span id="kpi-top-pipe-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-[50px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f59e0b); clip-path: path('M0,25 Q30,5 60,25 T120,25 T180,25 T240,25 T300,25 L300,50 L0,50 Z');"></div>
+            </div>
+
+            <!-- Fastest Sales Owner by Avg Sales Cycle -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-5 relative overflow-hidden flex flex-col justify-between h-[135px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Fastest Cycle</span>
+                    <span id="kpi-fastest-val" class="text-lg font-black text-sky-600 mt-1 block truncate">0 Ngày</span>
+                    <span id="kpi-fastest-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-[50px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #0ea5e9); clip-path: path('M0,20 Q20,5 40,20 T80,20 T120,20 T160,20 T200,20 T240,20 T280,20 L280,50 L0,50 Z');"></div>
+            </div>
+        </div>
+
+        <!-- ROW 2: Sales Owner Win Rate Performance [Qualified Leads, Won Leads (cột) vs Win Rate (đường)] -->
+        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Sales Owner Win Rate Performance</h3>
+            <div class="relative w-full h-[400px]">
+                <canvas id="winRatePerformanceChart"></canvas>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2 italic text-right">Click vào cột bất kỳ để xem chi tiết hiệu suất của Sales Owner đó.</p>
+        </div>
+
+        <!-- ROW 3: Average Sales Cycle by Sales Owner -->
+        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Average Sales Cycle by Sales Owner (Days)</h3>
+            <div class="relative w-full h-[380px]">
+                <canvas id="avgSalesCycleChart"></canvas>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2 italic text-right">Click vào cột để xem chi tiết thời gian chốt deal và BANT Score.</p>
+        </div>
+
+        <!-- ROW 4: Top Loss Reasons by Product Line (Stacked Bar Chart) -->
+        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Top Loss Reasons by Product Line</h3>
+            <div class="relative w-full h-[420px]">
+                <canvas id="lossReasonsProductChart"></canvas>
+            </div>
+        </div>
+
+        <!-- ROW 5: Workload vs Result Matrix (Bubble Chart) -->
+        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Workload vs Result Matrix</h3>
+            <div class="relative w-full h-[450px]">
+                <canvas id="workloadResultChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Popups / Modals -->
+        <!-- Modal 1: Sales Owner General Dashboard (Click Row 2) -->
+        <div id="salesOwnerGeneralModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4 transition-all duration-200">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl transform scale-95 opacity-0 transition-all duration-300 flex flex-col" id="generalModalContainer">
+                <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800 tracking-tight" id="genModalTitle">Sales Owner Performance</h2>
+                        <p class="text-slate-500 text-xs font-medium mt-1">Tổng quan thông số cơ hội và chuyển đổi</p>
+                    </div>
+                    <button onclick="closeGeneralModal()" class="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-lg transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="p-6 grid grid-cols-2 gap-6 bg-slate-50/50">
+                    <div class="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Leads</span>
+                        <span id="gen-modal-total-leads" class="text-2xl font-black text-slate-700 mt-1 block">0</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Revenue Won</span>
+                        <span id="gen-modal-revenue-won" class="text-2xl font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Conversion Rate</span>
+                        <span id="gen-modal-cr" class="text-2xl font-black text-indigo-600 mt-1 block">0%</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Avg Sales Cycle</span>
+                        <span id="gen-modal-sales-cycle" class="text-2xl font-black text-sky-600 mt-1 block">0 Ngày</span>
+                    </div>
+                </div>
+                <div class="flex justify-end p-6 border-t border-slate-100">
+                    <button onclick="closeGeneralModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all text-sm">Đóng</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 2: Sales Owner BANT Details (Click Row 3) -->
+        <div id="salesOwnerBantModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4 transition-all duration-200">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl transform scale-95 opacity-0 transition-all duration-300 flex flex-col" id="bantModalContainer">
+                <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800 tracking-tight" id="bantModalTitle">Sales Owner Detailed Insights</h2>
+                        <p class="text-slate-500 text-xs font-medium mt-1">Đánh giá chất lượng lead và chi tiết phễu chốt deal</p>
+                    </div>
+                    <button onclick="closeBantModal()" class="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-lg transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50/50">
+                    <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Won Leads</span>
+                        <span id="bant-modal-won-leads" class="text-xl font-black text-[#f6171b] mt-1 block">0</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Revenue Won</span>
+                        <span id="bant-modal-revenue-won" class="text-xl font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Avg Deal Size</span>
+                        <span id="bant-modal-deal-size" class="text-xl font-black text-slate-700 mt-1 block">0 VNĐ</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Win Rate</span>
+                        <span id="bant-modal-win-rate" class="text-xl font-black text-indigo-600 mt-1 block">0%</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">BANT Complete Rate</span>
+                        <span id="bant-modal-complete-rate" class="text-xl font-black text-amber-600 mt-1 block">0%</span>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Avg BANT Score</span>
+                        <span id="bant-modal-avg-score" class="text-xl font-black text-sky-600 mt-1 block">0 / 4.0</span>
+                    </div>
+                </div>
+                <div class="flex justify-end p-6 border-t border-slate-100">
+                    <button onclick="closeBantModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all text-sm">Đóng</button>
+                </div>
+            </div>
+        </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script th:inline="javascript">
+        // Datasets
+        let topRevData = null;
+        let topWrData = null;
+        let fastestCycleData = null;
+        let pipelineData = [];
+        let salesDashboardData = [];
+        let winRateSalesData = [];
+        let cycleSalesData = [];
+        let bantCompleteData = [];
+        let bantScoreData = [];
+        let lossReasonsData = [];
+
+        // Chart instances
+        let winRatePerformanceChartInstance = null;
+        let avgSalesCycleChartInstance = null;
+        let lossReasonsProductChartInstance = null;
+        let workloadResultChartInstance = null;
+
+        // Custom colors matching brand guideline
+        const brandRed = 'rgba(246, 23, 27, 1)';
+        const brandRedLight = 'rgba(246, 23, 27, 0.65)';
+        const accentBlue = 'rgba(59, 130, 246, 1)';
+        const accentBlueLight = 'rgba(59, 130, 246, 0.65)';
+        const accentEmerald = 'rgba(16, 185, 129, 1)';
+        const accentEmeraldLight = 'rgba(16, 185, 129, 0.65)';
+
+        // Color palette for sales owners
+        const chartColors = [
+            'rgba(246, 23, 27, 0.7)',
+            'rgba(59, 130, 246, 0.7)',
+            'rgba(16, 185, 129, 0.7)',
+            'rgba(245, 158, 11, 0.7)',
+            'rgba(139, 92, 246, 0.7)',
+            'rgba(236, 72, 153, 0.7)',
+            'rgba(6, 182, 212, 0.7)',
+            'rgba(100, 116, 139, 0.7)'
+        ];
+
+        window.addEventListener('error', function(e) {
+            const logDiv = document.getElementById('debug-error-log');
+            if (logDiv) {
+                logDiv.classList.remove('hidden');
+                logDiv.innerText += "\n[JS Error]: " + e.message + " (" + e.filename + ":" + e.lineno + ")";
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await reloadData();
+        });
+
+        async function safeFetch(url, fallbackValue = []) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    console.warn(`API warning for ${url}: status ${response.status}`);
+                    return fallbackValue;
+                }
+                return await response.json();
+            } catch (err) {
+                console.error(`Fetch failed for ${url}:`, err);
+                return fallbackValue;
+            }
+        }
+
+        function formatCurrency(val) {
+            if (val === undefined || val === null) return '0 VNĐ';
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+        }
+
+        async function reloadData() {
+            const icon = document.getElementById('refresh-icon');
+            if (icon) icon.classList.add('animate-spin');
+
+            try {
+                // Fetch datasets safely
+                const [
+                    topRevRes, topWrRes, fastestRes, pipelineRes,
+                    salesDashRes, winRateSalesRes, cycleSalesRes,
+                    bantCompleteRes, bantScoreRes, lossReasonsRes
+                ] = await Promise.all([
+                    safeFetch('/api/dashboard/top-sales-owner-revenue', null),
+                    safeFetch('/api/dashboard/top-sales-owner-win-rate', null),
+                    safeFetch('/api/dashboard/fastest-sales-owner', null),
+                    safeFetch('/api/dashboard/pipeline-coverage'),
+                    safeFetch('/api/dashboard/sales-owner-dashboard'),
+                    safeFetch('/api/dashboard/win-rate-by-saleowner'),
+                    safeFetch('/api/dashboard/sales-owner/avg-sales-cycle'),
+                    safeFetch('/api/dashboard/sales-owner/bant-complete-rate'),
+                    safeFetch('/api/dashboard/sales-owner/avg-bant-score'),
+                    safeFetch('/api/dashboard/product-line/loss-reasons')
+                ]);
+
+                topRevData = topRevRes;
+                topWrData = topWrRes;
+                fastestCycleData = fastestRes;
+                pipelineData = pipelineRes || [];
+                salesDashboardData = salesDashRes || [];
+                winRateSalesData = winRateSalesRes || [];
+                cycleSalesData = cycleSalesRes || [];
+                bantCompleteData = bantCompleteRes || [];
+                bantScoreData = bantScoreRes || [];
+                lossReasonsData = lossReasonsRes || [];
+
+                // Render components safely
+                try { renderKpis(); } catch(e) { console.error("Error rendering KPIs:", e); }
+                try { renderWinRatePerformanceChart(); } catch(e) { console.error("Error rendering Win Rate Performance Chart:", e); }
+                try { renderAvgSalesCycleChart(); } catch(e) { console.error("Error rendering Avg Sales Cycle Chart:", e); }
+                try { renderLossReasonsProductChart(); } catch(e) { console.error("Error rendering Loss Reasons Product Chart:", e); }
+                try { renderWorkloadResultChart(); } catch(e) { console.error("Error rendering Workload Result Chart:", e); }
+
+            } catch (err) {
+                console.error("Error loading dashboard data", err);
+                const logDiv = document.getElementById('debug-error-log');
+                if (logDiv) {
+                    logDiv.classList.remove('hidden');
+                    logDiv.innerText = "Lỗi nạp dữ liệu: " + err.message;
+                }
+            } finally {
+                if (icon) icon.classList.remove('animate-spin');
+            }
+        }
+
+        // Hàng 1: KPIs
+        function renderKpis() {
+            // 1. Top Sales Owner by Revenue
+            if (topRevData) {
+                document.getElementById('kpi-top-rev-val').innerText = formatCurrency(topRevData.revenue);
+                document.getElementById('kpi-top-rev-name').innerText = topRevData.fullName || 'Unknown';
+            }
+
+            // 2. Top Sales Owner by Won Leads
+            if (Array.isArray(salesDashboardData) && salesDashboardData.length) {
+                let topWon = { userName: 'N/A', wonLead: 0 };
+                salesDashboardData.forEach(d => {
+                    if (d.wonLead > topWon.wonLead) {
+                        topWon = d;
+                    }
+                });
+                document.getElementById('kpi-top-won-val').innerText = `${topWon.wonLead} Deals`;
+                document.getElementById('kpi-top-won-name').innerText = topWon.userName || 'Unknown';
+            }
+
+            // 3. Top Sales Owner by Win Rate
+            if (topWrData) {
+                document.getElementById('kpi-top-wr-val').innerText = (topWrData.winRate || 0).toFixed(1) + '%';
+                document.getElementById('kpi-top-wr-name').innerText = topWrData.fullName || 'Unknown';
+            }
+
+            // 4. Sales Owner with Highest Pipeline
+            if (Array.isArray(pipelineData) && pipelineData.length) {
+                let topPipe = { salesOwner: 'N/A', openPipeline: 0 };
+                pipelineData.forEach(d => {
+                    if (d.openPipeline > topPipe.openPipeline) {
+                        topPipe = d;
+                    }
+                });
+                document.getElementById('kpi-top-pipe-val').innerText = formatCurrency(topPipe.openPipeline);
+                document.getElementById('kpi-top-pipe-name').innerText = topPipe.salesOwner || 'Unknown';
+            }
+
+            // 5. Fastest Sales Owner by Avg Sales Cycle
+            if (fastestCycleData) {
+                document.getElementById('kpi-fastest-val').innerText = (fastestCycleData.avgSalesCycle || 0).toFixed(1) + ' Ngày';
+                document.getElementById('kpi-fastest-name').innerText = fastestCycleData.fullName || 'Unknown';
+            }
+        }
+
+        // Hàng 2: Sales Owner Win Rate Performance
+        function renderWinRatePerformanceChart() {
+            const ctx = document.getElementById('winRatePerformanceChart').getContext('2d');
+            
+            const labels = winRateSalesData.map(d => d.userName || 'Unknown');
+            const qualifiedLeads = winRateSalesData.map(d => d.qualifiedLead || 0);
+            const wonLeads = winRateSalesData.map(d => d.wonLead || 0);
+            const winRates = winRateSalesData.map(d => d.winRate || 0);
+
+            if (winRatePerformanceChartInstance) winRatePerformanceChartInstance.destroy();
+
+            winRatePerformanceChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Qualified Leads',
+                            data: qualifiedLeads,
+                            backgroundColor: accentBlueLight,
+                            borderColor: accentBlue,
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Won Leads',
+                            data: wonLeads,
+                            backgroundColor: brandRedLight,
+                            borderColor: brandRed,
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Win Rate (%)',
+                            data: winRates,
+                            type: 'line',
+                            borderColor: 'rgba(245, 158, 11, 1)', // Amber color
+                            backgroundColor: 'transparent',
+                            pointBackgroundColor: 'rgba(245, 158, 11, 1)',
+                            pointBorderColor: '#fff',
+                            pointRadius: 5,
+                            borderWidth: 3,
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const salesOwner = winRateSalesData[index];
+                            openGeneralModal(salesOwner.userName, salesOwner.userId || salesOwner.userCode);
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Số lượng Lead', font: { weight: 'bold' } },
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#475569' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Tỷ lệ Win Rate (%)', font: { weight: 'bold' } },
+                            grid: { drawOnChartArea: false },
+                            ticks: {
+                                callback: val => val + '%',
+                                color: '#475569'
+                            },
+                            min: 0
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { weight: 'bold' } } },
+                        tooltip: { padding: 12, cornerRadius: 8 }
+                    }
+                }
+            });
+        }
+
+        // Hàng 3: Average Sales Cycle by Sales Owner
+        function renderAvgSalesCycleChart() {
+            const ctx = document.getElementById('avgSalesCycleChart').getContext('2d');
+            
+            const labels = cycleSalesData.map(d => d.fullName || 'Unknown');
+            const cycles = cycleSalesData.map(d => d.avgSalesCycle || 0);
+
+            // Check if all cycles are 0 and show warning message below the canvas
+            const isAllZero = cycles.length > 0 && cycles.every(v => v === 0);
+            const infoTextId = 'avg-sales-cycle-info';
+            let infoEl = document.getElementById(infoTextId);
+            if (isAllZero) {
+                if (!infoEl) {
+                    infoEl = document.createElement('div');
+                    infoEl.id = infoTextId;
+                    infoEl.className = 'text-xs text-amber-600 bg-amber-50 border border-amber-100 p-3 rounded-lg mt-3 font-medium flex items-center gap-2';
+                    infoEl.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500 shrink-0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <span>Dữ liệu chu kỳ bán hàng của tất cả Sales Owner hiện tại trong cơ sở dữ liệu đều trả về 0.0 ngày (ngày chốt Won trùng với ngày tạo Lead).</span>
+                    `;
+                    document.getElementById('avgSalesCycleChart').parentNode.appendChild(infoEl);
+                }
+            } else if (infoEl) {
+                infoEl.remove();
+            }
+
+            if (avgSalesCycleChartInstance) avgSalesCycleChartInstance.destroy();
+
+            avgSalesCycleChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Sales Cycle (Days)',
+                        data: cycles,
+                        backgroundColor: 'rgba(14, 165, 233, 0.7)', // Sky blue
+                        borderColor: 'rgba(14, 165, 233, 1)',
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    }]
+                },
+                plugins: [
+                    {
+                        id: 'valueOnBar',
+                        afterDatasetsDraw(chart) {
+                            const { ctx } = chart;
+                            ctx.save();
+                            chart.data.datasets.forEach((dataset, i) => {
+                                const meta = chart.getDatasetMeta(i);
+                                meta.data.forEach((bar, index) => {
+                                    const val = dataset.data[index];
+                                    ctx.fillStyle = '#475569';
+                                    ctx.font = 'bold 11px sans-serif';
+                                    ctx.textAlign = 'center';
+                                    ctx.fillText(Number(val).toFixed(1) + ' ngày', bar.x, bar.y - 8);
+                                });
+                            });
+                            ctx.restore();
+                        }
+                    }
+                ],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const salesOwner = cycleSalesData[index];
+                            openBantModal(salesOwner.fullName, salesOwner.userCode);
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#475569' },
+                            min: 0,
+                            max: 10
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { padding: 12, cornerRadius: 8 }
+                    }
+                }
+            });
+        }
+
+        // Hàng 4: Top Loss Reasons by Product Line
+        function renderLossReasonsProductChart() {
+            const ctx = document.getElementById('lossReasonsProductChart').getContext('2d');
+            
+            // Get unique product lines & loss reasons
+            const products = [...new Set(lossReasonsData.map(d => d.productName))].filter(Boolean);
+            const reasons = [...new Set(lossReasonsData.map(d => d.lossReason))].filter(Boolean);
+
+            // Build datasets for stacked bar chart
+            const datasets = reasons.map((reason, idx) => {
+                const data = products.map(prod => {
+                    const found = lossReasonsData.find(d => d.productName === prod && d.lossReason === reason);
+                    return found ? found.lostLead || 0 : 0;
+                });
+                return {
+                    label: reason,
+                    data: data,
+                    backgroundColor: chartColors[idx % chartColors.length],
+                    borderWidth: 1
+                };
+            });
+
+            if (lossReasonsProductChartInstance) lossReasonsProductChartInstance.destroy();
+
+            lossReasonsProductChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: products,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' }
+                        },
+                        y: {
+                            stacked: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#475569' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'right', labels: { font: { weight: 'bold' } } },
+                        tooltip: { padding: 12, cornerRadius: 8 }
+                    }
+                }
+            });
+        }
+
+        // Hàng 5: Workload vs Result Matrix
+        function renderWorkloadResultChart() {
+            const ctx = document.getElementById('workloadResultChart').getContext('2d');
+            
+            // Merge datasets by sales owner to construct the bubble dataset
+            const bubbleData = salesDashboardData.map((dash, idx) => {
+                const ownerName = dash.userName || 'Unknown';
+                
+                // Fetch qualified lead from winRateSalesData
+                const winRateObj = winRateSalesData.find(d => d.userName === ownerName);
+                const qualLead = winRateObj ? winRateObj.qualifiedLead || 0 : 0;
+                
+                // Fetch avg sales cycle from cycleSalesData
+                const cycleObj = cycleSalesData.find(d => d.fullName === ownerName);
+                const salesCycle = cycleObj ? cycleObj.avgSalesCycle || 0 : 0;
+
+                const won = dash.wonLead || 0;
+                const total = dash.totalLead || 0;
+                const lost = total - won;
+                const winRate = dash.winRate || 0;
+                const revenue = dash.totalRevenue || 0;
+                const dealSize = won > 0 ? (revenue / won) : 0;
+
+                return {
+                    label: ownerName,
+                    data: [{
+                        x: total,                  // Workload = Total Leads
+                        y: revenue,                // Result = Revenue Won
+                        r: Math.max(won * 2.5, 5) // Bubble Size = Won Leads (scaled)
+                    }],
+                    // Extra metadata for custom tooltip rendering
+                    meta: {
+                        qualifiedLeads: qualLead,
+                        wonLeads: won,
+                        lostLeads: lost,
+                        winRate: winRate,
+                        avgDealSize: dealSize,
+                        avgSalesCycle: salesCycle
+                    },
+                    backgroundColor: chartColors[idx % chartColors.length],
+                    hoverBackgroundColor: chartColors[idx % chartColors.length]
+                };
+            });
+
+            if (workloadResultChartInstance) workloadResultChartInstance.destroy();
+
+            workloadResultChartInstance = new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: bubbleData
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Tổng số Leads (Workload)', font: { weight: 'bold' } },
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#475569' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Doanh thu thắng được (Result)', font: { weight: 'bold' } },
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                callback: val => (val / 1000000000).toFixed(1) + 'B',
+                                color: '#475569'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { weight: 'bold' } } },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const meta = context.dataset.meta;
+                                    const name = context.dataset.label;
+                                    return [
+                                        `Sales: ${name}`,
+                                        `----------------------------`,
+                                        `- Qualified Leads: ${meta.qualifiedLeads}`,
+                                        `- Won Leads: ${meta.wonLeads}`,
+                                        `- Lost Leads: ${meta.lostLeads}`,
+                                        `- Win Rate: ${Number(meta.winRate).toFixed(1)}%`,
+                                        `- Avg Deal Size: ${formatCurrency(meta.avgDealSize)}`,
+                                        `- Avg Sales Cycle: ${Number(meta.avgSalesCycle).toFixed(1)} Ngày`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Modals Management
+        // Modal 1: General Dashboard (Clicked Row 2)
+        async function openGeneralModal(userName, userCode) {
+            document.getElementById('genModalTitle').innerText = `${userName} - Performance`;
+
+            // Load details from API
+            try {
+                // If userCode is missing, fallback using salesDashboardData matching
+                let cleanUserCode = userCode;
+                if (!cleanUserCode) {
+                    const match = winRateSalesData.find(d => d.userName === userName);
+                    cleanUserCode = match ? match.userId || match.userCode : '';
+                }
+
+                if (cleanUserCode) {
+                    const details = await safeFetch(`/api/dashboard/sales-owner/detail?userCode=${cleanUserCode}`, null);
+                    if (details) {
+                        const totalLeads = (details.qualifiedLeads || 0) + (details.wonLeads || 0) + (details.lostLeads || 0);
+                        const totalRevenue = (details.wonLeads || 0) * (details.avgDealSize || 0);
+
+                        document.getElementById('gen-modal-total-leads').innerText = totalLeads;
+                        document.getElementById('gen-modal-revenue-won').innerText = formatCurrency(totalRevenue);
+                        document.getElementById('gen-modal-cr').innerText = (details.winRate || 0).toFixed(1) + '%';
+                        document.getElementById('gen-modal-sales-cycle').innerText = (details.avgSalesCycle || 0).toFixed(1) + ' Ngày';
+                    }
+                }
+            } catch (err) {
+                console.error("Gen modal load error", err);
+            }
+
+            const modal = document.getElementById('salesOwnerGeneralModal');
+            const container = document.getElementById('generalModalContainer');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        function closeGeneralModal() {
+            const modal = document.getElementById('salesOwnerGeneralModal');
+            const container = document.getElementById('generalModalContainer');
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Modal 2: BANT Dashboard (Clicked Row 3)
+        async function openBantModal(fullName, userCode) {
+            document.getElementById('bantModalTitle').innerText = `${fullName} - Insights`;
+
+            try {
+                // Fetch metrics
+                const [details, bantRateList, bantScoreList] = await Promise.all([
+                    safeFetch(`/api/dashboard/sales-owner/detail?userCode=${userCode}`, null),
+                    safeFetch('/api/dashboard/sales-owner/bant-complete-rate'),
+                    safeFetch('/api/dashboard/sales-owner/avg-bant-score')
+                ]);
+
+                // 1. Details
+                if (details) {
+                    const totalRevenue = (details.wonLeads || 0) * (details.avgDealSize || 0);
+                    document.getElementById('bant-modal-won-leads').innerText = details.wonLeads || 0;
+                    document.getElementById('bant-modal-revenue-won').innerText = formatCurrency(totalRevenue);
+                    document.getElementById('bant-modal-deal-size').innerText = formatCurrency(details.avgDealSize);
+                    document.getElementById('bant-modal-win-rate').innerText = (details.winRate || 0).toFixed(1) + '%';
+                }
+
+                // 2. BANT complete rate
+                const rateObj = bantRateList.find(d => d.fullName === fullName || d.userCode === userCode);
+                document.getElementById('bant-modal-complete-rate').innerText = rateObj ? (rateObj.bantCompleteRate || 0).toFixed(1) + '%' : 'N/A';
+
+                // 3. Avg BANT score
+                const scoreObj = bantScoreList.find(d => d.fullName === fullName || d.userCode === userCode);
+                document.getElementById('bant-modal-avg-score').innerText = scoreObj ? (scoreObj.avgBantScore || 0).toFixed(2) + ' / 4.0' : 'N/A';
+
+            } catch (err) {
+                console.error("Bant modal load error", err);
+            }
+
+            const modal = document.getElementById('salesOwnerBantModal');
+            const container = document.getElementById('bantModalContainer');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        function closeBantModal() {
+            const modal = document.getElementById('salesOwnerBantModal');
+            const container = document.getElementById('bantModalContainer');
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+    </script>
+    </div>
+</body>
+</html>
