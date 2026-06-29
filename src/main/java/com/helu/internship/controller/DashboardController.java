@@ -439,7 +439,14 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
     public List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore() {
         return dashboardService.getSalesOwnerAvgBantScore();
     }
-// dashboard các lý do thua theo sản phẩm //
+
+    // Customer Value Matrix chart data
+    @GetMapping("/customer-value-matrix")
+    public List<CustomerValueMatrixResponse> getCustomerValueMatrix() {
+        return dashboardService.getCustomerValueMatrix();
+    }
+
+    // dashboard các lý do thua theo sản phẩm //
     @GetMapping("/product-line/loss-reasons")
     public List<LossReasonByProductLineResponse> getLossReasonByProductLine() {
         return dashboardService.getLossReasonByProductLine();

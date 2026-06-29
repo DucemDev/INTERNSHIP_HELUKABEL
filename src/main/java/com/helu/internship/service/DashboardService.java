@@ -131,5 +131,8 @@ public interface DashboardService {
     List<SalesOwnerBantCompleteRateResponse> getSalesOwnerBantCompleteRate();
     List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore();
     List<LossReasonByProductLineResponse> getLossReasonByProductLine();
+    List<CustomerValueMatrixResponse> getCustomerValueMatrix();
+
+    // Retrieves data for Customer Value Matrix chart
     SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
 }

@@ -437,9 +437,15 @@ public class DashboardServiceImpl implements DashboardService {
         return leadRepo.getSalesOwnerAvgBantScore();
     }
     @Override
+    public List<CustomerValueMatrixResponse> getCustomerValueMatrix() {
+        return leadRepo.getCustomerValueMatrix();
+    }
+
+    @Override
     public List<LossReasonByProductLineResponse> getLossReasonByProductLine() {
         return leadRepo.getLossReasonByProductLine();
     }
+
     @Override
     public SalesOwnerDetailResponse getSalesOwnerDetail(String userCode) {
         return leadRepo.getSalesOwnerDetail(userCode);
