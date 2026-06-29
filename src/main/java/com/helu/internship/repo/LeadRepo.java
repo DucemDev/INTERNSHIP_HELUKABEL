@@ -2140,4 +2140,18 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             """, nativeQuery = true)
     List<CustomerValueMatrixResponse> getCustomerValueMatrix();
 
+    @Query(value = """
+        SELECT 
+            COUNT(l.lead_id) as totalLeads,
+            CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) as wonLeads,
+            CAST(SUM(CASE WHEN l.status = 'Lost' THEN 1 ELSE 0 END) AS BIGINT) as lostLeads
+        FROM lead l
+        WHERE l.user_id = :userId
+          AND l.created_date >= :sinceDate
+        """, nativeQuery = true)
+    PerformanceStatsProjection getPerformanceStatsForUser(
+        @Param("userId") java.util.UUID userId,
+        @Param("sinceDate") java.time.LocalDate sinceDate
+    );
+
 }

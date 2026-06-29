@@ -1503,3 +1503,22 @@ VALUES
     ('QUARTERLY', 2, 2026, 65000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'),
     ('QUARTERLY', 3, 2026, 80000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991');
 GO
+
+-- =================================================================================
+-- CREATE NOTIFICATION TABLE
+-- =================================================================================
+CREATE TABLE notification
+(
+    id          UNIQUEIDENTIFIER DEFAULT NEWID() NOT NULL,
+    user_id     UNIQUEIDENTIFIER NOT NULL,
+    title       NVARCHAR(200) NOT NULL,
+    message     NVARCHAR(1000) NOT NULL,
+    is_read     BIT DEFAULT 0 NOT NULL,
+    type        VARCHAR(50) NOT NULL,
+    link        VARCHAR(255) NULL,
+    created_at  DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+    CONSTRAINT PK_notification PRIMARY KEY (id),
+    CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE CASCADE
+);
+GO
+
