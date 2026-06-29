@@ -39,4 +39,10 @@ public class HomeController {
         model.addAttribute("activeMenu", "leads");
         return "seller/lead-management";
     }
+
+    @GetMapping("/customer-analysis")
+    public String customerAnalysisPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "customer-analysis");
+        return "dashboard/customer-analysis";
+    }
 }

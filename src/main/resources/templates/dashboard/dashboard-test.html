@@ -476,9 +476,10 @@
 
                     // 2. Quarterly Trends
                     const selectedYear = document.getElementById('dashboardYearFilter')?.value || '';
+                    const yearQuery = selectedYear ? `?year=${selectedYear}` : '';
                     const [revQuarterlyRes, leadQuarterlyRes] = await Promise.all([
-                        fetch(`/api/dashboard/revenue-quarterly?year=${selectedYear}`),
-                        fetch(`/api/dashboard/lead-quarterly?year=${selectedYear}`)
+                        fetch(`/api/dashboard/revenue-quarterly${yearQuery}`),
+                        fetch(`/api/dashboard/lead-quarterly${yearQuery}`)
                     ]);
 
                     if (revQuarterlyRes.ok && leadQuarterlyRes.ok) {

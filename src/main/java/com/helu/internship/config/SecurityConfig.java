@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/dashboard/**").permitAll()
 
                         .requestMatchers("/users/**").hasRole("Admin")
+                        .requestMatchers("/customer-analysis").hasRole("Admin")
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "Seller")
                         .requestMatchers("/seller/**").hasAnyRole("Seller")
                         .requestMatchers("/api/seller/**").hasRole("Seller")

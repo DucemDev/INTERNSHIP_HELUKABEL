@@ -87,7 +87,6 @@
                     <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Phân loại BANT</th>
                     <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Điểm số chi tiết</th>
                     <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Nguồn / Dòng sản phẩm</th>
-                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10">Thao tác</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -95,10 +94,13 @@
                 </tbody>
             </table>
         </div>
-        <!-- Record Count -->
+        <!-- Record Count and Pagination -->
         <div class="flex items-center justify-between border-t border-gray-100 bg-white px-6 py-4">
             <div class="text-sm font-medium text-gray-500" id="recordCount">
                 Hiển thị 0/0 bản ghi
+            </div>
+            <div class="flex items-center gap-2" id="paginationControls">
+                <!-- Pagination buttons generated via JS -->
             </div>
         </div>
     </div>
@@ -219,6 +221,8 @@
         const apiBase = '/api/seller/leads';
         let allLeads = [];
         let filteredLeads = [];
+        let currentPage = 1;
+        const pageSize = 10;
 
         let statusChartInstance = null;
 
@@ -228,6 +232,7 @@
                 if (response.ok) {
                     allLeads = await response.json();
                     filteredLeads = [...allLeads];
+                    currentPage = 1;
                     updateStats();
                     renderLeads();
                     fetchStatusChart();
@@ -307,7 +312,18 @@
             const tbody = document.getElementById('leadsTable').querySelector('tbody');
             tbody.innerHTML = '';
 
-            if (filteredLeads.length === 0) {
+            const totalRecords = filteredLeads.length;
+            const totalPages = Math.ceil(totalRecords / pageSize);
+
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
+
+            if (paginatedLeads.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="7" class="py-8 text-center text-sm font-medium text-gray-400">
@@ -316,6 +332,7 @@
                     </tr>
                 `;
                 document.getElementById('recordCount').innerText = 'Hiển thị 0/0 bản ghi';
+                document.getElementById('paginationControls').innerHTML = '';
                 return;
             }
 
@@ -331,42 +348,44 @@
                 'WARM': 'bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-sm shadow-amber-100',
                 'COLD': 'bg-gradient-to-r from-slate-400 to-slate-500 text-white shadow-sm shadow-slate-100'
             };
-
-            filteredLeads.forEach(lead => {
+            paginatedLeads.forEach(lead => {
                 const tr = document.createElement('tr');
-                tr.className = 'border-b border-gray-50 hover:bg-gray-50/50 transition-all group';
+                tr.className = 'border-b border-gray-50 hover:bg-gray-50/50 transition-all group cursor-pointer';
+                tr.onclick = () => {
+                    window.location.href = `/leads/${lead.leadId}`;
+                };
 
                 const totalBant = (lead.bantBudget || 0) + (lead.bantAuthority || 0) + (lead.bantNeed || 0) + (lead.bantTimeline || 0);
 
                 tr.innerHTML = `
-                    <td class="py-4 px-6">
-                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">${lead.leadId}</span>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">${lead.leadId}</span>
                     </td>
-                    <td class="py-4 px-6">
-                        <div class="font-bold text-gray-900 hover:text-helu-red cursor-pointer" onclick="viewDetail('${lead.leadId}')">${lead.fullName}</div>
-                        <div class="text-xs font-medium text-gray-500">${lead.account}</div>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <div class="font-bold text-gray-900 text-xs hover:text-helu-red cursor-pointer">${lead.fullName}</div>
+                        <div class="text-[10px] font-medium text-gray-500">${lead.account}</div>
                     </td>
-                    <td class="py-4 px-6">
-                        <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${statusColors[lead.status] || 'bg-gray-50 text-gray-600'}">
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${statusColors[lead.status] || 'bg-gray-50 text-gray-600'}">
                             ${lead.status}
                         </span>
                     </td>
-                    <td class="py-4 px-6">
-                        <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${heatColors[lead.leadHeat] || 'bg-slate-400 text-white'}">
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${heatColors[lead.leadHeat] || 'bg-slate-400 text-white'}">
                             ${lead.leadHeat === 'HOT' ? '<i data-lucide="flame" class="w-3 h-3"></i>' : ''}
                             ${lead.leadHeat || 'COLD'} (${totalBant}đ)
                         </span>
                     </td>
-                    <td class="py-4 px-6">
-                        <div class="flex flex-col gap-1 w-32">
-                            <div class="flex justify-between text-[10px] font-bold text-gray-400">
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <div class="flex flex-col gap-0.5 w-28">
+                            <div class="flex justify-between text-[9px] font-bold text-gray-400">
                                 <span>BANT Score</span>
                                 <span>${totalBant}/100</span>
                             </div>
-                            <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                            <div class="w-full bg-gray-100 rounded-full h-1 overflow-hidden">
                                 <div class="h-full rounded-full ${lead.leadHeat === 'HOT' ? 'bg-red-500' : lead.leadHeat === 'WARM' ? 'bg-amber-400' : 'bg-slate-400'}" style="width: ${totalBant}%"></div>
                             </div>
-                            <div class="flex gap-2 text-[8px] font-bold text-gray-400 mt-0.5">
+                            <div class="flex gap-1.5 text-[8px] font-bold text-gray-400 mt-0.5">
                                 <span>B: ${lead.bantBudget || 0}</span>
                                 <span>A: ${lead.bantAuthority || 0}</span>
                                 <span>N: ${lead.bantNeed || 0}</span>
@@ -374,28 +393,64 @@
                             </div>
                         </div>
                     </td>
-                    <td class="py-4 px-6">
+                    <td class="py-3 px-4 whitespace-nowrap">
                         <div class="text-xs font-bold text-gray-800">${lead.sourceName || 'N/A'}</div>
-                        <div class="text-[10px] font-medium text-gray-400">${lead.productName || 'N/A'}</div>
-                    </td>
-                    <td class="py-4 px-6 text-right pr-10">
-                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="viewDetail('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Xem chi tiết">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="openBantModal('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-helu-red transition-all" title="Đánh giá BANT">
-                                <i data-lucide="sliders" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="openStatusModal('${lead.leadId}', '${lead.status}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Cập nhật trạng thái">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            </button>
-                        </div>
+                        <div class="text-[9px] font-medium text-gray-400">${lead.productName || 'N/A'}</div>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+            const startRecord = startIndex + 1;
+            const endRecord = Math.min(endIndex, totalRecords);
+            document.getElementById('recordCount').innerText = `Hiển thị ${startRecord}-${endRecord}/${totalRecords} bản ghi (Tổng ${allLeads.length})`;
 
-            document.getElementById('recordCount').innerText = `Hiển thị ${filteredLeads.length}/${allLeads.length} bản ghi`;
+            // Render pagination buttons
+            const paginationControls = document.getElementById('paginationControls');
+            paginationControls.innerHTML = '';
+            if (totalPages > 1) {
+                // Previous Button
+                const prevBtn = document.createElement('button');
+                prevBtn.type = 'button';
+                prevBtn.className = `rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 hover:text-helu-red transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`;
+                prevBtn.innerText = 'Trước';
+                if (currentPage > 1) {
+                    prevBtn.onclick = () => { currentPage--; renderLeads(); };
+                }
+                paginationControls.appendChild(prevBtn);
+                // Current Page Input Container (Middle)
+                const pageContainer = document.createElement('div');
+                pageContainer.className = 'flex items-center gap-1.5 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm';
+                pageContainer.innerHTML = `
+                    <span>Trang</span>
+                    <input type="number" id="pageInput" min="1" max="${totalPages}" value="${currentPage}" class="w-12 h-7 text-center border border-gray-300 rounded-lg focus:border-helu-red outline-none bg-white font-black" />
+                    <span>/ ${totalPages}</span>
+                `;
+                paginationControls.appendChild(pageContainer);
+
+                const pageInput = pageContainer.querySelector('#pageInput');
+                pageInput.onchange = (e) => {
+                    let val = parseInt(e.target.value);
+                    if (isNaN(val) || val < 1) val = 1;
+                    if (val > totalPages) val = totalPages;
+                    currentPage = val;
+                    renderLeads();
+                };
+                pageInput.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        pageInput.blur();
+                    }
+                };
+
+                // Next Button
+                const nextBtn = document.createElement('button');
+                nextBtn.type = 'button';
+                nextBtn.className = `rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 hover:text-helu-red transition-all ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`;
+                nextBtn.innerText = 'Sau';
+                if (currentPage < totalPages) {
+                    nextBtn.onclick = () => { currentPage++; renderLeads(); };
+                }
+                paginationControls.appendChild(nextBtn);
+            }
             lucide.createIcons();
         }
 
@@ -418,6 +473,7 @@
                 return matchesSearch && matchesStatus && matchesHeat;
             });
 
+            currentPage = 1;
             renderLeads();
         }
 
