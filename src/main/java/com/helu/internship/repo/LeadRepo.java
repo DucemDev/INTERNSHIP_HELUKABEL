@@ -934,6 +934,25 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             """, nativeQuery = true)
     List<LostLeadBySourceResponse> getLostLeadBySource();
 
+    @Query(value = "SELECT COUNT(DISTINCT l.account) FROM lead l WHERE l.account IS NOT NULL AND l.account <> ''", nativeQuery = true)
+    Long countTotalAccounts();
+
+    @Query(value = "SELECT COUNT(DISTINCT l.account) FROM lead l WHERE l.status = 'Won' AND l.account IS NOT NULL AND l.account <> ''", nativeQuery = true)
+    Long countWonAccounts();
+
+    @Query(value = """
+        SELECT TOP 1 
+            CONCAT(l.industry_type, ' / ', l.region) AS segment, 
+            COUNT(*) AS count 
+        FROM lead l 
+        WHERE l.status IN ('Lost', 'Disqualified') 
+          AND l.industry_type IS NOT NULL 
+          AND l.region IS NOT NULL
+        GROUP BY l.industry_type, l.region 
+        ORDER BY count DESC
+    """, nativeQuery = true)
+    TopUnderservedSegmentProjection getTopUnderservedSegment();
+
     @Query(value = """
     SELECT TOP 1
         l.account AS account,
@@ -1709,7 +1728,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
         l.industry_type AS industry,
 
-        STRING_AGG(DISTINCT p.product_name, ', ') AS productLine,
+        STRING_AGG(p.product_name, ', ') AS productLine,
 
         l.customer_group AS customerGroup,
 

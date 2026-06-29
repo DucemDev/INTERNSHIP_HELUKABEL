@@ -254,11 +254,26 @@ public class DashboardController {
     public List<LostLeadBySourceResponse> getLostLeadBySource() {
         return dashboardService.getLostLeadBySource();
     }
-// dashoard khách hàng có doanh thu cao nhất //
-@GetMapping("/best-account-revenue")
-public BestAccountRevenueResponse getBestAccountByRevenue() {
-    return dashboardService.getBestAccountByRevenue();
-}
+    @GetMapping("/total-accounts")
+    public Long countTotalAccounts() {
+        return dashboardService.countTotalAccounts();
+    }
+
+    @GetMapping("/won-accounts")
+    public Long countWonAccounts() {
+        return dashboardService.countWonAccounts();
+    }
+
+    @GetMapping("/top-underserved-segment")
+    public TopUnderservedSegmentProjection getTopUnderservedSegment() {
+        return dashboardService.getTopUnderservedSegment();
+    }
+
+    // dashoard khách hàng có doanh thu cao nhất //
+    @GetMapping("/best-account-revenue")
+    public BestAccountRevenueResponse getBestAccountByRevenue() {
+        return dashboardService.getBestAccountByRevenue();
+    }
 // dáshboard industry có tổng won cao nhất //
     @GetMapping("/best-industry-won-deal")
     public BestIndustryByWonDealResponse getBestIndustryByWonDeal() {

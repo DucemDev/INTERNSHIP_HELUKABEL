@@ -282,6 +282,18 @@ public class DashboardServiceImpl implements DashboardService {
         return leadRepo.getLostLeadBySource();
     }
     @Override
+    public Long countTotalAccounts() {
+        return leadRepo.countTotalAccounts();
+    }
+    @Override
+    public Long countWonAccounts() {
+        return leadRepo.countWonAccounts();
+    }
+    @Override
+    public TopUnderservedSegmentProjection getTopUnderservedSegment() {
+        return leadRepo.getTopUnderservedSegment();
+    }
+    @Override
     public BestAccountRevenueResponse getBestAccountByRevenue() {
         return leadRepo.getBestAccountByRevenue();
     }
