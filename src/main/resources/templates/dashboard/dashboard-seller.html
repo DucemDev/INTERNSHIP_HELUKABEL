@@ -1,7 +1,28 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
-    <main class="space-y-8 p-4 md:p-8 bg-slate-50 min-h-screen">
+    <main class="space-y-8">
+        <style>
+            /* Funnel hover effects */
+            .funnel-stage {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .funnel-stage:hover path {
+                filter: brightness(1.15) drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+                transition: all 0.3s ease;
+            }
+            .funnel-stage:hover text {
+                fill: #0f172a !important;
+                font-weight: 800 !important;
+                transform: scale(1.02);
+                transition: all 0.2s ease;
+            }
+            .funnel-stage:hover line {
+                stroke: #3b82f6 !important;
+                stroke-width: 1.5px !important;
+                stroke-dasharray: none !important;
+            }
+        </style>
         <div>
             <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Bảng điều khiển Nhân viên</h1>
             <p class="mt-1 text-sm font-medium text-gray-500">Theo dõi hiệu suất cá nhân và so sánh với khu vực.</p>
@@ -9,21 +30,21 @@
 
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-gray-900">
+            <div class="relative rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="openDetailModal('kpi')">
                 <div class="flex justify-between items-start mb-4">
                     <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i data-lucide="users" class="w-6 h-6"></i></div>
                 </div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Leads của tôi</h3>
-                <div id="myTotalLeads" class="mt-4 text-4xl font-extrabold text-gray-900 tracking-tight">0</div>
+                <div id="myTotalLeads" class="mt-4 text-4xl font-extrabold text-gray-900 tracking-tight kpi-val">0</div>
                 <p class="mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">Đang theo dõi</p>
             </div>
 
-            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
+            <div class="relative rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="openDetailModal('kpi')">
                 <div class="flex justify-between items-start mb-4">
                     <div class="bg-purple-100 text-purple-600 p-3 rounded-xl"><i data-lucide="pie-chart" class="w-6 h-6"></i></div>
                 </div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tỷ lệ thắng</h3>
-                <div id="myConversionRate" class="mt-4 text-4xl font-extrabold text-blue-600 tracking-tight">0%</div>
+                <div id="myConversionRate" class="mt-4 text-4xl font-extrabold text-blue-600 tracking-tight kpi-val">0%</div>
                 <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Hiệu quả chốt đơn</p>
             </div>
         </div>
@@ -31,9 +52,9 @@
         <!-- Row 1: KPI Progress Circle & Funnel Chart -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- SVG Progress Ring -->
-            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col justify-between">
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow" onclick="openDetailModal('kpi')">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-red-600 rounded-full"></span> 
+                    <span class="w-1.5 h-5 bg-helu-red rounded-full"></span> 
                     Tiến độ Target & Chỉ tiêu KPI
                 </h2>
                 <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-4 flex-1">
@@ -80,7 +101,7 @@
                                 <span id="txtTarget" class="text-slate-800 font-extrabold">0 đ</span>
                             </div>
                             <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                <div id="barTarget" class="bg-gradient-to-r from-red-500 to-rose-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                <div id="barTarget" class="bg-gradient-to-r from-helu-red to-rose-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
                             </div>
                         </div>
                     </div>
@@ -88,74 +109,18 @@
             </div>
 
             <!-- Leads Conversion Funnel Chart -->
-            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col justify-between">
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow" onclick="openDetailModal('funnel')">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
                     Phễu Chuyển đổi Khách hàng (SLA Stages)
                 </h2>
-                <div class="funnel-container flex flex-col items-center justify-center space-y-1 py-1 flex-1">
-                    <!-- Stage 1: New -->
-                    <div class="funnel-stage w-full max-w-[340px] bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
-                        <span class="font-extrabold text-[9px] uppercase tracking-wider">1. Mới nhận (New)</span>
-                        <span class="text-xs font-black" id="funnelNew">0 Leads</span>
-                    </div>
-                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
-                        <span id="rateNewToContacted">0%</span>
-                    </div>
-
-                    <!-- Stage 2: Contacted -->
-                    <div class="funnel-stage w-[88%] max-w-[300px] bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
-                        <span class="font-extrabold text-[9px] uppercase tracking-wider">2. Đã tiếp cận (Contacted)</span>
-                        <span class="text-xs font-black" id="funnelContacted">0 Leads</span>
-                    </div>
-                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
-                        <span id="rateContactedToQualified">0%</span>
-                    </div>
-
-                    <!-- Stage 3: Qualified -->
-                    <div class="funnel-stage w-[76%] max-w-[260px] bg-gradient-to-r from-purple-600 to-purple-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
-                        <span class="font-extrabold text-[9px] uppercase tracking-wider">3. Thẩm định (Qualified)</span>
-                        <span class="text-xs font-black" id="funnelQualified">0 Leads</span>
-                    </div>
-                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
-                        <span id="rateQualifiedToProposal">0%</span>
-                    </div>
-
-                    <!-- Stage 4: Proposal Sent -->
-                    <div class="funnel-stage w-[64%] max-w-[220px] bg-gradient-to-r from-pink-600 to-pink-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
-                        <span class="font-extrabold text-[9px] uppercase tracking-wider">4. Đã báo giá (Proposal)</span>
-                        <span class="text-xs font-black" id="funnelProposal">0 Leads</span>
-                    </div>
-                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
-                        <span id="rateProposalToNegotiation">0%</span>
-                    </div>
-
-                    <!-- Stage 5: In Negotiation -->
-                    <div class="funnel-stage w-[52%] max-w-[180px] bg-gradient-to-r from-amber-600 to-amber-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
-                        <span class="font-extrabold text-[9px] uppercase tracking-wider">5. Thương thảo (Negotiation)</span>
-                        <span class="text-xs font-black" id="funnelNegotiation">0 Leads</span>
-                    </div>
-                    <div class="flex items-center gap-1 text-slate-400 text-[8px] font-bold">
-                        <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
-                        <span id="rateNegotiationToWon">0%</span>
-                    </div>
-
-                    <!-- Stage 6: Won -->
-                    <div class="funnel-stage w-[40%] max-w-[140px] bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-xl px-4 py-2 text-white shadow-sm flex justify-between items-center transition-all hover:scale-102">
-                        <span class="font-extrabold text-[9px] uppercase tracking-wider">6. Chốt thắng (Won)</span>
-                        <span class="text-xs font-black" id="funnelWon">0 Leads</span>
-                    </div>
-                </div>
+                <div class="relative w-full flex-1 min-h-[400px] flex items-center justify-center" id="leadStatusFunnelContainer"></div>
             </div>
         </div>
 
         <!-- Row 2: BANT Scatter Plot -->
         <div class="w-full mt-6">
-            <div class="bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col justify-between">
+            <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow" onclick="openDetailModal('bant')">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span> 
                     Bản đồ Phân tán Leads (BANT vs Giá trị)
@@ -168,6 +133,10 @@
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
+            let cachedLeads = [];
+            let cachedKpi = null;
+            let cachedFunnel = {};
+
             document.addEventListener('DOMContentLoaded', async () => {
                 loadStats();
                 loadKpiProgress();
@@ -195,6 +164,7 @@
                     const data = await response.json();
                     if (data.length === 0) return;
                     const item = data[0];
+                    cachedKpi = item;
 
                     const openPipeline = item.openPipeline || 0;
                     const wonRevenue = item.wonRevenue || 0;
@@ -267,32 +237,189 @@
                         }
                     });
 
-                    document.getElementById('funnelNew').innerText = countNew + ' Leads';
-                    document.getElementById('funnelContacted').innerText = countContacted + ' Leads';
-                    document.getElementById('funnelQualified').innerText = countQualified + ' Leads';
-                    document.getElementById('funnelProposal').innerText = countProposal + ' Leads';
-                    document.getElementById('funnelNegotiation').innerText = countNegotiation + ' Leads';
-                    document.getElementById('funnelWon').innerText = countWon + ' Leads';
-
-                    // Hàm phụ tính tỷ lệ chuyển đổi an toàn
-                    const calcRate = (curr, prev) => {
-                        if (prev <= 0) return curr > 0 ? 100 : 0;
-                        return Math.round((curr / prev) * 100);
+                    cachedFunnel = {
+                        'New': countNew,
+                        'Contacted': countContacted,
+                        'Qualified': countQualified,
+                        'Proposal Sent': countProposal,
+                        'In Negotiation': countNegotiation,
+                        'Won': countWon
                     };
 
-                    document.getElementById('rateNewToContacted').innerText = calcRate(countContacted, countNew) + '% Chuyển đổi';
-                    document.getElementById('rateContactedToQualified').innerText = calcRate(countQualified, countContacted) + '% Chuyển đổi';
-                    document.getElementById('rateQualifiedToProposal').innerText = calcRate(countProposal, countQualified) + '% Chuyển đổi';
-                    document.getElementById('rateProposalToNegotiation').innerText = calcRate(countNegotiation, countProposal) + '% Chuyển đổi';
-                    document.getElementById('rateNegotiationToWon').innerText = calcRate(countWon, countNegotiation) + '% Chuyển đổi';
+                    const v1 = countNew + countContacted;
+                    const v2 = countQualified;
+                    const v3 = countProposal;
+                    const v4 = countNegotiation;
+                    const v5 = countWon;
 
-                    // Vẽ lại icon Lucide
-                    if (window.lucide) {
-                        window.lucide.createIcons();
+                    const values = [v1, v2, v3, v4, v5];
+                    const totalActive = values.reduce((a, b) => a + b, 0);
+
+                    const stages = [
+                        { key: 'New_Contacted', label: 'New + Contacted', color: 'url(#grad-blue-3d)', topColor: 'url(#grad-funnel-interior)' },
+                        { key: 'Qualified', label: 'Qualified', color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
+                        { key: 'Proposal Sent', label: 'Proposal Sent', color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
+                        { key: 'In Negotiation', label: 'In Negotiation', color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
+                        { key: 'Won', label: 'Won', color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
+                    ];
+
+                    const totalHeight = 260;
+                    const gap = 6;
+                    const startY = 34;
+
+                    const Y_start = startY;
+                    const Y_end = startY + totalHeight + 4 * gap;
+                    const getFunnelWidth = (y) => {
+                        const ratio = Math.max(0, Math.min(1, (y - Y_start) / (Y_end - Y_start)));
+                        return 220 - (220 - 45) * ratio;
+                    };
+
+                    const minH = 8;
+                    let heights = [];
+                    if (totalActive === 0) {
+                        heights = [52, 52, 52, 52, 52];
+                    } else {
+                        const remainingH = totalHeight - (5 * minH);
+                        heights = values.map(v => minH + remainingH * (v / totalActive));
                     }
+
+                    let svgHtml = `
+                    <svg viewBox="0 0 500 350" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="grad-funnel-interior" cx="50%" cy="50%" r="50%" fx="50%" fy="30%">
+                                <stop offset="0%" stop-color="#0f172a" />
+                                <stop offset="100%" stop-color="#1e293b" />
+                            </radialGradient>
+                            <linearGradient id="grad-blue-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#1e3a8a" />
+                                <stop offset="30%" stop-color="#3b82f6" />
+                                <stop offset="50%" stop-color="#60a5fa" />
+                                <stop offset="70%" stop-color="#3b82f6" />
+                                <stop offset="100%" stop-color="#1d4ed8" />
+                            </linearGradient>
+                            <linearGradient id="grad-purple-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#4c1d95" />
+                                <stop offset="30%" stop-color="#7c3aed" />
+                                <stop offset="50%" stop-color="#a78bfa" />
+                                <stop offset="70%" stop-color="#7c3aed" />
+                                <stop offset="100%" stop-color="#6d28d9" />
+                            </linearGradient>
+                            <linearGradient id="grad-amber-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#78350f" />
+                                <stop offset="30%" stop-color="#f59e0b" />
+                                <stop offset="50%" stop-color="#fcd34d" />
+                                <stop offset="70%" stop-color="#f59e0b" />
+                                <stop offset="100%" stop-color="#b45309" />
+                            </linearGradient>
+                            <linearGradient id="grad-teal-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#115e59" />
+                                <stop offset="30%" stop-color="#0d9488" />
+                                <stop offset="50%" stop-color="#2dd4bf" />
+                                <stop offset="70%" stop-color="#0d9488" />
+                                <stop offset="100%" stop-color="#0f766e" />
+                            </linearGradient>
+                            <linearGradient id="grad-emerald-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#064e3b" />
+                                <stop offset="30%" stop-color="#10b981" />
+                                <stop offset="50%" stop-color="#34d399" />
+                                <stop offset="70%" stop-color="#10b981" />
+                                <stop offset="100%" stop-color="#047857" />
+                            </linearGradient>
+                            <linearGradient id="grad-purple-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#c084fc" />
+                                <stop offset="100%" stop-color="#a855f7" />
+                            </linearGradient>
+                            <linearGradient id="grad-amber-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#fbbf24" />
+                                <stop offset="100%" stop-color="#f59e0b" />
+                            </linearGradient>
+                            <linearGradient id="grad-teal-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#2dd4bf" />
+                                <stop offset="100%" stop-color="#0d9488" />
+                            </linearGradient>
+                            <linearGradient id="grad-emerald-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#34d399" />
+                                <stop offset="100%" stop-color="#10b981" />
+                            </linearGradient>
+                        </defs>
+                    `;
+
+                    const X_c = 140;
+                    let currentY = startY;
+
+                    let calculatedStages = [];
+                    for (let i = 0; i < 5; i++) {
+                        const stage = stages[i];
+                        const val = values[i];
+                        const pct = totalActive > 0 ? ((val / totalActive) * 100).toFixed(1) : '0.0';
+                        const h = heights[i];
+
+                        const yTop = currentY;
+                        const yBottom = yTop + h;
+                        currentY = yBottom + gap;
+
+                        const rXt = getFunnelWidth(yTop) / 2;
+                        const rYt = rXt * 0.12;
+                        const rXb = getFunnelWidth(yBottom) / 2;
+                        const rYb = rXb * 0.12;
+
+                        calculatedStages.push({ index: i, stage, val, pct, h, yTop, yBottom, rXt, rYt, rXb, rYb });
+                    }
+
+                    for (let i = 4; i >= 0; i--) {
+                        const cs = calculatedStages[i];
+                        const { stage, val, pct, h, yTop, yBottom, rXt, rYt, rXb, rYb } = cs;
+
+                        const xTl = X_c - rXt;
+                        const xTr = X_c + rXt;
+                        const xBr = X_c + rXb;
+                        const xBl = X_c - rXb;
+
+                        const pathD = `M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop} L ${xBr} ${yBottom} A ${rXb} ${rYb} 0 0 0 ${xBl} ${yBottom} Z`;
+                        const xMid = X_c + (rXt + rXb) / 2;
+                        const yMid = yTop + h / 2;
+
+                        svgHtml += `<g class="funnel-stage">`;
+                        svgHtml += `<ellipse cx="${X_c}" cy="${yTop}" rx="${rXt}" ry="${rYt}" fill="${stage.topColor}" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" />`;
+                        svgHtml += `<path d="${pathD}" fill="${stage.color}" />`;
+                        svgHtml += `<path d="M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />`;
+
+                        if (i === 4) {
+                            const neckHeight = 18;
+                            const yNeckBottom = yBottom + neckHeight;
+                            const rXn = rXb;
+                            const rYn = rYb;
+                            const xNl = X_c - rXn;
+                            const xNr = X_c + rXn;
+                            const neckPathD = `M ${xBl} ${yBottom} L ${xBl} ${yNeckBottom} A ${rXn} ${rYn} 0 0 1 ${xNr} ${yNeckBottom} L ${xBr} ${yBottom} A ${rXb} ${rYb} 0 0 0 ${xBl} ${yBottom} Z`;
+                            svgHtml += `<path d="${neckPathD}" fill="${stage.color}" />`;
+                            svgHtml += `<ellipse cx="${X_c}" cy="${yNeckBottom}" rx="${rXn}" ry="${rYn}" fill="#0f172a" opacity="0.7" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />`;
+                        }
+
+                        svgHtml += `
+                            <circle cx="${xMid}" cy="${yMid}" r="3.5" fill="${i === 0 ? '#3b82f6' : i === 1 ? '#8b5cf6' : i === 2 ? '#f59e0b' : i === 3 ? '#0d9488' : '#10b981'}" />
+                            <line x1="${xMid + 4}" y1="${yMid}" x2="270" y2="${yMid}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
+                        `;
+
+                        if (h >= 35) {
+                            svgHtml += `
+                            <text x="280" y="${yMid - 3}" font-family="'Inter', sans-serif" font-size="13" font-weight="bold" fill="#1e293b">${stage.label}</text>
+                            <text x="280" y="${yMid + 13}" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#64748b">${val.toLocaleString()} Leads (${pct}%)</text>
+                            `;
+                        } else {
+                            svgHtml += `
+                            <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${val.toLocaleString()} (${pct}%)</tspan></text>
+                            `;
+                        }
+                        svgHtml += `</g>`;
+                    }
+
+                    svgHtml += `</svg>`;
+                    document.getElementById('leadStatusFunnelContainer').innerHTML = svgHtml;
 
                 } catch (error) {
                     console.error('Error loading funnel chart:', error);
+                    document.getElementById('leadStatusFunnelContainer').innerHTML = `<p class="text-red-500 font-bold text-center">Không thể tải biểu đồ phễu</p>`;
                 }
             }
 
@@ -301,6 +428,7 @@
                     const response = await fetch('/api/seller/leads');
                     if (!response.ok) return;
                     const leads = await response.json();
+                    cachedLeads = leads;
 
                     const hotData = [];
                     const warmData = [];
@@ -373,12 +501,15 @@
                                 },
                                 y: {
                                     title: { display: true, text: 'Giá trị Lead (VNĐ)', font: { weight: 'bold' } },
+                                    max: 5000000000,
                                     ticks: {
                                         callback: function(value) {
-                                            if (value >= 1000000) {
-                                                return (value / 1000000).toLocaleString() + 'M';
+                                            if (value >= 1000000000) {
+                                                return (value / 1000000000).toLocaleString('vi-VN') + ' Tỷ';
+                                            } else if (value >= 1000000) {
+                                                return (value / 1000000).toLocaleString('vi-VN') + ' Tr';
                                             }
-                                            return value.toLocaleString();
+                                            return value.toLocaleString('vi-VN');
                                         }
                                     }
                                 }
@@ -389,7 +520,289 @@
                     console.error('Error loading BANT scatter chart:', error);
                 }
             }
+
+            function openDetailModal(type) {
+                const modal = document.getElementById('chartDetailModal');
+                const title = document.getElementById('modalDetailTitle');
+                const subtitle = document.getElementById('modalDetailSubtitle');
+                const body = document.getElementById('modalDetailBody');
+                
+                body.innerHTML = '';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                
+                if (type === 'kpi') {
+                    title.innerText = 'Chi tiết Tiến độ Target & KPI';
+                    subtitle.innerText = 'Chi tiết phân bổ chỉ tiêu doanh số và tiến trình thực tế.';
+                    
+                    if (!cachedKpi) {
+                        body.innerHTML = `<p class="text-sm text-gray-500">Chưa có dữ liệu thống kê KPI.</p>`;
+                        return;
+                    }
+                    
+                    const wonLeads = cachedLeads.filter(l => l.status === 'Won');
+                    const pipelineLeads = cachedLeads.filter(l => l.status !== 'Won' && l.status !== 'Lost' && l.status !== 'Disqualified');
+                    
+                    body.innerHTML = `
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                                <div class="text-xs font-bold text-emerald-600 uppercase">Đã chốt (Won)</div>
+                                <div class="text-2xl font-black text-emerald-800 mt-1">${(cachedKpi.wonRevenue || 0).toLocaleString('vi-VN')} đ</div>
+                                <div class="text-[10px] text-emerald-500 mt-1">${wonLeads.length} leads chốt thành công</div>
+                            </div>
+                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                <div class="text-xs font-bold text-blue-600 uppercase">Cơ hội (Pipeline)</div>
+                                <div class="text-2xl font-black text-blue-800 mt-1">${(cachedKpi.openPipeline || 0).toLocaleString('vi-VN')} đ</div>
+                                <div class="text-[10px] text-blue-500 mt-1">${pipelineLeads.length} leads đang theo sát</div>
+                            </div>
+                            <div class="p-4 bg-red-50 rounded-lg border border-red-100">
+                                <div class="text-xs font-bold text-[#f6171b] uppercase">Chỉ tiêu (Target)</div>
+                                <div class="text-2xl font-black text-red-800 mt-1">${(cachedKpi.targetRevenue || 0).toLocaleString('vi-VN')} đ</div>
+                                <div class="text-[10px] text-red-500 mt-1">Đạt chỉ tiêu: ${cachedKpi.targetRevenue > 0 ? Math.round((cachedKpi.wonRevenue / cachedKpi.targetRevenue) * 100) : 0}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Hợp đồng đã chốt thành công (Won)
+                                </h4>
+                                ${renderDetailTable(wonLeads)}
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Cơ hội đang chăm sóc (Pipeline)
+                                </h4>
+                                ${renderDetailTable(pipelineLeads)}
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'funnel') {
+                    title.innerText = 'Chi tiết Phễu Chuyển đổi Khách hàng';
+                    subtitle.innerText = 'Danh sách khách hàng tiềm năng chia theo từng giai đoạn chuyển đổi.';
+                    
+                    let stageTabs = '';
+                    const stages = ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'In Negotiation', 'Won'];
+                    const stageLabels = {
+                        'New': 'Mới nhận',
+                        'Contacted': 'Tiếp cận',
+                        'Qualified': 'Thẩm định',
+                        'Proposal Sent': 'Báo giá',
+                        'In Negotiation': 'Thương thảo',
+                        'Won': 'Chốt thắng'
+                    };
+                    
+                    stages.forEach(st => {
+                        const count = cachedFunnel[st] || 0;
+                        stageTabs += `
+                            <button onclick="switchFunnelDetailTab('${st}')" id="tab-${st.replace(' ', '-')}" class="funnel-tab-btn flex-1 py-3 px-2 text-xs font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-wider text-center">
+                                ${stageLabels[st]} (${count})
+                            </button>
+                        `;
+                    });
+                    
+                    body.innerHTML = `
+                        <div class="flex border-b border-gray-100 mb-6 overflow-x-auto whitespace-nowrap">
+                            ${stageTabs}
+                        </div>
+                        <div id="funnelTabContent" class="min-h-[200px]">
+                            <!-- Content loaded dynamically -->
+                        </div>
+                    `;
+                    
+                    switchFunnelDetailTab('New');
+                } else if (type === 'bant') {
+                    title.innerText = 'Bảng chi tiết Đánh giá tiêu chí BANT';
+                    subtitle.innerText = 'Báo cáo điểm số BANT, nhiệt độ và giá trị doanh thu dự kiến của toàn bộ Leads.';
+                    
+                    body.innerHTML = `
+                        <div class="mb-4 flex items-center justify-between">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tổng số: ${cachedLeads.length} Leads</span>
+                        </div>
+                        ${renderDetailTable(cachedLeads, true)}
+                    `;
+                }
+                
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }
+
+            function switchFunnelDetailTab(stage) {
+                document.querySelectorAll('.funnel-tab-btn').forEach(btn => {
+                    btn.classList.remove('border-[#f6171b]', 'text-[#f6171b]');
+                    btn.classList.add('border-transparent', 'text-gray-400');
+                });
+                
+                const activeTab = document.getElementById(`tab-${stage.replace(' ', '-')}`);
+                if (activeTab) {
+                    activeTab.classList.remove('border-transparent', 'text-gray-400');
+                    activeTab.classList.add('border-[#f6171b]', 'text-[#f6171b]');
+                }
+                
+                const container = document.getElementById('funnelTabContent');
+                const leads = cachedLeads.filter(l => (l.status || '').trim().toLowerCase() === stage.trim().toLowerCase() || 
+                                                     (stage === 'Proposal Sent' && (l.status || '').trim().toLowerCase() === 'proposal sent') ||
+                                                     (stage === 'In Negotiation' && (l.status || '').trim().toLowerCase() === 'in negotiation'));
+                
+                if (leads.length === 0) {
+                    container.innerHTML = `<p class="text-sm text-gray-500 py-8 text-center bg-gray-50/50 rounded-lg border border-dashed border-gray-200">Không có leads nào ở giai đoạn này.</p>`;
+                } else {
+                    container.innerHTML = renderDetailTable(leads);
+                }
+            }
+
+            function renderDetailTable(leads, showBantDetails = false) {
+                if (leads.length === 0) {
+                    return `<p class="text-xs text-gray-400 py-3 text-center">Không có bản ghi nào.</p>`;
+                }
+                
+                const statusColors = {
+                    'New': 'bg-blue-50 text-blue-600 border-blue-100',
+                    'In Progress': 'bg-amber-50 text-amber-600 border-amber-100',
+                    'Won': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                    'Lost': 'bg-rose-50 text-rose-600 border-rose-100',
+                    'In Negotiation': 'bg-purple-50 text-purple-600 border-purple-100',
+                    'Proposal Sent': 'bg-cyan-50 text-cyan-600 border-cyan-100'
+                };
+                
+                const heatColors = {
+                    'HOT': 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-sm',
+                    'WARM': 'bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-sm',
+                    'COLD': 'bg-gradient-to-r from-slate-400 to-slate-500 text-white shadow-sm'
+                };
+
+                let headers = `
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Mã Lead</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Khách hàng</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Trạng thái</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Phân loại</th>
+                `;
+                
+                if (showBantDetails) {
+                    headers += `
+                        <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Ngân sách (B)</th>
+                        <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Quyết định (A)</th>
+                        <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Nhu cầu (N)</th>
+                        <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Tiến độ (T)</th>
+                        <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Tổng Điểm</th>
+                    `;
+                }
+                
+                headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-right">Doanh thu dự kiến</th>`;
+                
+                let rows = '';
+                leads.forEach((l, index) => {
+                    const totalBant = (l.bantBudget || 0) + (l.bantAuthority || 0) + (l.bantNeed || 0) + (l.bantTimeline || 0);
+                    let rowBant = '';
+                    
+                    if (showBantDetails) {
+                        rowBant = `
+                            <td class="py-3 px-4 text-xs font-semibold text-gray-600 text-center">${l.bantBudget || 0}/25</td>
+                            <td class="py-3 px-4 text-xs font-semibold text-gray-600 text-center">${l.bantAuthority || 0}/25</td>
+                            <td class="py-3 px-4 text-xs font-semibold text-gray-600 text-center">${l.bantNeed || 0}/25</td>
+                            <td class="py-3 px-4 text-xs font-semibold text-gray-600 text-center">${l.bantTimeline || 0}/25</td>
+                            <td class="py-3 px-4 text-xs font-extrabold text-[#f6171b] text-center">${totalBant}/100</td>
+                        `;
+                    }
+                    
+                    rows += `
+                        <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]/50'}">
+                            <td class="py-3 px-4 text-xs font-black text-gray-400 uppercase">${l.leadId}</td>
+                            <td class="py-3 px-4">
+                                <div class="text-xs font-bold text-gray-900">${l.fullName}</div>
+                                <div class="text-[10px] text-gray-400">${l.account}</div>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase ${statusColors[l.status] || 'bg-gray-50 text-gray-600 border-gray-100'}">
+                                    ${l.status}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-bold ${heatColors[l.leadHeat] || 'bg-slate-400 text-white'}">
+                                    ${l.leadHeat || 'COLD'}
+                                </span>
+                            </td>
+                            ${rowBant}
+                            <td class="py-3 px-4 text-xs font-bold text-gray-800 text-right">${(l.expectedRevenue || 0).toLocaleString('vi-VN')} đ</td>
+                        </tr>
+                    `;
+                });
+                
+                return `
+                    <div class="border border-gray-100 rounded-lg overflow-hidden shadow-sm">
+                        <table class="w-full text-left bg-white">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-100" style="background-color: #fafafa;">
+                                    ${headers}
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                ${rows}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            function closeDetailModal() {
+                const modal = document.getElementById('chartDetailModal');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            // Auto-shrinking text logic for long numbers
+            document.addEventListener('DOMContentLoaded', () => {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        const target = mutation.target;
+                        const len = target.innerText.trim().length;
+                        if (len > 12) {
+                            target.style.fontSize = '1.5rem';
+                        } else if (len > 8) {
+                            target.style.fontSize = '2rem';
+                        } else {
+                            target.style.fontSize = '';
+                        }
+                    });
+                });
+                document.querySelectorAll('.kpi-val').forEach(el => {
+                    observer.observe(el, { childList: true, characterData: true, subtree: true });
+                    // Initial check
+                    const len = el.innerText.trim().length;
+                    if (len > 12) {
+                        el.style.fontSize = '1.5rem';
+                    } else if (len > 8) {
+                        el.style.fontSize = '2rem';
+                    }
+                });
+            });
         </script>
+
+        <!-- Chart Detail Modal -->
+        <div id="chartDetailModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+            <div class="w-full max-w-4xl rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh] border border-gray-100">
+                <div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+                    <div>
+                        <h2 id="modalDetailTitle" class="text-xl font-extrabold text-gray-900 tracking-tight">Chi tiết số liệu</h2>
+                        <p id="modalDetailSubtitle" class="text-xs text-gray-400 mt-1">Báo cáo chi tiết từ hệ thống.</p>
+                    </div>
+                    <button onclick="closeDetailModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-[#f6171b] transition-all">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <div class="overflow-y-auto flex-1 pr-2" id="modalDetailBody">
+                    <!-- Dynamic Content -->
+                </div>
+                
+                <div class="flex items-center justify-end pt-6 border-t border-gray-100 mt-4">
+                    <button class="rounded-[6px] bg-[#f6171b] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all active:scale-95" onclick="closeDetailModal()">
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
     </main>
 </body>
 </html>

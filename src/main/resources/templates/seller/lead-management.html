@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
-<main class="space-y-8 p-4 md:p-8 bg-slate-50 min-h-screen">
+<main class="space-y-8">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -18,10 +18,10 @@
     <!-- Dashboard Overview Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left: KPI Card (Leads của tôi) -->
-        <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between border-l-4 border-l-gray-900">
+        <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between">
             <div>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Leads của tôi</h3>
-                <div id="statTotal" class="mt-4 text-5xl font-black text-gray-900">0</div>
+                <div id="statTotal" class="mt-4 text-5xl font-black text-gray-900 kpi-val">0</div>
             </div>
             <div class="mt-8 flex items-center justify-between">
                 <p class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">Đang hoạt động</p>
@@ -32,7 +32,7 @@
         </div>
 
         <!-- Right: Leads Status Distribution Doughnut Chart -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-3xl border border-helu-border shadow-sm flex flex-col justify-between">
+        <div class="lg:col-span-2 rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between">
             <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
                 <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
                 Cơ cấu Trạng thái Leads
@@ -44,7 +44,7 @@
     </div>
 
     <!-- Filter Bar -->
-    <div class="rounded-2xl border border-helu-border bg-white p-6 shadow-sm">
+    <div class="rounded-3xl border border-helu-border bg-white p-6 shadow-sm">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="space-y-2">
                 <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Tìm kiếm</label>
@@ -76,18 +76,19 @@
     </div>
 
     <!-- Leads Table / Grid -->
-    <div class="rounded-2xl border border-helu-border bg-white shadow-sm overflow-hidden">
+    <div class="rounded-3xl border border-helu-border bg-white shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left" id="leadsTable">
                 <thead>
-                <tr class="border-b border-gray-100 bg-gray-50/50">
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Mã Lead</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Khách hàng</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Phân loại BANT</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Điểm số chi tiết</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Nguồn / Dòng sản phẩm</th>
-                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10">Thao tác</th>
+                <tr class="border-b border-gray-100" style="background-color: #fafafa;">
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b] w-16 text-center">STT</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Mã Lead</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Khách hàng</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Trạng thái</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Phân loại BANT</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Điểm số chi tiết</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Nguồn / Dòng sản phẩm</th>
+                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-[#52525b] pr-10">Thao tác</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -95,10 +96,19 @@
                 </tbody>
             </table>
         </div>
-        <!-- Record Count -->
-        <div class="flex items-center justify-between border-t border-gray-100 bg-white px-6 py-4">
+        <!-- Record Count & Pagination -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-100 bg-transparent px-6 py-4">
             <div class="text-sm font-medium text-gray-500" id="recordCount">
                 Hiển thị 0/0 bản ghi
+            </div>
+            <div class="flex items-center gap-2" id="paginationControls">
+                <button id="prevBtn" onclick="changePage(currentPage - 1)" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Trước
+                </button>
+                <span class="text-xs font-bold text-gray-600 px-2" id="pageInfo">Trang 1 / 1</span>
+                <button id="nextBtn" onclick="changePage(currentPage + 1)" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    Sau <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -219,6 +229,8 @@
         const apiBase = '/api/seller/leads';
         let allLeads = [];
         let filteredLeads = [];
+        let currentPage = 1;
+        const pageSize = 10;
 
         let statusChartInstance = null;
 
@@ -228,6 +240,7 @@
                 if (response.ok) {
                     allLeads = await response.json();
                     filteredLeads = [...allLeads];
+                    currentPage = 1;
                     updateStats();
                     renderLeads();
                     fetchStatusChart();
@@ -307,15 +320,32 @@
             const tbody = document.getElementById('leadsTable').querySelector('tbody');
             tbody.innerHTML = '';
 
-            if (filteredLeads.length === 0) {
+            const totalRecords = filteredLeads.length;
+            const totalPages = Math.ceil(totalRecords / pageSize) || 1;
+
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
+
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = startIdx + pageSize;
+            const displayedLeads = filteredLeads.slice(startIdx, endIdx);
+
+            if (displayedLeads.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" class="py-8 text-center text-sm font-medium text-gray-400">
+                        <td colspan="8" class="py-8 text-center text-sm font-medium text-gray-400">
                             Không tìm thấy khách hàng tiềm năng nào phù hợp.
                         </td>
                     </tr>
                 `;
                 document.getElementById('recordCount').innerText = 'Hiển thị 0/0 bản ghi';
+                document.getElementById('prevBtn').disabled = true;
+                document.getElementById('nextBtn').disabled = true;
+                document.getElementById('pageInfo').innerText = 'Trang 1 / 1';
                 return;
             }
 
@@ -323,27 +353,32 @@
                 'New': 'bg-blue-50 text-blue-600 border-blue-100',
                 'In Progress': 'bg-amber-50 text-amber-600 border-amber-100',
                 'Won': 'bg-emerald-50 text-emerald-600 border-emerald-100',
-                'Lost': 'bg-rose-50 text-rose-600 border-rose-100'
+                'Lost': 'bg-rose-50 text-rose-600 border-rose-100',
+                'In Negotiation': 'bg-purple-50 text-purple-600 border-purple-100',
+                'Proposal Sent': 'bg-cyan-50 text-cyan-600 border-cyan-100'
             };
 
             const heatColors = {
-                'HOT': 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-sm shadow-orange-100',
-                'WARM': 'bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-sm shadow-amber-100',
-                'COLD': 'bg-gradient-to-r from-slate-400 to-slate-500 text-white shadow-sm shadow-slate-100'
+                'HOT': 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-sm',
+                'WARM': 'bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-sm',
+                'COLD': 'bg-gradient-to-r from-slate-400 to-slate-500 text-white shadow-sm'
             };
 
-            filteredLeads.forEach(lead => {
+            displayedLeads.forEach((lead, index) => {
                 const tr = document.createElement('tr');
-                tr.className = 'border-b border-gray-50 hover:bg-gray-50/50 transition-all group';
+                tr.className = `border-b border-gray-50 hover:bg-gray-50/50 transition-all group ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]/50'}`;
 
                 const totalBant = (lead.bantBudget || 0) + (lead.bantAuthority || 0) + (lead.bantNeed || 0) + (lead.bantTimeline || 0);
 
                 tr.innerHTML = `
+                    <td class="py-4 px-6 text-center font-semibold text-gray-500">
+                        ${(currentPage - 1) * pageSize + index + 1}
+                    </td>
                     <td class="py-4 px-6">
                         <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">${lead.leadId}</span>
                     </td>
                     <td class="py-4 px-6">
-                        <div class="font-bold text-gray-900 hover:text-helu-red cursor-pointer" onclick="viewDetail('${lead.leadId}')">${lead.fullName}</div>
+                        <div class="font-bold text-gray-900 hover:text-[#f6171b] cursor-pointer" onclick="viewDetail('${lead.leadId}')">${lead.fullName}</div>
                         <div class="text-xs font-medium text-gray-500">${lead.account}</div>
                     </td>
                     <td class="py-4 px-6">
@@ -364,7 +399,7 @@
                                 <span>${totalBant}/100</span>
                             </div>
                             <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                                <div class="h-full rounded-full ${lead.leadHeat === 'HOT' ? 'bg-red-500' : lead.leadHeat === 'WARM' ? 'bg-amber-400' : 'bg-slate-400'}" style="width: ${totalBant}%"></div>
+                                <div class="h-full rounded-full ${lead.leadHeat === 'HOT' ? 'bg-[#f6171b]' : lead.leadHeat === 'WARM' ? 'bg-amber-400' : 'bg-slate-400'}" style="width: ${totalBant}%"></div>
                             </div>
                             <div class="flex gap-2 text-[8px] font-bold text-gray-400 mt-0.5">
                                 <span>B: ${lead.bantBudget || 0}</span>
@@ -383,7 +418,7 @@
                             <button onclick="viewDetail('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Xem chi tiết">
                                 <i data-lucide="eye" class="w-4 h-4"></i>
                             </button>
-                            <button onclick="openBantModal('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-helu-red transition-all" title="Đánh giá BANT">
+                            <button onclick="openBantModal('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-[#f6171b] transition-all" title="Đánh giá BANT">
                                 <i data-lucide="sliders" class="w-4 h-4"></i>
                             </button>
                             <button onclick="openStatusModal('${lead.leadId}', '${lead.status}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Cập nhật trạng thái">
@@ -395,8 +430,19 @@
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('recordCount').innerText = `Hiển thị ${filteredLeads.length}/${allLeads.length} bản ghi`;
+            document.getElementById('recordCount').innerText = `Hiển thị ${startIdx + 1}-${Math.min(endIdx, totalRecords)}/${totalRecords} bản ghi`;
+            document.getElementById('pageInfo').innerText = `Trang ${currentPage} / ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
             lucide.createIcons();
+        }
+
+        function changePage(page) {
+            const totalRecords = filteredLeads.length;
+            const totalPages = Math.ceil(totalRecords / pageSize) || 1;
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderLeads();
         }
 
         function viewDetail(id) {
@@ -418,6 +464,7 @@
                 return matchesSearch && matchesStatus && matchesHeat;
             });
 
+            currentPage = 1;
             renderLeads();
         }
 
@@ -539,7 +586,34 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', fetchLeads);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchLeads();
+            
+            // Auto-shrinking text logic for long numbers
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    const target = mutation.target;
+                    const len = target.innerText.trim().length;
+                    if (len > 12) {
+                        target.style.fontSize = '1.5rem';
+                    } else if (len > 8) {
+                        target.style.fontSize = '2rem';
+                    } else {
+                        target.style.fontSize = '';
+                    }
+                });
+            });
+            document.querySelectorAll('.kpi-val').forEach(el => {
+                observer.observe(el, { childList: true, characterData: true, subtree: true });
+                // Initial check
+                const len = el.innerText.trim().length;
+                if (len > 12) {
+                    el.style.fontSize = '1.5rem';
+                } else if (len > 8) {
+                    el.style.fontSize = '2rem';
+                }
+            });
+        });
     </script>
 </main>
 </body>

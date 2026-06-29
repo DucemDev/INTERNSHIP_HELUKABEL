@@ -142,6 +142,56 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
     @Query(value = """
             SELECT
+                l.user_id AS userId,
+                u.full_name AS userName,
+                SUM(
+                    CASE
+                        WHEN l.status IN ('Qualified','Won')
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS qualifiedLead,
+                SUM(
+                    CASE
+                        WHEN l.status = 'Won'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS wonLead,
+                (
+                    SUM(
+                        CASE
+                            WHEN l.status = 'Won'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) * 100.0
+                    /
+                    NULLIF(
+                        SUM(
+                            CASE
+                                WHEN l.status IN ('Qualified','Won')
+                                THEN 1
+                                ELSE 0
+                            END
+                        ),
+                        0
+                    )
+                ) AS winRate
+            FROM lead l
+            LEFT JOIN [user] u ON l.user_id = u.user_id
+            WHERE
+                (:quarter = 'this' AND DATEPART(QUARTER, l.created_date) = DATEPART(QUARTER, GETDATE()) AND YEAR(l.created_date) = YEAR(GETDATE()))
+                OR (:quarter = 'last' AND DATEPART(QUARTER, l.created_date) = DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) AND YEAR(l.created_date) = YEAR(DATEADD(QUARTER, -1, GETDATE())))
+            GROUP BY l.user_id, u.full_name
+            """, nativeQuery = true)
+    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(
+            @Param("quarter") String quarter
+    );
+
+
+    @Query(value = """
+            SELECT
                 industry_type AS industryType,
             
                 CAST(SUM(
@@ -379,13 +429,31 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             """, nativeQuery = true)
     List<RoiLeadSourceResponse> getROIByLeadSource();
 
+    @Query(value = """
+            SELECT
+                ls.source_name AS sourceName,
+                COUNT(l.lead_id) AS totalLeads,
+                SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLeads,
+                (SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(l.lead_id), 0)) AS conversionRate,
+                SUM(l.cost) AS totalCost,
+                SUM(CASE WHEN l.status = 'Won' THEN l.business_result ELSE 0 END) AS totalRevenue,
+                (SUM(l.cost) * 1.0 / NULLIF(COUNT(l.lead_id), 0)) AS avgCostPerLead,
+                (SUM(CASE WHEN l.status = 'Won' THEN l.business_result ELSE 0 END) * 1.0 / NULLIF(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END), 0)) AS avgRevenuePerWon,
+                (SUM(CASE WHEN l.status = 'Won' THEN l.business_result ELSE 0 END) * 1.0 / NULLIF(SUM(l.cost), 0)) AS roi
+            FROM lead l
+            JOIN lead_source ls ON l.source_id = ls.source_id
+            GROUP BY ls.source_name
+            """, nativeQuery = true)
+    List<LeadSourceSummaryResponse> getLeadSourceSummary();
+
+
     @Query("""
             SELECT
                 COUNT(l) AS totalLead,
                 SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLead,
                 SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(l), 0) AS conversionRate
             FROM LeadEntity l
-            WHERE l.user.email = :email
+            WHERE l.user.email = :email 
             """)
     ConversionRateResponse getStatsByEmail(@Param("email") String email);
 

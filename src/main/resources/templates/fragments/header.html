@@ -1,29 +1,26 @@
-<header class="fixed top-0 right-0 z-[1000] flex h-20 w-full items-center justify-between border-b border-helu-border bg-white px-10 transition-all duration-300 lg:w-[calc(100%-16rem)]" th:fragment="header">
+<header class="fixed top-0 right-0 z-[1000] flex h-20 w-full items-center justify-between border-b border-white/30 bg-white/45 backdrop-blur-xl px-10 transition-all duration-300 lg:w-[calc(100%-16rem)] shadow-[0_4px_20px_rgba(0,0,0,0.01)]" th:fragment="header">
     <div class="flex items-center flex-1">
-        <div class="relative w-full max-w-lg group">
-            <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-helu-red transition-colors"></i>
-            <input type="text" placeholder="Tìm kiếm lead, khách hàng, sản phẩm..." class="h-12 w-full rounded-2xl bg-gray-50 pl-12 pr-4 text-sm outline-none border border-transparent focus:border-helu-red focus:bg-white transition-all">
-        </div>
+        <!-- Search bar removed -->
     </div>
 
     <div class="flex items-center gap-6">
         <!-- Multi-language Toggle -->
-        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <div class="flex items-center gap-2 bg-white/30 backdrop-blur-md p-1 rounded-xl border border-white/50">
             <a th:href="@{''(lang='vi')}" 
                class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-               th:classappend="${#locale.language == 'vi'} ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'">
+               th:classappend="${#locale.language == 'vi'} ? 'bg-white/80 text-helu-red shadow-sm' : 'text-slate-500 hover:text-slate-700'">
                 VN
             </a>
             <a th:href="@{''(lang='en')}" 
                class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-               th:classappend="${#locale.language == 'en'} ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'">
+               th:classappend="${#locale.language == 'en'} ? 'bg-white/80 text-helu-red shadow-sm' : 'text-slate-500 hover:text-slate-700'">
                 EN
             </a>
         </div>
 
         <!-- User Profile -->
         <div class="relative">
-            <button class="flex items-center gap-3 rounded-xl p-1.5 transition-all hover:bg-gray-50 group" onclick="toggleUserDropdown()">
+            <button class="flex items-center gap-3 rounded-xl p-1.5 transition-all hover:bg-white/40 group" onclick="toggleUserDropdown()">
                 <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-helu-red font-bold text-white shadow-md shadow-red-200">AD</div>
                 <div class="hidden flex-col text-left md:flex">
                     <span class="text-sm font-bold text-gray-800" id="displayUserName">Admin</span>
@@ -33,16 +30,16 @@
             </button>
             
             <!-- Profile Dropdown -->
-            <div id="userDropdown" class="absolute right-0 top-[calc(100%+10px)] hidden w-56 rounded-2xl border border-helu-border bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
-                <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-helu-red transition-all">
+            <div id="userDropdown" class="absolute right-0 top-[calc(100%+10px)] hidden w-56 rounded-2xl border border-white/60 bg-white/80 backdrop-blur-xl p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
+                <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-white/50 hover:text-helu-red transition-all">
                     <i data-lucide="user" class="w-4 h-4"></i> Hồ sơ cá nhân
                 </a>
-                <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-helu-red transition-all">
+                <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-white/50 hover:text-helu-red transition-all">
                     <i data-lucide="key" class="w-4 h-4"></i> Đổi mật khẩu
                 </a>
-                <div class="my-2 h-[1px] bg-helu-border"></div>
+                <div class="my-2 h-[1px] bg-white/30"></div>
                 <form th:action="@{/logout}" method="post">
-                    <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-helu-red hover:bg-red-50 transition-all text-left">
+                    <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-helu-red hover:bg-red-50/50 transition-all text-left">
                         <i data-lucide="log-out" class="w-4 h-4"></i> Đăng xuất
                     </button>
                 </form>

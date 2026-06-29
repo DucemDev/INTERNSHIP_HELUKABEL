@@ -99,6 +99,12 @@ public class DashboardController {
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return dashboardService.getROIByLeadSource();
     }
+
+    @GetMapping("/lead-source-summary")
+    public List<LeadSourceSummaryResponse> getLeadSourceSummary() {
+        return dashboardService.getLeadSourceSummary();
+    }
+
     @GetMapping("/conversion-rate/filter")
     public List<ConversionRateResponse> getConversionRateFilter(
             @RequestParam(required = false) String sourceId,

@@ -19,13 +19,16 @@ public class DashboardServiceImpl implements DashboardService {
     private final PipelineCoveragerRepo pipelineCoverageRepo;
     private final UserRepo userRepo;
     private final SalesOwnerDashboardRepo salesOwnerDashboardRepo;
+    private final LeadSourceRepo leadSourceRepo;
+
     public DashboardServiceImpl(
             LeadRepo leadRepo,
             LeadStatusHistoryRepo leadStatusHistoryRepo,
             CostPerLeadRepo costPerLeadRepo,
             PipelineCoveragerRepo pipelineCoverageRepo,
             UserRepo userRepo,
-            SalesOwnerDashboardRepo salesOwnerDashboardRepo) {
+            SalesOwnerDashboardRepo salesOwnerDashboardRepo,
+            LeadSourceRepo leadSourceRepo) {
 
         this.leadRepo = leadRepo;
         this.leadStatusHistoryRepo = leadStatusHistoryRepo;
@@ -33,7 +36,9 @@ public class DashboardServiceImpl implements DashboardService {
         this.pipelineCoverageRepo = pipelineCoverageRepo;
         this.userRepo = userRepo;
         this.salesOwnerDashboardRepo = salesOwnerDashboardRepo;
+        this.leadSourceRepo = leadSourceRepo;
     }
+
 
     @Override
     public List<WinRateByIndustryProjection> getWinRateByIndustry() {
@@ -140,7 +145,13 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return leadRepo.getROIByLeadSource();
+     }
+
+    @Override
+    public List<LeadSourceSummaryResponse> getLeadSourceSummary() {
+        return leadRepo.getLeadSourceSummary();
     }
+
 
     @Override
     public ConversionRateResponse getStaffStats(String email) {
@@ -183,6 +194,18 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<SalesOwnerDashboardProjection> getSalesOwnerDashboard() {
         return salesOwnerDashboardRepo.getSalesOwnerDashboard();
+    }
+    @Override
+    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter) {
+        return salesOwnerDashboardRepo.getSalesOwnerDashboardByQuarter(quarter);
+    }
+    @Override
+    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter) {
+        return leadRepo.getWinRateBySalesOwnerByQuarter(quarter);
+    }
+    @Override
+    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter) {
+        return pipelineCoverageRepo.getPipelineCoverageByQuarter(quarter);
     }
     @Override
     public List<RevenueMonthlyProjection> getRevenueMonthly() {
@@ -450,4 +473,10 @@ public class DashboardServiceImpl implements DashboardService {
     public SalesOwnerDetailResponse getSalesOwnerDetail(String userCode) {
         return leadRepo.getSalesOwnerDetail(userCode);
     }
+
+    @Override
+    public List<com.helu.internship.entity.LeadSourceEntity> getAllLeadSources() {
+        return leadSourceRepo.findAll();
+    }
 }
+

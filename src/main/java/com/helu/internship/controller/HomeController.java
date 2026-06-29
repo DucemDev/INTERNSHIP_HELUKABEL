@@ -28,6 +28,19 @@ public class HomeController {
         return "dashboard/dashboard-home";
     }
 
+    @GetMapping("/dashboard/lead-source-analysis")
+    public String leadSourceAnalysisPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "lead-source-analysis");
+        return "dashboard/lead-source-analysis";
+    }
+
+    @GetMapping("/dashboard/sales-performance-analysis")
+    public String salesPerformanceAnalysisPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "sales-performance-analysis");
+        return "dashboard/sales-performance-analysis";
+    }
+
+
     @GetMapping("/seller/dashboard")
     public String sellerDashboard(org.springframework.ui.Model model) {
         model.addAttribute("activeMenu", "dashboard");
