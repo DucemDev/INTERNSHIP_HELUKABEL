@@ -505,6 +505,19 @@
             const currency = locale === 'vi' ? ' VNĐ' : ' VND';
             const fmtNum = (v) => Number(v || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
             const fmtCurrency = (v) => fmtNum(v) + currency;
+            const fmtShortNum = (v) => {
+                const absV = Math.abs(v);
+                if (locale === 'vi') {
+                    if (absV >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + ' Tỷ';
+                    if (absV >= 1e6) return (v / 1e6).toFixed(1).replace(/\.0$/, '') + ' Tr';
+                    return fmtNum(v);
+                } else {
+                    if (absV >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+                    if (absV >= 1e6) return (v / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+                    return fmtNum(v);
+                }
+            };
+            const fmtShortCurrency = (v) => fmtShortNum(v) + currency;
 
             // i18n labels
             const i18n = {
@@ -531,16 +544,17 @@
                 refreshDashboard();
             });
 
-            async function refreshDashboard() {
-                await Promise.all([
-                    loadKPIs(),
-                    loadLeadStatusChart(),
-                    loadLeadSourceProfitability(),
-                    loadLeadSourceEfficiency(),
-                    loadAllLeadsForMatrix(),
-                    loadQuarterlyComparisons()
-                ]);
-            }
+             async function refreshDashboard() {
+                 await Promise.all([
+                     loadKPIs(),
+                     loadLeadStatusChart(),
+                     loadLeadSourceProfitability(),
+                     loadLeadSourceEfficiency(),
+                     loadAllLeadsForMatrix(),
+                     loadTopAccounts(),
+                     loadQuarterlyComparisons()
+                 ]);
+             }
 
             function onYearChange() {
                 loadQuarterlyComparisons();
@@ -983,7 +997,7 @@
                                 type: 'linear', position: 'left',
                                 border: { display: false },
                                 grid: { color: '#f1f5f9' },
-                                ticks: { callback: v => fmtNum(v) }
+                                ticks: { callback: v => fmtShortNum(v) }
                             },
                             y1: {
                                 type: 'linear', position: 'right',
@@ -997,7 +1011,7 @@
                                 grid: { display: false },
                                 border: { display: false },
                                 title: { display: true, text: 'Chi phí TB', font: { weight: 'bold', size: 11 }, color: '#f43f5e' },
-                                ticks: { callback: v => fmtNum(v), color: '#f43f5e' }
+                                ticks: { callback: v => fmtShortNum(v), color: '#f43f5e' }
                             }
                         },
                         plugins: {
@@ -1127,28 +1141,27 @@
             }
 
 
-            // ==========================================
-            // HÀM 5: Load All Leads → Matrix + Top Accounts
-            // ==========================================
-            async function loadAllLeadsForMatrix() {
-                try {
-                    const res = await fetch('/api/leads');
-                    if (res.ok) {
-                        allLeadsData = await res.json();
-                    }
-
-                    if (!allLeadsData || allLeadsData.length === 0) {
-                        // Fallback: use conversion-rate/filter to get data by region/industry
-                        await loadMatrixFromFilters();
-                    } else {
-                        drawMatrixFromLeads(allLeadsData);
-                        drawTopAccountsFromLeads(allLeadsData);
-                    }
-                } catch (e) {
-                    console.error('Error loading leads for matrix:', e);
-                    await loadMatrixFromFilters();
-                }
-            }
+             // ==========================================
+             // HÀM 5: Load All Leads → Matrix
+             // ==========================================
+             async function loadAllLeadsForMatrix() {
+                 try {
+                     const res = await fetch('/api/leads');
+                     if (res.ok) {
+                         allLeadsData = await res.json();
+                     }
+ 
+                     if (!allLeadsData || allLeadsData.length === 0) {
+                         // Fallback: use conversion-rate/filter to get data by region/industry
+                         await loadMatrixFromFilters();
+                     } else {
+                         drawMatrixFromLeads(allLeadsData);
+                     }
+                 } catch (e) {
+                     console.error('Error loading leads for matrix:', e);
+                     await loadMatrixFromFilters();
+                 }
+             }
 
             // Fallback: Build matrix from filter API
             async function loadMatrixFromFilters() {
@@ -1210,75 +1223,80 @@
                 drawMatrixSVG(cells, regions, industries, maxVal);
             }
 
-            function drawTopAccountsFromLeads(leads) {
-                // Group by account, sum revenue for Won leads
-                const accountMap = {};
-                leads.filter(l => l.status === 'Won').forEach(l => {
-                    const acc = l.account || 'N/A';
-                    if (!accountMap[acc]) accountMap[acc] = 0;
-                    accountMap[acc] += Number(l.businessResult || 0);
-                });
+            async function loadTopAccounts() {
+                try {
+                    const res = await fetch(`${API_BASE}/top10-accounts`);
+                    if (!res.ok) {
+                        drawTopAccountsEmpty();
+                        return;
+                    }
+                    const data = await res.json();
+                    if (!data || data.length === 0) {
+                        drawTopAccountsEmpty();
+                        return;
+                    }
 
-                const sorted = Object.entries(accountMap)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 10);
+                    const labels = data.map(d => d.account || 'N/A');
+                    const values = data.map(d => d.revenue || 0);
 
-                if (sorted.length === 0) {
-                    drawTopAccountsEmpty();
-                    return;
-                }
+                    // Gradient colors for bars
+                    const colors = values.map((_, i) => {
+                        const alpha = 0.9 - (i * 0.06);
+                        return `rgba(16, 185, 129, ${alpha})`;
+                    });
 
-                const labels = sorted.map(s => s[0]);
-                const values = sorted.map(s => s[1]);
-
-                // Gradient colors for bars
-                const colors = values.map((_, i) => {
-                    const alpha = 0.9 - (i * 0.06);
-                    return `rgba(16, 185, 129, ${alpha})`;
-                });
-
-                renderChart('topAccountsChart', 'bar', {
-                    labels,
-                    datasets: [{
-                        label: 'Revenue',
-                        data: values,
-                        backgroundColor: colors,
-                        borderRadius: 4,
-                        barThickness: 18
-                    }]
-                }, {
-                    indexAxis: 'y',
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            border: { display: false },
-                            grid: { color: '#f1f5f9' },
-                            ticks: { callback: v => fmtNum(v) }
+                    renderChart('topAccountsChart', 'bar', {
+                        labels,
+                        datasets: [{
+                            label: 'Revenue',
+                            data: values,
+                            backgroundColor: colors,
+                            borderRadius: 4,
+                            barThickness: 18
+                        }]
+                    }, {
+                        indexAxis: 'y',
+                        layout: {
+                            padding: {
+                                right: 80
+                            }
                         },
-                        y: {
-                            grid: { display: false },
-                            border: { display: false },
-                            ticks: { font: { size: 11, weight: 'bold' } }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        datalabels: {
-                            display: true,
-                            anchor: 'end',
-                            align: 'right',
-                            offset: 4,
-                            color: '#064e3b',
-                            font: { weight: 'bold', size: 10 },
-                            formatter: v => fmtCurrency(v)
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 60000000000,
+                                border: { display: false },
+                                grid: { color: '#f1f5f9' },
+                                ticks: { callback: v => fmtShortNum(v) }
+                            },
+                            y: {
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: { font: { size: 11, weight: 'bold' } }
+                            }
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: ctx => ` Revenue: ${fmtCurrency(ctx.parsed.x)}`
+                        plugins: {
+                            legend: { display: false },
+                            datalabels: {
+                                display: true,
+                                anchor: 'end',
+                                align: 'right',
+                                offset: 4,
+                                color: '#064e3b',
+                                font: { weight: 'bold', size: 10 },
+                                formatter: v => fmtShortCurrency(v)
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => ` Revenue: ${fmtCurrency(ctx.parsed.x)}`
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                } catch (e) {
+                    console.error('Error loading top accounts:', e);
+                    drawTopAccountsEmpty();
+                }
             }
 
             function drawTopAccountsEmpty() {
@@ -1494,7 +1512,7 @@
                         lucide.createIcons();
                     }
 
-                    // 2. Win Rate Chart
+                     // 2. Win Rate Chart
                     const allUsersSet = new Set();
                     wrThis.forEach(d => { if (d.userName) allUsersSet.add(d.userName); });
                     wrLast.forEach(d => { if (d.userName) allUsersSet.add(d.userName); });

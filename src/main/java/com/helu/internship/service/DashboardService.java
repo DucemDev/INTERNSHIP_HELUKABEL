@@ -94,6 +94,9 @@ public interface DashboardService {
     List<RevenueBySourceProductResponse> getRevenueBySourceProduct();
     List<WonLeadBySourceProductResponse> getWonLeadBySourceProduct();
     List<LostLeadBySourceResponse> getLostLeadBySource();
+    Long countTotalAccounts();
+    Long countWonAccounts();
+    TopUnderservedSegmentProjection getTopUnderservedSegment();
     BestAccountRevenueResponse getBestAccountByRevenue();
     BestIndustryByWonDealResponse getBestIndustryByWonDeal();
     BestIndustryByRevenueResponse getBestIndustryByRevenue();

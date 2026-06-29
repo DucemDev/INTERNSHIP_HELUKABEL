@@ -379,6 +379,47 @@
             </div>
         </div>
 
+        <!-- MODAL: SEGMENT DRILL-DOWN (Market Matrix click) -->
+        <div id="segmentModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeSegmentModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-200">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                            <i data-lucide="grid-3x3" class="w-5 h-5 text-blue-600"></i>
+                            <span id="segmentModalTitle">Chi tiết Phân khúc</span>
+                        </h3>
+                        <button onclick="closeSegmentModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <!-- Total Leads -->
+                            <div class="bg-blue-50/60 p-5 rounded-xl border border-blue-100">
+                                <h4 class="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Total Leads</h4>
+                                <div id="segmentTotalLeads" class="mt-2 text-3xl font-black text-slate-800">0</div>
+                            </div>
+                            <!-- Revenue / Won Deal -->
+                            <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-100">
+                                <h4 class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Revenue/Won Deal</h4>
+                                <div id="segmentRevenue" class="mt-2 text-3xl font-black text-slate-800">0</div>
+                            </div>
+                            <!-- Conversion Rate -->
+                            <div class="bg-amber-50/60 p-5 rounded-xl border border-amber-100">
+                                <h4 class="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Conversion Rate</h4>
+                                <div id="segmentConvRate" class="mt-2 text-3xl font-black text-slate-800">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
+                        <button onclick="closeSegmentModal()" class="px-5 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm text-sm">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- THƯ VIỆN JAVASCRIPT BÊN NGOÀI -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -429,6 +470,22 @@
 
             function closeDetailModal() {
                 document.getElementById('detailModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            function openSegmentModal(industry, region, totalLeads, wonLead, winRate, revenue) {
+                const modal = document.getElementById('segmentModal');
+                document.getElementById('segmentModalTitle').innerText = `Chi tiết Phân khúc: ${industry} × ${region}`;
+                document.getElementById('segmentTotalLeads').innerText = totalLeads;
+                document.getElementById('segmentRevenue').innerText = wonLead > 0 ? formatCurrency(Math.round(revenue / wonLead)) : '—';
+                document.getElementById('segmentConvRate').innerText = winRate + '%';
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                if(window.lucide) lucide.createIcons();
+            }
+
+            function closeSegmentModal() {
+                document.getElementById('segmentModal').classList.add('hidden');
                 document.body.style.overflow = '';
             }
 
@@ -672,25 +729,82 @@
             // ==========================================
             // HÀNG 4: Draw Matrix SVG (Bubble Grid)
             // ==========================================
-            function renderMatrixBubbleChart() {
-                const cells = [
-                    { region: 'Central', industry: 'Automotive & EV', winRate: 25, value: 50 },
-                    { region: 'North', industry: 'Automotive & EV', winRate: 31, value: 65 },
-                    { region: 'South', industry: 'Automotive & EV', winRate: 50, value: 120 },
-                    { region: 'Central', industry: 'Construction & Infrastructure', winRate: 20, value: 40 },
-                    { region: 'North', industry: 'Construction & Infrastructure', winRate: 25, value: 50 },
-                    { region: 'South', industry: 'Construction & Infrastructure', winRate: 33, value: 70 },
-                    { region: 'Central', industry: 'Industrial Machinery', winRate: 8, value: 15 },
-                    { region: 'North', industry: 'Industrial Machinery', winRate: 12, value: 25 },
-                    { region: 'South', industry: 'Industrial Machinery', winRate: 30, value: 60 },
-                    { region: 'Central', industry: 'Renewable Energy', winRate: 31, value: 65 },
-                    { region: 'North', industry: 'Renewable Energy', winRate: 15, value: 30 },
-                    { region: 'South', industry: 'Renewable Energy', winRate: 36, value: 80 }
-                ];
-                const regions = ['Central', 'North', 'South'];
-                const industries = ['Automotive & EV', 'Construction & Infrastructure', 'Industrial Machinery', 'Renewable Energy'];
-                const maxVal = 120;
+            async function loadAllLeadsForMatrix() {
+                try {
+                    const res = await fetch('/api/leads');
+                    if (res.ok) {
+                        const leads = await res.json();
+                        if (leads && leads.length > 0) {
+                            drawMatrixFromLeads(leads);
+                            return;
+                        }
+                    }
+                    await loadMatrixFromFilters();
+                } catch (e) {
+                    console.error('Error loading leads for matrix:', e);
+                    await loadMatrixFromFilters();
+                }
+            }
 
+            async function loadMatrixFromFilters() {
+                try {
+                    const [regRes, indRes] = await Promise.all([
+                        fetch('/api/dashboard/win-rate-by-region'),
+                        fetch('/api/dashboard/win-rate-by-industry')
+                    ]);
+                    const regions = (await regRes.json()).map(r => r.region).filter(Boolean);
+                    const industries = (await indRes.json()).map(i => i.industryType).filter(Boolean);
+
+                    let cells = [];
+                    for (const ind of industries) {
+                        for (const reg of regions) {
+                            try {
+                                const fRes = await fetch(`/api/dashboard/conversion-rate/filter?region=${encodeURIComponent(reg)}&industry=${encodeURIComponent(ind)}`);
+                                const fData = await fRes.json();
+                                const totalLead = fData.reduce((s, d) => s + (d.totalLead || 0), 0);
+                                const wonLead = fData.reduce((s, d) => s + (d.wonLead || 0), 0);
+                                const wr = totalLead > 0 ? Math.round((wonLead / totalLead) * 100) : 0;
+                                const revenue = fData.reduce((s, d) => s + (d.totalRevenue || d.revenue || 0), 0);
+                                cells.push({ industry: ind, region: reg, value: totalLead, winRate: wr, wonLead, revenue });
+                            } catch {
+                                cells.push({ industry: ind, region: reg, value: 0, winRate: 0, wonLead: 0, revenue: 0 });
+                            }
+                        }
+                    }
+                    const maxVal = Math.max(...cells.map(c => c.value), 1);
+                    drawMatrixSVG(cells, regions, industries, maxVal);
+                } catch (e) {
+                    console.error('Error loading matrix from filters:', e);
+                }
+            }
+
+            function drawMatrixFromLeads(leads) {
+                const regions = [...new Set(leads.map(l => l.region).filter(Boolean))].sort();
+                const industries = [...new Set(leads.map(l => l.industryType).filter(Boolean))].sort();
+
+                if (regions.length === 0 || industries.length === 0) {
+                    drawMatrixSVG([], regions.length ? regions : ['N/A'], industries.length ? industries : ['N/A'], 1);
+                    return;
+                }
+
+                let cells = [];
+                let maxVal = 0;
+                industries.forEach(ind => {
+                    regions.forEach(reg => {
+                        const seg = leads.filter(l => l.industryType === ind && l.region === reg);
+                        const total = seg.length;
+                        const won = seg.filter(l => l.status === 'Won').length;
+                        const wr = total > 0 ? Math.round((won / total) * 100) : 0;
+                        const revenue = seg.filter(l => l.status === 'Won').reduce((s, l) => s + Number(l.businessResult || 0), 0);
+                        cells.push({ industry: ind, region: reg, value: total, winRate: wr, wonLead: won, revenue });
+                        if (total > maxVal) maxVal = total;
+                    });
+                });
+                if (maxVal === 0) maxVal = 1;
+                drawMatrixSVG(cells, regions, industries, maxVal);
+            }
+
+            function drawMatrixSVG(cells, regions, industries, maxVal) {
                 const svg = document.getElementById('matrixBubbleChart');
                 if (!svg) return;
                 svg.innerHTML = '';
@@ -787,6 +901,7 @@
 
                     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                     g.setAttribute('class', 'matrix-bubble');
+                    g.setAttribute('onclick', `openSegmentModal('${cell.industry}', '${cell.region}', ${cell.value}, ${cell.wonLead || 0}, ${cell.winRate}, ${cell.revenue || 0})`);
                     g.style.cursor = 'pointer';
 
                     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -814,19 +929,26 @@
             // ==========================================
             // HÀNG 5: Top 10 Accounts & Detail Table
             // ==========================================
-            function renderTopAccounts() {
-                const accountsData = [
-                    { name: 'Vingroup JSC', revenue: 950000000, industry: 'Construction', product: 'Power Cables', group: 'Rất tốt', region: 'North', role: 'Decision Maker', cpl: 120000 },
-                    { name: 'Hoa Phat Group', revenue: 820000000, industry: 'Manufacturing', product: 'Control Cables', group: 'Deal lớn', region: 'North', role: 'Influencer', cpl: 150000 },
-                    { name: 'EVN', revenue: 780000000, industry: 'Energy', product: 'Medium Voltage', group: 'Deal lớn', region: 'Central', role: 'Decision Maker', cpl: 200000 },
-                    { name: 'Viettel Group', revenue: 650000000, industry: 'Telecommunications', product: 'Data Cables', group: 'Rất tốt', region: 'North', role: 'End User', cpl: 90000 },
-                    { name: 'Thaco Group', revenue: 590000000, industry: 'Automotive', product: 'Control Cables', group: 'Nhỏ', region: 'South', role: 'Buyer', cpl: 80000 },
-                    { name: 'FPT Corp', revenue: 450000000, industry: 'Technology', product: 'Data Cables', group: 'Nhỏ', region: 'North', role: 'Decision Maker', cpl: 95000 },
-                    { name: 'Masan Group', revenue: 380000000, industry: 'F&B', product: 'Power Cables', group: 'Nhỏ', region: 'South', role: 'Influencer', cpl: 85000 },
-                    { name: 'Vinamilk', revenue: 320000000, industry: 'F&B', product: 'Control Cables', group: 'Nhỏ', region: 'South', role: 'Buyer', cpl: 75000 },
-                    { name: 'Sun Group', revenue: 290000000, industry: 'Construction', product: 'Power Cables', group: 'Không ưu tiên', region: 'Central', role: 'Influencer', cpl: 140000 },
-                    { name: 'Bitexco', revenue: 210000000, industry: 'Construction', product: 'Power Cables', group: 'Không ưu tiên', region: 'South', role: 'Buyer', cpl: 130000 }
-                ];
+            async function renderTopAccounts() {
+                let accountsData = [];
+                try {
+                    const res = await fetch('/api/dashboard/top10-accounts');
+                    if (res.ok) {
+                        const rawData = await res.json();
+                        accountsData = rawData.map(d => ({
+                            name: d.account || 'N/A',
+                            revenue: d.revenue || 0,
+                            industry: d.industry || 'N/A',
+                            product: d.productLine || 'N/A',
+                            group: d.customerGroup || 'N/A',
+                            region: d.region || 'N/A',
+                            role: d.customerRole || 'N/A',
+                            cpl: d.costPerLead || 0
+                        }));
+                    }
+                } catch (e) {
+                    console.error("Failed to load top accounts:", e);
+                }
 
                 // 1. Render Bar Chart
                 const canvas = document.getElementById('topAccountsChart');
@@ -964,89 +1086,87 @@
 
                 await loadAllMixedCharts();
                 await renderCustomerValueMatrix();
-                renderMatrixBubbleChart();
+                await loadAllLeadsForMatrix();
                 renderTopAccounts();
 
-                // 1 & 2 & 8: These endpoints need to be built by BE, currently mocked with placeholders
-                try {
-                    const totalAccountsRes = await fetch('/api/dashboard/total-accounts').catch(() => null);
-                    if (totalAccountsRes && totalAccountsRes.ok) {
-                        const val = await totalAccountsRes.json();
-                        document.getElementById('totalAccountsVal').innerText = val.count ?? val;
-                    } else {
-                        document.getElementById('totalAccountsVal').innerText = "124"; // Mock fallback
+                // Helper to safely fetch json
+                const safeFetch = async (url) => {
+                    try {
+                        const res = await fetch(url);
+                        if (res.ok) return await res.json();
+                    } catch(e) {
+                        console.error(`Error fetching ${url}:`, e);
                     }
+                    return null;
+                };
 
-                    const wonAccountsRes = await fetch('/api/dashboard/won-accounts').catch(() => null);
-                    if (wonAccountsRes && wonAccountsRes.ok) {
-                        const val = await wonAccountsRes.json();
-                        document.getElementById('wonAccountsVal').innerText = val.count ?? val;
-                    } else {
-                        document.getElementById('wonAccountsVal').innerText = "42"; // Mock fallback
-                    }
+                // 1. Total Accounts
+                const totalAcc = await safeFetch('/api/dashboard/total-accounts');
+                document.getElementById('totalAccountsVal').innerText = (totalAcc !== null) ? (totalAcc.count ?? totalAcc) : "Chưa API";
 
-                    const underServedRes = await fetch('/api/dashboard/top-underserved-segment').catch(() => null);
-                    if (underServedRes && underServedRes.ok) {
-                        const data = await underServedRes.json();
-                        document.getElementById('underServedName').innerText = data.segment || 'N/A';
-                        document.getElementById('underServedVal').innerText = 'Thất bại ' + (data.count ?? 0) + ' Deal';
-                    } else {
-                        document.getElementById('underServedName').innerText = "Solar / Miền Nam"; // Mock fallback
-                        document.getElementById('underServedVal').innerText = 'Thất bại 12 Deal';
-                    }
-                } catch(e) {
-                    console.warn("Placeholders active for undeveloped BE endpoints.", e);
-                }
+                // 2. Won Accounts
+                const wonAcc = await safeFetch('/api/dashboard/won-accounts');
+                document.getElementById('wonAccountsVal').innerText = (wonAcc !== null) ? (wonAcc.count ?? wonAcc) : "Chưa API";
 
                 // 3. Top Account by Revenue
-                try {
-                    const res = await fetch('/api/dashboard/best-account-revenue');
-                    if (res.ok) {
-                        const data = await res.json();
-                        document.getElementById('topAccountName').innerText = data.account || 'N/A';
-                        document.getElementById('topAccountRevenueVal').innerText = formatCurrency(data.totalRevenue);
-                    }
-                } catch(e) { console.error(e); }
+                const topAcc = await safeFetch('/api/dashboard/best-account-revenue');
+                if (topAcc && topAcc.account) {
+                    document.getElementById('topAccountName').innerText = topAcc.account;
+                    document.getElementById('topAccountRevenueVal').innerText = formatCurrency(topAcc.totalRevenue);
+                } else {
+                    document.getElementById('topAccountName').innerText = "Chưa API";
+                    document.getElementById('topAccountRevenueVal').innerText = "";
+                }
 
                 // 4. Best Industry by Revenue
-                try {
-                    const res = await fetch('/api/dashboard/best-industry-revenue');
-                    if (res.ok) {
-                        const data = await res.json();
-                        document.getElementById('bestIndustryName').innerText = data.industryType || 'N/A';
-                        document.getElementById('bestIndustryRevenueVal').innerText = formatCurrency(data.totalRevenue);
-                    }
-                } catch(e) { console.error(e); }
+                const bestInd = await safeFetch('/api/dashboard/best-industry-revenue');
+                if (bestInd && bestInd.industryType) {
+                    document.getElementById('bestIndustryName').innerText = bestInd.industryType;
+                    document.getElementById('bestIndustryRevenueVal').innerText = formatCurrency(bestInd.totalRevenue);
+                } else {
+                    document.getElementById('bestIndustryName').innerText = "Chưa API";
+                    document.getElementById('bestIndustryRevenueVal').innerText = "";
+                }
 
                 // 5. Top Region by Revenue
-                try {
-                    const res = await fetch('/api/dashboard/best-region-revenue');
-                    if (res.ok) {
-                        const data = await res.json();
-                        document.getElementById('topRegionName').innerText = data.region || 'N/A';
-                        document.getElementById('topRegionRevenueVal').innerText = formatCurrency(data.totalRevenue);
-                    }
-                } catch(e) { console.error(e); }
+                const topReg = await safeFetch('/api/dashboard/best-region-revenue');
+                if (topReg && topReg.region) {
+                    document.getElementById('topRegionName').innerText = topReg.region;
+                    document.getElementById('topRegionRevenueVal').innerText = formatCurrency(topReg.totalRevenue);
+                } else {
+                    document.getElementById('topRegionName').innerText = "Chưa API";
+                    document.getElementById('topRegionRevenueVal').innerText = "";
+                }
 
                 // 6. Best Customer Group by Leads
-                try {
-                    const res = await fetch('/api/dashboard/best-customer-group-lead');
-                    if (res.ok) {
-                        const data = await res.json();
-                        document.getElementById('bestGroupLeadsName').innerText = data.customerGroup || 'N/A';
-                        document.getElementById('bestGroupLeadsVal').innerText = (data.totalLead ?? 0) + ' Leads';
-                    }
-                } catch(e) { console.error(e); }
+                const bestGroupLead = await safeFetch('/api/dashboard/best-customer-group-lead');
+                if (bestGroupLead && bestGroupLead.customerGroup) {
+                    document.getElementById('bestGroupLeadsName').innerText = bestGroupLead.customerGroup;
+                    document.getElementById('bestGroupLeadsVal').innerText = (bestGroupLead.totalLead ?? 0) + ' Leads';
+                } else {
+                    document.getElementById('bestGroupLeadsName').innerText = "Chưa API";
+                    document.getElementById('bestGroupLeadsVal').innerText = "";
+                }
 
                 // 7. Best Customer Group by Revenue
-                try {
-                    const res = await fetch('/api/dashboard/best-customer-group-revenue');
-                    if (res.ok) {
-                        const data = await res.json();
-                        document.getElementById('bestGroupRevenueName').innerText = data.customerGroup || 'N/A';
-                        document.getElementById('bestGroupRevenueVal').innerText = formatCurrency(data.totalRevenue);
-                    }
-                } catch(e) { console.error(e); }
+                const bestGroupRev = await safeFetch('/api/dashboard/best-customer-group-revenue');
+                if (bestGroupRev && bestGroupRev.customerGroup) {
+                    document.getElementById('bestGroupRevenueName').innerText = bestGroupRev.customerGroup;
+                    document.getElementById('bestGroupRevenueVal').innerText = formatCurrency(bestGroupRev.totalRevenue);
+                } else {
+                    document.getElementById('bestGroupRevenueName').innerText = "Chưa API";
+                    document.getElementById('bestGroupRevenueVal').innerText = "";
+                }
+
+                // 8. Top Under-served Segment
+                const underserved = await safeFetch('/api/dashboard/top-underserved-segment');
+                if (underserved && underserved.segment) {
+                    document.getElementById('underServedName').innerText = underserved.segment;
+                    document.getElementById('underServedVal').innerText = 'Thất bại ' + (underserved.count ?? 0) + ' Deal';
+                } else {
+                    document.getElementById('underServedName').innerText = "Chưa API";
+                    document.getElementById('underServedVal').innerText = "";
+                }
 
                 if (refreshIcon) refreshIcon.classList.remove('animate-spin');
             }
