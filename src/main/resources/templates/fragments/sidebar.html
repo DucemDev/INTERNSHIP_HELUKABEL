@@ -66,6 +66,14 @@
             </a>
         </div>
 
+        <!-- Trợ lý AI Chatbot -->
+        <div th:classappend="${activeMenu == 'chatbot' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+            <a href="/chatbot" class="flex items-center px-4 py-3 font-medium">
+                <i data-lucide="message-square" class="mr-3 w-5 h-5"></i>
+                <span>Trợ lý AI Chatbot</span>
+            </a>
+        </div>
+
         <!-- Nhân sự (Admin) -->
         <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'users' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/users" class="flex items-center px-4 py-3 font-medium">

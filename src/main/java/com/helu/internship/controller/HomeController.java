@@ -58,4 +58,10 @@ public class HomeController {
         model.addAttribute("activeMenu", "customer-analysis");
         return "dashboard/customer-analysis";
     }
+
+    @GetMapping("/chatbot")
+    public String chatbotPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "chatbot");
+        return "chatbot/chatbot-workspace";
+    }
 }

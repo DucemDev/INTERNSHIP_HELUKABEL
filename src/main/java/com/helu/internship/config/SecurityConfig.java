@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/dashboard/**").hasAnyRole("Admin", "Seller")
                         .requestMatchers("/seller/**").hasAnyRole("Seller")
                         .requestMatchers("/api/seller/**").hasRole("Seller")
+                        .requestMatchers("/chatbot", "/api/chatbot/**").hasAnyRole("Admin", "Seller")
 
                         .anyRequest().authenticated()
                 )

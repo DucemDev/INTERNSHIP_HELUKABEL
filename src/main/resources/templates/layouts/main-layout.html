@@ -50,9 +50,158 @@
         </main>
     </div>
 
+    <!-- Floating Chatbot Widget -->
+    <div id="floatingChatbotWidget" class="fixed bottom-6 right-6 z-[999]">
+        <!-- Trigger Button -->
+        <button id="chatbotTrigger" onclick="toggleFloatingChat()" class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-helu-red to-orange-500 text-white shadow-xl shadow-red-500/30 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer">
+            <i data-lucide="message-circle" class="w-6 h-6"></i>
+        </button>
+
+        <!-- Chat Window -->
+        <div id="chatbotWindow" class="absolute bottom-20 right-0 hidden w-96 h-[500px] flex-col rounded-3xl border border-helu-border bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-200 overflow-hidden">
+            <!-- Header -->
+            <div class="flex items-center justify-between bg-gradient-to-r from-[#1a1a1a] to-[#2d2d2d] px-6 py-4 text-white">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-helu-red font-bold text-xs shadow-md">AI</div>
+                    <div>
+                        <span class="block text-xs font-black tracking-wide">HELUKABEL AI Assistant</span>
+                        <span class="block text-[9px] font-medium text-emerald-400">Online • Hỗ trợ 24/7</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="/chatbot" class="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white transition-all" title="Mở rộng không gian làm việc">
+                        <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                    </a>
+                    <button onclick="toggleFloatingChat()" class="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white transition-all">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages List -->
+            <div id="floatingChatMessages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50">
+                <div class="flex gap-2.5 items-start">
+                    <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-helu-red text-[10px] font-bold text-white flex-shrink-0 mt-0.5">AI</div>
+                    <div class="rounded-2xl rounded-tl-none bg-white p-3 border border-helu-border text-xs text-gray-700 max-w-[80%] shadow-sm leading-relaxed">
+                        Xin chào! Tôi là trợ lý ảo AI. Bạn có thể hỏi tôi bất kỳ thông tin nào về CRM, tiêu chí BANT hoặc dữ liệu khách hàng.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-3 border-t border-helu-border bg-white flex gap-2 items-center">
+                <input type="text" id="floatingChatInput" placeholder="Nhập tin nhắn..." class="flex-1 h-10 px-4 rounded-xl border border-gray-200 outline-none text-xs focus:border-helu-red focus:bg-gray-50/50 transition-all font-medium" onkeydown="handleFloatingChatKey(event)" />
+                <button onclick="sendFloatingChatMessage()" class="flex h-10 w-10 items-center justify-center rounded-xl bg-helu-red text-white hover:bg-red-700 shadow-md shadow-red-200 transition-all active:scale-95 cursor-pointer">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Initialize Lucide icons globally
         lucide.createIcons();
+
+        // Hide floating chatbot on chatbot page itself
+        if (window.location.pathname === '/chatbot') {
+            document.getElementById('floatingChatbotWidget').classList.add('hidden');
+        }
+
+        function toggleFloatingChat() {
+            const chatWin = document.getElementById('chatbotWindow');
+            chatWin.classList.toggle('hidden');
+            chatWin.classList.toggle('flex');
+            if (chatWin.classList.contains('flex')) {
+                document.getElementById('floatingChatInput').focus();
+            }
+        }
+
+        function handleFloatingChatKey(e) {
+            if (e.key === 'Enter') {
+                sendFloatingChatMessage();
+            }
+        }
+
+        async function sendFloatingChatMessage() {
+            const input = document.getElementById('floatingChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            appendFloatingMessage(message, true);
+
+            // Typing indicator
+            const typingId = appendFloatingTyping();
+
+            try {
+                const response = await fetch('/api/chatbot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                document.getElementById(typingId)?.remove();
+
+                if (response.ok) {
+                    const data = await response.json();
+                    appendFloatingMessage(data.response, false);
+                } else {
+                    appendFloatingMessage("Đã xảy ra lỗi khi gửi tin nhắn tới trợ lý ảo.", false);
+                }
+            } catch (err) {
+                document.getElementById(typingId)?.remove();
+                console.error("Chat error:", err);
+                appendFloatingMessage("Lỗi kết nối tới hệ thống AI.", false);
+            }
+        }
+
+        function appendFloatingMessage(text, isUser) {
+            const container = document.getElementById('floatingChatMessages');
+            const msgEl = document.createElement('div');
+            msgEl.className = `flex gap-2.5 items-start ${isUser ? 'flex-row-reverse' : ''}`;
+            
+            const avatarHtml = isUser 
+                ? `<div class="flex h-6 w-6 items-center justify-center rounded-lg bg-gray-200 text-[10px] font-bold text-gray-600 flex-shrink-0 mt-0.5">U</div>`
+                : `<div class="flex h-6 w-6 items-center justify-center rounded-lg bg-helu-red text-[10px] font-bold text-white flex-shrink-0 mt-0.5">AI</div>`;
+
+            const bgClass = isUser 
+                ? 'bg-helu-red text-white rounded-tr-none' 
+                : 'bg-white text-gray-700 border border-helu-border rounded-tl-none';
+
+            // Convert markdown style linebreaks/bold
+            let formattedText = text
+                .replace(/\n/g, '<br/>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            msgEl.innerHTML = `
+                ${avatarHtml}
+                <div class="rounded-2xl ${bgClass} p-3 text-xs max-w-[80%] shadow-sm leading-relaxed font-medium">
+                    ${formattedText}
+                </div>
+            `;
+
+            container.appendChild(msgEl);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendFloatingTyping() {
+            const container = document.getElementById('floatingChatMessages');
+            const typingId = 'typing-' + Date.now();
+            const msgEl = document.createElement('div');
+            msgEl.id = typingId;
+            msgEl.className = 'flex gap-2.5 items-start';
+            msgEl.innerHTML = `
+                <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-helu-red text-[10px] font-bold text-white flex-shrink-0 mt-0.5">AI</div>
+                <div class="rounded-2xl rounded-tl-none bg-white p-3 border border-helu-border text-xs text-gray-500 max-w-[80%] shadow-sm flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.1s"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.2s"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.3s"></span>
+                </div>
+            `;
+            container.appendChild(msgEl);
+            container.scrollTop = container.scrollHeight;
+            return typingId;
+        }
 
         // Auto-shrink KPI numbers when they are too long
         document.addEventListener("DOMContentLoaded", () => {
