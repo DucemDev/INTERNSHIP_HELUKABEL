@@ -66,7 +66,13 @@
         </div>
     </div>
 
+    <!-- Toast Container for Real-time Popup Notifications -->
+    <div id="toastContainer" class="fixed top-24 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
     <script>
+        let knownNotifIds = new Set();
+        let isFirstLoad = true;
+
         function toggleUserDropdown() {
             const dropdown = document.getElementById('userDropdown');
             dropdown.classList.toggle('hidden');
@@ -92,11 +98,96 @@
             }
         }
 
+        function playNotificationSound() {
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const playChime = (time, freq) => {
+                    const osc = context.createOscillator();
+                    const gain = context.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, time);
+                    
+                    gain.gain.setValueAtTime(0.15, time);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.5);
+                    
+                    osc.connect(gain);
+                    gain.connect(context.destination);
+                    
+                    osc.start(time);
+                    osc.stop(time + 0.5);
+                };
+                playChime(context.currentTime, 523.25); // C5
+                playChime(context.currentTime + 0.12, 659.25); // E5
+            } catch (e) {
+                console.warn("Audio context failed or not allowed:", e);
+            }
+        }
+
+        function showToast(title, message, type, link) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = "flex w-80 items-start gap-3 rounded-2xl border border-helu-border bg-white p-4 shadow-xl pointer-events-auto transform translate-x-full transition-all duration-300 animate-in slide-in-from-right-10";
+
+            let iconHtml = '<i data-lucide="bell" class="w-5 h-5 text-gray-500"></i>';
+            let titleColorClass = "text-gray-800";
+            if (type === 'LOW_PERFORMANCE') {
+                iconHtml = '<i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500"></i>';
+                titleColorClass = "text-amber-700";
+            } else if (type === 'LEAD_LOST') {
+                iconHtml = '<i data-lucide="x-circle" class="w-5 h-5 text-rose-500"></i>';
+                titleColorClass = "text-rose-700";
+            } else if (type === 'LEAD_WON') {
+                iconHtml = '<i data-lucide="trophy" class="w-5 h-5 text-emerald-500"></i>';
+                titleColorClass = "text-emerald-700";
+            } else if (type === 'NEW_LEAD' || type === 'LEAD_ASSIGNED') {
+                iconHtml = '<i data-lucide="user-plus" class="w-5 h-5 text-blue-500"></i>';
+                titleColorClass = "text-blue-700";
+            }
+
+            toast.innerHTML = `
+                <div class="flex-shrink-0 mt-0.5">${iconHtml}</div>
+                <div class="flex-1 min-w-0">
+                    <span class="block text-xs font-black ${titleColorClass}">${title}</span>
+                    <span class="block text-[11px] text-gray-500 mt-1 leading-normal">${message}</span>
+                </div>
+                <button class="flex-shrink-0 text-gray-400 hover:text-gray-600" onclick="this.parentElement.remove()"><i data-lucide="x" class="w-4 h-4"></i></button>
+            `;
+
+            if (link) {
+                toast.classList.add('cursor-pointer');
+                toast.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        window.location.href = link;
+                    }
+                });
+            }
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 6000);
+        }
+
         async function updateUnreadCount() {
             try {
-                const response = await fetch('/api/notifications/unread-count');
+                const response = await fetch('/api/notifications');
                 if (response.ok) {
-                    const count = await response.json();
+                    const list = await response.json();
+                    
+                    // 1. Calculate unread count
+                    const unreadList = list.filter(item => !item.isRead);
+                    const count = unreadList.length;
+                    
                     const badge = document.getElementById('notificationBadge');
                     if (count > 0) {
                         badge.textContent = count;
@@ -104,6 +195,24 @@
                     } else {
                         badge.classList.add('hidden');
                     }
+
+                    // 2. Play sound / toast for new unread notifications
+                    unreadList.forEach(item => {
+                        if (!knownNotifIds.has(item.id)) {
+                            knownNotifIds.add(item.id);
+                            if (!isFirstLoad) {
+                                showToast(item.title, item.message, item.type, item.link);
+                                playNotificationSound();
+                            }
+                        }
+                    });
+
+                    // Add all to known set to prevent future toasts
+                    list.forEach(item => {
+                        knownNotifIds.add(item.id);
+                    });
+
+                    isFirstLoad = false;
                 }
             } catch (err) {
                 console.error("Error loading unread count:", err);
@@ -123,15 +232,36 @@
                 const isReadClass = item.isRead ? 'opacity-60 bg-white' : 'bg-red-50/40 font-semibold border-l-4 border-helu-red';
                 const date = new Date(item.createdAt).toLocaleString('vi-VN', {hour: '2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'});
                 
+                let iconHtml = '<i data-lucide="bell" class="w-4 h-4 text-gray-500"></i>';
+                let iconBg = 'bg-gray-100';
+                if (item.type === 'LOW_PERFORMANCE') {
+                    iconHtml = '<i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>';
+                    iconBg = 'bg-amber-50';
+                } else if (item.type === 'LEAD_LOST') {
+                    iconHtml = '<i data-lucide="x-circle" class="w-4 h-4 text-rose-500"></i>';
+                    iconBg = 'bg-rose-50';
+                } else if (item.type === 'LEAD_WON') {
+                    iconHtml = '<i data-lucide="trophy" class="w-4 h-4 text-emerald-500"></i>';
+                    iconBg = 'bg-emerald-50';
+                } else if (item.type === 'NEW_LEAD' || item.type === 'LEAD_ASSIGNED') {
+                    iconHtml = '<i data-lucide="user-plus" class="w-4 h-4 text-blue-500"></i>';
+                    iconBg = 'bg-blue-50';
+                }
+
                 const notifEl = document.createElement('div');
-                notifEl.className = `p-3 rounded-xl hover:bg-gray-50 transition-all cursor-pointer text-xs ${isReadClass} mb-1`;
+                notifEl.className = `p-3 rounded-xl hover:bg-gray-50 transition-all cursor-pointer text-xs ${isReadClass} mb-1 flex gap-3 items-start`;
                 notifEl.innerHTML = `
-                    <div class="flex justify-between items-start gap-1">
-                        <span class="text-gray-800 font-bold block">${item.title}</span>
-                        ${!item.isRead ? '<span class="h-2 w-2 rounded-full bg-helu-red flex-shrink-0 mt-1"></span>' : ''}
+                    <div class="flex-shrink-0 rounded-xl p-2 ${iconBg}">
+                        ${iconHtml}
                     </div>
-                    <span class="text-gray-600 block mt-1">${item.message}</span>
-                    <span class="text-[10px] text-gray-400 block mt-1">${date}</span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start gap-1">
+                            <span class="text-gray-800 font-bold block">${item.title}</span>
+                            ${!item.isRead ? '<span class="h-2 w-2 rounded-full bg-helu-red flex-shrink-0 mt-1"></span>' : ''}
+                        </div>
+                        <span class="text-gray-600 block mt-1 leading-relaxed">${item.message}</span>
+                        <span class="text-[9px] text-gray-400 block mt-1">${date}</span>
+                    </div>
                 `;
                 
                 notifEl.addEventListener('click', async () => {
@@ -148,6 +278,7 @@
                 
                 container.appendChild(notifEl);
             });
+            lucide.createIcons();
         }
 
         async function markAllNotificationsAsRead() {
@@ -183,7 +314,7 @@
         // Initialize update and polling
         document.addEventListener('DOMContentLoaded', () => {
             updateUnreadCount();
-            setInterval(updateUnreadCount, 30000); // Poll every 30s
+            setInterval(updateUnreadCount, 10000); // Poll every 10s for active toast feel
         });
     </script>
 </header>
