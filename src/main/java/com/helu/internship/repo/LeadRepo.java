@@ -429,6 +429,24 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             """, nativeQuery = true)
     List<RoiLeadSourceResponse> getROIByLeadSource();
 
+    @Query(value = """
+            SELECT
+                ls.source_name AS sourceName,
+                COUNT(l.lead_id) AS totalLeads,
+                SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS wonLeads,
+                (SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(l.lead_id), 0)) AS conversionRate,
+                SUM(l.cost) AS totalCost,
+                SUM(CASE WHEN l.status = 'Won' THEN l.business_result ELSE 0 END) AS totalRevenue,
+                (SUM(l.cost) * 1.0 / NULLIF(COUNT(l.lead_id), 0)) AS avgCostPerLead,
+                (SUM(CASE WHEN l.status = 'Won' THEN l.business_result ELSE 0 END) * 1.0 / NULLIF(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END), 0)) AS avgRevenuePerWon,
+                (SUM(CASE WHEN l.status = 'Won' THEN l.business_result ELSE 0 END) * 1.0 / NULLIF(SUM(l.cost), 0)) AS roi
+            FROM lead l
+            JOIN lead_source ls ON l.source_id = ls.source_id
+            GROUP BY ls.source_name
+            """, nativeQuery = true)
+    List<LeadSourceSummaryResponse> getLeadSourceSummary();
+
+
     @Query("""
             SELECT
                 COUNT(l) AS totalLead,

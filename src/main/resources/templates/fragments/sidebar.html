@@ -25,13 +25,22 @@
             </a>
         </div>
 
-        <!-- Dashboard Test / Analytics Preview -->
-        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'dashboard-test' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
-            <a href="/dashboard/test" class="flex items-center px-4 py-3 font-medium">
-                <i data-lucide="flask-conical" class="mr-3 w-5 h-5"></i>
-                <span>Analytics Preview</span>
+        <!-- Lead Source Analysis -->
+        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'lead-source-analysis' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+            <a href="/dashboard/lead-source-analysis" class="flex items-center px-4 py-3 font-medium">
+                <i data-lucide="bar-chart-3" class="mr-3 w-5 h-5"></i>
+                <span>Lead Source Analysis</span>
             </a>
         </div>
+
+        <!-- Sales Performance Analysis -->
+        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'sales-performance-analysis' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+            <a href="/dashboard/sales-performance-analysis" class="flex items-center px-4 py-3 font-medium">
+                <i data-lucide="line-chart" class="mr-3 w-5 h-5"></i>
+                <span>Sales Performance Analysis</span>
+            </a>
+        </div>
+
 
         <!-- Quản lý Lead (Admin) -->
         <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'leads' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">

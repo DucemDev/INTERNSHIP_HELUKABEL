@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::div.lead-analysis-container})}">
+<body>
+    <div class="lead-analysis-container space-y-8 p-4 md:p-6 bg-slate-50 min-h-screen relative">
+        <!-- Dot Matrix Background Overlay -->
+        <div class="absolute inset-0 pointer-events-none opacity-[0.4]" style="background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1.2px, transparent 1.2px); background-size: 24px 24px;"></div>
+
+        <!-- Notification / Error log for debugging -->
+        <div id="debug-error-log" class="text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-100 hidden relative z-10"></div>
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+            <div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight text-[#0f0f11]">Lead Source Analysis</h1>
+                <p class="text-slate-500 font-medium">Báo cáo trực quan hóa hiệu quả và ROI của các nguồn lead.</p>
+            </div>
+            <button onclick="reloadData()" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition-all shadow-sm">
+                <i data-lucide="refresh-cw" class="w-4 h-4" id="refresh-icon"></i>
+                <span>Làm mới dữ liệu</span>
+            </button>
+        </div>
+
+        <!-- ROW 1: KPI CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 relative z-10">
+            <!-- Total Lead Source -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-6 relative overflow-hidden flex flex-col justify-between h-[140px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Total Lead Sources</span>
+                    <span id="kpi-total-sources" class="text-3xl font-black text-slate-800 mt-2 block tracking-tight">0</span>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #3b82f6); clip-path: path('M0,30 Q20,10 40,30 T80,30 T120,30 T160,30 T200,30 T240,30 T280,30 L280,60 L0,60 Z');"></div>
+            </div>
+
+            <!-- Best Source by Revenue -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-6 relative overflow-hidden flex flex-col justify-between h-[140px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Best Revenue Source</span>
+                    <span id="kpi-best-revenue-val" class="text-lg font-black text-emerald-600 mt-1 block truncate">N/A</span>
+                    <span id="kpi-best-revenue-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #10b981); clip-path: path('M0,35 Q30,15 60,35 T120,35 T180,35 T240,35 T300,35 L300,60 L0,60 Z');"></div>
+            </div>
+
+            <!-- Best Source by Conversion Rate -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-6 relative overflow-hidden flex flex-col justify-between h-[140px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Best Win Rate Source</span>
+                    <span id="kpi-best-cr-val" class="text-lg font-black text-[#f6171b] mt-1 block truncate">0%</span>
+                    <span id="kpi-best-cr-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f6171b); clip-path: path('M0,25 Q25,5 50,25 T100,25 T150,25 T200,25 T250,25 T300,25 L300,60 L0,60 Z');"></div>
+            </div>
+
+            <!-- Best Source by Leads -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-6 relative overflow-hidden flex flex-col justify-between h-[140px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Highest Volume Source</span>
+                    <span id="kpi-best-leads-val" class="text-lg font-black text-indigo-600 mt-1 block truncate">0 Leads</span>
+                    <span id="kpi-best-leads-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #6366f1); clip-path: path('M0,30 Q20,10 40,30 T80,30 T120,30 T160,30 T200,30 T240,30 T280,30 L280,60 L0,60 Z');"></div>
+            </div>
+
+            <!-- Best Source by ROI -->
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-6 relative overflow-hidden flex flex-col justify-between h-[140px] border-none" style="border: none !important;">
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Best ROI Source</span>
+                    <span id="kpi-best-roi-val" class="text-lg font-black text-amber-600 mt-1 block truncate">0x</span>
+                    <span id="kpi-best-roi-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f59e0b); clip-path: path('M0,35 Q30,15 60,35 T120,35 T180,35 T240,35 T300,35 L300,60 L0,60 Z');"></div>
+            </div>
+        </div>
+
+        <!-- ROW 2: Total Leads (Bar) + Conversion Rate (Line) by Source -->
+        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Total Leads & Win Rate by Source</h3>
+            <div class="relative w-full h-[400px]">
+                <canvas id="leadsCrChart"></canvas>
+            </div>
+        </div>
+
+        <!-- ROW 3: Avg Cost per Lead vs Avg Revenue per Won & ROI by Source -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
+            <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 shadow-sm">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Avg Cost per Lead vs Avg Revenue per Won</h3>
+                <div class="relative w-full h-[350px]">
+                    <canvas id="avgCostRevChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 shadow-sm">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">ROI by Source</h3>
+                <div class="relative w-full h-[350px]">
+                    <canvas id="roiSourceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 4: Lead Funnel by Source -->
+        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Lead Funnel by Source</h3>
+                <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
+                    <label for="funnelSourceFilter" class="text-xs font-bold text-slate-500">Nguồn:</label>
+                    <select id="funnelSourceFilter" onchange="loadFunnelData()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
+                        <!-- Will be dynamically populated -->
+                    </select>
+                </div>
+            </div>
+            <div class="relative w-full h-[320px]">
+                <canvas id="funnelChart"></canvas>
+            </div>
+        </div>
+
+        <!-- ROW 5: Lead Source by Product Line -->
+        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Lead Source by Product Line</h3>
+                <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
+                    <label for="productLineFilter" class="text-xs font-bold text-slate-500">Dòng sản phẩm:</label>
+                    <select id="productLineFilter" onchange="renderProductLineChart()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
+                        <!-- Will be dynamically populated -->
+                    </select>
+                </div>
+            </div>
+            <div class="relative w-full h-[400px]">
+                <canvas id="productLineChart"></canvas>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2 italic text-right">Click vào bất kỳ cột nào để hiển thị thông tin chi tiết.</p>
+        </div>
+
+        <!-- Dynamic Popup / Modal -->
+        <div id="sourceDetailsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4 transition-all duration-200">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300 flex flex-col" id="modalContainer">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800 tracking-tight" id="modalTitle">Lead Source Insights</h2>
+                        <p class="text-slate-500 text-xs font-medium mt-1" id="modalSubtitle">Nguồn lead dưới dòng sản phẩm đã chọn</p>
+                    </div>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-lg transition-all">
+                        <!-- Custom SVG X Close icon to avoid dependency issues -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+
+                <!-- Modal Content -->
+                <div class="p-6 space-y-6">
+                    <!-- Modal KPIs (3 Dashboard Card Widgets) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Total Revenue -->
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex flex-col justify-between h-[110px]">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu</span>
+                            <span id="modal-kpi-revenue" class="text-2xl font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                        </div>
+                        <!-- Total Won Leads -->
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex flex-col justify-between h-[110px]">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng số lead Won</span>
+                            <span id="modal-kpi-won" class="text-2xl font-black text-[#f6171b] mt-1 block">0</span>
+                        </div>
+                        <!-- Total Lost Leads -->
+                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex flex-col justify-between h-[110px]">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng số lead Lost</span>
+                            <span id="modal-kpi-lost" class="text-2xl font-black text-slate-700 mt-1 block">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Lost Reason Bar Chart -->
+                    <div class="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Số lượng lý do Lost</h4>
+                        <div class="relative w-full h-[280px]">
+                            <canvas id="modalLostReasonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="flex justify-end p-6 border-t border-slate-100 bg-slate-50/50">
+                    <button onclick="closeModal()" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition-all text-sm">
+                        Đóng cửa sổ
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script th:inline="javascript">
+        // Global variables for charts and data
+        let summaryData = [];
+        let productLineData = [];
+        let revenueProductData = [];
+        let wonProductData = [];
+        let lostProductData = [];
+        let leadSources = [];
+
+        let leadsCrChartInstance = null;
+        let avgCostRevChartInstance = null;
+        let roiSourceChartInstance = null;
+        let funnelChartInstance = null;
+        let productLineChartInstance = null;
+        let modalChartInstance = null;
+
+        // Custom color helper
+        const brandRed = 'rgba(246, 23, 27, 1)';
+        const brandRedLight = 'rgba(246, 23, 27, 0.6)';
+        const accentBlue = 'rgba(59, 130, 246, 1)';
+        const accentBlueLight = 'rgba(59, 130, 246, 0.6)';
+        const accentEmerald = 'rgba(16, 185, 129, 1)';
+        const accentEmeraldLight = 'rgba(16, 185, 129, 0.6)';
+
+        // Error logging
+        window.addEventListener('error', function(e) {
+            const logDiv = document.getElementById('debug-error-log');
+            if (logDiv) {
+                logDiv.classList.remove('hidden');
+                logDiv.innerText += "\n[JS Error]: " + e.message + " (" + e.filename + ":" + e.lineno + ")";
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await reloadData();
+            
+            // KPI text auto-shrinking Mutation Observer logic
+            const kpiValIds = ['kpi-total-sources', 'kpi-best-revenue-val', 'kpi-best-cr-val', 'kpi-best-leads-val', 'kpi-best-roi-val'];
+            kpiValIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const observer = new MutationObserver(() => {
+                        const len = el.innerText.length;
+                        if (len > 15) {
+                            el.className = el.className.replace('text-3xl', 'text-xl').replace('text-lg', 'text-sm');
+                        } else if (len > 10) {
+                            el.className = el.className.replace('text-3xl', 'text-2xl').replace('text-lg', 'text-base');
+                        }
+                    });
+                    observer.observe(el, { childList: true });
+                }
+            });
+        });
+
+        async function safeFetch(url, fallbackValue = []) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    console.warn(`API warning for ${url}: status ${response.status}`);
+                    return fallbackValue;
+                }
+                return await response.json();
+            } catch (err) {
+                console.error(`Fetch failed for ${url}:`, err);
+                return fallbackValue;
+            }
+        }
+
+        async function reloadData() {
+            const icon = document.getElementById('refresh-icon');
+            if (icon) icon.classList.add('animate-spin');
+
+            try {
+                // Fetch datasets safely
+                const [summaryRes, productRes, revProdRes, wonProdRes, lostProdRes, sourcesRes] = await Promise.all([
+                    safeFetch('/api/dashboard/lead-source-summary'),
+                    safeFetch('/api/dashboard/lead-source-by-product'),
+                    safeFetch('/api/dashboard/revenue-by-source-product'),
+                    safeFetch('/api/dashboard/won-lead-by-source-product'),
+                    safeFetch('/api/dashboard/lost-lead-by-source-product'),
+                    safeFetch('/api/dashboard/cost-per-win-source')
+                ]);
+
+                summaryData = summaryRes || [];
+                productLineData = productRes || [];
+                revenueProductData = revProdRes || [];
+                wonProductData = wonProdRes || [];
+                lostProductData = lostProdRes || [];
+                leadSources = sourcesRes || [];
+
+                // Populate filters safely
+                try {
+                    populateFilters();
+                } catch (e) {
+                    console.error("Error populating filters:", e);
+                }
+
+                // Load individual components safely so that one chart failure doesn't block the others
+                try { renderKpis(); } catch (e) { console.error("Error rendering KPIs:", e); }
+                try { renderLeadsCrChart(); } catch (e) { console.error("Error rendering Leads CR Chart:", e); }
+                try { renderAvgCostRevChart(); } catch (e) { console.error("Error rendering Avg Cost Rev Chart:", e); }
+                try { renderRoiSourceChart(); } catch (e) { console.error("Error rendering ROI Source Chart:", e); }
+                try { await loadFunnelData(); } catch (e) { console.error("Error loading Funnel Data:", e); }
+                try { renderProductLineChart(); } catch (e) { console.error("Error rendering Product Line Chart:", e); }
+
+            } catch (err) {
+                console.error("Error loading dashboard data", err);
+                const logDiv = document.getElementById('debug-error-log');
+                if (logDiv) {
+                    logDiv.classList.remove('hidden');
+                    logDiv.innerText = "Lỗi nạp dữ liệu: " + err.message;
+                }
+            } finally {
+                if (icon) icon.classList.remove('animate-spin');
+            }
+        }
+
+        function populateFilters() {
+            // Funnel filter
+            const funnelFilter = document.getElementById('funnelSourceFilter');
+            funnelFilter.innerHTML = '';
+            
+            if (Array.isArray(leadSources)) {
+                leadSources.forEach((src, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = src.sourceId || src.sourceName || '';
+                    opt.innerText = src.sourceName || 'Unknown';
+                    if (idx === 0) opt.selected = true;
+                    funnelFilter.appendChild(opt);
+                });
+            }
+
+            // Product line filter
+            const prodFilter = document.getElementById('productLineFilter');
+            prodFilter.innerHTML = '<option value="All" selected>Tất cả sản phẩm</option>';
+            
+            if (Array.isArray(productLineData)) {
+                const uniqueProds = [...new Set(productLineData.map(d => d.productName))].filter(Boolean);
+                uniqueProds.forEach(prod => {
+                    const opt = document.createElement('option');
+                    opt.value = prod;
+                    opt.innerText = prod;
+                    prodFilter.appendChild(opt);
+                });
+            }
+        }
+
+        // Formatter helpers
+        function formatCurrency(val) {
+            if (val === undefined || val === null) return '0 VNĐ';
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+        }
+
+        function renderKpis() {
+            if (!summaryData.length) return;
+
+            // Total sources
+            document.getElementById('kpi-total-sources').innerText = summaryData.length;
+
+            // Best revenue
+            let bestRev = { sourceName: 'N/A', totalRevenue: 0 };
+            let bestCr = { sourceName: 'N/A', conversionRate: 0 };
+            let bestLeads = { sourceName: 'N/A', totalLeads: 0 };
+            let bestRoi = { sourceName: 'N/A', roi: 0 };
+
+            summaryData.forEach(d => {
+                if (d.totalRevenue > bestRev.totalRevenue) bestRev = d;
+                if (d.conversionRate > bestCr.conversionRate) bestCr = d;
+                if (d.totalLeads > bestLeads.totalLeads) bestLeads = d;
+                if (d.roi > bestRoi.roi) bestRoi = d;
+            });
+
+            document.getElementById('kpi-best-revenue-val').innerText = formatCurrency(bestRev.totalRevenue);
+            document.getElementById('kpi-best-revenue-name').innerText = bestRev.sourceName;
+
+            document.getElementById('kpi-best-cr-val').innerText = (bestCr.conversionRate || 0).toFixed(1) + '%';
+            document.getElementById('kpi-best-cr-name').innerText = bestCr.sourceName;
+
+            document.getElementById('kpi-best-leads-val').innerText = (bestLeads.totalLeads || 0) + ' Leads';
+            document.getElementById('kpi-best-leads-name').innerText = bestLeads.sourceName;
+
+            document.getElementById('kpi-best-roi-val').innerText = (bestRoi.roi || 0).toFixed(2) + 'x';
+            document.getElementById('kpi-best-roi-name').innerText = bestRoi.sourceName;
+        }
+
+        // ROW 2 Chart: Total Leads by Source (cột) + Conversion Rate by Source(đường)
+        function renderLeadsCrChart() {
+            const ctx = document.getElementById('leadsCrChart').getContext('2d');
+            
+            const labels = summaryData.map(d => d.sourceName);
+            const totalLeads = summaryData.map(d => d.totalLeads);
+            const conversionRates = summaryData.map(d => d.conversionRate);
+
+            if (leadsCrChartInstance) leadsCrChartInstance.destroy();
+
+            leadsCrChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Tổng Leads',
+                            data: totalLeads,
+                            backgroundColor: accentBlueLight,
+                            borderColor: accentBlue,
+                            borderWidth: 1.5,
+                            borderRadius: 4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Conversion Rate (%)',
+                            data: conversionRates,
+                            type: 'line',
+                            borderColor: brandRed,
+                            backgroundColor: 'transparent',
+                            pointBackgroundColor: brandRed,
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: brandRed,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            borderWidth: 3.5,
+                            tension: 0.35,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Tổng số Leads', font: { weight: 'bold' } },
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#475569' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Tỷ lệ chuyển đổi (%)', font: { weight: 'bold' } },
+                            grid: { drawOnChartArea: false },
+                            ticks: {
+                                callback: val => val + '%',
+                                color: '#475569'
+                            },
+                            min: 0
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { weight: 'bold', size: 12 } } },
+                        tooltip: { padding: 12, cornerRadius: 8 }
+                    }
+                }
+            });
+        }
+
+        // ROW 3 Chart 1: Avg Cost per Lead vs Avg Revenue per Won
+        function renderAvgCostRevChart() {
+            const ctx = document.getElementById('avgCostRevChart').getContext('2d');
+            const labels = summaryData.map(d => d.sourceName);
+            const avgCost = summaryData.map(d => d.avgCostPerLead || 0);
+            const avgRevenue = summaryData.map(d => d.avgRevenuePerWon || 0);
+
+            if (avgCostRevChartInstance) avgCostRevChartInstance.destroy();
+
+            avgCostRevChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Avg Cost per Lead',
+                            data: avgCost,
+                            backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1.5,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Avg Revenue per Won',
+                            data: avgRevenue,
+                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 1.5,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#475569' } },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                callback: val => (val / 1000000).toLocaleString() + 'M',
+                                color: '#475569'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { weight: 'bold' } } },
+                        tooltip: {
+                            callbacks: {
+                                label: context => context.dataset.label + ': ' + formatCurrency(context.raw)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ROW 3 Chart 2: ROI by Source
+        function renderRoiSourceChart() {
+            const ctx = document.getElementById('roiSourceChart').getContext('2d');
+            const labels = summaryData.map(d => d.sourceName);
+            const rois = summaryData.map(d => d.roi || 0);
+
+            if (roiSourceChartInstance) roiSourceChartInstance.destroy();
+
+            roiSourceChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ROI',
+                        data: rois,
+                        backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#475569' } },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                callback: val => val.toFixed(1) + 'x',
+                                color: '#475569'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: context => 'ROI: ' + context.raw.toFixed(2) + 'x'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ROW 4: Lead Funnel by Source
+        async function loadFunnelData() {
+            const sourceId = document.getElementById('funnelSourceFilter').value;
+            if (!sourceId) return;
+
+            try {
+                const res = await fetch(`/api/dashboard/lead-funnel/source?sourceId=${sourceId}`).then(r => r.json());
+                const data = res && res.length ? res[0] : null;
+
+                const stages = ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Negotiation'];
+                const values = data ? [
+                    data.newLead || 0,
+                    data.contactedLead || 0,
+                    data.qualifiedLead || 0,
+                    data.proposalSentLead || 0,
+                    data.negotiationLead || 0
+                ] : [0, 0, 0, 0, 0];
+
+                const ctx = document.getElementById('funnelChart').getContext('2d');
+                if (funnelChartInstance) funnelChartInstance.destroy();
+
+                funnelChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: stages,
+                        datasets: [{
+                            label: 'Số lượng Lead',
+                            data: values,
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.75)',  // Blue
+                                'rgba(99, 102, 241, 0.75)',  // Indigo
+                                'rgba(168, 85, 247, 0.75)',  // Purple
+                                'rgba(236, 72, 153, 0.75)',  // Pink
+                                'rgba(244, 63, 94, 0.75)'    // Rose
+                            ],
+                            borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(99, 102, 241, 1)',
+                                'rgba(168, 85, 247, 1)',
+                                'rgba(236, 72, 153, 1)',
+                                'rgba(244, 63, 94, 1)'
+                            ],
+                            borderWidth: 1.5,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                grid: { color: '#f1f5f9' },
+                                ticks: { color: '#475569', font: { weight: 'bold' } }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: '#475569', font: { weight: 'bold' } }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { padding: 12, cornerRadius: 8 }
+                        }
+                    }
+                });
+
+            } catch (err) {
+                console.error("Funnel load error", err);
+            }
+        }
+
+        // ROW 5: Lead Source by Product Line
+        function renderProductLineChart() {
+            const productFilter = document.getElementById('productLineFilter').value;
+            
+            // Get unique sources
+            const allSources = [...new Set(summaryData.map(d => d.sourceName))].filter(Boolean);
+
+            const values = allSources.map(src => {
+                let filtered = productLineData.filter(d => (d.leadSource === src || d.sourceName === src));
+                if (productFilter !== 'All') {
+                    filtered = filtered.filter(d => d.productName === productFilter);
+                }
+                return filtered.reduce((sum, d) => sum + (d.totalLead || 0), 0);
+            });
+
+            const ctx = document.getElementById('productLineChart').getContext('2d');
+            if (productLineChartInstance) productLineChartInstance.destroy();
+
+            productLineChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: allSources,
+                    datasets: [{
+                        label: `Số lượng Lead - ${productFilter === 'All' ? 'Tất cả sản phẩm' : productFilter}`,
+                        data: values,
+                        backgroundColor: brandRedLight,
+                        borderColor: brandRed,
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const sourceName = allSources[index];
+                            openSourceDetailsModal(sourceName, productFilter);
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#475569' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { weight: 'bold' } } },
+                        tooltip: { padding: 12, cornerRadius: 8 }
+                    }
+                }
+            });
+        }
+
+        // Popup details handlers
+        function openSourceDetailsModal(sourceName, productFilter) {
+            document.getElementById('modalTitle').innerText = `${sourceName} - Insights`;
+            document.getElementById('modalSubtitle').innerText = productFilter === 'All' 
+                ? `Tất cả sản phẩm` 
+                : `Dòng sản phẩm: ${productFilter}`;
+
+            // Calculate Revenue
+            let revFiltered = revenueProductData.filter(d => d.sourceName === sourceName);
+            if (productFilter !== 'All') {
+                revFiltered = revFiltered.filter(d => d.productLine === productFilter);
+            }
+            const totalRevenue = revFiltered.reduce((sum, d) => sum + (d.totalRevenue || 0), 0);
+            document.getElementById('modal-kpi-revenue').innerText = formatCurrency(totalRevenue);
+
+            // Calculate Won leads
+            let wonFiltered = wonProductData.filter(d => (d.sourceName === sourceName || d.sourceName === sourceName));
+            if (productFilter !== 'All') {
+                wonFiltered = wonFiltered.filter(d => d.productLine === productFilter);
+            }
+            const totalWon = wonFiltered.reduce((sum, d) => sum + (d.wonLead || 0), 0);
+            document.getElementById('modal-kpi-won').innerText = totalWon;
+
+            // Calculate Lost leads and Lost Reasons
+            let lostFiltered = lostProductData.filter(d => d.sourceName === sourceName);
+            if (productFilter !== 'All') {
+                lostFiltered = lostFiltered.filter(d => d.productName === productFilter);
+            }
+            const totalLost = lostFiltered.reduce((sum, d) => sum + (d.totalLost || 0), 0);
+            document.getElementById('modal-kpi-lost').innerText = totalLost;
+
+            // Lost reasons count grouping
+            const reasonsMap = {};
+            lostFiltered.forEach(d => {
+                const reason = d.lossReason || 'Không rõ lý do';
+                reasonsMap[reason] = (reasonsMap[reason] || 0) + (d.totalLost || 0);
+            });
+
+            const reasonLabels = Object.keys(reasonsMap);
+            const reasonCounts = Object.values(reasonsMap);
+
+            // Render lost reason chart
+            const ctx = document.getElementById('modalLostReasonChart').getContext('2d');
+            if (modalChartInstance) modalChartInstance.destroy();
+
+            modalChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: reasonLabels,
+                    datasets: [{
+                        label: 'Số lượng lead lost',
+                        data: reasonCounts,
+                        backgroundColor: 'rgba(100, 116, 139, 0.75)',
+                        borderColor: '#64748b',
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' }
+                        },
+                        y: {
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#475569', stepSize: 1 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { padding: 12, cornerRadius: 8 }
+                    }
+                }
+            });
+
+            // Show Modal with animation
+            const modal = document.getElementById('sourceDetailsModal');
+            const container = document.getElementById('modalContainer');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('sourceDetailsModal');
+            const container = document.getElementById('modalContainer');
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+    </script>
+    </div>
+</body>
+</html>

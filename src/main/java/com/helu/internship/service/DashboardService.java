@@ -39,6 +39,8 @@ public interface DashboardService {
     List<RevenueIndustryResponse> getRevenueByIndustry();
 
     List<RoiLeadSourceResponse> getROIByLeadSource();
+    List<LeadSourceSummaryResponse> getLeadSourceSummary();
+
 
     List<ConversionRateResponse> getConversionRateFilter(
             String sourceId,
@@ -135,4 +137,6 @@ public interface DashboardService {
     List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore();
     List<LossReasonByProductLineResponse> getLossReasonByProductLine();
     SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
+    List<com.helu.internship.entity.LeadSourceEntity> getAllLeadSources();
 }
+
