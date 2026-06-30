@@ -39,6 +39,8 @@ public interface DashboardService {
     List<RevenueIndustryResponse> getRevenueByIndustry();
 
     List<RoiLeadSourceResponse> getROIByLeadSource();
+    List<LeadSourceSummaryResponse> getLeadSourceSummary();
+
 
     List<ConversionRateResponse> getConversionRateFilter(
             String sourceId,
@@ -67,11 +69,11 @@ public interface DashboardService {
 
     List<RevenueMonthlyProjection> getRevenueMonthly();
 
-    List<RevenueQuarterlyProjection> getRevenueQuarterly(Integer year);
+    List<RevenueQuarterlyProjection> getRevenueQuarterly();
 
     List<LeadMonthlyProjection> getLeadMonthly();
 
-    List<LeadQuarterlyProjection> getLeadQuarterly(Integer year);
+    List<LeadQuarterlyProjection> getLeadQuarterly();
 
     List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly();
 
@@ -141,5 +143,7 @@ public interface DashboardService {
 
     // Retrieves data for Customer Value Matrix chart
     SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
+    List<com.helu.internship.entity.LeadSourceEntity> getAllLeadSources();
     DailyCompareResponse getDailyCompare();
 }
+

@@ -19,13 +19,16 @@ public class DashboardServiceImpl implements DashboardService {
     private final PipelineCoveragerRepo pipelineCoverageRepo;
     private final UserRepo userRepo;
     private final SalesOwnerDashboardRepo salesOwnerDashboardRepo;
+    private final LeadSourceRepo leadSourceRepo;
+
     public DashboardServiceImpl(
             LeadRepo leadRepo,
             LeadStatusHistoryRepo leadStatusHistoryRepo,
             CostPerLeadRepo costPerLeadRepo,
             PipelineCoveragerRepo pipelineCoverageRepo,
             UserRepo userRepo,
-            SalesOwnerDashboardRepo salesOwnerDashboardRepo) {
+            SalesOwnerDashboardRepo salesOwnerDashboardRepo,
+            LeadSourceRepo leadSourceRepo) {
 
         this.leadRepo = leadRepo;
         this.leadStatusHistoryRepo = leadStatusHistoryRepo;
@@ -33,7 +36,9 @@ public class DashboardServiceImpl implements DashboardService {
         this.pipelineCoverageRepo = pipelineCoverageRepo;
         this.userRepo = userRepo;
         this.salesOwnerDashboardRepo = salesOwnerDashboardRepo;
+        this.leadSourceRepo = leadSourceRepo;
     }
+
 
     @Override
     public List<WinRateByIndustryProjection> getWinRateByIndustry() {
@@ -140,7 +145,13 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return leadRepo.getROIByLeadSource();
+     }
+
+    @Override
+    public List<LeadSourceSummaryResponse> getLeadSourceSummary() {
+        return leadRepo.getLeadSourceSummary();
     }
+
 
     @Override
     public ConversionRateResponse getStaffStats(String email) {
@@ -202,8 +213,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<RevenueQuarterlyProjection> getRevenueQuarterly(Integer year) {
-        return leadRepo.getRevenueQuarterly(year);
+    public List<RevenueQuarterlyProjection> getRevenueQuarterly() {
+        return leadRepo.getRevenueQuarterly();
     }
 
     @Override
@@ -212,8 +223,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<LeadQuarterlyProjection> getLeadQuarterly(Integer year) {
-        return leadRepo.getLeadQuarterly(year);
+    public List<LeadQuarterlyProjection> getLeadQuarterly() {
+        return leadRepo.getLeadQuarterly();
     }
     @Override
     public List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly() {
@@ -476,6 +487,11 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<com.helu.internship.entity.LeadSourceEntity> getAllLeadSources() {
+        return leadSourceRepo.findAll();
+    }
+
+    @Override
     public DailyCompareResponse getDailyCompare() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
@@ -520,3 +536,4 @@ public class DashboardServiceImpl implements DashboardService {
         );
     }
 }
+
