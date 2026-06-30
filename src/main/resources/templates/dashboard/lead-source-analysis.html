@@ -2,6 +2,28 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
     <main class="space-y-8">
+        <style>
+            /* Funnel hover effects */
+            .funnel-stage {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .funnel-stage:hover path {
+                filter: brightness(1.1) drop-shadow(0 10px 15px rgba(0, 0, 0, 0.15));
+                opacity: 0.95;
+            }
+            .funnel-stage:hover text {
+                fill: #1e3a8a !important;
+                font-weight: 800;
+            }
+            .funnel-stage:hover line {
+                stroke: #3b82f6 !important;
+                stroke-width: 1.5;
+            }
+            .funnel-stage:hover circle {
+                transform: scale(1.3);
+                transform-origin: center;
+            }
+        </style>
         <!-- Dot Matrix Background Overlay -->
         <div class="absolute inset-0 pointer-events-none opacity-[0.4]" style="background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1.2px, transparent 1.2px); background-size: 24px 24px;"></div>
 
@@ -23,41 +45,41 @@
             </div>
 
             <!-- Best Source by Revenue -->
-            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-6 relative overflow-hidden flex flex-col justify-between h-[140px] border-none" style="border: none !important;">
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-5 relative overflow-hidden flex flex-col justify-between h-[146px] border-none" style="border: none !important;">
                 <div>
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Best Revenue Source</span>
-                    <span id="kpi-best-revenue-val" class="text-lg font-black text-emerald-600 mt-1 block truncate">N/A</span>
-                    <span id="kpi-best-revenue-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Top Revenue Source</span>
+                    <span id="kpi-best-revenue-name" class="text-[18px] font-black text-slate-800 mt-1 block truncate">Loading...</span>
+                    <span id="kpi-best-revenue-val" class="text-xs font-bold text-emerald-600 block truncate">N/A</span>
                 </div>
                 <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #10b981); clip-path: path('M0,35 Q30,15 60,35 T120,35 T180,35 T240,35 T300,35 L300,60 L0,60 Z');"></div>
             </div>
 
             <!-- Best Source by Conversion Rate -->
-            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-6 relative overflow-hidden flex flex-col justify-between h-[140px] border-none" style="border: none !important;">
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-5 relative overflow-hidden flex flex-col justify-between h-[146px] border-none" style="border: none !important;">
                 <div>
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Best Win Rate Source</span>
-                    <span id="kpi-best-cr-val" class="text-lg font-black text-[#f6171b] mt-1 block truncate">0%</span>
-                    <span id="kpi-best-cr-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Top Win Rate Source</span>
+                    <span id="kpi-best-cr-name" class="text-[18px] font-black text-slate-800 mt-1 block truncate">Loading...</span>
+                    <span id="kpi-best-cr-val" class="text-xs font-bold text-[#f6171b] block truncate">0%</span>
                 </div>
                 <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f6171b); clip-path: path('M0,25 Q25,5 50,25 T100,25 T150,25 T200,25 T250,25 T300,25 L300,60 L0,60 Z');"></div>
             </div>
 
             <!-- Best Source by Leads -->
-            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-6 relative overflow-hidden flex flex-col justify-between h-[140px] border-none" style="border: none !important;">
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-5 relative overflow-hidden flex flex-col justify-between h-[146px] border-none" style="border: none !important;">
                 <div>
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Highest Volume Source</span>
-                    <span id="kpi-best-leads-val" class="text-lg font-black text-indigo-600 mt-1 block truncate">0 Leads</span>
-                    <span id="kpi-best-leads-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                    <span id="kpi-best-leads-name" class="text-[18px] font-black text-slate-800 mt-1 block truncate">Loading...</span>
+                    <span id="kpi-best-leads-val" class="text-xs font-bold text-indigo-600 block truncate">0 Leads</span>
                 </div>
                 <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #6366f1); clip-path: path('M0,30 Q20,10 40,30 T80,30 T120,30 T160,30 T200,30 T240,30 T280,30 L280,60 L0,60 Z');"></div>
             </div>
 
             <!-- Best Source by ROI -->
-            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-6 relative overflow-hidden flex flex-col justify-between h-[140px] border-none" style="border: none !important;">
+            <div class="bg-white rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.02)] p-5 relative overflow-hidden flex flex-col justify-between h-[146px] border-none" style="border: none !important;">
                 <div>
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Best ROI Source</span>
-                    <span id="kpi-best-roi-val" class="text-lg font-black text-amber-600 mt-1 block truncate">0x</span>
-                    <span id="kpi-best-roi-name" class="text-xs font-semibold text-slate-500 block truncate">Loading...</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Top ROI Source</span>
+                    <span id="kpi-best-roi-name" class="text-[18px] font-black text-slate-800 mt-1 block truncate">Loading...</span>
+                    <span id="kpi-best-roi-val" class="text-xs font-bold text-amber-600 block truncate">0x</span>
                 </div>
                 <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f59e0b); clip-path: path('M0,35 Q30,15 60,35 T120,35 T180,35 T240,35 T300,35 L300,60 L0,60 Z');"></div>
             </div>
@@ -98,8 +120,8 @@
                     </select>
                 </div>
             </div>
-            <div class="relative w-full h-[320px]">
-                <canvas id="funnelChart"></canvas>
+            <div class="relative w-full max-w-[450px] min-h-[320px] mx-auto flex items-center justify-center" id="leadStatusFunnelContainer">
+                <!-- Will be populated with a single beautiful SVG funnel -->
             </div>
         </div>
 
@@ -121,55 +143,120 @@
         </div>
 
         <!-- Dynamic Popup / Modal -->
-        <div id="sourceDetailsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4 transition-all duration-200">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300 flex flex-col" id="modalContainer">
-                <!-- Modal Header -->
-                <div class="flex items-center justify-between p-6 border-b border-slate-100">
-                    <div>
-                        <h2 class="text-xl font-black text-slate-800 tracking-tight" id="modalTitle">Lead Source Insights</h2>
-                        <p class="text-slate-500 text-xs font-medium mt-1" id="modalSubtitle">Nguồn lead dưới dòng sản phẩm đã chọn</p>
+        <div id="sourceDetailsModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-200" id="modalContainer">
+                    <!-- Modal Header -->
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <div>
+                            <h3 class="text-lg font-black text-slate-800 tracking-tight" id="modalTitle">Lead Source Insights</h3>
+                            <p class="text-slate-400 text-xs font-medium mt-0.5" id="modalSubtitle">Nguồn lead dưới dòng sản phẩm đã chọn</p>
+                        </div>
+                        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
                     </div>
-                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-lg transition-all">
-                        <!-- Custom SVG X Close icon to avoid dependency issues -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
+
+                    <!-- Modal Content -->
+                    <div class="p-6 space-y-5">
+                        <!-- Modal KPIs (3 Dashboard Card Widgets) -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Total Revenue -->
+                            <div class="bg-slate-50/75 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu</span>
+                                <span id="modal-kpi-revenue" class="text-lg font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                            </div>
+                            <!-- Total Won Leads -->
+                            <div class="bg-slate-50/75 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng số lead Won</span>
+                                <span id="modal-kpi-won" class="text-lg font-black text-[#f6171b] mt-1 block">0</span>
+                            </div>
+                            <!-- Total Lost Leads -->
+                            <div class="bg-slate-50/75 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng số lead Lost</span>
+                                <span id="modal-kpi-lost" class="text-lg font-black text-slate-700 mt-1 block">0</span>
+                            </div>
+                        </div>
+
+                        <!-- Lost Reason Bar Chart -->
+                        <div class="bg-slate-50/75 border border-slate-100 rounded-xl p-4">
+                            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Số lượng lý do Lost</h4>
+                            <div class="relative w-full h-[180px]">
+                                <canvas id="modalLostReasonChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-end">
+                        <button onclick="closeModal()" class="px-5 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all text-xs">
+                            Đóng cửa sổ
+                        </button>
+                    </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Modal Content -->
-                <div class="p-6 space-y-6">
-                    <!-- Modal KPIs (3 Dashboard Card Widgets) -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Total Revenue -->
-                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex flex-col justify-between h-[110px]">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu</span>
-                            <span id="modal-kpi-revenue" class="text-2xl font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+        <!-- ========================================== -->
+        <!-- MODAL: DANH SÁCH LEADS THEO TRẠNG THÁI -->
+        <!-- ========================================== -->
+        <div id="leadStatusModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm"
+                    onclick="closeLeadModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                <div
+                    class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full border border-slate-200">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                            <span id="modalStatusTitle" class="text-blue-600">Status</span>
+                            <span class="text-slate-400 font-medium text-lg">| <span th:text="#{modal.lead_list}">Danh sách Leads</span></span>
+                        </h3>
+                        <button onclick="closeLeadModal()"
+                            class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
+                            <!-- Custom SVG X Close icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div id="modalTableContainer" class="overflow-hidden rounded-xl border border-slate-100 shadow-sm">
+                            <div class="overflow-x-auto max-h-[60vh]">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="sticky top-0 z-10">
+                                        <tr class="bg-slate-50 border-b border-slate-100">
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.lead_id}">Lead ID</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{dashboard.col.account}">Tài khoản</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.contact}">Người liên hệ</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.email}">Email</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.phone}">SĐT</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.status}">Trạng thái</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.assigned}">Phụ trách</th>
+                                            <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[11px] tracking-wider whitespace-nowrap" th:text="#{modal.col.created}">Ngày tạo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modalTableBody" class="divide-y divide-slate-50 bg-white"></tbody>
+                                </table>
+                            </div>
                         </div>
-                        <!-- Total Won Leads -->
-                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex flex-col justify-between h-[110px]">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng số lead Won</span>
-                            <span id="modal-kpi-won" class="text-2xl font-black text-[#f6171b] mt-1 block">0</span>
+                        <div id="modalLoading" class="hidden py-12 text-center">
+                            <!-- Custom spinner SVG -->
+                            <svg class="animate-spin h-10 w-10 text-blue-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <p class="text-slate-500 font-medium" th:text="#{modal.loading}">Đang truy xuất...</p>
                         </div>
-                        <!-- Total Lost Leads -->
-                        <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex flex-col justify-between h-[110px]">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng số lead Lost</span>
-                            <span id="modal-kpi-lost" class="text-2xl font-black text-slate-700 mt-1 block">0</span>
+                        <div id="modalEmpty" class="hidden py-12 text-center">
+                            <div class="bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            </div>
+                            <p class="text-slate-500 font-bold" th:text="#{modal.empty}">Không tìm thấy Lead.</p>
                         </div>
                     </div>
-
-                    <!-- Lost Reason Bar Chart -->
-                    <div class="bg-slate-50 rounded-xl p-6 border border-slate-100">
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Số lượng lý do Lost</h4>
-                        <div class="relative w-full h-[280px]">
-                            <canvas id="modalLostReasonChart"></canvas>
-                        </div>
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                        <button onclick="closeLeadModal()"
+                            class="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm"
+                            th:text="#{modal.close}">Đóng</button>
                     </div>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="flex justify-end p-6 border-t border-slate-100 bg-slate-50/50">
-                    <button onclick="closeModal()" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition-all text-sm">
-                        Đóng cửa sổ
-                    </button>
                 </div>
             </div>
         </div>
@@ -189,7 +276,8 @@
         let leadsCrChartInstance = null;
         let avgCostRevChartInstance = null;
         let roiSourceChartInstance = null;
-        let funnelChartInstance = null;
+        let funnelChartInstance = null; // compatibility fallback
+        window.funnelChartInstances = {};
         let productLineChartInstance = null;
         let modalChartInstance = null;
 
@@ -297,16 +385,17 @@
         function populateFilters() {
             // Funnel filter
             const funnelFilter = document.getElementById('funnelSourceFilter');
-            funnelFilter.innerHTML = '';
-            
-            if (Array.isArray(leadSources)) {
-                leadSources.forEach((src, idx) => {
-                    const opt = document.createElement('option');
-                    opt.value = src.sourceId || src.sourceName || '';
-                    opt.innerText = src.sourceName || 'Unknown';
-                    if (idx === 0) opt.selected = true;
-                    funnelFilter.appendChild(opt);
-                });
+            if (funnelFilter) {
+                funnelFilter.innerHTML = '';
+                if (Array.isArray(leadSources)) {
+                    leadSources.forEach((src, idx) => {
+                        const opt = document.createElement('option');
+                        opt.value = src.sourceId || src.sourceName || '';
+                        opt.innerText = src.sourceName || 'Unknown';
+                        if (idx === 0) opt.selected = true;
+                        funnelFilter.appendChild(opt);
+                    });
+                }
             }
 
             // Product line filter
@@ -384,7 +473,8 @@
                             borderColor: accentBlue,
                             borderWidth: 1.5,
                             borderRadius: 4,
-                            yAxisID: 'y'
+                            yAxisID: 'y',
+                            order: 2
                         },
                         {
                             label: 'Conversion Rate (%)',
@@ -400,7 +490,9 @@
                             pointHoverRadius: 7,
                             borderWidth: 3.5,
                             tension: 0.35,
-                            yAxisID: 'y1'
+                            yAxisID: 'y1',
+                            order: 1,
+                            pointStyle: 'circle'
                         }
                     ]
                 },
@@ -434,7 +526,27 @@
                         }
                     },
                     plugins: {
-                        legend: { position: 'top', labels: { font: { weight: 'bold', size: 12 } } },
+                        legend: { 
+                            position: 'top', 
+                            labels: { 
+                                usePointStyle: true,
+                                font: { weight: 'bold', size: 12 },
+                                generateLabels: function(chart) {
+                                    const defaultLabels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                                    defaultLabels.forEach(label => {
+                                        if (label.text.includes('Conversion Rate')) {
+                                            label.pointStyle = 'dash';
+                                            label.fillStyle = brandRed;
+                                            label.strokeStyle = brandRed;
+                                            label.lineWidth = 3;
+                                        } else {
+                                            label.pointStyle = 'rect';
+                                        }
+                                    });
+                                    return defaultLabels;
+                                }
+                            } 
+                        },
                         tooltip: { padding: 12, cornerRadius: 8 }
                     }
                 }
@@ -545,74 +657,193 @@
         }
 
         // ROW 4: Lead Funnel by Source
+        // ROW 4: Lead Funnel by Source
         async function loadFunnelData() {
             const sourceId = document.getElementById('funnelSourceFilter').value;
             if (!sourceId) return;
+
+            const container = document.getElementById('leadStatusFunnelContainer');
+            if (!container) return;
+            container.innerHTML = '';
 
             try {
                 const res = await fetch(`/api/dashboard/lead-funnel/source?sourceId=${sourceId}`).then(r => r.json());
                 const data = res && res.length ? res[0] : null;
 
-                const stages = ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Negotiation'];
-                const values = data ? [
-                    data.newLead || 0,
-                    data.contactedLead || 0,
-                    data.qualifiedLead || 0,
-                    data.proposalSentLead || 0,
-                    data.negotiationLead || 0
-                ] : [0, 0, 0, 0, 0];
+                const values = [
+                    data ? (data.newLead || 0) : 0,
+                    data ? (data.contactedLead || 0) : 0,
+                    data ? (data.qualifiedLead || 0) : 0,
+                    data ? (data.proposalSentLead || 0) : 0,
+                    data ? (data.negotiationLead || 0) : 0
+                ];
+                const totalActive = values.reduce((a, b) => a + b, 0);
 
-                const ctx = document.getElementById('funnelChart').getContext('2d');
-                if (funnelChartInstance) funnelChartInstance.destroy();
+                const stagesConfig = [
+                    { key: 'New', label: 'New', statuses: ['New'], color: 'url(#grad-blue-3d)', topColor: 'url(#grad-funnel-interior)' },
+                    { key: 'Contacted', label: 'Contacted', statuses: ['Contacted'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
+                    { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
+                    { key: 'Proposal Sent', label: 'Proposal Sent', statuses: ['Proposal Sent'], color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
+                    { key: 'Negotiation', label: 'Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
+                ];
 
-                funnelChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: stages,
-                        datasets: [{
-                            label: 'Số lượng Lead',
-                            data: values,
-                            backgroundColor: [
-                                'rgba(59, 130, 246, 0.75)',  // Blue
-                                'rgba(99, 102, 241, 0.75)',  // Indigo
-                                'rgba(168, 85, 247, 0.75)',  // Purple
-                                'rgba(236, 72, 153, 0.75)',  // Pink
-                                'rgba(244, 63, 94, 0.75)'    // Rose
-                            ],
-                            borderColor: [
-                                'rgba(59, 130, 246, 1)',
-                                'rgba(99, 102, 241, 1)',
-                                'rgba(168, 85, 247, 1)',
-                                'rgba(236, 72, 153, 1)',
-                                'rgba(244, 63, 94, 1)'
-                            ],
-                            borderWidth: 1.5,
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: {
-                                grid: { color: '#f1f5f9' },
-                                ticks: { color: '#475569', font: { weight: 'bold' } }
-                            },
-                            y: {
-                                grid: { display: false },
-                                ticks: { color: '#475569', font: { weight: 'bold' } }
-                            }
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { padding: 12, cornerRadius: 8 }
-                        }
+                const totalHeight = 260;
+                const gap = 6;
+                const startY = 34;
+
+                const Y_start = startY;
+                const Y_end = startY + totalHeight + 4 * gap;
+                const getFunnelWidth = (y) => {
+                    const ratio = Math.max(0, Math.min(1, (y - Y_start) / (Y_end - Y_start)));
+                    return 220 - (220 - 45) * ratio;
+                };
+
+                const minH = 8;
+                let heights = [];
+                if (totalActive === 0) {
+                    heights = [52, 52, 52, 52, 52];
+                } else {
+                    const remainingH = totalHeight - (5 * minH);
+                    heights = values.map(v => minH + remainingH * (v / totalActive));
+                }
+
+                let svgHtml = `
+                <svg viewBox="0 0 500 350" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="grad-funnel-interior" cx="50%" cy="50%" r="50%" fx="50%" fy="30%">
+                            <stop offset="0%" stop-color="#0f172a" />
+                            <stop offset="100%" stop-color="#1e293b" />
+                        </radialGradient>
+                        <linearGradient id="grad-blue-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#1e3a8a" />
+                            <stop offset="30%" stop-color="#3b82f6" />
+                            <stop offset="50%" stop-color="#60a5fa" />
+                            <stop offset="70%" stop-color="#3b82f6" />
+                            <stop offset="100%" stop-color="#1d4ed8" />
+                        </linearGradient>
+                        <linearGradient id="grad-purple-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#4c1d95" />
+                            <stop offset="30%" stop-color="#7c3aed" />
+                            <stop offset="50%" stop-color="#a78bfa" />
+                            <stop offset="70%" stop-color="#7c3aed" />
+                            <stop offset="100%" stop-color="#6d28d9" />
+                        </linearGradient>
+                        <linearGradient id="grad-amber-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#78350f" />
+                            <stop offset="30%" stop-color="#f59e0b" />
+                            <stop offset="50%" stop-color="#fcd34d" />
+                            <stop offset="70%" stop-color="#f59e0b" />
+                            <stop offset="100%" stop-color="#b45309" />
+                        </linearGradient>
+                        <linearGradient id="grad-teal-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#115e59" />
+                            <stop offset="30%" stop-color="#0d9488" />
+                            <stop offset="50%" stop-color="#2dd4bf" />
+                            <stop offset="70%" stop-color="#0d9488" />
+                            <stop offset="100%" stop-color="#0f766e" />
+                        </linearGradient>
+                        <linearGradient id="grad-emerald-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#064e3b" />
+                            <stop offset="30%" stop-color="#10b981" />
+                            <stop offset="50%" stop-color="#34d399" />
+                            <stop offset="70%" stop-color="#10b981" />
+                            <stop offset="100%" stop-color="#047857" />
+                        </linearGradient>
+                        <linearGradient id="grad-purple-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#c084fc" />
+                            <stop offset="100%" stop-color="#a855f7" />
+                        </linearGradient>
+                        <linearGradient id="grad-amber-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#fbbf24" />
+                            <stop offset="100%" stop-color="#f59e0b" />
+                        </linearGradient>
+                        <linearGradient id="grad-teal-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#2dd4bf" />
+                            <stop offset="100%" stop-color="#0d9488" />
+                        </linearGradient>
+                        <linearGradient id="grad-emerald-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#34d399" />
+                            <stop offset="100%" stop-color="#10b981" />
+                        </linearGradient>
+                    </defs>
+                `;
+
+                const X_c = 140;
+                let currentY = startY;
+
+                let calculatedStages = [];
+                for (let i = 0; i < 5; i++) {
+                    const stage = stagesConfig[i];
+                    const val = values[i];
+                    const pct = totalActive > 0 ? ((val / totalActive) * 100).toFixed(1) : '0.0';
+                    const h = heights[i];
+
+                    const yTop = currentY;
+                    const yBottom = yTop + h;
+                    currentY = yBottom + gap;
+
+                    const rXt = getFunnelWidth(yTop) / 2;
+                    const rYt = rXt * 0.12;
+                    const rXb = getFunnelWidth(yBottom) / 2;
+                    const rYb = rXb * 0.12;
+
+                    calculatedStages.push({ index: i, stage, val, pct, h, yTop, yBottom, rXt, rYt, rXb, rYb });
+                }
+
+                for (let i = 4; i >= 0; i--) {
+                    const cs = calculatedStages[i];
+                    const { stage, val, pct, h, yTop, yBottom, rXt, rYt, rXb, rYb } = cs;
+
+                    const xTl = X_c - rXt;
+                    const xTr = X_c + rXt;
+                    const xBr = X_c + rXb;
+                    const xBl = X_c - rXb;
+
+                    const pathD = `M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop} L ${xBr} ${yBottom} A ${rXb} ${rYb} 0 0 0 ${xBl} ${yBottom} Z`;
+                    const xMid = X_c + (rXt + rXb) / 2;
+                    const yMid = yTop + h / 2;
+
+                    const statusesJson = JSON.stringify(stage.statuses);
+
+                    svgHtml += `<g class="funnel-stage" cursor="pointer" onclick='openLeadStatusModal(${statusesJson})'>`;
+                    svgHtml += `<ellipse cx="${X_c}" cy="${yTop}" rx="${rXt}" ry="${rYt}" fill="${stage.topColor}" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" />`;
+                    svgHtml += `<path d="${pathD}" fill="${stage.color}" />`;
+                    svgHtml += `<path d="M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />`;
+
+                    if (i === 4) {
+                        const neckHeight = 18;
+                        const yNeckBottom = yBottom + neckHeight;
+                        const rXn = rXb;
+                        const rYn = rYb;
+                        const xNr = X_c + rXn;
+                        const neckPathD = `M ${xBl} ${yBottom} L ${xBl} ${yNeckBottom} A ${rXn} ${rYn} 0 0 1 ${xNr} ${yNeckBottom} L ${xBr} ${yBottom} A ${rXb} ${rYb} 0 0 0 ${xBl} ${yBottom} Z`;
+                        svgHtml += `<path d="${neckPathD}" fill="${stage.color}" />`;
+                        svgHtml += `<ellipse cx="${X_c}" cy="${yNeckBottom}" rx="${rXn}" ry="${rYn}" fill="#0f172a" opacity="0.7" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />`;
                     }
-                });
 
+                    svgHtml += `
+                        <circle cx="${xMid}" cy="${yMid}" r="3.5" fill="${i === 0 ? '#3b82f6' : i === 1 ? '#8b5cf6' : i === 2 ? '#f59e0b' : i === 3 ? '#0d9488' : '#10b981'}" />
+                        <line x1="${xMid + 4}" y1="${yMid}" x2="270" y2="${yMid}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
+                    `;
+
+                    if (h >= 35) {
+                        svgHtml += `
+                        <text x="280" y="${yMid - 3}" font-family="'Inter', sans-serif" font-size="13" font-weight="bold" fill="#1e293b">${stage.label}</text>
+                        <text x="280" y="${yMid + 13}" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#64748b">${val.toLocaleString()} Leads (${pct}%)</text>
+                        `;
+                    } else {
+                        svgHtml += `
+                        <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${val.toLocaleString()} (${pct}%)</tspan></text>
+                        `;
+                    }
+                    svgHtml += `</g>`;
+                }
+
+                svgHtml += `</svg>`;
+                container.innerHTML = svgHtml;
             } catch (err) {
                 console.error("Funnel load error", err);
+                container.innerHTML = `<p class="text-red-500 font-bold text-center">Không thể tải biểu đồ phễu</p>`;
             }
         }
 
@@ -727,8 +958,8 @@
                     datasets: [{
                         label: 'Số lượng lead lost',
                         data: reasonCounts,
-                        backgroundColor: 'rgba(100, 116, 139, 0.75)',
-                        borderColor: '#64748b',
+                        backgroundColor: brandRedLight,
+                        borderColor: brandRed,
                         borderWidth: 1.5,
                         borderRadius: 4
                     }]
@@ -753,24 +984,91 @@
                 }
             });
 
-            // Show Modal with animation
+            // Show Modal
             const modal = document.getElementById('sourceDetailsModal');
-            const container = document.getElementById('modalContainer');
             modal.classList.remove('hidden');
-            setTimeout(() => {
-                container.classList.remove('scale-95', 'opacity-0');
-                container.classList.add('scale-100', 'opacity-100');
-            }, 50);
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
             const modal = document.getElementById('sourceDetailsModal');
-            const container = document.getElementById('modalContainer');
-            container.classList.remove('scale-100', 'opacity-100');
-            container.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // ==========================================
+        // MODAL LOGIC: Lead Status list
+        // ==========================================
+        async function openLeadStatusModal(status) {
+            const modal = document.getElementById('leadStatusModal');
+            const title = document.getElementById('modalStatusTitle');
+            const tbody = document.getElementById('modalTableBody');
+            const loading = document.getElementById('modalLoading');
+            const empty = document.getElementById('modalEmpty');
+            const container = document.getElementById('modalTableContainer');
+
+            title.innerText = Array.isArray(status) ? status.join(' + ') : status;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            tbody.innerHTML = '';
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+            container.classList.add('hidden');
+
+            try {
+                let data = [];
+                if (Array.isArray(status)) {
+                    const promises = status.map(st =>
+                        fetch(`/api/dashboard/leads-by-status?status=${encodeURIComponent(st)}`)
+                            .then(r => r.ok ? r.json() : [])
+                            .catch(() => [])
+                    );
+                    const results = await Promise.all(promises);
+                    data = results.flat();
+                } else {
+                    try {
+                        const res = await fetch(`/api/dashboard/leads-by-status?status=${encodeURIComponent(status)}`);
+                        data = res.ok ? await res.json() : [];
+                    } catch {
+                        data = [];
+                    }
+                }
+                loading.classList.add('hidden');
+
+                if (!data || data.length === 0) {
+                    empty.classList.remove('hidden');
+                    return;
+                }
+
+                container.classList.remove('hidden');
+                data.forEach(lead => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition-colors group';
+                    tr.innerHTML = `
+                        <td class="px-4 py-3 text-[11px] font-bold text-slate-400">#${lead.leadId || '-'}</td>
+                        <td class="px-4 py-3 text-sm font-bold text-slate-800">${lead.account || '-'}</td>
+                        <td class="px-4 py-3 text-sm text-slate-600">${lead.fullName || '-'}</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">${lead.email || '-'}</td>
+                        <td class="px-4 py-3 text-sm text-slate-500">${lead.phoneNumber || '-'}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-50 text-blue-600">${lead.status || '-'}</span>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-slate-600">${lead.userName || '-'}</td>
+                        <td class="px-4 py-3 text-xs text-slate-400">${lead.createdDate || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading Lead Status list:', error);
+                loading.classList.add('hidden');
+                empty.classList.remove('hidden');
+            }
+        }
+
+        function closeLeadModal() {
+            document.getElementById('leadStatusModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
         }
     </script>
     </main>

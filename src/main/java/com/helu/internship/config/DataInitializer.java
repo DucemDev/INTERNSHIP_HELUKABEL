@@ -22,6 +22,43 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // Tự động sửa cấu trúc bảng notification nếu sai schema (dùng notification_id thay vì id)
+        try {
+            jdbcTemplate.execute("SELECT TOP 1 notification_id FROM notification");
+            System.out.println("Detected old notification table schema (using BIGINT notification_id). Recreating it to match NotificationEntity (UUID id)...");
+            try {
+                jdbcTemplate.execute("ALTER TABLE notification DROP CONSTRAINT FK_notification_user");
+            } catch (Exception ignored) {}
+            try {
+                jdbcTemplate.execute("DROP TABLE notification");
+            } catch (Exception ignored) {}
+        } catch (Exception e) {
+            // Bảng chưa có hoặc đã dùng đúng schema UUID
+        }
+
+        try {
+            jdbcTemplate.execute(
+                "IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'notification') " +
+                "BEGIN " +
+                "    CREATE TABLE notification ( " +
+                "        id UNIQUEIDENTIFIER DEFAULT NEWID() NOT NULL, " +
+                "        user_id UNIQUEIDENTIFIER NOT NULL, " +
+                "        title NVARCHAR(200) NOT NULL, " +
+                "        message NVARCHAR(1000) NOT NULL, " +
+                "        is_read BIT DEFAULT 0 NOT NULL, " +
+                "        type VARCHAR(50) NOT NULL, " +
+                "        link VARCHAR(255) NULL, " +
+                "        created_at DATETIME2 DEFAULT SYSDATETIME() NOT NULL, " +
+                "        CONSTRAINT PK_notification PRIMARY KEY (id), " +
+                "        CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE CASCADE " +
+                "    ); " +
+                "    PRINT 'Recreated notification table successfully.'; " +
+                "END"
+            );
+        } catch (Exception e) {
+            System.err.println("Failed to create correct notification table: " + e.getMessage());
+        }
+
         // Tự động kiểm tra và thêm các cột thiếu trong bảng lead
         String[] columns = {
             "email VARCHAR(100) NULL",

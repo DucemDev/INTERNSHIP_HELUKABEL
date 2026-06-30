@@ -397,6 +397,30 @@
                         </button>
                     </div>
                     <div class="p-6">
+                        <!-- Account Analysis Summary (Hiển thị các yếu tố phân tích của Doanh nghiệp) -->
+                        <div id="modalAccountSummary" class="hidden mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <!-- Số lần / Tần suất -->
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Số lần giao dịch (Quay lại)</span>
+                                <span id="account-summary-freq" class="text-base font-black text-blue-600 mt-1 block">0 lần</span>
+                            </div>
+                            <!-- Bao nhiêu / Doanh thu -->
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu tích lũy</span>
+                                <span id="account-summary-revenue" class="text-base font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                            </div>
+                            <!-- Product / Sản phẩm -->
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sản phẩm quan tâm</span>
+                                <span id="account-summary-products" class="text-xs font-bold text-slate-700 mt-1 block truncate" title="">N/A</span>
+                            </div>
+                            <!-- Thời gian -->
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lịch sử giao dịch</span>
+                                <span id="account-summary-time" class="text-xs font-bold text-slate-700 mt-1 block">N/A</span>
+                            </div>
+                        </div>
+
                         <div id="modalTableContainer" class="overflow-hidden rounded-xl border border-slate-100 shadow-sm">
                             <div class="overflow-x-auto max-h-[60vh]">
                                 <table class="w-full text-left border-collapse">
@@ -1256,6 +1280,16 @@
                         }]
                     }, {
                         indexAxis: 'y',
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                const index = elements[0].index;
+                                const accountName = labels[index];
+                                openAccountDetailsModal(accountName);
+                            }
+                        },
+                        onHover: (event, chartElement) => {
+                            event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                        },
                         layout: {
                             padding: {
                                 right: 80
@@ -1391,6 +1425,7 @@
                 }
 
                 // Bubbles
+                const maxWinRate = Math.max(...cells.map(c => c.winRate), 1);
                 cells.forEach(cell => {
                     const colIdx = regions.indexOf(cell.region);
                     const rowIdx = industries.indexOf(cell.industry);
@@ -1401,7 +1436,7 @@
 
                     const minR = 14;
                     const maxR = Math.min(colW, rowH) * 0.38;
-                    const r = cell.value > 0 ? minR + (maxR - minR) * Math.sqrt(cell.value / maxVal) : minR;
+                    const r = cell.winRate > 0 ? minR + (maxR - minR) * Math.sqrt(cell.winRate / maxWinRate) : minR;
 
                     // Color by win rate
                     let fillColor;
@@ -1652,6 +1687,9 @@
                 const loading = document.getElementById('modalLoading');
                 const empty = document.getElementById('modalEmpty');
                 const container = document.getElementById('modalTableContainer');
+                const summaryBlock = document.getElementById('modalAccountSummary');
+
+                if (summaryBlock) summaryBlock.classList.add('hidden');
 
                 title.innerText = Array.isArray(status) ? status.join(' + ') : status;
                 modal.classList.remove('hidden');
@@ -1719,6 +1757,97 @@
             function closeLeadModal() {
                 document.getElementById('leadStatusModal').classList.add('hidden');
                 document.body.style.overflow = '';
+            }
+
+            async function openAccountDetailsModal(accountName) {
+                const modal = document.getElementById('leadStatusModal');
+                const title = document.getElementById('modalStatusTitle');
+                const tbody = document.getElementById('modalTableBody');
+                const loading = document.getElementById('modalLoading');
+                const empty = document.getElementById('modalEmpty');
+                const container = document.getElementById('modalTableContainer');
+                const summaryBlock = document.getElementById('modalAccountSummary');
+
+                title.innerText = accountName;
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+
+                tbody.innerHTML = '';
+                loading.classList.remove('hidden');
+                empty.classList.add('hidden');
+                container.classList.add('hidden');
+                if (summaryBlock) summaryBlock.classList.add('hidden');
+                lucide.createIcons();
+
+                try {
+                    const res = await fetch('/api/leads');
+                    if (!res.ok) throw new Error('API error');
+                    const leads = await res.json();
+                    
+                    const filtered = leads.filter(l => l.account === accountName);
+                    
+                    loading.classList.add('hidden');
+
+                    if (!filtered || filtered.length === 0) {
+                        empty.classList.remove('hidden');
+                        return;
+                    }
+
+                    // Compute Account metrics
+                    const freq = filtered.length;
+                    const totalRev = filtered.reduce((sum, l) => sum + (l.businessResult || 0), 0);
+                    const productsList = [...new Set(filtered.map(l => l.productName).filter(Boolean))];
+                    const productsText = productsList.length > 0 ? productsList.join(', ') : 'N/A';
+                    
+                    // Timeline
+                    const dates = filtered.map(l => l.createdDate).filter(Boolean).sort();
+                    let timeText = 'N/A';
+                    if (dates.length > 0) {
+                        const firstDate = dates[0];
+                        const lastDate = dates[dates.length - 1];
+                        timeText = firstDate === lastDate ? firstDate : `${firstDate} ~ ${lastDate}`;
+                    }
+
+                    // Populate summary metrics
+                    if (summaryBlock) {
+                        document.getElementById('account-summary-freq').innerText = `${freq} lần`;
+                        document.getElementById('account-summary-revenue').innerText = fmtCurrency(totalRev);
+                        
+                        const prodSpan = document.getElementById('account-summary-products');
+                        prodSpan.innerText = productsText;
+                        prodSpan.setAttribute('title', productsText);
+                        
+                        document.getElementById('account-summary-time').innerText = timeText;
+                        summaryBlock.classList.remove('hidden');
+                    }
+
+                    container.classList.remove('hidden');
+                    filtered.forEach(lead => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50 transition-colors group';
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 text-[11px] font-bold text-slate-400">#${lead.leadId || '-'}</td>
+                            <td class="px-4 py-3 text-sm font-bold text-slate-800">${lead.account || '-'}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600">${lead.fullName || '-'}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500">${lead.email || '-'}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500">${lead.phoneNumber || '-'}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-1 rounded-lg text-[10px] font-black uppercase ${getStatusBadgeClass(lead.status)}">
+                                    ${lead.status || '-'}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm font-medium text-slate-700">${lead.userName || 'Chưa gán'}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500">${lead.createdDate || '-'}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    lucide.createIcons();
+                } catch (error) {
+                    console.error('Error fetching leads for account modal:', error);
+                    loading.classList.add('hidden');
+                    tbody.innerHTML = `<tr><td colspan="8" class="py-12 text-center text-red-500 font-bold">Không thể tải danh sách Lead.</td></tr>`;
+                    container.classList.remove('hidden');
+                }
             }
 
             function getStatusBadgeClass(status) {
