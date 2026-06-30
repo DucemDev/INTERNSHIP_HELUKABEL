@@ -2146,6 +2146,29 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     SalesOwnerDetailResponse getSalesOwnerDetail(
             @Param("userCode") String userCode
     );
+    @Query(value = """
+    SELECT
+
+        ls.source_name AS source,
+
+        ROUND(
+            SUM(l.cost)
+            /
+            COUNT(l.lead_id)
+        ,2) AS avgCostPerLead
+
+    FROM lead l
+
+    INNER JOIN lead_source ls
+        ON l.source_id = ls.source_id
+
+    GROUP BY
+        ls.source_name
+
+    ORDER BY
+        avgCostPerLead DESC
+    """, nativeQuery = true)
+    List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource();
 
     @Query(value = """
             SELECT
