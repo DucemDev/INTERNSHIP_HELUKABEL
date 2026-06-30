@@ -10,11 +10,50 @@
 
     <div class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
         <!-- Dashboard Admin -->
-        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'dashboard' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
-            <a href="/dashboard" class="flex items-center px-4 py-3 font-medium">
-                <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i>
-                <span th:text="#{nav.dashboard}">Dashboard</span>
-            </a>
+        <div sec:authorize="hasRole('Admin')" class="rounded-xl transition-all duration-200">
+            <div th:classappend="${activeMenu == 'dashboard' || activeMenu == 'lead-source-analysis' || activeMenu == 'sales-performance-analysis' || activeMenu == 'customer-analysis' || activeMenu == 'dashboard-test' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl">
+                <div class="flex items-center justify-between px-4 py-3 cursor-pointer" onclick="toggleSubmenu(this.parentElement)">
+                    <div class="flex items-center font-medium">
+                        <i data-lucide="layout-dashboard" class="mr-3 w-5 h-5"></i>
+                        <span th:text="#{nav.dashboard}">Dashboard</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200 arrow-icon" th:classappend="${activeMenu == 'dashboard' || activeMenu == 'lead-source-analysis' || activeMenu == 'sales-performance-analysis' || activeMenu == 'customer-analysis' || activeMenu == 'dashboard-test' ? 'rotate-90' : ''}"></i>
+                </div>
+            </div>
+            
+            <div class="mt-1 ml-4 space-y-1 overflow-hidden transition-all duration-300" 
+                 th:classappend="${activeMenu == 'dashboard' || activeMenu == 'lead-source-analysis' || activeMenu == 'sales-performance-analysis' || activeMenu == 'customer-analysis' || activeMenu == 'dashboard-test' ? '' : 'hidden'}">
+                <a href="/dashboard" 
+                   th:classappend="${activeMenu == 'dashboard' ? 'text-helu-red font-semibold bg-white/60' : 'text-gray-500 hover:text-helu-red'}"
+                   class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
+                    <i data-lucide="pie-chart" class="mr-3 w-4 h-4"></i>
+                    <span>Tổng quan (Overview)</span>
+                </a>
+                <a href="/dashboard/lead-source-analysis" 
+                   th:classappend="${activeMenu == 'lead-source-analysis' ? 'text-helu-red font-semibold bg-white/60' : 'text-gray-500 hover:text-helu-red'}"
+                   class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
+                    <i data-lucide="bar-chart-3" class="mr-3 w-4 h-4"></i>
+                    <span>Lead Source Analysis</span>
+                </a>
+                <a href="/dashboard/sales-performance-analysis" 
+                   th:classappend="${activeMenu == 'sales-performance-analysis' ? 'text-helu-red font-semibold bg-white/60' : 'text-gray-500 hover:text-helu-red'}"
+                   class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
+                    <i data-lucide="line-chart" class="mr-3 w-4 h-4"></i>
+                    <span>Sales Performance</span>
+                </a>
+                <a href="/customer-analysis" 
+                   th:classappend="${activeMenu == 'customer-analysis' ? 'text-helu-red font-semibold bg-white/60' : 'text-gray-500 hover:text-helu-red'}"
+                   class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
+                    <i data-lucide="pie-chart" class="mr-3 w-4 h-4"></i>
+                    <span>Customer Analysis</span>
+                </a>
+                <a href="/dashboard/test" 
+                   th:classappend="${activeMenu == 'dashboard-test' ? 'text-helu-red font-semibold bg-white/60' : 'text-gray-500 hover:text-helu-red'}"
+                   class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
+                    <i data-lucide="flask-conical" class="mr-3 w-4 h-4"></i>
+                    <span>Dashboard Test</span>
+                </a>
+            </div>
         </div>
 
         <!-- Dashboard Seller -->
@@ -24,23 +63,6 @@
                 <span th:text="#{nav.dashboard}">Dashboard</span>
             </a>
         </div>
-
-        <!-- Lead Source Analysis -->
-        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'lead-source-analysis' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
-            <a href="/dashboard/lead-source-analysis" class="flex items-center px-4 py-3 font-medium">
-                <i data-lucide="bar-chart-3" class="mr-3 w-5 h-5"></i>
-                <span>Lead Source Analysis</span>
-            </a>
-        </div>
-
-        <!-- Sales Performance Analysis -->
-        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'sales-performance-analysis' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
-            <a href="/dashboard/sales-performance-analysis" class="flex items-center px-4 py-3 font-medium">
-                <i data-lucide="line-chart" class="mr-3 w-5 h-5"></i>
-                <span>Sales Performance Analysis</span>
-            </a>
-        </div>
-
 
         <!-- Quản lý Lead (Admin) -->
         <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'leads' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
@@ -55,14 +77,6 @@
             <a href="/seller/leads" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="users" class="mr-3 w-5 h-5"></i>
                 <span th:text="#{nav.leads}">Quản lý Lead</span>
-            </a>
-        </div>
-
-        <!-- Customer Analysis -->
-        <div sec:authorize="hasRole('Admin')" th:classappend="${activeMenu == 'customer-analysis' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
-            <a href="/customer-analysis" class="flex items-center px-4 py-3 font-medium">
-                <i data-lucide="pie-chart" class="mr-3 w-5 h-5"></i>
-                <span>Customer Analysis</span>
             </a>
         </div>
         <!-- Nhân sự (Admin) -->
