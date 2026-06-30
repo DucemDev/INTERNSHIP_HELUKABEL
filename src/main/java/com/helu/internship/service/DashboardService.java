@@ -139,7 +139,12 @@ public interface DashboardService {
     List<SalesOwnerBantCompleteRateResponse> getSalesOwnerBantCompleteRate();
     List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore();
     List<LossReasonByProductLineResponse> getLossReasonByProductLine();
+
     List<CustomerValueMatrixResponse> getCustomerValueMatrix();
+
+//    SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
+    List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource();
+
 
     // Retrieves data for Customer Value Matrix chart
     SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
