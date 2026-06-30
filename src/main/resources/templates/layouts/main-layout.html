@@ -53,45 +53,71 @@
     <!-- Floating Chatbot Widget -->
     <div id="floatingChatbotWidget" class="fixed bottom-6 right-6 z-[999]">
         <!-- Trigger Button -->
-        <button id="chatbotTrigger" onclick="toggleFloatingChat()" class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-helu-red to-orange-500 text-white shadow-xl shadow-red-500/30 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer">
-            <i data-lucide="message-circle" class="w-6 h-6"></i>
+        <button id="chatbotTrigger" onclick="toggleFloatingChat()" class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-red-600 to-orange-500 text-white shadow-xl shadow-red-500/40 hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer relative group">
+            <i id="chatbotTriggerIcon" data-lucide="message-square" class="w-6 h-6 transition-all duration-300"></i>
+            <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white"></span>
+            </span>
         </button>
 
         <!-- Chat Window -->
-        <div id="chatbotWindow" class="absolute bottom-20 right-0 hidden w-96 h-[500px] flex-col rounded-3xl border border-helu-border bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-200 overflow-hidden">
+        <div id="chatbotWindow" class="absolute bottom-20 right-0 hidden w-[380px] h-[520px] flex-col rounded-3xl border border-gray-100 bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-300 overflow-hidden">
             <!-- Header -->
-            <div class="flex items-center justify-between bg-gradient-to-r from-[#1a1a1a] to-[#2d2d2d] px-6 py-4 text-white">
+            <div class="flex items-center justify-between bg-gradient-to-r from-gray-900 via-gray-800 to-red-950 px-5 py-4 text-white shadow-md">
                 <div class="flex items-center gap-3">
-                    <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-helu-red font-bold text-xs shadow-md">AI</div>
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-white shadow-md"><i data-lucide="bot" class="w-5 h-5"></i></div>
                     <div>
-                        <span class="block text-xs font-black tracking-wide">HELUKABEL AI Assistant</span>
-                        <span class="block text-[9px] font-medium text-emerald-400">Online • Hỗ trợ 24/7</span>
+                        <span class="block text-xs font-black tracking-wider">HELUKABEL AI Assistant</span>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+                            <span class="text-[9px] font-medium text-emerald-400">Online • Hỗ trợ 24/7</span>
+                        </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1">
                     <a href="/chatbot" class="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white transition-all" title="Mở rộng không gian làm việc">
-                        <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                        <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
                     </a>
                     <button onclick="toggleFloatingChat()" class="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white transition-all">
-                        <i data-lucide="x" class="w-4 h-4"></i>
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Messages List -->
-            <div id="floatingChatMessages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50">
+            <div id="floatingChatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50" style="scroll-behavior: smooth;">
                 <div class="flex gap-2.5 items-start">
-                    <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-helu-red text-[10px] font-bold text-white flex-shrink-0 mt-0.5">AI</div>
-                    <div class="rounded-2xl rounded-tl-none bg-white p-3 border border-helu-border text-xs text-gray-700 max-w-[80%] shadow-sm leading-relaxed font-medium">
-                        Xin chào! Tôi là trợ lý ảo AI. Bạn có thể hỏi tôi bất kỳ thông tin nào về CRM, tiêu chí BANT hoặc dữ liệu khách hàng.
+                    <div class="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-white flex-shrink-0 shadow-md"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div>
+                    <div class="rounded-2xl rounded-tl-none bg-white p-3 border border-gray-100 text-xs text-gray-700 max-w-[80%] shadow-sm leading-relaxed font-medium">
+                        Xin chào! Tôi là trợ lý ảo AI của **HELUKABEL**. Bạn có thể hỏi tôi về tổng quan lead, doanh thu, hiệu suất seller hoặc các dự báo kinh doanh.
                     </div>
                 </div>
             </div>
 
+            <!-- Suggestion Prompt Starters -->
+            <div class="px-4 py-2.5 bg-white border-t border-gray-100 flex gap-1.5 overflow-x-auto whitespace-nowrap" style="ms-overflow-style: none; scrollbar-width: none;">
+                <button onclick="triggerQuickPrompt('Tình hình lead hiện tại?')" class="flex-shrink-0 rounded-full border border-gray-100 bg-gray-50 hover:bg-red-50/20 hover:border-red-200 hover:text-red-600 px-3 py-1.5 text-[10px] text-gray-600 transition-all font-semibold cursor-pointer shadow-sm">
+                    📊 Tổng quan Lead
+                </button>
+                <button onclick="triggerQuickPrompt('Doanh thu theo seller?')" class="flex-shrink-0 rounded-full border border-gray-100 bg-gray-50 hover:bg-red-50/20 hover:border-red-200 hover:text-red-600 px-3 py-1.5 text-[10px] text-gray-600 transition-all font-semibold cursor-pointer shadow-sm">
+                    💰 Doanh thu Seller
+                </button>
+                <button onclick="triggerQuickPrompt('Top 5 lý do Lost phổ biến nhất?')" class="flex-shrink-0 rounded-full border border-gray-100 bg-gray-50 hover:bg-red-50/20 hover:border-red-200 hover:text-red-600 px-3 py-1.5 text-[10px] text-gray-600 transition-all font-semibold cursor-pointer shadow-sm">
+                    ⚠️ Lý do Lost
+                </button>
+                <button onclick="triggerQuickPrompt('Dự đoán doanh thu tháng sau?')" class="flex-shrink-0 rounded-full border border-gray-100 bg-gray-50 hover:bg-red-50/20 hover:border-red-200 hover:text-red-600 px-3 py-1.5 text-[10px] text-gray-600 transition-all font-semibold cursor-pointer shadow-sm">
+                    📈 Dự báo doanh thu
+                </button>
+            </div>
+
             <!-- Input Area -->
-            <div class="p-3 border-t border-helu-border bg-white flex gap-2 items-center">
-                <input type="text" id="floatingChatInput" placeholder="Nhập tin nhắn..." class="flex-1 h-10 px-4 rounded-xl border border-gray-200 outline-none text-xs focus:border-helu-red focus:bg-gray-50/50 transition-all font-medium" onkeydown="handleFloatingChatKey(event)" />
-                <button onclick="sendFloatingChatMessage()" class="flex h-10 w-10 items-center justify-center rounded-xl bg-helu-red text-white hover:bg-red-700 shadow-md shadow-red-200 transition-all active:scale-95 cursor-pointer">
+            <div class="p-3 border-t border-gray-100 bg-white flex gap-2 items-center">
+                <input type="text" id="floatingChatInput" placeholder="Nhập câu hỏi tại đây..." class="flex-1 h-10 px-4 rounded-xl border border-gray-200 outline-none text-xs focus:border-red-500 focus:bg-gray-50/30 focus:ring-1 focus:ring-red-500/20 transition-all font-medium" onkeydown="handleFloatingChatKey(event)" />
+                <button onclick="sendFloatingChatMessage()" class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-200 transition-all active:scale-95 cursor-pointer focus:outline-none">
                     <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -109,11 +135,23 @@
 
         function toggleFloatingChat() {
             const chatWin = document.getElementById('chatbotWindow');
+            const triggerIcon = document.getElementById('chatbotTriggerIcon');
+            
             chatWin.classList.toggle('hidden');
             chatWin.classList.toggle('flex');
+            
             if (chatWin.classList.contains('flex')) {
                 document.getElementById('floatingChatInput').focus();
+                triggerIcon.setAttribute('data-lucide', 'message-square');
+            } else {
+                triggerIcon.setAttribute('data-lucide', 'message-square');
             }
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function triggerQuickPrompt(text) {
+            document.getElementById('floatingChatInput').value = text;
+            sendFloatingChatMessage();
         }
 
         function handleFloatingChatKey(e) {
@@ -161,12 +199,12 @@
             msgEl.className = `flex gap-2.5 items-start ${isUser ? 'flex-row-reverse' : ''}`;
             
             const avatarHtml = isUser 
-                ? `<div class="flex h-6 w-6 items-center justify-center rounded-lg bg-gray-200 text-[10px] font-bold text-gray-600 flex-shrink-0 mt-0.5">U</div>`
-                : `<div class="flex h-6 w-6 items-center justify-center rounded-lg bg-helu-red text-[10px] font-bold text-white flex-shrink-0 mt-0.5">AI</div>`;
+                ? `<div class="flex h-7 w-7 items-center justify-center rounded-xl bg-gray-100 text-gray-500 flex-shrink-0 shadow-sm border border-gray-200/50"><i data-lucide="user" class="w-3.5 h-3.5"></i></div>`
+                : `<div class="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-white flex-shrink-0 shadow-md"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div>`;
 
             const bgClass = isUser 
-                ? 'bg-helu-red text-white rounded-tr-none' 
-                : 'bg-white text-gray-700 border border-helu-border rounded-tl-none';
+                ? 'bg-gradient-to-br from-red-600 to-red-700 text-white rounded-tr-none shadow-md shadow-red-500/10' 
+                : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none shadow-sm';
 
             // Convert markdown style linebreaks/bold
             let formattedText = text
@@ -175,13 +213,14 @@
 
             msgEl.innerHTML = `
                 ${avatarHtml}
-                <div class="rounded-2xl ${bgClass} p-3 text-xs max-w-[80%] shadow-sm leading-relaxed font-medium">
+                <div class="rounded-2xl ${bgClass} p-3 text-xs max-w-[80%] leading-relaxed font-medium">
                     ${formattedText}
                 </div>
             `;
 
             container.appendChild(msgEl);
             container.scrollTop = container.scrollHeight;
+            if (window.lucide) lucide.createIcons();
         }
 
         function appendFloatingTyping() {
@@ -191,8 +230,8 @@
             msgEl.id = typingId;
             msgEl.className = 'flex gap-2.5 items-start';
             msgEl.innerHTML = `
-                <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-helu-red text-[10px] font-bold text-white flex-shrink-0 mt-0.5">AI</div>
-                <div class="rounded-2xl rounded-tl-none bg-white p-3 border border-helu-border text-xs text-gray-500 max-w-[80%] shadow-sm flex items-center gap-1">
+                <div class="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-white flex-shrink-0 shadow-md"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div>
+                <div class="rounded-2xl rounded-tl-none bg-white p-3 border border-gray-100 text-xs text-gray-400 max-w-[80%] shadow-sm flex items-center gap-1.5 font-medium">
                     <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.1s"></span>
                     <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.2s"></span>
                     <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.3s"></span>
@@ -200,6 +239,7 @@
             `;
             container.appendChild(msgEl);
             container.scrollTop = container.scrollHeight;
+            if (window.lucide) lucide.createIcons();
             return typingId;
         }
 
