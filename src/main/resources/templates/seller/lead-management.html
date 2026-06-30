@@ -80,15 +80,15 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left" id="leadsTable">
                 <thead>
-                <tr class="border-b border-gray-100 bg-gray-50/50">
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400 w-16 text-center">STT</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Mã Lead</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Khách hàng</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Phân loại BANT</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Điểm số chi tiết</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Nguồn / Dòng sản phẩm</th>
-                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10">Thao tác</th>
+                <tr class="border-b border-gray-100" style="background-color: #fafafa;">
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b] w-16 text-center">STT</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Mã Lead</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Khách hàng</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Trạng thái</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Phân loại BANT</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Điểm số chi tiết</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Nguồn / Dòng sản phẩm</th>
+                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-[#52525b] pr-10">Thao tác</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -96,13 +96,19 @@
                 </tbody>
             </table>
         </div>
-        <!-- Record Count and Pagination -->
-        <div class="flex items-center justify-between border-t border-gray-100 bg-white px-6 py-4">
+        <!-- Record Count & Pagination -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-100 bg-transparent px-6 py-4">
             <div class="text-sm font-medium text-gray-500" id="recordCount">
                 Hiển thị 0/0 bản ghi
             </div>
             <div class="flex items-center gap-2" id="paginationControls">
-                <!-- Pagination buttons generated via JS -->
+                <button id="prevBtn" onclick="changePage(currentPage - 1)" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Trước
+                </button>
+                <span class="text-xs font-bold text-gray-600 px-2" id="pageInfo">Trang 1 / 1</span>
+                <button id="nextBtn" onclick="changePage(currentPage + 1)" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    Sau <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -324,9 +330,9 @@
                 currentPage = 1;
             }
 
-            const startIndex = (currentPage - 1) * pageSize;
-            const endIndex = startIndex + pageSize;
-            const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = startIdx + pageSize;
+            const paginatedLeads = filteredLeads.slice(startIdx, endIdx);
 
             if (paginatedLeads.length === 0) {
                 tbody.innerHTML = `
@@ -337,6 +343,9 @@
                     </tr>
                 `;
                 document.getElementById('recordCount').innerText = 'Hiển thị 0/0 bản ghi';
+                document.getElementById('prevBtn').disabled = true;
+                document.getElementById('nextBtn').disabled = true;
+                document.getElementById('pageInfo').innerText = 'Trang 1 / 1';
                 document.getElementById('paginationControls').innerHTML = '';
                 return;
             }
@@ -364,7 +373,7 @@
 
                 tr.innerHTML = `
                     <td class="py-4 px-6 text-center font-semibold text-gray-500 text-xs">
-                        ${(currentPage - 1) * pageSize + index + 1}
+                        ${startIdx + index + 1}
                     </td>
                     <td class="py-4 px-6">
                         <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">${lead.leadId}</span>
@@ -390,8 +399,8 @@
                                 <span>BANT Score</span>
                                 <span>${totalBant}/100</span>
                             </div>
-                            <div class="w-full bg-gray-100 rounded-full h-1 overflow-hidden">
-                                <div class="h-full rounded-full ${lead.leadHeat === 'HOT' ? 'bg-red-500' : lead.leadHeat === 'WARM' ? 'bg-amber-400' : 'bg-slate-400'}" style="width: ${totalBant}%"></div>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="h-full rounded-full ${lead.leadHeat === 'HOT' ? 'bg-[#f6171b]' : lead.leadHeat === 'WARM' ? 'bg-amber-400' : 'bg-slate-400'}" style="width: ${totalBant}%"></div>
                             </div>
                             <div class="flex gap-1.5 text-[8px] font-bold text-gray-400 mt-0.5">
                                 <span>B: ${lead.bantBudget || 0}</span>
@@ -409,7 +418,7 @@
                         <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onclick="viewDetail('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Xem chi tiết">
                                 <i data-lucide="eye" class="w-4 h-4"></i>
-                            </button>
+                   </button>
                             <button onclick="openBantModal('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-helu-red transition-all" title="Đánh giá BANT">
                                 <i data-lucide="sliders" class="w-4 h-4"></i>
                             </button>
@@ -422,57 +431,10 @@
                 tbody.appendChild(tr);
             });
 
-            const startRecord = startIndex + 1;
-            const endRecord = Math.min(endIndex, totalRecords);
-            document.getElementById('recordCount').innerText = `Hiển thị ${startRecord}-${endRecord}/${totalRecords} bản ghi (Tổng ${allLeads.length})`;
-
-            // Render pagination buttons
-            const paginationControls = document.getElementById('paginationControls');
-            paginationControls.innerHTML = '';
-            if (totalPages > 1) {
-                // Previous Button
-                const prevBtn = document.createElement('button');
-                prevBtn.type = 'button';
-                prevBtn.className = `rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 hover:text-helu-red transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`;
-                prevBtn.innerText = 'Trước';
-                if (currentPage > 1) {
-                    prevBtn.onclick = () => { currentPage--; renderLeads(); };
-                }
-                paginationControls.appendChild(prevBtn);
-                // Current Page Input Container (Middle)
-                const pageContainer = document.createElement('div');
-                pageContainer.className = 'flex items-center gap-1.5 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm';
-                pageContainer.innerHTML = `
-                    <span>Trang</span>
-                    <input type="number" id="pageInput" min="1" max="${totalPages}" value="${currentPage}" class="w-12 h-7 text-center border border-gray-300 rounded-lg focus:border-helu-red outline-none bg-white font-black" />
-                    <span>/ ${totalPages}</span>
-                `;
-                paginationControls.appendChild(pageContainer);
-
-                const pageInput = pageContainer.querySelector('#pageInput');
-                pageInput.onchange = (e) => {
-                    let val = parseInt(e.target.value);
-                    if (isNaN(val) || val < 1) val = 1;
-                    if (val > totalPages) val = totalPages;
-                    currentPage = val;
-                    renderLeads();
-                };
-                pageInput.onkeydown = (e) => {
-                    if (e.key === 'Enter') {
-                        pageInput.blur();
-                    }
-                };
-
-                // Next Button
-                const nextBtn = document.createElement('button');
-                nextBtn.type = 'button';
-                nextBtn.className = `rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 hover:text-helu-red transition-all ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`;
-                nextBtn.innerText = 'Sau';
-                if (currentPage < totalPages) {
-                    nextBtn.onclick = () => { currentPage++; renderLeads(); };
-                }
-                paginationControls.appendChild(nextBtn);
-            }
+            document.getElementById('recordCount').innerText = `Hiển thị ${startIdx + 1}-${Math.min(endIdx, totalRecords)}/${totalRecords} bản ghi`;
+            document.getElementById('pageInfo').innerText = `Trang ${currentPage} / ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
             lucide.createIcons();
         }
 
@@ -627,7 +589,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchLeads();
-            
+
             // Auto-shrinking text logic for long numbers
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {

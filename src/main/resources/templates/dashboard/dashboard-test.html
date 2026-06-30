@@ -1,32 +1,21 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::div.dashboard-test-container})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
-    <div class="dashboard-test-container space-y-8 p-4 md:p-6 bg-slate-50 min-h-screen">
+    <main class="space-y-8">
         <div id="debug-error-log" class="text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-100 hidden"></div>
         
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-black text-slate-800 tracking-tight">Advanced Analytics & Lost Deal Reports</h1>
-                <p class="text-slate-500 font-medium">Báo cáo trực quan hóa các API phân tích nâng cao và phân tích lý do thất bại.</p>
-            </div>
-            <button onclick="refreshTestData()" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm">
-                <i data-lucide="refresh-cw" class="w-4 h-4" id="refresh-test-icon"></i>
-                <span>Làm mới dữ liệu</span>
-            </button>
-        </div>
 
         <!-- Section 1: Lost Deals Analysis -->
         <div class="space-y-6">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-red-600 rounded-full"></span>
-                    <span>1. Phân tích Lead thất bại (Lost Leads Analysis)</span>
+                    <span>Phân tích Lead thất bại (Lost Leads Analysis)</span>
                 </h2>
                 
                 <!-- Category Select Tabs for Lost Analysis -->
                 <div class="flex flex-wrap gap-1.5" id="lostCategoryTabs">
-                    <button onclick="switchLostCategory('reasons')" id="lost-tab-reasons" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm active-tab">
+                    <button onclick="switchLostCategory('reasons')" id="lost-tab-reasons" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-helu-red text-white bg-helu-red hover:bg-red-700 shadow-sm shadow-red-500/10">
                         Theo Lý Do (/lost-reasons)
                     </button>
                     <button onclick="switchLostCategory('seller')" id="lost-tab-seller" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
@@ -56,11 +45,11 @@
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-600 rounded-full"></span>
-                    <span>2. Phân khúc doanh số thực tế (Revenue Segmentations)</span>
+                    <span>Phân khúc doanh số thực tế (Revenue Segmentations)</span>
                 </h2>
                 
                 <div class="flex flex-wrap gap-1.5" id="revenueSegmentTabs">
-                    <button onclick="switchRevenueSegment('industry')" id="rev-tab-industry" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm active-tab">
+                    <button onclick="switchRevenueSegment('industry')" id="rev-tab-industry" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-helu-red text-white bg-helu-red hover:bg-red-700 shadow-sm shadow-red-500/10">
                         Theo Ngành nghề (/revenue-industry)
                     </button>
                     <button onclick="switchRevenueSegment('region')" id="rev-tab-region" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
@@ -83,7 +72,7 @@
         <div class="space-y-6 pt-4">
             <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <span class="w-1.5 h-5 bg-indigo-600 rounded-full"></span>
-                <span>3. Xu hướng lịch sử doanh số & leads (Monthly & Quarterly Historical Trends)</span>
+                <span>Xu hướng lịch sử doanh số & leads (Monthly & Quarterly Historical Trends)</span>
             </h2>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -126,11 +115,11 @@
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-purple-600 rounded-full"></span>
-                    <span>4. Xu hướng doanh thu chi tiết qua từng tháng (Monthly Categories Trends)</span>
+                    <span>Xu hướng doanh thu chi tiết qua từng tháng (Monthly Categories Trends)</span>
                 </h2>
                 
                 <div class="flex flex-wrap gap-1.5" id="monthlyTrendTabs">
-                    <button onclick="switchMonthlyTrendCategory('source')" id="tab-source" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm active-tab">
+                    <button onclick="switchMonthlyTrendCategory('source')" id="tab-source" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-helu-red text-white bg-helu-red hover:bg-red-700 shadow-sm shadow-red-500/10">
                         Theo Nguồn (/revenue-source-monthly)
                     </button>
                     <button onclick="switchMonthlyTrendCategory('region')" id="tab-region" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
@@ -152,14 +141,7 @@
             </div>
         </div>
 
-        <!-- Styles for tabs -->
-        <style>
-            .active-tab {
-                background-color: #ef4444 !important;
-                color: #ffffff !important;
-                border-color: #ef4444 !important;
-            }
-        </style>
+
 
         <!-- JavaScript Libraries -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -208,8 +190,15 @@
             function switchLostCategory(category) {
                 currentLostCategory = category;
                 const buttons = document.querySelectorAll('#lostCategoryTabs button');
-                buttons.forEach(btn => btn.classList.remove('active-tab'));
-                document.getElementById('lost-tab-' + category).classList.add('active-tab');
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                    btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                });
+                const activeBtn = document.getElementById('lost-tab-' + category);
+                if (activeBtn) {
+                    activeBtn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                    activeBtn.classList.add('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                }
                 loadLostAnalysis();
             }
 
@@ -294,8 +283,15 @@
             function switchRevenueSegment(segment) {
                 currentRevenueSegment = segment;
                 const buttons = document.querySelectorAll('#revenueSegmentTabs button');
-                buttons.forEach(btn => btn.classList.remove('active-tab'));
-                document.getElementById('rev-tab-' + segment).classList.add('active-tab');
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                    btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                });
+                const activeBtn = document.getElementById('rev-tab-' + segment);
+                if (activeBtn) {
+                    activeBtn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                    activeBtn.classList.add('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                }
                 loadRevenueSegment();
             }
 
@@ -569,8 +565,15 @@
             function switchMonthlyTrendCategory(category) {
                 currentMonthlyTrendCategory = category;
                 const buttons = document.querySelectorAll('#monthlyTrendTabs button');
-                buttons.forEach(btn => btn.classList.remove('active-tab'));
-                document.getElementById('tab-' + category).classList.add('active-tab');
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                    btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                });
+                const activeBtn = document.getElementById('tab-' + category);
+                if (activeBtn) {
+                    activeBtn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                    activeBtn.classList.add('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                }
                 loadMonthlyCategoryTrends();
             }
 
@@ -710,6 +713,6 @@
                 }
             }
         </script>
-    </div>
+    </main>
 </body>
 </html>

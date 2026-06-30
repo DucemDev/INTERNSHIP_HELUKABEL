@@ -1,24 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::div.lead-analysis-container})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
-    <div class="lead-analysis-container space-y-8 p-4 md:p-6 bg-slate-50 min-h-screen relative">
+    <main class="space-y-8">
         <!-- Dot Matrix Background Overlay -->
         <div class="absolute inset-0 pointer-events-none opacity-[0.4]" style="background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1.2px, transparent 1.2px); background-size: 24px 24px;"></div>
 
         <!-- Notification / Error log for debugging -->
         <div id="debug-error-log" class="text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-100 hidden relative z-10"></div>
         
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-            <div>
-                <h1 class="text-2xl font-black text-slate-800 tracking-tight text-[#0f0f11]">Lead Source Analysis</h1>
-                <p class="text-slate-500 font-medium">Báo cáo trực quan hóa hiệu quả và ROI của các nguồn lead.</p>
-            </div>
-            <button onclick="reloadData()" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-lg hover:bg-slate-50 transition-all shadow-sm">
-                <i data-lucide="refresh-cw" class="w-4 h-4" id="refresh-icon"></i>
-                <span>Làm mới dữ liệu</span>
-            </button>
-        </div>
+
 
         <!-- ROW 1: KPI CARDS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 relative z-10">
@@ -783,6 +773,6 @@
             }, 200);
         }
     </script>
-    </div>
+    </main>
 </body>
 </html>
