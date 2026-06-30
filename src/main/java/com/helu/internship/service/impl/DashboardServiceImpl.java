@@ -426,6 +426,10 @@ public class DashboardServiceImpl implements DashboardService {
     public SalesOwnerDetailResponse getSalesOwnerDetail(String userCode) {
         return leadRepo.getSalesOwnerDetail(userCode);
     }
+    @Override
+    public List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource() {
+        return leadRepo.getAvgCostPerLeadBySource();
+    }
 
 
 

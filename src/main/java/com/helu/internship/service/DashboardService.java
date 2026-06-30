@@ -129,5 +129,6 @@ public interface DashboardService {
     List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore();
     List<LossReasonByProductLineResponse> getLossReasonByProductLine();
     SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
+    List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource();
 
 }

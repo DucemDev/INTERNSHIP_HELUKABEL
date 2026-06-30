@@ -451,6 +451,11 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
     ) {
         return dashboardService.getSalesOwnerDetail(userCode);
     }
+    // trung bình tiền chi cho mỗi lead
+    @GetMapping("/source/avg-cost-per-lead")
+    public List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource() {
+        return dashboardService.getAvgCostPerLeadBySource();
+    }
 
 
 
