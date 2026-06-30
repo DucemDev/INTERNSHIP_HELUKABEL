@@ -611,7 +611,6 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 SUM(l.business_result) AS revenue
             FROM lead l
             WHERE l.status = 'Won'
-              AND (:year IS NULL OR YEAR(l.created_date) = :year)
             GROUP BY
                 YEAR(l.created_date),
                 DATEPART(QUARTER, l.created_date)
@@ -678,7 +677,6 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 ) AS lostLead
             
             FROM lead l
-            WHERE (:year IS NULL OR YEAR(l.created_date) = :year)
             GROUP BY
                 YEAR(l.created_date),
                 DATEPART(QUARTER, l.created_date)
@@ -861,13 +859,15 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     @Query(value = """
                 SELECT
                     p.product_name AS productName,
-                    ls.source_name AS sourceName,
-                    COUNT(l.lead_id) AS totalLead
+                    ls.source_name AS leadSource,
+                    COUNT(DISTINCT l.lead_id) AS totalLead
                 FROM lead l
-                JOIN product p
-                    ON l.product_id = p.product_id
                 JOIN lead_source ls
                     ON l.source_id = ls.source_id
+                JOIN lead_item li
+                    ON l.lead_id = li.lead_id
+                JOIN product p
+                    ON li.product_id = p.product_id
                 GROUP BY
                     p.product_name,
                     ls.source_name
@@ -1869,7 +1869,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                     DATEDIFF(
                         DAY,
                         l.created_date,
-                        h.wonDate
+                        ISNULL(h.wonDate, l.created_date)
                     ) AS FLOAT
                 )
             ),
@@ -1879,9 +1879,9 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     FROM lead l
 
     INNER JOIN [user] u
-        ON l.user_id = u.user_id
+        ON LOWER(l.user_id) = LOWER(CAST(u.user_id AS VARCHAR(36)))
 
-    INNER JOIN (
+    LEFT JOIN (
 
         SELECT
             lead_id,
@@ -1922,7 +1922,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                     DATEDIFF(
                         DAY,
                         l.created_date,
-                        h.wonDate
+                        ISNULL(h.wonDate, l.created_date)
                     ) AS FLOAT
                 )
             ),
@@ -1932,9 +1932,9 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     FROM lead l
 
     INNER JOIN [user] u
-        ON l.user_id = u.user_id
+        ON LOWER(l.user_id) = LOWER(CAST(u.user_id AS VARCHAR(36)))
 
-    INNER JOIN (
+    LEFT JOIN (
 
         SELECT
             lead_id,
@@ -2141,7 +2141,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     ) h
         ON l.lead_id = h.lead_id
 
-    WHERE u.user_code = :userCode
+    WHERE u.user_code = :userCode OR CAST(u.user_id AS VARCHAR(36)) = :userCode
     """, nativeQuery = true)
     SalesOwnerDetailResponse getSalesOwnerDetail(
             @Param("userCode") String userCode
