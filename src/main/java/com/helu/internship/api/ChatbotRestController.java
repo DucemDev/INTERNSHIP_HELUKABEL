@@ -1,26 +1,65 @@
 package com.helu.internship.api;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.client.RestTemplate;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controller handling CRM Chatbot requests.
+ * Acts as a secure proxy to the FastAPI AI service, with an automatic
+ * fallback to static mock responses if the Python service is offline.
+ */
 @RestController
 @RequestMapping("/api/chatbot")
 public class ChatbotRestController {
 
+    private final RestTemplate restTemplate = new RestTemplate();
+    private static final String FASTAPI_URL = "http://localhost:8000/ask";
+
     @PostMapping
     public ResponseEntity<Map<String, String>> handleChat(@RequestBody Map<String, String> payload, Principal principal) {
-        String userEmail = principal != null ? principal.getName() : "User";
         String message = payload.getOrDefault("message", "").trim();
         String responseText = "";
 
+        if (message.isEmpty()) {
+            Map<String, String> response = new HashMap<>();
+            response.put("response", "Vui lòng nhập câu hỏi của bạn.");
+            return ResponseEntity.ok(response);
+        }
+
+        // Try calling the Python FastAPI Chatbot Service
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer HeluBackendSecretToken");
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("question", message);
+
+            HttpEntity<Map<String, String>> entity = new HttpEntity<>(requestBody, headers);
+            
+            @SuppressWarnings("unchecked")
+            ResponseEntity<Map> apiResponse = restTemplate.postForEntity(FASTAPI_URL, entity, Map.class);
+            
+            if (apiResponse.getStatusCode() == HttpStatus.OK && apiResponse.getBody() != null) {
+                String answer = (String) apiResponse.getBody().get("answer");
+                if (answer != null && !answer.trim().isEmpty()) {
+                    Map<String, String> response = new HashMap<>();
+                    response.put("response", answer);
+                    return ResponseEntity.ok(response);
+                }
+            }
+        } catch (Exception e) {
+            // Log that we are falling back to mock response
+            System.err.println("FastAPI chatbot offline or returned error: " + e.getMessage() + ". Falling back to static mock.");
+        }
+
+        // Fallback to static mock responses if Python service is down
         String msgLower = message.toLowerCase();
-        if (msgLower.isEmpty()) {
-            responseText = "Vui lòng nhập câu hỏi của bạn.";
-        } else if (msgLower.contains("hello") || msgLower.contains("hi") || msgLower.contains("chào") || msgLower.contains("xin chào")) {
+        if (msgLower.contains("hello") || msgLower.contains("hi") || msgLower.contains("chào") || msgLower.contains("xin chào")) {
             responseText = "Xin chào! Tôi là **Trợ lý AI HELUKABEL**. Tôi ở đây để hỗ trợ bạn khai thác dữ liệu khách hàng, phân tích tiêu chí BANT, và tối ưu hóa hiệu suất bán hàng. Hôm nay bạn cần tôi trợ giúp gì?";
         } else if (msgLower.contains("bant")) {
             responseText = "Hệ thống HELUKABEL CRM chấm điểm **BANT** theo 4 tiêu chí:\n" +

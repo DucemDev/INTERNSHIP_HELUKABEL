@@ -14,46 +14,13 @@
         </div>
     </div>
 
-    <!-- Main Workspace Grid -->
+    <!-- Main Workspace Area (Full Width, Col Span 4) -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-220px)] min-h-[500px]">
-        
-        <!-- Sidebar: Chat History Sessions (1/4 col) -->
-        <div class="lg:col-span-1 rounded-3xl border border-helu-border bg-white p-5 flex flex-col h-full shadow-sm overflow-hidden">
-            <!-- New Chat Button -->
-            <button onclick="startNewChatSession()" class="w-full flex items-center justify-center gap-2 rounded-xl bg-helu-red hover:bg-red-700 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 transition-all duration-200 cursor-pointer active:scale-95">
-                <i data-lucide="plus" class="w-4 h-4"></i> Cuộc hội thoại mới
-            </button>
-
-            <!-- Divider -->
-            <div class="my-4 h-[1px] bg-gray-100"></div>
-
-            <!-- Scrollable Chat List -->
-            <div class="flex-1 overflow-y-auto space-y-2 pr-1" id="chatSessionList">
-                <div onclick="switchSession(this)" class="p-3 rounded-xl hover:bg-gray-50 text-xs font-semibold text-gray-700 cursor-pointer bg-red-50/50 border border-red-100/50 text-helu-red transition-all flex items-center gap-2">
-                    <i data-lucide="message-square" class="w-4 h-4 flex-shrink-0"></i>
-                    <span class="truncate flex-1">Phân tích BANT & Nhiệt độ Lead</span>
-                </div>
-                <div onclick="switchSession(this)" class="p-3 rounded-xl hover:bg-gray-50 text-xs font-semibold text-gray-500 cursor-pointer transition-all flex items-center gap-2">
-                    <i data-lucide="message-square" class="w-4 h-4 flex-shrink-0"></i>
-                    <span class="truncate flex-1">Cách tối ưu hóa tỷ lệ Lost Lead</span>
-                </div>
-                <div onclick="switchSession(this)" class="p-3 rounded-xl hover:bg-gray-50 text-xs font-semibold text-gray-500 cursor-pointer transition-all flex items-center gap-2">
-                    <i data-lucide="message-square" class="w-4 h-4 flex-shrink-0"></i>
-                    <span class="truncate flex-1">Tra cứu doanh thu từ nguồn Direct</span>
-                </div>
-            </div>
-            
-            <div class="text-[10px] text-gray-400 text-center mt-3 border-t border-gray-100 pt-3 font-semibold">
-                Dữ liệu đồng bộ với HELUKABEL CRM
-            </div>
-        </div>
-
-        <!-- Chat Workspace Area (3/4 col) -->
-        <div class="lg:col-span-3 rounded-3xl border border-helu-border bg-white flex flex-col h-full shadow-sm overflow-hidden">
+        <div class="lg:col-span-4 rounded-3xl border border-helu-border bg-white p-0 flex flex-col h-full shadow-sm overflow-hidden">
             <!-- Workspace Header -->
             <div class="px-6 py-4 border-b border-helu-border flex items-center justify-between bg-gray-50/50">
                 <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-helu-red to-orange-500 font-extrabold text-white shadow-md shadow-red-200">AI</div>
+                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-red-600 to-orange-500 font-extrabold text-white shadow-md shadow-red-200">AI</div>
                     <div>
                         <h2 class="text-sm font-extrabold text-gray-800 tracking-tight" id="activeSessionTitle">Phân tích BANT & Nhiệt độ Lead</h2>
                         <p class="text-[10px] font-medium text-emerald-500">Mô hình AI HELU-LLM v1.2 đang sẵn sàng</p>
@@ -115,155 +82,122 @@
                 </div>
             </div>
         </div>
-
     </div>
-</div>
 
-<script th:inline="javascript">
-    // Helper to press enter to submit
-    function handleWorkspaceKey(e) {
-        if (e.key === 'Enter') {
+    <!-- Script moved inside the main content div so it's not discarded by Thymeleaf replacement -->
+    <script th:inline="javascript">
+        // Helper to press enter to submit
+        function handleWorkspaceKey(e) {
+            if (e.key === 'Enter') {
+                sendWorkspaceMessage();
+            }
+        }
+
+        // Trigger prompt starter
+        function triggerSuggestedPrompt(btn) {
+            const text = btn.innerText.trim();
+            document.getElementById('workspaceChatInput').value = text;
             sendWorkspaceMessage();
         }
-    }
 
-    // Trigger prompt starter
-    function triggerSuggestedPrompt(btn) {
-        const text = btn.innerText.trim();
-        document.getElementById('workspaceChatInput').value = text;
-        sendWorkspaceMessage();
-    }
-
-    // Clear history
-    function clearChatWorkspace() {
-        const container = document.getElementById('workspaceChatMessages');
-        container.innerHTML = `
-            <div class="flex gap-4 items-start max-w-[85%]">
-                <div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-helu-red text-xs font-bold text-white flex-shrink-0 shadow-md">AI</div>
-                <div class="rounded-3xl rounded-tl-none bg-white p-4 border border-helu-border text-xs text-gray-700 shadow-sm leading-relaxed font-medium">
-                    Lịch sử trò chuyện đã được làm sạch. Tôi có thể giúp gì tiếp cho bạn?
+        // Clear history
+        function clearChatWorkspace() {
+            const container = document.getElementById('workspaceChatMessages');
+            container.innerHTML = `
+                <div class="flex gap-4 items-start max-w-[85%]">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-helu-red text-xs font-bold text-white flex-shrink-0 shadow-md">AI</div>
+                    <div class="rounded-3xl rounded-tl-none bg-white p-4 border border-helu-border text-xs text-gray-700 shadow-sm leading-relaxed font-medium">
+                        Lịch sử trò chuyện đã được làm sạch. Tôi có thể giúp gì tiếp cho bạn?
+                    </div>
                 </div>
-            </div>
-        `;
-    }
+            `;
+        }
 
-    // Send workspace message
-    async function sendWorkspaceMessage() {
-        const input = document.getElementById('workspaceChatInput');
-        const message = input.value.trim();
-        if (!message) return;
+        // Send workspace message
+        async function sendWorkspaceMessage() {
+            const input = document.getElementById('workspaceChatInput');
+            const message = input.value.trim();
+            if (!message) return;
 
-        input.value = '';
-        appendWorkspaceMessage(message, true);
+            input.value = '';
+            appendWorkspaceMessage(message, true);
 
-        // Typing indicator
-        const typingId = appendWorkspaceTyping();
+            // Typing indicator
+            const typingId = appendWorkspaceTyping();
 
-        try {
-            const response = await fetch('/api/chatbot', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message })
-            });
+            try {
+                const response = await fetch('/api/chatbot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
 
-            document.getElementById(typingId)?.remove();
+                document.getElementById(typingId)?.remove();
 
-            if (response.ok) {
-                const data = await response.json();
-                appendWorkspaceMessage(data.response, false);
-            } else {
-                appendWorkspaceMessage("Đã xảy ra lỗi khi trao đổi với trợ lý ảo.", false);
+                if (response.ok) {
+                    const data = await response.json();
+                    appendWorkspaceMessage(data.response, false);
+                } else {
+                    appendWorkspaceMessage("Đã xảy ra lỗi khi trao đổi với trợ lý ảo.", false);
+                }
+            } catch (err) {
+                document.getElementById(typingId)?.remove();
+                console.error("Chat error:", err);
+                appendWorkspaceMessage("Lỗi kết nối tới hệ thống AI.", false);
             }
-        } catch (err) {
-            document.getElementById(typingId)?.remove();
-            console.error("Chat error:", err);
-            appendWorkspaceMessage("Lỗi kết nối tới hệ thống AI.", false);
-        }
-    }
-
-    // Switch chat history session
-    function switchSession(div) {
-        // Remove active class from all sessions
-        const sessions = document.getElementById('chatSessionList').children;
-        for (let s of sessions) {
-            s.className = "p-3 rounded-xl hover:bg-gray-50 text-xs font-semibold text-gray-500 cursor-pointer transition-all flex items-center gap-2";
-            s.querySelector('svg')?.setAttribute('class', 'w-4 h-4 flex-shrink-0 text-gray-400');
         }
 
-        // Add active classes
-        div.className = "p-3 rounded-xl hover:bg-gray-50 text-xs font-semibold text-gray-700 cursor-pointer bg-red-50/50 border border-red-100/50 text-helu-red transition-all flex items-center gap-2";
-        div.querySelector('svg')?.setAttribute('class', 'w-4 h-4 flex-shrink-0 text-helu-red');
+        function appendWorkspaceMessage(text, isUser) {
+            const container = document.getElementById('workspaceChatMessages');
+            const msgEl = document.createElement('div');
+            msgEl.className = `flex gap-4 items-start max-w-[85%] ${isUser ? 'flex-row-reverse ml-auto' : ''}`;
+            
+            const avatarHtml = isUser 
+                ? `<div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-gray-200 text-xs font-bold text-gray-600 flex-shrink-0 shadow-md">U</div>`
+                : `<div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-helu-red text-xs font-bold text-white flex-shrink-0 shadow-md">AI</div>`;
 
-        const title = div.querySelector('span').innerText;
-        document.getElementById('activeSessionTitle').innerText = title;
+            const bgClass = isUser 
+                ? 'bg-helu-red text-white rounded-tr-none' 
+                : 'bg-white text-gray-700 border border-helu-border rounded-tl-none';
 
-        // Reset conversation
-        clearChatWorkspace();
-    }
+            // Convert markdown style linebreaks/bold
+            let formattedText = text
+                .replace(/\n/g, '<br/>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-    // Start a new session
-    function startNewChatSession() {
-        const list = document.getElementById('chatSessionList');
-        const newSessionDiv = document.createElement('div');
-        newSessionDiv.onclick = function() { switchSession(this); };
-        newSessionDiv.className = "p-3 rounded-xl hover:bg-gray-50 text-xs font-semibold text-gray-500 cursor-pointer transition-all flex items-center gap-2";
-        newSessionDiv.innerHTML = `
-            <i data-lucide="message-square" class="w-4 h-4 flex-shrink-0"></i>
-            <span class="truncate flex-1">Cuộc trò chuyện mới #${list.children.length + 1}</span>
-        `;
-        list.insertBefore(newSessionDiv, list.firstChild);
-        lucide.createIcons();
+            msgEl.innerHTML = `
+                ${avatarHtml}
+                <div class="rounded-3xl ${bgClass} p-4 text-xs shadow-sm leading-relaxed font-medium">
+                    ${formattedText}
+                </div>
+            `;
 
-        switchSession(newSessionDiv);
-    }
+            container.appendChild(msgEl);
+            container.scrollTop = container.scrollHeight;
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
 
-    function appendWorkspaceMessage(text, isUser) {
-        const container = document.getElementById('workspaceChatMessages');
-        const msgEl = document.createElement('div');
-        msgEl.className = `flex gap-4 items-start max-w-[85%] ${isUser ? 'flex-row-reverse ml-auto' : ''}`;
-        
-        const avatarHtml = isUser 
-            ? `<div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-gray-200 text-xs font-bold text-gray-600 flex-shrink-0 shadow-md">U</div>`
-            : `<div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-helu-red text-xs font-bold text-white flex-shrink-0 shadow-md">AI</div>`;
-
-        const bgClass = isUser 
-            ? 'bg-helu-red text-white rounded-tr-none' 
-            : 'bg-white text-gray-700 border border-helu-border rounded-tl-none';
-
-        // Convert markdown style linebreaks/bold
-        let formattedText = text
-            .replace(/\n/g, '<br/>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-        msgEl.innerHTML = `
-            ${avatarHtml}
-            <div class="rounded-3xl ${bgClass} p-4 text-xs shadow-sm leading-relaxed font-medium">
-                ${formattedText}
-            </div>
-        `;
-
-        container.appendChild(msgEl);
-        container.scrollTop = container.scrollHeight;
-    }
-
-    function appendWorkspaceTyping() {
-        const container = document.getElementById('workspaceChatMessages');
-        const typingId = 'typing-' + Date.now();
-        const msgEl = document.createElement('div');
-        msgEl.id = typingId;
-        msgEl.className = 'flex gap-4 items-start max-w-[85%]';
-        msgEl.innerHTML = `
-            <div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-helu-red text-xs font-bold text-white flex-shrink-0 shadow-md">AI</div>
-            <div class="rounded-3xl rounded-tl-none bg-white p-4 border border-helu-border text-xs text-gray-500 shadow-sm flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.1s"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.2s"></span>
-                <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.3s"></span>
-            </div>
-        `;
-        container.appendChild(msgEl);
-        container.scrollTop = container.scrollHeight;
-        return typingId;
-    }
-</script>
+        function appendWorkspaceTyping() {
+            const container = document.getElementById('workspaceChatMessages');
+            const typingId = 'typing-' + Date.now();
+            const msgEl = document.createElement('div');
+            msgEl.id = typingId;
+            msgEl.className = 'flex gap-4 items-start max-w-[85%]';
+            msgEl.innerHTML = `
+                <div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-helu-red text-xs font-bold text-white flex-shrink-0 shadow-md">AI</div>
+                <div class="rounded-3xl rounded-tl-none bg-white p-4 border border-helu-border text-xs text-gray-500 shadow-sm flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.1s"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.2s"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.3s"></span>
+                </div>
+            `;
+            container.appendChild(msgEl);
+            container.scrollTop = container.scrollHeight;
+            return typingId;
+        }
+    </script>
+</div>
 </body>
 </html>
