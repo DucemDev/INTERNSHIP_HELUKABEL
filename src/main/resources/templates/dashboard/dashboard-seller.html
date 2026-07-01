@@ -603,7 +603,7 @@
                 }
             }
 
-            function openDetailModal(type) {
+            async function openDetailModal(type) {
                 const modal = document.getElementById('chartDetailModal');
                 const title = document.getElementById('modalDetailTitle');
                 const subtitle = document.getElementById('modalDetailSubtitle');
@@ -622,43 +622,66 @@
                         return;
                     }
                     
-                    const wonLeads = cachedLeads.filter(l => l.status === 'Won');
-                    const pipelineLeads = cachedLeads.filter(l => l.status !== 'Won' && l.status !== 'Lost' && l.status !== 'Disqualified');
-                    
+                    // Show a loading indicator while fetching the dynamic lead list
                     body.innerHTML = `
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-                                <div class="text-xs font-bold text-emerald-600 uppercase">Đã chốt (Won)</div>
-                                <div class="text-2xl font-black text-emerald-800 mt-1">${(cachedKpi.wonRevenue || 0).toLocaleString('vi-VN')} đ</div>
-                                <div class="text-[10px] text-emerald-500 mt-1">${wonLeads.length} leads chốt thành công</div>
-                            </div>
-                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                                <div class="text-xs font-bold text-blue-600 uppercase">Cơ hội (Pipeline)</div>
-                                <div class="text-2xl font-black text-blue-800 mt-1">${(cachedKpi.openPipeline || 0).toLocaleString('vi-VN')} đ</div>
-                                <div class="text-[10px] text-blue-500 mt-1">${pipelineLeads.length} leads đang theo sát</div>
-                            </div>
-                            <div class="p-4 bg-red-50 rounded-lg border border-red-100">
-                                <div class="text-xs font-bold text-[#f6171b] uppercase">Chỉ tiêu (Target)</div>
-                                <div class="text-2xl font-black text-red-800 mt-1">${(cachedKpi.targetRevenue || 0).toLocaleString('vi-VN')} đ</div>
-                                <div class="text-[10px] text-red-500 mt-1">Đạt chỉ tiêu: ${cachedKpi.targetRevenue > 0 ? Math.round((cachedKpi.wonRevenue / cachedKpi.targetRevenue) * 100) : 0}%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-6">
-                            <div>
-                                <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Hợp đồng đã chốt thành công (Won)
-                                </h4>
-                                ${renderDetailTable(wonLeads)}
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Cơ hội đang chăm sóc (Pipeline)
-                                </h4>
-                                ${renderDetailTable(pipelineLeads)}
-                            </div>
+                        <div class="flex items-center justify-center py-12">
+                            <div class="w-8 h-8 border-4 border-helu-red border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     `;
+
+                    try {
+                        const ySelect = document.getElementById('kpiYearSelect');
+                        const qSelect = document.getElementById('kpiQuarterSelect');
+                        const q = qSelect ? qSelect.value : '3';
+                        const y = ySelect ? ySelect.value : '2026';
+
+                        const response = await fetch(`/api/dashboard/seller/kpi-leads?quarter=${q}&year=${y}`);
+                        if (!response.ok) {
+                            body.innerHTML = `<p class="text-sm text-red-500">Không thể tải chi tiết danh sách lead.</p>`;
+                            return;
+                        }
+                        const details = await response.json();
+                        const wonLeads = details.wonLeads || [];
+                        const pipelineLeads = details.pipelineLeads || [];
+
+                        body.innerHTML = `
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                                    <div class="text-xs font-bold text-emerald-600 uppercase">Đã chốt (Won)</div>
+                                    <div class="text-2xl font-black text-emerald-800 mt-1">${(cachedKpi.wonRevenue || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-[10px] text-emerald-500 mt-1">${wonLeads.length} leads chốt thành công</div>
+                                </div>
+                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                    <div class="text-xs font-bold text-blue-600 uppercase">Cơ hội (Pipeline)</div>
+                                    <div class="text-2xl font-black text-blue-800 mt-1">${(cachedKpi.openPipeline || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-[10px] text-blue-500 mt-1">${pipelineLeads.length} leads đang theo sát</div>
+                                </div>
+                                <div class="p-4 bg-red-50 rounded-lg border border-red-100">
+                                    <div class="text-xs font-bold text-[#f6171b] uppercase">Chỉ tiêu (Target)</div>
+                                    <div class="text-2xl font-black text-red-800 mt-1">${(cachedKpi.targetRevenue || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-[10px] text-red-500 mt-1">Đạt chỉ tiêu: ${cachedKpi.targetRevenue > 0 ? Math.round((cachedKpi.wonRevenue / cachedKpi.targetRevenue) * 100) : 0}%</div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Hợp đồng đã chốt thành công (Won)
+                                    </h4>
+                                    ${renderDetailTable(wonLeads, false, true)}
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Cơ hội đang chăm sóc (Pipeline)
+                                    </h4>
+                                    ${renderDetailTable(pipelineLeads, false, false)}
+                                </div>
+                            </div>
+                        `;
+                    } catch (error) {
+                        console.error('Error loading KPI details:', error);
+                        body.innerHTML = `<p class="text-sm text-red-500">Đã xảy ra lỗi khi tải dữ liệu chi tiết.</p>`;
+                    }
                 } else if (type === 'funnel') {
                     title.innerText = 'Chi tiết Phễu Chuyển đổi Khách hàng';
                     subtitle.innerText = 'Danh sách khách hàng tiềm năng chia theo từng giai đoạn chuyển đổi.';
@@ -734,7 +757,7 @@
                 }
             }
 
-            function renderDetailTable(leads, showBantDetails = false) {
+            function renderDetailTable(leads, showBantDetails = false, showWonDate = false) {
                 if (leads.length === 0) {
                     return `<p class="text-xs text-gray-400 py-3 text-center">Không có bản ghi nào.</p>`;
                 }
@@ -758,7 +781,6 @@
                     <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Mã Lead</th>
                     <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Khách hàng</th>
                     <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Trạng thái</th>
-                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Phân loại</th>
                 `;
                 
                 if (showBantDetails) {
@@ -771,7 +793,11 @@
                     `;
                 }
                 
-                headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-right">Doanh thu dự kiến</th>`;
+                if (showWonDate) {
+                    headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Thời gian Win</th>`;
+                }
+                
+                headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-right">Doanh thu</th>`;
                 
                 let rows = '';
                 leads.forEach((l, index) => {
@@ -788,25 +814,30 @@
                         `;
                     }
                     
+                    let rowWonDate = '';
+                    if (showWonDate) {
+                        rowWonDate = `<td class="py-3 px-4 text-xs font-semibold text-emerald-600">${l.wonDate || '—'}</td>`;
+                    }
+
+                    const rev = l.revenue !== undefined ? l.revenue : (l.expectedRevenue || 0);
+                    const company = l.companyName !== undefined ? l.companyName : (l.account || '');
+                    
                     rows += `
                         <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]/50'}">
                             <td class="py-3 px-4 text-xs font-black text-gray-400 uppercase">${l.leadId}</td>
                             <td class="py-3 px-4">
                                 <div class="text-xs font-bold text-gray-900">${l.fullName}</div>
-                                <div class="text-[10px] text-gray-400">${l.account}</div>
+                                <div class="text-[10px] text-gray-400">${company}</div>
                             </td>
                             <td class="py-3 px-4">
                                 <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase ${statusColors[l.status] || 'bg-gray-50 text-gray-600 border-gray-100'}">
                                     ${l.status}
                                 </span>
                             </td>
-                            <td class="py-3 px-4">
-                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-bold ${heatColors[l.leadHeat] || 'bg-slate-400 text-white'}">
-                                    ${l.leadHeat || 'COLD'}
-                                </span>
-                            </td>
+
                             ${rowBant}
-                            <td class="py-3 px-4 text-xs font-bold text-gray-800 text-right">${(l.expectedRevenue || 0).toLocaleString('vi-VN')} đ</td>
+                            ${rowWonDate}
+                            <td class="py-3 px-4 text-xs font-bold text-gray-800 text-right">${(rev || 0).toLocaleString('vi-VN')} đ</td>
                         </tr>
                     `;
                 });

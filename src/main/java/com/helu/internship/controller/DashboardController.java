@@ -148,6 +148,14 @@ public class DashboardController {
         return dashboardService.getStaffPipelineCoverage(principal.getName(), quarter, year);
     }
 
+    @GetMapping("/seller/kpi-leads")
+    public java.util.Map<String, Object> getStaffKpiLeads(
+            @RequestParam(value = "quarter", required = false) Integer quarter,
+            @RequestParam(value = "year", required = false) Integer year,
+            Principal principal) {
+        return dashboardService.getStaffKpiLeads(principal.getName(), quarter, year);
+    }
+
     @GetMapping("/seller/leads-by-status-count")
     public List<LeadStatusCountResponse> getSellerLeadsByStatusCount(Principal principal) {
         return dashboardService.getSellerLeadsByStatusCount(principal.getName());

@@ -67,6 +67,8 @@ public interface DashboardService {
 
     List<PipelineCoverageProjection> getStaffPipelineCoverage(String email, Integer quarter, Integer year);
 
+    java.util.Map<String, Object> getStaffKpiLeads(String email, Integer quarter, Integer year);
+
     List<RevenueMonthlyProjection> getRevenueMonthly();
 
     List<RevenueQuarterlyProjection> getRevenueQuarterly(Integer year);
