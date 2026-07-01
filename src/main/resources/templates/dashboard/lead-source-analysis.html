@@ -6,6 +6,11 @@
             /* Funnel hover effects */
             .funnel-stage {
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                pointer-events: auto !important;
+                cursor: pointer !important;
+            }
+            .funnel-stage * {
+                pointer-events: auto !important;
             }
             .funnel-stage:hover path {
                 filter: brightness(1.1) drop-shadow(0 10px 15px rgba(0, 0, 0, 0.15));
@@ -203,12 +208,11 @@
         <!-- MODAL: DANH SÁCH LEADS THEO TRẠNG THÁI -->
         <!-- ========================================== -->
         <div id="leadStatusModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="flex items-center justify-center min-h-screen p-4 md:p-10">
                 <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm"
                     onclick="closeLeadModal()"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
                 <div
-                    class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full border border-slate-200">
+                    class="relative z-[2010] bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all max-w-6xl w-full border border-slate-200">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
                             <span id="modalStatusTitle" class="text-blue-600">Status</span>
@@ -252,11 +256,7 @@
                             <p class="text-slate-500 font-bold" th:text="#{modal.empty}">Không tìm thấy Lead.</p>
                         </div>
                     </div>
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-                        <button onclick="closeLeadModal()"
-                            class="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm"
-                            th:text="#{modal.close}">Đóng</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -573,7 +573,8 @@
                             backgroundColor: 'rgba(239, 68, 68, 0.7)',
                             borderColor: 'rgba(239, 68, 68, 1)',
                             borderWidth: 1.5,
-                            borderRadius: 4
+                            borderRadius: 4,
+                            yAxisID: 'yCost'
                         },
                         {
                             label: 'Avg Revenue per Won',
@@ -581,7 +582,8 @@
                             backgroundColor: 'rgba(16, 185, 129, 0.7)',
                             borderColor: 'rgba(16, 185, 129, 1)',
                             borderWidth: 1.5,
-                            borderRadius: 4
+                            borderRadius: 4,
+                            yAxisID: 'yRevenue'
                         }
                     ]
                 },
@@ -590,8 +592,21 @@
                     maintainAspectRatio: false,
                     scales: {
                         x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#475569' } },
-                        y: {
+                        yRevenue: {
+                            type: 'linear',
+                            position: 'left',
+                            title: { display: true, text: 'Avg Revenue (Won)', color: 'rgba(16, 185, 129, 1)', font: { weight: 'bold', size: 11 } },
                             grid: { color: '#f1f5f9' },
+                            ticks: {
+                                callback: val => (val / 1000000).toLocaleString() + 'M',
+                                color: '#475569'
+                            }
+                        },
+                        yCost: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: 'Avg Cost (Lead)', color: 'rgba(239, 68, 68, 1)', font: { weight: 'bold', size: 11 } },
+                            grid: { drawOnChartArea: false },
                             ticks: {
                                 callback: val => (val / 1000000).toLocaleString() + 'M',
                                 color: '#475569'
@@ -805,7 +820,8 @@
 
                     const statusesJson = JSON.stringify(stage.statuses);
 
-                    svgHtml += `<g class="funnel-stage" cursor="pointer" onclick='openLeadStatusModal(${statusesJson})'>`;
+                    svgHtml += `<a href="javascript:void(0)" onclick='openLeadStatusModal(${statusesJson})' style="cursor: pointer; text-decoration: none; pointer-events: auto;">`;
+                    svgHtml += `<g class="funnel-stage" cursor="pointer" style="pointer-events: auto;">`;
                     svgHtml += `<ellipse cx="${X_c}" cy="${yTop}" rx="${rXt}" ry="${rYt}" fill="${stage.topColor}" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" />`;
                     svgHtml += `<path d="${pathD}" fill="${stage.color}" />`;
                     svgHtml += `<path d="M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />`;
@@ -836,7 +852,7 @@
                         <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${val.toLocaleString()} (${pct}%)</tspan></text>
                         `;
                     }
-                    svgHtml += `</g>`;
+                    svgHtml += `</g></a>`;
                 }
 
                 svgHtml += `</svg>`;

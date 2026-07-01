@@ -70,6 +70,39 @@
     <div id="toastContainer" class="fixed top-24 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/users/me');
+                if (response.ok) {
+                    const user = await response.json();
+                    
+                    const nameEl = document.getElementById('displayUserName');
+                    const roleEl = document.getElementById('displayUserRole');
+                    if (nameEl) nameEl.innerText = user.fullName;
+                    if (roleEl) {
+                        roleEl.innerText = user.roleName === 'ADMIN' ? 'Quản trị viên' : 'Seller (Nhân viên)';
+                    }
+                    
+                    const avatarEl = document.querySelector('button[onclick="toggleUserDropdown()"] div.bg-helu-red');
+                    if (avatarEl && user.fullName) {
+                        const parts = user.fullName.split(' ');
+                        let initials = '';
+                        if (parts.length >= 2) {
+                            initials = (parts[parts.length - 2][0] + parts[parts.length - 1][0]).toUpperCase();
+                        } else if (parts.length === 1) {
+                            initials = parts[0].substring(0, 2).toUpperCase();
+                        }
+                        if (initials) {
+                            avatarEl.innerText = initials;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading user profile:", err);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadUserProfile);
+
         let knownNotifIds = new Set();
         let isFirstLoad = true;
 

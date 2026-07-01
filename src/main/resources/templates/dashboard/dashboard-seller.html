@@ -117,7 +117,7 @@
                                 <span id="txtTarget" class="text-slate-800 font-extrabold">0 đ</span>
                             </div>
                             <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                <div id="barTarget" class="bg-gradient-to-r from-helu-red to-rose-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                                <div id="barTarget" class="bg-gradient-to-r from-amber-400 to-yellow-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
                             </div>
                         </div>
                     </div>
@@ -461,7 +461,9 @@
                         const xMid = X_c + (rXt + rXb) / 2;
                         const yMid = yTop + h / 2;
 
-                        svgHtml += `<g class="funnel-stage">`;
+                        const activeTab = stage.key === 'New_Contacted' ? 'New' : stage.key;
+                        svgHtml += `<a href="javascript:void(0)" onclick="event.stopPropagation(); openDetailModal('funnel', '${activeTab}')" style="cursor: pointer; text-decoration: none; pointer-events: auto;">`;
+                        svgHtml += `<g class="funnel-stage" cursor="pointer" style="pointer-events: auto;">`;
                         svgHtml += `<ellipse cx="${X_c}" cy="${yTop}" rx="${rXt}" ry="${rYt}" fill="${stage.topColor}" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" />`;
                         svgHtml += `<path d="${pathD}" fill="${stage.color}" />`;
                         svgHtml += `<path d="M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />`;
@@ -493,7 +495,7 @@
                             <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${val.toLocaleString()} (${pct}%)</tspan></text>
                             `;
                         }
-                        svgHtml += `</g>`;
+                        svgHtml += `</g></a>`;
                     }
 
                     svgHtml += `</svg>`;
@@ -603,7 +605,7 @@
                 }
             }
 
-            async function openDetailModal(type) {
+            async function openDetailModal(type, activeTab) {
                 const modal = document.getElementById('chartDetailModal');
                 const title = document.getElementById('modalDetailTitle');
                 const subtitle = document.getElementById('modalDetailSubtitle');
@@ -656,10 +658,10 @@
                                     <div class="text-2xl font-black text-blue-800 mt-1">${(cachedKpi.openPipeline || 0).toLocaleString('vi-VN')} đ</div>
                                     <div class="text-[10px] text-blue-500 mt-1">${pipelineLeads.length} leads đang theo sát</div>
                                 </div>
-                                <div class="p-4 bg-red-50 rounded-lg border border-red-100">
-                                    <div class="text-xs font-bold text-[#f6171b] uppercase">Chỉ tiêu (Target)</div>
-                                    <div class="text-2xl font-black text-red-800 mt-1">${(cachedKpi.targetRevenue || 0).toLocaleString('vi-VN')} đ</div>
-                                    <div class="text-[10px] text-red-500 mt-1">Đạt chỉ tiêu: ${cachedKpi.targetRevenue > 0 ? Math.round((cachedKpi.wonRevenue / cachedKpi.targetRevenue) * 100) : 0}%</div>
+                                <div class="p-4 bg-amber-50 rounded-lg border border-amber-100">
+                                    <div class="text-xs font-bold text-amber-600 uppercase">Chỉ tiêu (Target)</div>
+                                    <div class="text-2xl font-black text-amber-800 mt-1">${(cachedKpi.targetRevenue || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-[10px] text-amber-500 mt-1">Đạt chỉ tiêu: ${cachedKpi.targetRevenue > 0 ? Math.round((cachedKpi.wonRevenue / cachedKpi.targetRevenue) * 100) : 0}%</div>
                                 </div>
                             </div>
                             
@@ -715,7 +717,7 @@
                         </div>
                     `;
                     
-                    switchFunnelDetailTab('New');
+                    switchFunnelDetailTab(activeTab || 'New');
                 } else if (type === 'bant') {
                     title.innerText = 'Bảng chi tiết Đánh giá tiêu chí BANT';
                     subtitle.innerText = 'Báo cáo điểm số BANT, nhiệt độ và giá trị doanh thu dự kiến của toàn bộ Leads.';
@@ -843,10 +845,10 @@
                 });
                 
                 return `
-                    <div class="border border-gray-100 rounded-lg overflow-hidden shadow-sm">
+                    <div class="border border-gray-100 rounded-lg overflow-hidden">
                         <table class="w-full text-left bg-white">
                             <thead>
-                                <tr class="bg-gray-50 border-b border-gray-100" style="background-color: #fafafa;">
+                                <tr class="bg-gray-50 border-b border-gray-100">
                                     ${headers}
                                 </tr>
                             </thead>
@@ -894,7 +896,7 @@
 
         <!-- Chart Detail Modal -->
         <div id="chartDetailModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <div class="w-full max-w-4xl rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh] border border-gray-100">
+            <div class="w-full max-w-4xl rounded-2xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh] border border-gray-100" style="background-color: #ffffff !important;">
                 <div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
                     <div>
                         <h2 id="modalDetailTitle" class="text-xl font-extrabold text-gray-900 tracking-tight">Chi tiết số liệu</h2>
@@ -907,12 +909,6 @@
                 
                 <div class="overflow-y-auto flex-1 pr-2" id="modalDetailBody">
                     <!-- Dynamic Content -->
-                </div>
-                
-                <div class="flex items-center justify-end pt-6 border-t border-gray-100 mt-4">
-                    <button class="rounded-[6px] bg-[#f6171b] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all active:scale-95" onclick="closeDetailModal()">
-                        Đóng
-                    </button>
                 </div>
             </div>
         </div>

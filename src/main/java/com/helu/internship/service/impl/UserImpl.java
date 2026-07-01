@@ -88,6 +88,13 @@ public class UserImpl implements UserService {
     }
 
     @Override
+    public UserResponse getUserByEmail(String email) {
+        UserEntity user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+        return mapToResponse(user);
+    }
+
+    @Override
     @Transactional
     public void deleteUser(UUID id) {
         userRepo.deleteById(id);

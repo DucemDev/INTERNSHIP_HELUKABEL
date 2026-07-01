@@ -2,6 +2,31 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
 <main class="space-y-8">
+    <style>
+        .funnel-stage {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+        .funnel-stage * {
+            pointer-events: auto !important;
+        }
+        .funnel-stage:hover path {
+            filter: brightness(1.1) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.15));
+            opacity: 0.95;
+        }
+        .funnel-stage:hover text {
+            fill: #ef4444 !important;
+        }
+        .funnel-stage:hover line {
+            stroke: #ef4444;
+            stroke-width: 1.5px;
+        }
+        .funnel-stage:hover circle {
+            r: 5.5px;
+        }
+    </style>
+
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -31,20 +56,18 @@
             </div>
         </div>
 
-        <!-- Right: Leads Status Distribution Doughnut Chart -->
-        <div class="lg:col-span-2 rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between">
+        <!-- Right: Leads Status Distribution Funnel Chart -->
+        <div class="lg:col-span-2 rounded-2xl border border-helu-border bg-white p-8 flex flex-col justify-between">
             <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
                 <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
-                Cơ cấu Trạng thái Leads
+                Cơ cấu Trạng thái Leads (Phễu)
             </h2>
-            <div class="relative h-[200px] flex items-center justify-center">
-                <canvas id="leadsStatusChart"></canvas>
-            </div>
+            <div class="relative w-full flex-1 min-h-[220px] flex items-center justify-center" id="leadStatusFunnelContainer"></div>
         </div>
     </div>
 
     <!-- Filter Bar -->
-    <div class="rounded-3xl border border-helu-border bg-white p-6 shadow-sm">
+    <div class="rounded-2xl border border-helu-border bg-white p-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="space-y-2">
                 <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Tìm kiếm</label>
@@ -58,7 +81,10 @@
                 <select id="statusFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterLeads()">
                     <option value="">Tất cả trạng thái</option>
                     <option value="New">New</option>
-                    <option value="In Progress">In Progress</option>
+                    <option value="Contacted">Contacted</option>
+                    <option value="Qualified">Qualified</option>
+                    <option value="Proposal Sent">Proposal Sent</option>
+                    <option value="In Negotiation">In Negotiation</option>
                     <option value="Won">Won</option>
                     <option value="Lost">Lost</option>
                 </select>
@@ -76,19 +102,19 @@
     </div>
 
     <!-- Leads Table / Grid -->
-    <div class="rounded-3xl border border-helu-border bg-white shadow-sm overflow-hidden">
+    <div class="rounded-2xl border border-helu-border bg-white overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left" id="leadsTable">
                 <thead>
-                <tr class="border-b border-gray-100" style="background-color: #fafafa;">
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b] w-16 text-center">STT</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Mã Lead</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Khách hàng</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Trạng thái</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Phân loại BANT</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Điểm số chi tiết</th>
-                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Nguồn / Dòng sản phẩm</th>
-                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-[#52525b] pr-10">Thao tác</th>
+                <tr class="border-b border-gray-100 bg-gray-50/50">
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400 w-16 text-center">STT</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Mã Lead</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Khách hàng</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Phân loại BANT</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Điểm số chi tiết</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400">Nguồn / Dòng sản phẩm</th>
+                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10">Thao tác</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -113,9 +139,8 @@
         </div>
     </div>
 
-    <!-- Modal Status Update -->
     <div id="statusModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-        <div class="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+        <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200 border border-gray-100" style="background-color: #ffffff !important;">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-extrabold text-gray-900 tracking-tight">Cập nhật Trạng thái Lead</h2>
                 <button onclick="closeStatusModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all">
@@ -133,17 +158,15 @@
                         <option value="Lost">Lost</option>
                     </select>
                 </div>
-                <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
-                    <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeStatusModal()">Hủy</button>
-                    <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">Lưu thay đổi</button>
+                <div class="pt-6 border-t border-gray-100">
+                    <button type="submit" class="w-full rounded-xl bg-helu-red px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">Lưu thay đổi</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal BANT Update -->
     <div id="bantModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-        <div class="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+        <div class="w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200 border border-gray-100" style="background-color: #ffffff !important;">
             <div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
                 <div>
                     <h2 class="text-xl font-extrabold text-gray-900 tracking-tight">Đánh giá tiêu chí BANT</h2>
@@ -213,9 +236,8 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
-                    <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeBantModal()">Hủy</button>
-                    <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all active:scale-95">Lưu điểm số</button>
+                <div class="pt-6 border-t border-gray-100">
+                    <button type="submit" class="w-full rounded-xl bg-helu-red px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all active:scale-95">Lưu điểm số</button>
                 </div>
             </form>
         </div>
@@ -257,60 +279,230 @@
             document.getElementById('statTotal').innerText = total;
         }
 
+        function filterByFunnel(stageKey) {
+            const statusFilterSelect = document.getElementById('statusFilter');
+            if (stageKey === 'New_Contacted') {
+                statusFilterSelect.value = '';
+                const search = document.getElementById('searchInput').value.toLowerCase();
+                const heat = document.getElementById('heatFilter').value;
+                filteredLeads = allLeads.filter(l => {
+                    const matchesSearch = l.fullName.toLowerCase().includes(search) || 
+                                         l.account.toLowerCase().includes(search) ||
+                                         l.leadId.toLowerCase().includes(search);
+                    const matchesStatus = l.status === 'New' || l.status === 'Contacted';
+                    const matchesHeat = !heat || l.leadHeat === heat;
+                    return matchesSearch && matchesStatus && matchesHeat;
+                });
+                currentPage = 1;
+                renderLeads();
+            } else {
+                statusFilterSelect.value = stageKey;
+                filterLeads();
+            }
+        }
+
         async function fetchStatusChart() {
             try {
                 const response = await fetch('/api/dashboard/seller/leads-by-status-count');
                 if (!response.ok) return;
                 const data = await response.json();
 
-                const labels = data.map(item => item.status || 'N/A');
-                const values = data.map(item => item.total || 0);
+                let countNew = 0;
+                let countContacted = 0;
+                let countQualified = 0;
+                let countProposal = 0;
+                let countNegotiation = 0;
+                let countWon = 0;
 
-                const colors = {
-                    'New': 'rgba(59, 130, 246, 0.85)',
-                    'In Progress': 'rgba(245, 158, 11, 0.85)',
-                    'In Negotiation': 'rgba(139, 92, 246, 0.85)',
-                    'Proposal Sent': 'rgba(6, 182, 212, 0.85)',
-                    'Contacted': 'rgba(236, 72, 153, 0.85)',
-                    'Won': 'rgba(16, 185, 129, 0.85)',
-                    'Lost': 'rgba(239, 68, 68, 0.85)',
-                    'Disqualified': 'rgba(107, 114, 128, 0.85)'
-                };
-
-                const backgroundColors = labels.map(label => colors[label] || 'rgba(156, 163, 175, 0.85)');
-
-                if (statusChartInstance) {
-                    statusChartInstance.destroy();
-                }
-
-                const ctx = document.getElementById('leadsStatusChart').getContext('2d');
-                statusChartInstance = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: values,
-                            backgroundColor: backgroundColors,
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: {
-                                    boxWidth: 12,
-                                    font: { size: 11, weight: 'bold' },
-                                    padding: 10
-                                }
-                            }
-                        },
-                        cutout: '60%'
+                data.forEach(item => {
+                    const status = item.status ? item.status.trim() : '';
+                    const total = item.total || 0;
+                    if (status === 'New') {
+                        countNew = total;
+                    } else if (status === 'Contacted') {
+                        countContacted = total;
+                    } else if (status === 'Qualified') {
+                        countQualified = total;
+                    } else if (status === 'Proposal Sent') {
+                        countProposal = total;
+                    } else if (status === 'In Negotiation') {
+                        countNegotiation = total;
+                    } else if (status === 'Won') {
+                        countWon = total;
                     }
                 });
+
+                const v1 = countNew + countContacted;
+                const v2 = countQualified;
+                const v3 = countProposal;
+                const v4 = countNegotiation;
+                const v5 = countWon;
+
+                const values = [v1, v2, v3, v4, v5];
+                const totalActive = values.reduce((a, b) => a + b, 0);
+
+                const stages = [
+                    { key: 'New_Contacted', label: 'New + Contacted', color: 'url(#grad-blue-3d)', topColor: 'url(#grad-funnel-interior)' },
+                    { key: 'Qualified', label: 'Qualified', color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
+                    { key: 'Proposal Sent', label: 'Proposal Sent', color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
+                    { key: 'In Negotiation', label: 'In Negotiation', color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
+                    { key: 'Won', label: 'Won', color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
+                ];
+
+                const totalHeight = 160;
+                const gap = 4;
+                const startY = 18;
+
+                const Y_start = startY;
+                const Y_end = startY + totalHeight + 4 * gap;
+                const getFunnelWidth = (y) => {
+                    const ratio = Math.max(0, Math.min(1, (y - Y_start) / (Y_end - Y_start)));
+                    return 180 - (180 - 45) * ratio;
+                };
+
+                const minH = 6;
+                let heights = [];
+                if (totalActive === 0) {
+                    heights = [32, 32, 32, 32, 32];
+                } else {
+                    const remainingH = totalHeight - (5 * minH);
+                    heights = values.map(v => minH + remainingH * (v / totalActive));
+                }
+
+                let svgHtml = `
+                <svg viewBox="0 0 500 220" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="grad-funnel-interior" cx="50%" cy="50%" r="50%" fx="50%" fy="30%">
+                            <stop offset="0%" stop-color="#0f172a" />
+                            <stop offset="100%" stop-color="#1e293b" />
+                        </radialGradient>
+                        <linearGradient id="grad-blue-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#1e3a8a" />
+                            <stop offset="30%" stop-color="#3b82f6" />
+                            <stop offset="50%" stop-color="#60a5fa" />
+                            <stop offset="70%" stop-color="#3b82f6" />
+                            <stop offset="100%" stop-color="#1d4ed8" />
+                        </linearGradient>
+                        <linearGradient id="grad-purple-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#4c1d95" />
+                            <stop offset="30%" stop-color="#7c3aed" />
+                            <stop offset="50%" stop-color="#a78bfa" />
+                            <stop offset="70%" stop-color="#7c3aed" />
+                            <stop offset="100%" stop-color="#6d28d9" />
+                        </linearGradient>
+                        <linearGradient id="grad-amber-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#78350f" />
+                            <stop offset="30%" stop-color="#f59e0b" />
+                            <stop offset="50%" stop-color="#fcd34d" />
+                            <stop offset="70%" stop-color="#f59e0b" />
+                            <stop offset="100%" stop-color="#b45309" />
+                        </linearGradient>
+                        <linearGradient id="grad-teal-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#115e59" />
+                            <stop offset="30%" stop-color="#0d9488" />
+                            <stop offset="50%" stop-color="#2dd4bf" />
+                            <stop offset="70%" stop-color="#0d9488" />
+                            <stop offset="100%" stop-color="#0f766e" />
+                        </linearGradient>
+                        <linearGradient id="grad-emerald-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#064e3b" />
+                            <stop offset="30%" stop-color="#10b981" />
+                            <stop offset="50%" stop-color="#34d399" />
+                            <stop offset="70%" stop-color="#10b981" />
+                            <stop offset="100%" stop-color="#047857" />
+                        </linearGradient>
+                        <linearGradient id="grad-purple-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#c084fc" />
+                            <stop offset="100%" stop-color="#a855f7" />
+                        </linearGradient>
+                        <linearGradient id="grad-amber-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#fbbf24" />
+                            <stop offset="100%" stop-color="#f59e0b" />
+                        </linearGradient>
+                        <linearGradient id="grad-teal-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#2dd4bf" />
+                            <stop offset="100%" stop-color="#0d9488" />
+                        </linearGradient>
+                        <linearGradient id="grad-emerald-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#34d399" />
+                            <stop offset="100%" stop-color="#10b981" />
+                        </linearGradient>
+                    </defs>
+                `;
+
+                const X_c = 130;
+                let currentY = startY;
+
+                let calculatedStages = [];
+                for (let i = 0; i < 5; i++) {
+                    const stage = stages[i];
+                    const val = values[i];
+                    const pct = totalActive > 0 ? ((val / totalActive) * 100).toFixed(1) : '0.0';
+                    const h = heights[i];
+
+                    const yTop = currentY;
+                    const yBottom = yTop + h;
+                    currentY = yBottom + gap;
+
+                    const rXt = getFunnelWidth(yTop) / 2;
+                    const rYt = rXt * 0.12;
+                    const rXb = getFunnelWidth(yBottom) / 2;
+                    const rYb = rXb * 0.12;
+
+                    calculatedStages.push({ index: i, stage, val, pct, h, yTop, yBottom, rXt, rYt, rXb, rYb });
+                }
+
+                for (let i = 4; i >= 0; i--) {
+                    const cs = calculatedStages[i];
+                    const { stage, val, pct, h, yTop, yBottom, rXt, rYt, rXb, rYb } = cs;
+
+                    const xTl = X_c - rXt;
+                    const xTr = X_c + rXt;
+                    const xBr = X_c + rXb;
+                    const xBl = X_c - rXb;
+
+                    const pathD = `M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop} L ${xBr} ${yBottom} A ${rXb} ${rYb} 0 0 0 ${xBl} ${yBottom} Z`;
+                    const xMid = X_c + (rXt + rXb) / 2;
+                    const yMid = yTop + h / 2;
+
+                    svgHtml += `<a href="javascript:void(0)" onclick="filterByFunnel('${stage.key}')" style="cursor: pointer; text-decoration: none; pointer-events: auto;">`;
+                    svgHtml += `<g class="funnel-stage" cursor="pointer" style="pointer-events: auto;">`;
+                    svgHtml += `<ellipse cx="${X_c}" cy="${yTop}" rx="${rXt}" ry="${rYt}" fill="${stage.topColor}" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" />`;
+                    svgHtml += `<path d="${pathD}" fill="${stage.color}" />`;
+                    svgHtml += `<path d="M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />`;
+
+                    if (i === 4) {
+                        const neckHeight = 18;
+                        const yNeckBottom = yBottom + neckHeight;
+                        const rXn = rXb;
+                        const rYn = rYb;
+                        const xNl = X_c - rXn;
+                        const xNr = X_c + rXn;
+                        const neckPathD = `M ${xBl} ${yBottom} L ${xBl} ${yNeckBottom} A ${rXn} ${rYn} 0 0 1 ${xNr} ${yNeckBottom} L ${xBr} ${yBottom} A ${rXb} ${rYb} 0 0 0 ${xBl} ${yBottom} Z`;
+                        svgHtml += `<path d="${neckPathD}" fill="${stage.color}" />`;
+                        svgHtml += `<ellipse cx="${X_c}" cy="${yNeckBottom}" rx="${rXn}" ry="${rYn}" fill="#0f172a" opacity="0.7" stroke="rgba(255,255,255,0.2)" stroke-width="0.5" />`;
+                    }
+
+                    svgHtml += `
+                        <circle cx="${xMid}" cy="${yMid}" r="3.5" fill="${i === 0 ? '#3b82f6' : i === 1 ? '#8b5cf6' : i === 2 ? '#f59e0b' : i === 3 ? '#0d9488' : '#10b981'}" />
+                        <line x1="${xMid + 4}" y1="${yMid}" x2="250" y2="${yMid}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
+                    `;
+
+                    if (h >= 30) {
+                        svgHtml += `
+                        <text x="260" y="${yMid - 3}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}</text>
+                        <text x="260" y="${yMid + 11}" font-family="'Inter', sans-serif" font-size="10" font-weight="600" fill="#64748b">${val.toLocaleString()} Leads (${pct}%)</text>
+                        `;
+                    } else {
+                        svgHtml += `
+                        <text x="260" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="11" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${val.toLocaleString()} (${pct}%)</tspan></text>
+                        `;
+                    }
+                    svgHtml += `</g></a>`;
+                }
+
+                svgHtml += `</svg>`;
+                document.getElementById('leadStatusFunnelContainer').innerHTML = svgHtml;
             } catch (error) {
                 console.error('Error rendering status chart:', error);
             }
@@ -367,7 +559,11 @@
 
             paginatedLeads.forEach((lead, index) => {
                 const tr = document.createElement('tr');
-                tr.className = `border-b border-gray-50 hover:bg-gray-50/50 transition-all group ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]/50'}`;
+                tr.className = 'border-b border-gray-50 hover:bg-gray-50/50 transition-all group cursor-pointer';
+                tr.onclick = (e) => {
+                    if (e.target.closest('button')) return;
+                    window.location.href = `/leads/${lead.leadId}`;
+                };
 
                 const totalBant = (lead.bantBudget || 0) + (lead.bantAuthority || 0) + (lead.bantNeed || 0) + (lead.bantTimeline || 0);
 
@@ -612,6 +808,17 @@
                     el.style.fontSize = '1.5rem';
                 } else if (len > 8) {
                     el.style.fontSize = '2rem';
+                }
+            });
+            // Close modals when clicking outside the content
+            window.addEventListener('click', (e) => {
+                const statusModal = document.getElementById('statusModal');
+                const bantModal = document.getElementById('bantModal');
+                if (e.target === statusModal) {
+                    closeStatusModal();
+                }
+                if (e.target === bantModal) {
+                    closeBantModal();
                 }
             });
         });

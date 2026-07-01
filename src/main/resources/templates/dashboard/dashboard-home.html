@@ -8,6 +8,11 @@
         /* Funnel hover effects (GIỮA NGUYÊN) */
         .funnel-stage {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+        .funnel-stage * {
+            pointer-events: auto !important;
         }
         .funnel-stage:hover path {
             filter: brightness(1.1) drop-shadow(0 8px 12px rgba(0, 0, 0, 0.15));
@@ -274,9 +279,6 @@
                         <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
                         <span class="text-sm font-normal text-slate-400 font-mono ml-2">(/lead-status)</span>
                     </h2>
-                    <button onclick="testFunnelMockData()" class="px-2.5 py-1 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all border border-blue-100 shadow-sm">
-                        Test Phễu Ảo (Tỷ lệ lệch)
-                    </button>
                 </div>
                 <div class="relative w-full flex-1 min-h-[400px] flex items-center justify-center" id="leadStatusFunnelContainer"></div>
             </div>
@@ -380,12 +382,11 @@
         <!-- MODAL: DANH SÁCH LEADS THEO TRẠNG THÁI (GIỮ NGUYÊN) -->
         <!-- ========================================== -->
         <div id="leadStatusModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="flex items-center justify-center min-h-screen p-4 md:p-10">
                 <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm"
                     onclick="closeLeadModal()"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
                 <div
-                    class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full border border-slate-200">
+                    class="relative z-[2010] bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all max-w-6xl w-full border border-slate-200">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
                             <span id="modalStatusTitle" class="text-blue-600">Status</span>
@@ -451,11 +452,7 @@
                             <p class="text-slate-500 font-bold" th:text="#{modal.empty}">Không tìm thấy Lead.</p>
                         </div>
                     </div>
-                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-                        <button onclick="closeLeadModal()"
-                            class="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm"
-                            th:text="#{modal.close}">Đóng</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -464,10 +461,9 @@
         <!-- MODAL: SEGMENT DRILL-DOWN (Market Matrix click) -->
         <!-- ========================================== -->
         <div id="segmentModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="segment-modal-overlay fixed inset-0 transition-opacity" onclick="closeSegmentModal()"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-200">
+            <div class="flex items-center justify-center min-h-screen p-4 md:p-10">
+                <div class="segment-modal-overlay fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" onclick="closeSegmentModal()"></div>
+                <div class="relative z-[2010] bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all max-w-3xl w-full border border-slate-200">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
                             <i data-lucide="grid-3x3" class="w-5 h-5 text-blue-600"></i>
@@ -496,9 +492,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="px-6 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
-                        <button onclick="closeSegmentModal()" class="px-5 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm text-sm" th:text="#{modal.close}">Đóng</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -844,7 +838,8 @@
 
                         const statusesJson = JSON.stringify(stage.statuses);
 
-                        svgHtml += `<g class="funnel-stage" cursor="pointer" onclick='openLeadStatusModal(${statusesJson})'>`;
+                        svgHtml += `<a href="javascript:void(0)" onclick='openLeadStatusModal(${statusesJson})' style="cursor: pointer; text-decoration: none; pointer-events: auto;">`;
+                        svgHtml += `<g class="funnel-stage" cursor="pointer" style="pointer-events: auto;">`;
                         svgHtml += `<ellipse cx="${X_c}" cy="${yTop}" rx="${rXt}" ry="${rYt}" fill="${stage.topColor}" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" />`;
                         svgHtml += `<path d="${pathD}" fill="${stage.color}" />`;
                         svgHtml += `<path d="M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />`;
@@ -876,7 +871,7 @@
                             <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${val.toLocaleString()} (${pct}%)</tspan></text>
                             `;
                         }
-                        svgHtml += `</g>`;
+                        svgHtml += `</g></a>`;
                     }
 
                     svgHtml += `</svg>`;
@@ -1699,7 +1694,7 @@
                 loading.classList.remove('hidden');
                 empty.classList.add('hidden');
                 container.classList.add('hidden');
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
 
                 try {
                     let data = [];
@@ -1744,7 +1739,7 @@
                         `;
                         tbody.appendChild(tr);
                     });
-                    lucide.createIcons();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
                 } catch (error) {
                     console.error('Error fetching leads for modal:', error);
                     loading.classList.add('hidden');
