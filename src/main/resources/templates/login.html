@@ -24,19 +24,18 @@
     </script>
     <!-- Icons (Lucide) -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body class="bg-gray-50 font-['Inter'] antialiased flex items-center justify-center min-h-screen p-6">
-<!-- Background Decor -->
-<div class="fixed inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-helu-red/5 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-gray-200/50 rounded-full blur-3xl"></div>
-</div>
+<body class="font-['Inter'] antialiased flex items-center justify-center min-h-screen p-6 relative overflow-hidden">
+<!-- Glowing Glassmorphism Background Orbs -->
+<div class="bg-glow-orb w-[500px] h-[500px] bg-red-200/30 -top-40 -left-40"></div>
+<div class="bg-glow-orb w-[600px] h-[600px] bg-blue-200/20 -bottom-40 -right-40" style="animation-duration: 25s; animation-direction: reverse;"></div>
 
-<div class="relative w-full max-w-xl">
-    <div class="bg-white rounded-[2.5rem] px-10 py-6 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
+<div class="relative w-full max-w-xl z-10">
+    <div class="glass-panel rounded-[2.5rem] px-10 py-6 border border-white/60 shadow-[0_20px_50px_rgba(31,38,135,0.04)] overflow-hidden">
         <!-- Branding -->
         <div class="text-center mb-6">
-            <img th:src="@{/images/logo.png}" alt="HELUKABEL" class="h-10 w-auto mx-auto mb-3">
+            <img th:src="@{/images/helu-logo.png}" alt="HELUKABEL" class="h-8 w-auto mx-auto mb-3">
             <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight uppercase">Hệ Thống Quản Trị</h2>
             <p class="text-[13px] font-medium text-gray-400 mt-0.5">Vui lòng đăng nhập để tiếp tục</p>
         </div>
@@ -59,7 +58,7 @@
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-helu-red transition-colors">
                         <i data-lucide="mail" class="w-5 h-5"></i>
                     </div>
-                    <input type="email" name="username" class="h-12 w-full rounded-2xl border border-gray-100 bg-gray-50 pl-14 pr-5 text-sm font-semibold outline-none focus:border-helu-red/50 focus:bg-white focus:ring-4 focus:ring-helu-red/5 transition-all shadow-sm shadow-inner" placeholder="admin@helukabel.vn" required autofocus/>
+                    <input type="email" name="username" id="username" class="h-12 w-full rounded-2xl pl-14 pr-5 text-sm font-semibold outline-none glass-input focus:bg-white/90 shadow-sm" placeholder="admin@helukabel.vn" required autofocus/>
                 </div>
             </div>
 
@@ -72,7 +71,7 @@
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-helu-red transition-colors">
                         <i data-lucide="lock" class="w-5 h-5"></i>
                     </div>
-                    <input type="password" name="password" class="h-12 w-full rounded-2xl border border-gray-100 bg-gray-50 pl-14 pr-5 text-sm font-semibold outline-none focus:border-helu-red/50 focus:bg-white focus:ring-4 focus:ring-helu-red/5 transition-all shadow-sm shadow-inner" placeholder="••••••••" required/>
+                    <input type="password" name="password" id="password" class="h-12 w-full rounded-2xl pl-14 pr-5 text-sm font-semibold outline-none glass-input focus:bg-white/90 shadow-sm" placeholder="••••••••" required/>
                 </div>
             </div>
 
@@ -95,13 +94,15 @@
                 <div class="h-px flex-1 bg-gray-100"></div>
             </div>
             <div class="grid grid-cols-2 gap-3 mb-4">
-                <div class="p-2.5 bg-gray-50 rounded-xl border border-gray-100/50 flex flex-col justify-center">
+                <div class="p-2.5 bg-white/30 backdrop-blur-md rounded-xl border border-white/50 flex flex-col justify-center test-account hover:bg-white/50 transition-all" data-username="admin@helukabel.vn" data-password="123">
                     <p class="text-[9px] font-bold text-gray-400 uppercase mb-0.5">Quản trị</p>
                     <p class="text-[10px] font-semibold text-gray-600">admin@helukabel.vn | 123</p>
+                    <button type="button" class="mt-2 text-xs font-medium text-helu-red hover:underline" onclick="fillCredentials(this)">Sử dụng</button>
                 </div>
-                <div class="p-2.5 bg-gray-50 rounded-xl border border-gray-100/50 flex flex-col justify-center">
+                <div class="p-2.5 bg-white/30 backdrop-blur-md rounded-xl border border-white/50 flex flex-col justify-center test-account hover:bg-white/50 transition-all" data-username="seller_thanh@helukabel.vn" data-password="123">
                     <p class="text-[9px] font-bold text-gray-400 uppercase mb-0.5">Nhân viên</p>
-                    <p class="text-[10px] font-semibold text-gray-600">thanh0@helukabel.vn | 123</p>
+                    <p class="text-[10px] font-semibold text-gray-600">seller_thanh@helukabel.vn | 123</p>
+                    <button type="button" class="mt-2 text-xs font-medium text-helu-red hover:underline" onclick="fillCredentials(this)">Sử dụng</button>
                 </div>
             </div>
 
@@ -117,6 +118,17 @@
 
 <script>
     lucide.createIcons();
+    function fillCredentials(btn) {
+        const container = btn.closest('.test-account');
+        const username = container.dataset.username;
+        const password = container.dataset.password;
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        if (usernameInput && passwordInput) {
+            usernameInput.value = username;
+            passwordInput.value = password;
+        }
+    }
 </script>
 </body>
 </html>

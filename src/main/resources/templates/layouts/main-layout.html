@@ -7,8 +7,8 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Main CSS -->
-    <link rel="stylesheet" th:href="@{/css/layout.css}">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css(v=3)}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v=3)}">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -30,14 +30,17 @@
     <!-- Icons (Lucide) -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gray-50 font-['Inter'] antialiased">
-    <div class="flex min-h-screen">
+<body class="font-['Inter'] antialiased min-h-screen relative overflow-x-hidden">
+    <!-- Glowing Glassmorphism Background Orbs -->
+    <div class="bg-glow-orb w-[500px] h-[500px] bg-red-200/30 -top-40 -left-40"></div>
+    <div class="bg-glow-orb w-[600px] h-[600px] bg-blue-200/20 -bottom-40 -right-40" style="animation-duration: 25s; animation-direction: reverse;"></div>
+    <div class="bg-glow-orb w-[400px] h-[400px] bg-purple-100/20 top-1/3 left-1/3" style="animation-duration: 30s;"></div>
+
+    <div class="flex min-h-screen relative z-10">
         <!-- Sidebar -->
         <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-        <!-- Main Content -->
-        <main class="flex-1 flex flex-col lg:ml-64 transition-all duration-300">
-            <!-- Header -->
+        <main class="flex-1 flex flex-col lg:ml-64 transition-all duration-300 min-w-0">
             <div th:replace="~{fragments/header :: header}"></div>
 
             <!-- Content Body -->
@@ -47,9 +50,227 @@
         </main>
     </div>
 
+    <!-- Floating Chatbot Widget -->
+    <div id="floatingChatbotWidget" class="fixed bottom-6 right-6 z-[999]">
+        <!-- Trigger Button -->
+        <button id="chatbotTrigger" onclick="toggleFloatingChat()" class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-red-600 to-orange-500 text-white shadow-xl shadow-red-500/40 hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer relative group">
+            <i id="chatbotTriggerIcon" data-lucide="message-square" class="w-6 h-6 transition-all duration-300"></i>
+            <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white"></span>
+            </span>
+        </button>
+
+        <!-- Chat Window -->
+        <div id="chatbotWindow" class="absolute bottom-20 right-0 hidden w-[380px] h-[520px] flex-col rounded-3xl border border-gray-100 bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-300 overflow-hidden">
+            <!-- Header -->
+            <div class="flex items-center justify-between bg-gradient-to-r from-gray-900 via-gray-800 to-red-950 px-5 py-4 text-white shadow-md">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-white shadow-md"><i data-lucide="bot" class="w-5 h-5"></i></div>
+                    <div>
+                        <span class="block text-xs font-black tracking-wider">HELUKABEL AI Assistant</span>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                            </span>
+                            <span class="text-[9px] font-medium text-emerald-400">Online • Hỗ trợ 24/7</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <a href="/chatbot" class="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white transition-all" title="Mở rộng không gian làm việc">
+                        <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                    </a>
+                    <button onclick="toggleFloatingChat()" class="rounded-lg p-1.5 text-gray-400 hover:bg-white/10 hover:text-white transition-all">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages List -->
+            <div id="floatingChatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50" style="scroll-behavior: smooth;">
+                <div class="flex gap-2.5 items-start">
+                    <div class="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-white flex-shrink-0 shadow-md"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div>
+                    <div class="rounded-2xl rounded-tl-none bg-white p-3 border border-gray-100 text-xs text-gray-700 max-w-[80%] shadow-sm leading-relaxed font-medium">
+                        Xin chào! Tôi là trợ lý ảo AI của **HELUKABEL**. Bạn có thể hỏi tôi về tổng quan lead, doanh thu, hiệu suất seller hoặc các dự báo kinh doanh.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggestion Prompt Starters -->
+            <div class="px-4 py-2.5 bg-white border-t border-gray-100 flex gap-1.5 overflow-x-auto whitespace-nowrap" style="ms-overflow-style: none; scrollbar-width: none;">
+                <button onclick="triggerQuickPrompt('Tình hình lead hiện tại?')" class="flex-shrink-0 rounded-full border border-gray-100 bg-gray-50 hover:bg-red-50/20 hover:border-red-200 hover:text-red-600 px-3 py-1.5 text-[10px] text-gray-600 transition-all font-semibold cursor-pointer shadow-sm">
+                    📊 Tổng quan Lead
+                </button>
+                <button onclick="triggerQuickPrompt('Doanh thu theo seller?')" class="flex-shrink-0 rounded-full border border-gray-100 bg-gray-50 hover:bg-red-50/20 hover:border-red-200 hover:text-red-600 px-3 py-1.5 text-[10px] text-gray-600 transition-all font-semibold cursor-pointer shadow-sm">
+                    💰 Doanh thu Seller
+                </button>
+                <button onclick="triggerQuickPrompt('Top 5 lý do Lost phổ biến nhất?')" class="flex-shrink-0 rounded-full border border-gray-100 bg-gray-50 hover:bg-red-50/20 hover:border-red-200 hover:text-red-600 px-3 py-1.5 text-[10px] text-gray-600 transition-all font-semibold cursor-pointer shadow-sm">
+                    ⚠️ Lý do Lost
+                </button>
+                <button onclick="triggerQuickPrompt('Dự đoán doanh thu tháng sau?')" class="flex-shrink-0 rounded-full border border-gray-100 bg-gray-50 hover:bg-red-50/20 hover:border-red-200 hover:text-red-600 px-3 py-1.5 text-[10px] text-gray-600 transition-all font-semibold cursor-pointer shadow-sm">
+                    📈 Dự báo doanh thu
+                </button>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-3 border-t border-gray-100 bg-white flex gap-2 items-center">
+                <input type="text" id="floatingChatInput" placeholder="Nhập câu hỏi tại đây..." class="flex-1 h-10 px-4 rounded-xl border border-gray-200 outline-none text-xs focus:border-red-500 focus:bg-gray-50/30 focus:ring-1 focus:ring-red-500/20 transition-all font-medium" onkeydown="handleFloatingChatKey(event)" />
+                <button onclick="sendFloatingChatMessage()" class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-200 transition-all active:scale-95 cursor-pointer focus:outline-none">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Initialize Lucide icons globally
         lucide.createIcons();
+
+        // Hide floating chatbot on chatbot page itself
+        if (window.location.pathname === '/chatbot') {
+            document.getElementById('floatingChatbotWidget').classList.add('hidden');
+        }
+
+        function toggleFloatingChat() {
+            const chatWin = document.getElementById('chatbotWindow');
+            const triggerIcon = document.getElementById('chatbotTriggerIcon');
+            
+            chatWin.classList.toggle('hidden');
+            chatWin.classList.toggle('flex');
+            
+            if (chatWin.classList.contains('flex')) {
+                document.getElementById('floatingChatInput').focus();
+                triggerIcon.setAttribute('data-lucide', 'message-square');
+            } else {
+                triggerIcon.setAttribute('data-lucide', 'message-square');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function triggerQuickPrompt(text) {
+            document.getElementById('floatingChatInput').value = text;
+            sendFloatingChatMessage();
+        }
+
+        function handleFloatingChatKey(e) {
+            if (e.key === 'Enter') {
+                sendFloatingChatMessage();
+            }
+        }
+
+        async function sendFloatingChatMessage() {
+            const input = document.getElementById('floatingChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            appendFloatingMessage(message, true);
+
+            // Typing indicator
+            const typingId = appendFloatingTyping();
+
+            try {
+                const response = await fetch('/api/chatbot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                document.getElementById(typingId)?.remove();
+
+                if (response.ok) {
+                    const data = await response.json();
+                    appendFloatingMessage(data.response, false);
+                } else {
+                    appendFloatingMessage("Đã xảy ra lỗi khi gửi tin nhắn tới trợ lý ảo.", false);
+                }
+            } catch (err) {
+                document.getElementById(typingId)?.remove();
+                console.error("Chat error:", err);
+                appendFloatingMessage("Lỗi kết nối tới hệ thống AI.", false);
+            }
+        }
+
+        function appendFloatingMessage(text, isUser) {
+            const container = document.getElementById('floatingChatMessages');
+            const msgEl = document.createElement('div');
+            msgEl.className = `flex gap-2.5 items-start ${isUser ? 'flex-row-reverse' : ''}`;
+            
+            const avatarHtml = isUser 
+                ? `<div class="flex h-7 w-7 items-center justify-center rounded-xl bg-gray-100 text-gray-500 flex-shrink-0 shadow-sm border border-gray-200/50"><i data-lucide="user" class="w-3.5 h-3.5"></i></div>`
+                : `<div class="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-white flex-shrink-0 shadow-md"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div>`;
+
+            const bgClass = isUser 
+                ? 'bg-gradient-to-br from-red-600 to-red-700 text-white rounded-tr-none shadow-md shadow-red-500/10' 
+                : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none shadow-sm';
+
+            // Convert markdown style linebreaks/bold
+            let formattedText = text
+                .replace(/\n/g, '<br/>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            msgEl.innerHTML = `
+                ${avatarHtml}
+                <div class="rounded-2xl ${bgClass} p-3 text-xs max-w-[80%] leading-relaxed font-medium">
+                    ${formattedText}
+                </div>
+            `;
+
+            container.appendChild(msgEl);
+            container.scrollTop = container.scrollHeight;
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function appendFloatingTyping() {
+            const container = document.getElementById('floatingChatMessages');
+            const typingId = 'typing-' + Date.now();
+            const msgEl = document.createElement('div');
+            msgEl.id = typingId;
+            msgEl.className = 'flex gap-2.5 items-start';
+            msgEl.innerHTML = `
+                <div class="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-tr from-red-500 to-red-600 text-white flex-shrink-0 shadow-md"><i data-lucide="bot" class="w-3.5 h-3.5"></i></div>
+                <div class="rounded-2xl rounded-tl-none bg-white p-3 border border-gray-100 text-xs text-gray-400 max-w-[80%] shadow-sm flex items-center gap-1.5 font-medium">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.1s"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.2s"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style="animation-delay: 0.3s"></span>
+                </div>
+            `;
+            container.appendChild(msgEl);
+            container.scrollTop = container.scrollHeight;
+            if (window.lucide) lucide.createIcons();
+            return typingId;
+        }
+
+        // Auto-shrink KPI numbers when they are too long
+        document.addEventListener("DOMContentLoaded", () => {
+            const adjustKpiFontSizes = () => {
+                const kpis = document.querySelectorAll('.kpi-card [id^="kpi"], .kpi-card .animate-counter');
+                kpis.forEach(el => {
+                    const text = el.textContent.trim();
+                    const len = text.length;
+                    if (len > 14) {
+                        el.style.setProperty('font-size', '0.78rem', 'important'); // Very long numbers (e.g. 100,000,000 VNĐ)
+                    } else if (len > 11) {
+                        el.style.setProperty('font-size', '0.92rem', 'important'); // Long numbers (e.g. 1,000,000 VNĐ)
+                    } else if (len > 8) {
+                        el.style.setProperty('font-size', '1.12rem', 'important'); // Medium numbers (e.g. 100,000 VNĐ)
+                    } else {
+                        el.style.fontSize = ''; // Default style
+                    }
+                });
+            };
+
+            // Run initial adjustment after rendering
+            setTimeout(adjustKpiFontSizes, 150);
+
+            // Observe text changes (useful for counts that start at 0 and count up)
+            const observer = new MutationObserver(adjustKpiFontSizes);
+            document.querySelectorAll('.kpi-card [id^="kpi"]').forEach(el => {
+                observer.observe(el, { childList: true, characterData: true, subtree: true });
+            });
+        });
     </script>
 </body>
 </html>

@@ -28,9 +28,46 @@ public class HomeController {
         return "dashboard/dashboard-home";
     }
 
-    @GetMapping("/staff/dashboard")
-    public String staffDashboard(org.springframework.ui.Model model) {
+    @GetMapping("/dashboard/test")
+    public String dashboardTestPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "dashboard-test");
+        return "dashboard/dashboard-test";
+    }
+
+    @GetMapping("/dashboard/lead-source-analysis")
+    public String leadSourceAnalysisPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "lead-source-analysis");
+        return "dashboard/lead-source-analysis";
+    }
+
+    @GetMapping("/dashboard/sales-performance-analysis")
+    public String salesPerformanceAnalysisPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "sales-performance-analysis");
+        return "dashboard/sales-performance-analysis";
+    }
+
+
+    @GetMapping("/seller/dashboard")
+    public String sellerDashboard(org.springframework.ui.Model model) {
         model.addAttribute("activeMenu", "dashboard");
         return "dashboard/dashboard-seller";
+    }
+
+    @GetMapping("/seller/leads")
+    public String sellerLeadsPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "leads");
+        return "seller/lead-management";
+    }
+
+    @GetMapping("/customer-analysis")
+    public String customerAnalysisPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "customer-analysis");
+        return "dashboard/customer-analysis";
+    }
+
+    @GetMapping("/chatbot")
+    public String chatbotPage(org.springframework.ui.Model model) {
+        model.addAttribute("activeMenu", "chatbot");
+        return "chatbot/chatbot-workspace";
     }
 }

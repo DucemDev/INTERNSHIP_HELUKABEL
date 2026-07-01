@@ -99,6 +99,12 @@ public class DashboardController {
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return dashboardService.getROIByLeadSource();
     }
+
+    @GetMapping("/lead-source-summary")
+    public List<LeadSourceSummaryResponse> getLeadSourceSummary() {
+        return dashboardService.getLeadSourceSummary();
+    }
+
     @GetMapping("/conversion-rate/filter")
     public List<ConversionRateResponse> getConversionRateFilter(
             @RequestParam(required = false) String sourceId,
@@ -127,20 +133,48 @@ public class DashboardController {
         return dashboardService.getPipelineCoverage(null);
     }
 
-    // --- STAFF ENDPOINTS ---
+    // --- SELLER ENDPOINTS ---
 
-    @GetMapping("/staff/stats")
+    @GetMapping("/seller/stats")
     public ConversionRateResponse getStaffStats(Principal principal) {
         return dashboardService.getStaffStats(principal.getName());
     }
 
-    @GetMapping("/staff/pipeline-coverage")
-    public List<PipelineCoverageProjection> getStaffPipelineCoverage(Principal principal) {
-        return dashboardService.getStaffPipelineCoverage(principal.getName());
+    @GetMapping("/seller/pipeline-coverage")
+    public List<PipelineCoverageProjection> getStaffPipelineCoverage(
+            @RequestParam(value = "quarter", required = false) Integer quarter,
+            @RequestParam(value = "year", required = false) Integer year,
+            Principal principal) {
+        return dashboardService.getStaffPipelineCoverage(principal.getName(), quarter, year);
+    }
+
+    @GetMapping("/seller/kpi-leads")
+    public java.util.Map<String, Object> getStaffKpiLeads(
+            @RequestParam(value = "quarter", required = false) Integer quarter,
+            @RequestParam(value = "year", required = false) Integer year,
+            Principal principal) {
+        return dashboardService.getStaffKpiLeads(principal.getName(), quarter, year);
+    }
+
+    @GetMapping("/seller/leads-by-status-count")
+    public List<LeadStatusCountResponse> getSellerLeadsByStatusCount(Principal principal) {
+        return dashboardService.getSellerLeadsByStatusCount(principal.getName());
     }
     @GetMapping("/sales-owner-dashboard")
     public List<SalesOwnerDashboardProjection> getSalesOwnerDashboard() {
         return dashboardService.getSalesOwnerDashboard();
+    }
+    @GetMapping("/sales-owner-dashboard-by-quarter")
+    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(@RequestParam String quarter, @RequestParam(required = false) Integer year) {
+        return dashboardService.getSalesOwnerDashboardByQuarter(quarter, year);
+    }
+    @GetMapping("/win-rate-by-saleowner-by-quarter")
+    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(@RequestParam String quarter, @RequestParam(required = false) Integer year) {
+        return dashboardService.getWinRateBySalesOwnerByQuarter(quarter, year);
+    }
+    @GetMapping("/pipeline-coverage-by-quarter")
+    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(@RequestParam String quarter, @RequestParam(required = false) Integer year) {
+        return dashboardService.getPipelineCoverageByQuarter(quarter, year);
     }
     @GetMapping("/revenue-summary")
     public RevenueSummaryProjection getRevenueSummary() {
@@ -162,8 +196,8 @@ public class DashboardController {
     }
 
     @GetMapping("/revenue-quarterly")
-    public List<RevenueQuarterlyProjection> getRevenueQuarterly() {
-        return dashboardService.getRevenueQuarterly();
+    public List<RevenueQuarterlyProjection> getRevenueQuarterly(@RequestParam(required = false) Integer year) {
+        return dashboardService.getRevenueQuarterly(year);
     }
 
     @GetMapping("/lead-monthly")
@@ -172,8 +206,8 @@ public class DashboardController {
     }
 
     @GetMapping("/lead-quarterly")
-    public List<LeadQuarterlyProjection> getLeadQuarterly() {
-        return dashboardService.getLeadQuarterly();
+    public List<LeadQuarterlyProjection> getLeadQuarterly(@RequestParam(required = false) Integer year) {
+        return dashboardService.getLeadQuarterly(year);
     }
     @GetMapping("/revenue-seller-monthly")
     public List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly() {
@@ -237,11 +271,26 @@ public class DashboardController {
     public List<LostLeadBySourceResponse> getLostLeadBySource() {
         return dashboardService.getLostLeadBySource();
     }
-// dashoard khách hàng có doanh thu cao nhất //
-@GetMapping("/best-account-revenue")
-public BestAccountRevenueResponse getBestAccountByRevenue() {
-    return dashboardService.getBestAccountByRevenue();
-}
+    @GetMapping("/total-accounts")
+    public Long countTotalAccounts() {
+        return dashboardService.countTotalAccounts();
+    }
+
+    @GetMapping("/won-accounts")
+    public Long countWonAccounts() {
+        return dashboardService.countWonAccounts();
+    }
+
+    @GetMapping("/top-underserved-segment")
+    public TopUnderservedSegmentProjection getTopUnderservedSegment() {
+        return dashboardService.getTopUnderservedSegment();
+    }
+
+    // dashoard khách hàng có doanh thu cao nhất //
+    @GetMapping("/best-account-revenue")
+    public BestAccountRevenueResponse getBestAccountByRevenue() {
+        return dashboardService.getBestAccountByRevenue();
+    }
 // dáshboard industry có tổng won cao nhất //
     @GetMapping("/best-industry-won-deal")
     public BestIndustryByWonDealResponse getBestIndustryByWonDeal() {
@@ -434,7 +483,15 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
     public List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore() {
         return dashboardService.getSalesOwnerAvgBantScore();
     }
-// dashboard các lý do thua theo sản phẩm //
+
+    // Customer Value Matrix chart data
+    //biểu đồ bà lôn
+    @GetMapping("/customer-value-matrix")
+    public List<CustomerValueMatrixResponse> getCustomerValueMatrix() {
+        return dashboardService.getCustomerValueMatrix();
+    }
+
+    // dashboard các lý do thua theo sản phẩm //
     @GetMapping("/product-line/loss-reasons")
     public List<LossReasonByProductLineResponse> getLossReasonByProductLine() {
         return dashboardService.getLossReasonByProductLine();
@@ -471,6 +528,11 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
         return dashboardService.getSalesOwnerByProductLine(productLine);
     }
 
+
+    @GetMapping("/daily-compare")
+    public DailyCompareResponse getDailyCompare() {
+        return dashboardService.getDailyCompare();
+    }
 
 
 

@@ -1,34 +1,256 @@
-/* Custom styles for HELUKABEL CRM */
-/* Most styles have been migrated to Tailwind CSS */
+/* --- LINEAR.APP-INSPIRED LIGHT UI OVERRIDES --- */
 
 :root {
-    --helu-red: #f6171b;
-    --helu-dark: #1a1a1a;
-    --helu-light: #f7f7f7;
-    --helu-border: #eeeeee;
+    --linear-bg: #f4f5f6;
+    --linear-panel-bg: #ffffff;
+    --linear-border: #e4e4e7;
+    --linear-accent: #f6171b; /* Restored HELUKABEL Brand Red */
+    --linear-accent-light: rgba(246, 23, 27, 0.08);
+    --linear-text-main: #0f0f11;
+    --linear-text-muted: #52525b;
+    --linear-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+/* Reset to Linear Font and Clean Background */
+body {
+    background-color: #fafbfd !important;
+    background-image: 
+        radial-gradient(rgba(0, 0, 0, 0.03) 1.2px, transparent 1.2px), /* Subtle dot grid pattern */
+        linear-gradient(135deg, #fcfdff 0%, #f1f4f9 50%, #fff1f2 100%) !important;
+    background-size: 24px 24px, cover !important;
+    background-attachment: fixed !important;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    color: var(--linear-text-main) !important;
 }
 
-::-webkit-scrollbar-track {
-    background: transparent;
+/* Disable background glowing blobs */
+.bg-glow-orb {
+    display: none !important;
 }
 
-::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
-    border-radius: 10px;
+/* Clean UI panels with surgical precision borders */
+main .bg-white,
+main .bg-gray-50,
+main .bg-slate-50,
+main .bg-slate-100,
+main div[class*="bg-white"],
+main div[class*="bg-gray-50"],
+main div[class*="bg-slate-50"],
+main div[class*="bg-slate-100"],
+main section[class*="bg-white"],
+main section[class*="bg-gray-"],
+main section[class*="bg-slate-"],
+main .kpi-card,
+.glass-panel {
+    background-color: rgba(255, 255, 255, 0.75) !important; /* Soft translucent card background */
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid var(--linear-border) !important;
+    box-shadow: var(--linear-shadow) !important;
+    border-radius: 8px !important; /* Sharp 8px rounded corners */
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #cbd5e1;
+/* Hover effects for Linear panels */
+main .kpi-card:hover,
+main div[class*="hover:shadow-md"]:hover,
+.glass-panel-hover:hover {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.05),
+                0 1px 0px 0px rgba(255, 255, 255, 0.6) inset !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease-in-out !important;
 }
 
-/* Custom animation for modals */
-.animate-in {
-    animation-duration: 0.2s;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+/* Modals styled like Linear sheets */
+.inline-block[class*="bg-white"],
+div[id*="modal"] .bg-white,
+div[id*="Modal"] .bg-white {
+    background-color: var(--linear-panel-bg) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid var(--linear-border) !important;
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 12px !important;
 }
+
+/* Navigation items overrides (Sidebar & Header) */
+aside.sidebar {
+    background-color: #fafafa !important;
+    backdrop-filter: none !important;
+    border-right: 1px solid var(--linear-border) !important;
+    box-shadow: none !important;
+}
+header {
+    background-color: var(--linear-panel-bg) !important;
+    backdrop-filter: none !important;
+    border-bottom: 1px solid var(--linear-border) !important;
+    box-shadow: none !important;
+}
+
+/* Active menu item styling mimicking Linear active states */
+aside.sidebar div[class*="bg-helu-red"] {
+    background-color: var(--linear-accent-light) !important;
+    color: var(--linear-accent) !important;
+    box-shadow: none !important;
+}
+aside.sidebar div[class*="bg-helu-red"] a,
+aside.sidebar div[class*="bg-helu-red"] span,
+aside.sidebar div[class*="bg-helu-red"] i {
+    color: var(--linear-accent) !important;
+}
+
+/* Remap brand colors to Linear Accent (HELUKABEL Red) */
+.bg-helu-red {
+    background-color: var(--linear-accent) !important;
+}
+.text-helu-red, .hover\:text-helu-red:hover {
+    color: var(--linear-accent) !important;
+}
+.shadow-red-200 {
+    box-shadow: 0 4px 12px rgba(246, 23, 27, 0.15) !important;
+}
+
+/* Tables styling */
+main table, 
+main .divide-y, 
+main tbody {
+    background: transparent !important;
+}
+main tr {
+    background: transparent !important;
+    transition: background-color 0.15s ease;
+}
+main tr:hover {
+    background-color: #fafafa !important;
+}
+main th {
+    background-color: #fafafa !important;
+    backdrop-filter: none !important;
+    border-bottom: 1px solid var(--linear-border) !important;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--linear-text-muted);
+}
+main td {
+    border-bottom: 1px solid #f4f4f5 !important;
+}
+
+/* Precise Input Fields */
+main input[type="text"],
+main input[type="email"],
+main input[type="password"],
+main input[type="number"],
+main input[type="tel"],
+main select,
+main textarea,
+.glass-input {
+    background-color: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid var(--linear-border) !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    transition: all 0.15s ease !important;
+}
+
+main input[type="text"]:focus,
+main input[type="email"]:focus,
+main input[type="password"]:focus,
+main input[type="number"]:focus,
+main input[type="tel"]:focus,
+main select:focus,
+main textarea:focus,
+.glass-input:focus {
+    background-color: #ffffff !important;
+    border-color: var(--linear-accent) !important;
+    box-shadow: 0 0 0 3px rgba(246, 23, 27, 0.1) !important;
+    outline: none !important;
+}
+
+/* Sharp precise buttons */
+main button.bg-white,
+main a.bg-white {
+    background-color: #ffffff !important;
+    border: 1px solid var(--linear-border) !important;
+    border-radius: 6px !important;
+}
+main button.bg-white:hover,
+main a.bg-white:hover {
+    background-color: #fafafa !important;
+    border-color: #d4d4d8 !important;
+}
+
+/* --- DETAILED SOFT COLOR BACKGROUNDS FOR KPI CARDS --- */
+.kpi-card {
+    background-color: #ffffff !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' preserveAspectRatio='none'%3E%3Cpath d='M0,25 C20,20 40,28 60,15 C80,2 100,10 120,5 L120,30 L0,30 Z' fill='rgba(59, 130, 246, 0.04)'/%3E%3C/svg%3E") !important;
+    background-position: bottom !important;
+    background-size: 100% 70px !important; /* Made the wave background significantly taller */
+    background-repeat: no-repeat !important;
+    border: none !important; /* Removed borders entirely */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.kpi-card:hover {
+    background-color: #ffffff !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' preserveAspectRatio='none'%3E%3Cpath d='M0,25 C20,20 40,28 60,15 C80,2 100,10 120,5 L120,30 L0,30 Z' fill='rgba(59, 130, 246, 0.08)'/%3E%3C/svg%3E") !important;
+    border: none !important;
+    box-shadow: 0 10px 25px rgba(246, 23, 27, 0.06) !important;
+}
+
+/* Sub-layer panel styling (KPIs & Charts) */
+main .kpi-card {
+    background-color: #ffffff !important; /* Pure white for clean contrast and maximum sharpness */
+    border: 1px solid rgba(226, 232, 240, 0.9) !important; /* Sharper slate border */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important; /* Soft minimal shadow */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 1rem 0.85rem !important; /* Reduced padding to give more horizontal room for text */
+}
+main div[class*="min-h-"][class*="rounded-2xl"],
+main div[class*="min-h-"][class*="rounded-3xl"],
+main div[class*="h-"][class*="rounded-2xl"] {
+    background-color: rgba(255, 255, 255, 0.55) !important; /* Premium semi-transparent white */
+    backdrop-filter: blur(16px) saturate(120%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(120%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important; /* Translucent border */
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.03), 
+                0 1px 0px 0px rgba(255, 255, 255, 0.4) inset !important; /* Soft depth shadow */
+}
+
+/* Ensure inner main templates are transparent and remove double padding */
+main main {
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+}
+
+/* Fix for long numbers in KPI cards wrapping/breaking layouts */
+main .kpi-card [id^="kpi"], 
+main .kpi-card .animate-counter {
+    font-size: 1.25rem !important; /* Safeguard size (20px) to prevent wrapping */
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: inline-block !important;
+    max-width: 100% !important;
+}
+@media (min-width: 1280px) {
+    main .kpi-card [id^="kpi"], 
+    main .kpi-card .animate-counter {
+        font-size: 1.38rem !important; /* Scale up to ~22px on larger desktop screens */
+    }
+}
+
+
+
+
+
+
+

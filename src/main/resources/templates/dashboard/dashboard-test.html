@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
+<body>
+    <main class="space-y-8">
+        <div id="debug-error-log" class="text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-100 hidden"></div>
+        
+
+        <!-- Section 1: Lost Deals Analysis -->
+        <div class="space-y-6">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-red-600 rounded-full"></span>
+                    <span>Phân tích Lead thất bại (Lost Leads Analysis)</span>
+                </h2>
+                
+                <!-- Category Select Tabs for Lost Analysis -->
+                <div class="flex flex-wrap gap-1.5" id="lostCategoryTabs">
+                    <button onclick="switchLostCategory('reasons')" id="lost-tab-reasons" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-helu-red text-white bg-helu-red hover:bg-red-700 shadow-sm shadow-red-500/10">
+                        Theo Lý Do (/lost-reasons)
+                    </button>
+                    <button onclick="switchLostCategory('seller')" id="lost-tab-seller" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
+                        Theo Seller (/lost-by-seller)
+                    </button>
+                    <button onclick="switchLostCategory('source')" id="lost-tab-source" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
+                        Theo Nguồn (/lost-by-source)
+                    </button>
+                    <button onclick="switchLostCategory('region')" id="lost-tab-region" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
+                        Theo Khu vực (/lost-by-region)
+                    </button>
+                    <button onclick="switchLostCategory('industry')" id="lost-tab-industry" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
+                        Theo Ngành (/lost-by-industry)
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                <div class="relative w-full flex-1">
+                    <canvas id="combinedLostChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Revenue Segmentation breakdown -->
+        <div class="space-y-6 pt-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-emerald-600 rounded-full"></span>
+                    <span>Phân khúc doanh số thực tế (Revenue Segmentations)</span>
+                </h2>
+                
+                <div class="flex flex-wrap gap-1.5" id="revenueSegmentTabs">
+                    <button onclick="switchRevenueSegment('industry')" id="rev-tab-industry" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-helu-red text-white bg-helu-red hover:bg-red-700 shadow-sm shadow-red-500/10">
+                        Theo Ngành nghề (/revenue-industry)
+                    </button>
+                    <button onclick="switchRevenueSegment('region')" id="rev-tab-region" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
+                        Theo Khu vực (/revenue-region)
+                    </button>
+                    <button onclick="switchRevenueSegment('product-line')" id="rev-tab-product-line" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
+                        Theo Dòng SP (/revenue-product-line)
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                <div class="relative w-full flex-1">
+                    <canvas id="combinedRevenueSegmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Monthly & Quarterly Historical Trends -->
+        <div class="space-y-6 pt-4">
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-1.5 h-5 bg-indigo-600 rounded-full"></span>
+                <span>Xu hướng lịch sử doanh số & leads (Monthly & Quarterly Historical Trends)</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Monthly Trends -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                    <h4 class="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4 flex justify-between items-center">
+                        <span>Biến động theo Tháng</span>
+                        <span class="text-[10px] text-slate-400 font-mono">/revenue-monthly & /lead-monthly</span>
+                    </h4>
+                    <div class="relative w-full flex-1">
+                        <canvas id="monthlyRevVolChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quarterly Trends -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[400px]">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-sm font-bold text-slate-700 uppercase tracking-wide">
+                            Biến động theo Quý
+                        </h4>
+                        <div class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 border border-slate-200 rounded-lg shadow-sm">
+                            <label for="dashboardYearFilter" class="text-[10px] font-bold text-slate-500 uppercase">Năm:</label>
+                            <select id="dashboardYearFilter" onchange="loadMonthlyQuarterlyTrends()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
+                                <option value="2026" selected>2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="">Tất cả</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="relative w-full flex-1">
+                        <canvas id="quarterlyRevVolChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Detailed Monthly Revenue Breakdowns -->
+        <div class="space-y-6 pt-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-purple-600 rounded-full"></span>
+                    <span>Xu hướng doanh thu chi tiết qua từng tháng (Monthly Categories Trends)</span>
+                </h2>
+                
+                <div class="flex flex-wrap gap-1.5" id="monthlyTrendTabs">
+                    <button onclick="switchMonthlyTrendCategory('source')" id="tab-source" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-helu-red text-white bg-helu-red hover:bg-red-700 shadow-sm shadow-red-500/10">
+                        Theo Nguồn (/revenue-source-monthly)
+                    </button>
+                    <button onclick="switchMonthlyTrendCategory('region')" id="tab-region" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
+                        Theo Khu vực (/revenue-region-monthly)
+                    </button>
+                    <button onclick="switchMonthlyTrendCategory('industry')" id="tab-industry" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
+                        Theo Ngành (/revenue-industry-monthly)
+                    </button>
+                    <button onclick="switchMonthlyTrendCategory('product')" id="tab-product" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-all border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 shadow-sm">
+                        Theo Dòng SP (/revenue-product-line-monthly)
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[500px]">
+                <div class="relative w-full flex-1">
+                    <canvas id="monthlyCategoryTrendsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- JavaScript Libraries -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+        <script th:inline="javascript">
+            window.addEventListener('error', function(e) {
+                const logDiv = document.getElementById('debug-error-log');
+                if (logDiv) {
+                    logDiv.classList.remove('hidden');
+                    logDiv.innerText += "\n[JS Error]: " + e.message + " (" + e.filename + ":" + e.lineno + ")";
+                }
+            });
+            window.addEventListener('unhandledrejection', function(e) {
+                const logDiv = document.getElementById('debug-error-log');
+                if (logDiv) {
+                    logDiv.classList.remove('hidden');
+                    logDiv.innerText += "\n[Promise Error]: " + e.reason;
+                }
+            });
+
+            let testCharts = {};
+            let currentLostCategory = 'reasons';
+            let currentRevenueSegment = 'industry';
+            let currentMonthlyTrendCategory = 'source';
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                await refreshTestData();
+            });
+
+            async function refreshTestData() {
+                const icon = document.getElementById('refresh-test-icon');
+                if (icon) icon.classList.add('animate-spin');
+
+                await Promise.all([
+                    loadLostAnalysis(),
+                    loadRevenueSegment(),
+                    loadMonthlyQuarterlyTrends(),
+                    loadMonthlyCategoryTrends()
+                ]);
+
+                if (icon) setTimeout(() => icon.classList.remove('animate-spin'), 500);
+            }
+
+            // SECTION 1: Lost Deals Analysis
+            function switchLostCategory(category) {
+                currentLostCategory = category;
+                const buttons = document.querySelectorAll('#lostCategoryTabs button');
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                    btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                });
+                const activeBtn = document.getElementById('lost-tab-' + category);
+                if (activeBtn) {
+                    activeBtn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                    activeBtn.classList.add('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                }
+                loadLostAnalysis();
+            }
+
+            // Register ChartDataLabels plugin globally
+            Chart.register(ChartDataLabels);
+
+            async function loadLostAnalysis() {
+                try {
+                    const chartId = 'combinedLostChart';
+                    let url = '';
+                    let labelKey = '';
+                    let valueKey = 'lostLead';
+                    let type = 'bar';
+                    let options = {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { display: false },
+                            datalabels: { display: false } // Default disabled for bar charts
+                        }
+                    };
+
+                    switch (currentLostCategory) {
+                        case 'reasons':
+                            url = '/api/dashboard/lost-reasons';
+                            labelKey = 'lossReason';
+                            valueKey = 'totalLost';
+                            type = 'doughnut';
+                            options.plugins.legend = { display: true, position: 'right' };
+                            options.plugins.datalabels = {
+                                display: true,
+                                color: '#ffffff',
+                                font: { weight: 'bold', size: 12 },
+                                formatter: (val) => val
+                            };
+                            break;
+                        case 'seller':
+                            url = '/api/dashboard/lost-by-seller';
+                            labelKey = 'salesOwner';
+                            break;
+                        case 'source':
+                            url = '/api/dashboard/lost-by-source';
+                            labelKey = 'sourceName';
+                            break;
+                        case 'region':
+                            url = '/api/dashboard/lost-by-region';
+                            labelKey = 'region';
+                            break;
+                        case 'industry':
+                            url = '/api/dashboard/lost-by-industry';
+                            labelKey = 'industryType';
+                            break;
+                    }
+
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    const existingChart = Chart.getChart(chartId);
+                    if (existingChart) existingChart.destroy();
+
+                    const ctx = document.getElementById(chartId).getContext('2d');
+                    testCharts[chartId] = new Chart(ctx, {
+                        type: type,
+                        data: {
+                            labels: data.map(d => d[labelKey] || 'N/A'),
+                            datasets: [{
+                                data: data.map(d => d[valueKey] || 0),
+                                backgroundColor: type === 'doughnut' 
+                                    ? ['#ef4444', '#f97316', '#fbbf24', '#8b5cf6', '#3b82f6', '#10b981', '#64748b']
+                                    : '#f87171',
+                                borderRadius: type === 'bar' ? 6 : 0
+                            }]
+                        },
+                        options: options
+                    });
+                } catch (e) {
+                    console.error("Error loading lost analysis:", e);
+                }
+            }
+
+            // SECTION 2: Revenue Segmentations
+            function switchRevenueSegment(segment) {
+                currentRevenueSegment = segment;
+                const buttons = document.querySelectorAll('#revenueSegmentTabs button');
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                    btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                });
+                const activeBtn = document.getElementById('rev-tab-' + segment);
+                if (activeBtn) {
+                    activeBtn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                    activeBtn.classList.add('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                }
+                loadRevenueSegment();
+            }
+
+            async function loadRevenueSegment() {
+                try {
+                    const chartId = 'combinedRevenueSegmentChart';
+                    let url = '';
+                    let labelKey = '';
+                    let type = 'bar';
+                    let options = {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { display: false },
+                            datalabels: { display: false } // Default disabled for bar charts
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    callback: (val) => val.toLocaleString('vi-VN') + ' đ'
+                                }
+                            }
+                        }
+                    };
+
+                    switch (currentRevenueSegment) {
+                        case 'industry':
+                            url = '/api/dashboard/revenue-industry';
+                            labelKey = 'industry';
+                            type = 'pie';
+                            options.plugins.legend = { display: true, position: 'right' };
+                            options.plugins.datalabels = {
+                                display: true,
+                                color: '#ffffff',
+                                font: { weight: 'bold', size: 11 },
+                                formatter: (val) => {
+                                    if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+                                    if (val > 0) return (val / 1000).toFixed(0) + 'K';
+                                    return val;
+                                }
+                            };
+                            delete options.scales;
+                            break;
+                        case 'region':
+                            url = '/api/dashboard/revenue-region';
+                            labelKey = 'region';
+                            break;
+                        case 'product-line':
+                            url = '/api/dashboard/revenue-product-line';
+                            labelKey = 'productName';
+                            type = 'doughnut';
+                            options.plugins.legend = { display: true, position: 'right' };
+                            options.plugins.datalabels = {
+                                display: true,
+                                color: '#ffffff',
+                                font: { weight: 'bold', size: 11 },
+                                formatter: (val) => {
+                                    if (val >= 1000000) return (val / 1000000).toFixed(1) + 'M';
+                                    if (val > 0) return (val / 1000).toFixed(0) + 'K';
+                                    return val;
+                                }
+                            };
+                            delete options.scales;
+                            break;
+                    }
+
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    const existingChart = Chart.getChart(chartId);
+                    if (existingChart) existingChart.destroy();
+
+                    const ctx = document.getElementById(chartId).getContext('2d');
+                    testCharts[chartId] = new Chart(ctx, {
+                        type: type,
+                        data: {
+                            labels: data.map(d => d[labelKey] || d.productId || 'N/A'),
+                            datasets: [{
+                                data: data.map(d => d.revenue || 0),
+                                backgroundColor: type === 'bar' ? '#0d9488' : ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#d946ef'],
+                                borderRadius: type === 'bar' ? 6 : 0
+                            }]
+                        },
+                        options: options
+                    });
+                } catch (e) {
+                    console.error("Error loading revenue segmentation:", e);
+                }
+            }
+
+            // SECTION 3: Monthly & Quarterly Historical Trends
+            async function loadMonthlyQuarterlyTrends() {
+                try {
+                    // 1. Monthly Trends
+                    const [revMonthlyRes, leadMonthlyRes] = await Promise.all([
+                        fetch('/api/dashboard/revenue-monthly'),
+                        fetch('/api/dashboard/lead-monthly')
+                    ]);
+
+                    if (revMonthlyRes.ok && leadMonthlyRes.ok) {
+                        const revData = await revMonthlyRes.json();
+                        const leadData = await leadMonthlyRes.json();
+
+                        const periods = [...new Set([
+                            ...revData.map(d => `${d.year}-${String(d.month).padStart(2, '0')}`),
+                            ...leadData.map(d => `${d.year}-${String(d.month).padStart(2, '0')}`)
+                        ])].sort();
+
+                        const labels = periods.map(p => {
+                            const [y, m] = p.split('-');
+                            return `${m}/${y}`;
+                        });
+
+                        const revenues = periods.map(p => {
+                            const [y, m] = p.split('-');
+                            const yr = parseInt(y);
+                            const mh = parseInt(m);
+                            const match = revData.find(d => d.year === yr && d.month === mh);
+                            return match ? match.revenue : 0;
+                        });
+
+                        const leadCounts = periods.map(p => {
+                            const [y, m] = p.split('-');
+                            const yr = parseInt(y);
+                            const mh = parseInt(m);
+                            const match = leadData.find(d => d.year === yr && d.month === mh);
+                            return match ? match.totalLead : 0;
+                        });
+
+                        const chartId = 'monthlyRevVolChart';
+                        const existingChart = Chart.getChart(chartId);
+                        if (existingChart) existingChart.destroy();
+                        const ctx = document.getElementById(chartId).getContext('2d');
+                        testCharts[chartId] = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [
+                                    {
+                                        type: 'bar',
+                                        label: 'Doanh thu (VNĐ)',
+                                        data: revenues,
+                                        backgroundColor: '#4f46e5cc',
+                                        yAxisID: 'yRev',
+                                        borderRadius: 4
+                                    },
+                                    {
+                                        type: 'bar',
+                                        label: 'Số lượng Leads',
+                                        data: leadCounts,
+                                        backgroundColor: '#10b981cc',
+                                        yAxisID: 'yVol',
+                                        borderRadius: 4
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    datalabels: { display: false }
+                                },
+                                scales: {
+                                    yRev: {
+                                        type: 'linear',
+                                        position: 'left',
+                                        ticks: { callback: (val) => (val / 1000000).toLocaleString() + 'M' }
+                                    },
+                                    yVol: {
+                                        type: 'linear',
+                                        position: 'right',
+                                        grid: { drawOnChartArea: false }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // 2. Quarterly Trends
+                    const selectedYear = document.getElementById('dashboardYearFilter')?.value || '';
+                    const yearQuery = selectedYear ? `?year=${selectedYear}` : '';
+                    const [revQuarterlyRes, leadQuarterlyRes] = await Promise.all([
+                        fetch(`/api/dashboard/revenue-quarterly${yearQuery}`),
+                        fetch(`/api/dashboard/lead-quarterly${yearQuery}`)
+                    ]);
+
+                    if (revQuarterlyRes.ok && leadQuarterlyRes.ok) {
+                        const revData = await revQuarterlyRes.json();
+                        const leadData = await leadQuarterlyRes.json();
+
+                        const periods = [...new Set([
+                            ...revData.map(d => `${d.year}-Q${d.quarter}`),
+                            ...leadData.map(d => `${d.year}-Q${d.quarter}`)
+                        ])].sort();
+
+                        const labels = periods.map(p => {
+                            const [y, q] = p.split('-');
+                            return `${q}/${y}`;
+                        });
+
+                        const revenues = periods.map(p => {
+                            const [y, q] = p.split('-');
+                            const yr = parseInt(y);
+                            const qtr = parseInt(q.substring(1));
+                            const match = revData.find(d => d.year === yr && d.quarter === qtr);
+                            return match ? match.revenue : 0;
+                        });
+
+                        const leadCounts = periods.map(p => {
+                            const [y, q] = p.split('-');
+                            const yr = parseInt(y);
+                            const qtr = parseInt(q.substring(1));
+                            const match = leadData.find(d => d.year === yr && d.quarter === qtr);
+                            return match ? match.totalLead : 0;
+                        });
+
+                        const chartId = 'quarterlyRevVolChart';
+                        const existingChart = Chart.getChart(chartId);
+                        if (existingChart) existingChart.destroy();
+                        const ctx = document.getElementById(chartId).getContext('2d');
+                        testCharts[chartId] = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [
+                                    {
+                                        type: 'bar',
+                                        label: 'Doanh thu (VNĐ)',
+                                        data: revenues,
+                                        backgroundColor: '#6366f1cc',
+                                        yAxisID: 'yRev',
+                                        borderRadius: 4
+                                    },
+                                    {
+                                        type: 'bar',
+                                        label: 'Số lượng Leads',
+                                        data: leadCounts,
+                                        backgroundColor: '#f59e0bcc',
+                                        yAxisID: 'yVol',
+                                        borderRadius: 4
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    datalabels: { display: false }
+                                },
+                                scales: {
+                                    yRev: {
+                                        type: 'linear',
+                                        position: 'left',
+                                        ticks: { callback: (val) => (val / 1000000).toLocaleString() + 'M' }
+                                    },
+                                    yVol: {
+                                        type: 'linear',
+                                        position: 'right',
+                                        grid: { drawOnChartArea: false }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error loading monthly/quarterly trends:", e);
+                }
+            }
+
+            // SECTION 4: Detailed Monthly Revenue Breakdowns
+            function switchMonthlyTrendCategory(category) {
+                currentMonthlyTrendCategory = category;
+                const buttons = document.querySelectorAll('#monthlyTrendTabs button');
+                buttons.forEach(btn => {
+                    btn.classList.remove('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                    btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                });
+                const activeBtn = document.getElementById('tab-' + category);
+                if (activeBtn) {
+                    activeBtn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200', 'hover:bg-slate-50');
+                    activeBtn.classList.add('bg-helu-red', 'text-white', 'border-helu-red', 'shadow-red-500/10');
+                }
+                loadMonthlyCategoryTrends();
+            }
+
+            async function loadMonthlyCategoryTrends() {
+                try {
+                    let url = '';
+                    let labelKey = '';
+                    
+                    switch (currentMonthlyTrendCategory) {
+                        case 'source':
+                            url = '/api/dashboard/revenue-source-monthly';
+                            labelKey = 'leadSource';
+                            break;
+                        case 'region':
+                            url = '/api/dashboard/revenue-region-monthly';
+                            labelKey = 'region';
+                            break;
+                        case 'industry':
+                            url = '/api/dashboard/revenue-industry-monthly';
+                            labelKey = 'industry';
+                            break;
+                        case 'product':
+                            url = '/api/dashboard/revenue-product-line-monthly';
+                            labelKey = 'productLine';
+                            break;
+                    }
+                    
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    
+                    const periods = [...new Set(data.map(d => `${d.year}-${String(d.month).padStart(2, '0')}`))].sort();
+                    const categories = [...new Set(data.map(d => d[labelKey]))].filter(Boolean);
+                    
+                    const colors = [
+                        '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+                        '#ec4899', '#06b6d4', '#14b8a6', '#f43f5e', '#64748b'
+                    ];
+                    
+                    const datasets = categories.map((cat, idx) => {
+                        const catColor = colors[idx % colors.length];
+                        const datalist = periods.map(p => {
+                            const [yearStr, monthStr] = p.split('-');
+                            const yr = parseInt(yearStr);
+                            const mh = parseInt(monthStr);
+                            const match = data.find(d => d[labelKey] === cat && d.year === yr && d.month === mh);
+                            return match ? match.revenue : 0;
+                        });
+                        
+                        return {
+                            label: cat,
+                            data: datalist,
+                            borderColor: catColor,
+                            backgroundColor: catColor + '10',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: catColor,
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointHoverRadius: 7,
+                            pointHoverBackgroundColor: catColor,
+                            pointHoverBorderColor: '#ffffff',
+                            pointHoverBorderWidth: 2
+                        };
+                    });
+                    
+                    const chartId = 'monthlyCategoryTrendsChart';
+                    const existingChart = Chart.getChart(chartId);
+                    if (existingChart) existingChart.destroy();
+                    
+                    const ctx = document.getElementById(chartId).getContext('2d');
+                    testCharts[chartId] = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: periods.map(p => {
+                                const [y, m] = p.split('-');
+                                return `${m}/${y}`;
+                            }),
+                            datasets: datasets
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false,
+                            },
+                            plugins: {
+                                datalabels: { display: false },
+                                legend: {
+                                    position: 'top',
+                                    labels: { 
+                                        boxWidth: 12, 
+                                        usePointStyle: true,
+                                        pointStyle: 'circle',
+                                        font: { size: 11, weight: '600', family: "'Inter', sans-serif" },
+                                        padding: 20
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                    titleFont: { size: 12, weight: 'bold', family: "'Inter', sans-serif" },
+                                    bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                                    padding: 12,
+                                    cornerRadius: 8,
+                                    callbacks: {
+                                        label: (ctx) => `  ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('vi-VN')} VNĐ`
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: {
+                                        color: 'rgba(241, 245, 249, 1)',
+                                        drawOnChartArea: true
+                                    },
+                                    ticks: {
+                                        font: { size: 11, weight: '500', family: "'Inter', sans-serif" }
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(241, 245, 249, 1)'
+                                    },
+                                    ticks: {
+                                        font: { size: 11, weight: '500', family: "'Inter', sans-serif" },
+                                        callback: (val) => (val / 1000000).toLocaleString() + 'M đ'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error("Error loading monthly category trends:", e);
+                }
+            }
+        </script>
+    </main>
+</body>
+</html>

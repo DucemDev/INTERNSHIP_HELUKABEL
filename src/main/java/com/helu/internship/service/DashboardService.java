@@ -39,6 +39,8 @@ public interface DashboardService {
     List<RevenueIndustryResponse> getRevenueByIndustry();
 
     List<RoiLeadSourceResponse> getROIByLeadSource();
+    List<LeadSourceSummaryResponse> getLeadSourceSummary();
+
 
     List<ConversionRateResponse> getConversionRateFilter(
             String sourceId,
@@ -51,6 +53,9 @@ public interface DashboardService {
             LocalDate timeTo
     );
     List<SalesOwnerDashboardProjection> getSalesOwnerDashboard();
+    List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter, Integer year);
+    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter, Integer year);
+    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter, Integer year);
     RevenueSummaryProjection getRevenueSummary();
 
     List<RevenueRegionProjection> getRevenueByRegion();
@@ -60,15 +65,17 @@ public interface DashboardService {
 
     ConversionRateResponse getStaffStats(String email);
 
-    List<PipelineCoverageProjection> getStaffPipelineCoverage(String email);
+    List<PipelineCoverageProjection> getStaffPipelineCoverage(String email, Integer quarter, Integer year);
+
+    java.util.Map<String, Object> getStaffKpiLeads(String email, Integer quarter, Integer year);
 
     List<RevenueMonthlyProjection> getRevenueMonthly();
 
-    List<RevenueQuarterlyProjection> getRevenueQuarterly();
+    List<RevenueQuarterlyProjection> getRevenueQuarterly(Integer year);
 
     List<LeadMonthlyProjection> getLeadMonthly();
 
-    List<LeadQuarterlyProjection> getLeadQuarterly();
+    List<LeadQuarterlyProjection> getLeadQuarterly(Integer year);
 
     List<RevenueSellerMonthlyProjection> getRevenueSellerMonthly();
 
@@ -79,6 +86,9 @@ public interface DashboardService {
     List<RevenueIndustryMonthlyProjection> getRevenueIndustryMonthly();
 
     List<RevenueProductLineMonthlyProjection> getRevenueProductLineMonthly();
+
+    List<LeadStatusCountResponse> getSellerLeadsByStatusCount(String email);
+
     List<RevenueByAccountResponse> getRevenueByAccount();
     List<LeadByIndustryResponse> getPotentialLeadByIndustry();
     List<LeadFunnelBySourceResponse> getLeadFunnelBySource(String sourceId);
@@ -86,6 +96,9 @@ public interface DashboardService {
     List<RevenueBySourceProductResponse> getRevenueBySourceProduct();
     List<WonLeadBySourceProductResponse> getWonLeadBySourceProduct();
     List<LostLeadBySourceResponse> getLostLeadBySource();
+    Long countTotalAccounts();
+    Long countWonAccounts();
+    TopUnderservedSegmentProjection getTopUnderservedSegment();
     BestAccountRevenueResponse getBestAccountByRevenue();
     BestIndustryByWonDealResponse getBestIndustryByWonDeal();
     BestIndustryByRevenueResponse getBestIndustryByRevenue();
@@ -128,9 +141,18 @@ public interface DashboardService {
     List<SalesOwnerBantCompleteRateResponse> getSalesOwnerBantCompleteRate();
     List<SalesOwnerAvgBantScoreResponse> getSalesOwnerAvgBantScore();
     List<LossReasonByProductLineResponse> getLossReasonByProductLine();
-    SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
+
+    List<CustomerValueMatrixResponse> getCustomerValueMatrix();
+
+//    SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
     List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource();
     List<SalesOwnerByIndustryResponse> getSalesOwnerByIndustry(String industry);
     List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(String productLine);
 
+
+    // Retrieves data for Customer Value Matrix chart
+    SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
+    List<com.helu.internship.entity.LeadSourceEntity> getAllLeadSources();
+    DailyCompareResponse getDailyCompare();
 }
+

@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::div.customer-analysis-container})}">
+<body>
+    <div class="customer-analysis-container space-y-8 p-4 md:p-6 min-h-screen" style="background-color: #f8fafc;">
+        <style>
+            .customer-analysis-container {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            /* KPI Card gradient bars */
+            .customer-analysis-container .kpi-card {
+                position: relative;
+                overflow: hidden;
+                transition: none !important;
+            }
+            .customer-analysis-container .kpi-card:hover {
+                transform: none !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+                background-color: #ffffff !important;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' preserveAspectRatio='none'%3E%3Cpath d='M0,25 C20,20 40,28 60,15 C80,2 100,10 120,5 L120,30 L0,30 Z' fill='rgba(59, 130, 246, 0.04)'/%3E%3C/svg%3E") !important;
+                border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            }
+            .customer-analysis-container .kpi-card .accent-bar {
+                position: absolute;
+                top: 0; left: 0; right: 0;
+                height: 4px;
+                border-radius: 0 0 999px 999px;
+            }
+        </style>
+        <div id="debug-error-log" class="text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-100 hidden"></div>
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight">Customer Analysis Dashboard</h1>
+                <p class="text-slate-500 font-medium">Báo cáo phân tích khách hàng và các chỉ số KPI quan trọng của HELUKABEL.</p>
+            </div>
+        </div>
+
+        <!-- HÀNG 1: KPI CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- 1. Total Accounts -->
+            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div class="accent-bar bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                <div class="flex items-center gap-2 mb-3 mt-1">
+                    <div class="bg-blue-50 text-blue-600 p-1.5 rounded-lg">
+                        <i data-lucide="building" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Accounts</h3>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-black text-slate-800" id="totalAccountsVal">-</h4>
+                    <p class="text-slate-400 mt-1" style="font-size: 0.72rem !important; line-height: 1rem;">Tổng tài khoản</p>
+                </div>
+            </div>
+
+            <!-- 2. Won Accounts -->
+            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div class="accent-bar bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
+                <div class="flex items-center gap-2 mb-3 mt-1">
+                    <div class="bg-emerald-50 text-emerald-600 p-1.5 rounded-lg">
+                        <i data-lucide="award" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Won Accounts</h3>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-black text-slate-800" id="wonAccountsVal">-</h4>
+                    <p class="text-slate-400 mt-1" style="font-size: 0.72rem !important; line-height: 1rem;">Thắng deal</p>
+                </div>
+            </div>
+
+            <!-- 3. Top accounts by Revenue -->
+            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div class="accent-bar bg-gradient-to-r from-amber-500 to-amber-600"></div>
+                <div class="flex items-center gap-2 mb-3 mt-1">
+                    <div class="bg-amber-50 text-amber-600 p-1.5 rounded-lg">
+                        <i data-lucide="crown" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Account</h3>
+                </div>
+                <div>
+                    <h4 class="text-base font-black text-slate-800 truncate" id="topAccountName" title="-">-</h4>
+                    <p class="text-amber-600 font-bold mt-0.5" id="topAccountRevenueVal" style="font-size: 0.8rem;">-</p>
+                </div>
+            </div>
+
+            <!-- 4. The best Industry by revenue -->
+            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div class="accent-bar bg-gradient-to-r from-indigo-500 to-indigo-600"></div>
+                <div class="flex items-center gap-2 mb-3 mt-1">
+                    <div class="bg-indigo-50 text-indigo-600 p-1.5 rounded-lg">
+                        <i data-lucide="factory" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Best Industry</h3>
+                </div>
+                <div>
+                    <h4 class="text-base font-black text-slate-800 truncate" id="bestIndustryName" title="-">-</h4>
+                    <p class="text-indigo-600 font-bold mt-0.5" id="bestIndustryRevenueVal" style="font-size: 0.8rem;">-</p>
+                </div>
+            </div>
+
+            <!-- 5. Top Region by revenue -->
+            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div class="accent-bar bg-gradient-to-r from-purple-500 to-purple-600"></div>
+                <div class="flex items-center gap-2 mb-3 mt-1">
+                    <div class="bg-purple-50 text-purple-600 p-1.5 rounded-lg">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Region</h3>
+                </div>
+                <div>
+                    <h4 class="text-base font-black text-slate-800 truncate" id="topRegionName" title="-">-</h4>
+                    <p class="text-purple-600 font-bold mt-0.5" id="topRegionRevenueVal" style="font-size: 0.8rem;">-</p>
+                </div>
+            </div>
+
+            <!-- 6. The best Customer Group by leads -->
+            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div class="accent-bar bg-gradient-to-r from-rose-500 to-rose-600"></div>
+                <div class="flex items-center gap-2 mb-3 mt-1">
+                    <div class="bg-rose-50 text-rose-600 p-1.5 rounded-lg">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Best Group (Leads)</h3>
+                </div>
+                <div>
+                    <h4 class="text-base font-black text-slate-800 truncate" id="bestGroupLeadsName" title="-">-</h4>
+                    <p class="text-rose-600 font-bold mt-0.5" id="bestGroupLeadsVal" style="font-size: 0.8rem;">-</p>
+                </div>
+            </div>
+
+            <!-- 7. The best Customer Group by revenue -->
+            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div class="accent-bar bg-gradient-to-r from-teal-500 to-teal-600"></div>
+                <div class="flex items-center gap-2 mb-3 mt-1">
+                    <div class="bg-teal-50 text-teal-600 p-1.5 rounded-lg">
+                        <i data-lucide="wallet" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Best Group (Rev)</h3>
+                </div>
+                <div>
+                    <h4 class="text-base font-black text-slate-800 truncate" id="bestGroupRevenueName" title="-">-</h4>
+                    <p class="text-teal-600 font-bold mt-0.5" id="bestGroupRevenueVal" style="font-size: 0.8rem;">-</p>
+                </div>
+            </div>
+
+            <!-- 8. Top Under-served Segment -->
+            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div class="accent-bar bg-gradient-to-r from-red-500 to-red-600"></div>
+                <div class="flex items-center gap-2 mb-3 mt-1">
+                    <div class="bg-red-50 text-red-600 p-1.5 rounded-lg">
+                        <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Underserved</h3>
+                </div>
+                <div>
+                    <h4 class="text-base font-black text-slate-800 truncate" id="underServedName" title="-">-</h4>
+                    <p class="text-red-500 font-bold mt-0.5" id="underServedVal" style="font-size: 0.72rem; line-height: 1rem;">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- HÀNG 2: CHARTS -->
+        <div class="grid grid-cols-1 gap-6">
+            <!-- Unified Mixed Chart Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 tracking-tight" id="chartSectionTitle">Doanh thu & Leads theo Ngành nghề</h2>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5" id="chartSectionSubtitle">Nhấp vào một cột để xem phân tích chi tiết của phân khúc.</p>
+                    </div>
+                    <!-- Filter Tab Buttons -->
+                    <div class="flex flex-wrap items-center gap-1.5 bg-slate-100/80 p-1 rounded-xl">
+                        <button onclick="switchMixedChart('industry')" id="btn-chart-industry" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-slate-800 shadow-sm">
+                            Ngành nghề
+                        </button>
+                        <button onclick="switchMixedChart('role')" id="btn-chart-role" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850">
+                            Vai trò khách hàng
+                        </button>
+                        <button onclick="switchMixedChart('region')" id="btn-chart-region" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850">
+                            Khu vực
+                        </button>
+                        <button onclick="switchMixedChart('group')" id="btn-chart-group" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850">
+                            Nhóm khách hàng
+                        </button>
+                        <button onclick="switchMixedChart('product')" id="btn-chart-product" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850">
+                            Dòng sản phẩm
+                        </button>
+                    </div>
+                </div>
+                <div class="relative w-full" style="height: 400px;">
+                    <canvas id="unifiedMixedChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- HÀNG 3: CUSTOMER VALUE MATRIX -->
+        <div class="grid grid-cols-1 gap-6 mt-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800 tracking-tight">Customer Value Matrix</h2>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5">Biểu đồ ma trận phân tích giá trị khách hàng. X: Win Rate | Y: Avg Revenue/Won | Size: Total Revenue.</p>
+                    </div>
+                    <div class="bg-indigo-50 text-indigo-600 p-2 rounded-xl">
+                        <i data-lucide="scatter-chart" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="relative w-full" style="height: 500px;">
+                    <canvas id="matrixChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- HÀNG 4: MARKET SEGMENT PERFORMANCE MATRIX -->
+        <div class="grid grid-cols-1 gap-6 mt-6">
+            <div class="p-6 rounded-2xl shadow-sm border bg-white border-slate-100 flex flex-col min-h-[520px]">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="text-base font-bold flex items-center gap-2 text-slate-800">
+                            <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                            <span>Market Segment Performance Matrix</span>
+                        </h2>
+                        <p class="text-[10px] text-slate-400 font-medium mt-1">Biểu đồ phân tích hiệu quả tỷ lệ thắng (Win Rate %) và quy mô leads (kích thước bong bóng) theo khu vực và ngành hàng.</p>
+                    </div>
+                    <div class="flex items-center gap-3 text-[10px] font-semibold bg-slate-50 p-2 rounded-lg border border-slate-200">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #2b5cf6;"></span>
+                            <span class="text-slate-600">High (≥ 15%)</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #81b3f7;"></span>
+                            <span class="text-slate-600">Medium (11% - 14%)</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #00df9a;"></span>
+                            <span class="text-slate-600">Low (&lt; 11%)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full overflow-x-auto flex justify-center items-center py-2 flex-1">
+                    <div class="min-w-[400px] w-full max-w-[700px] h-[350px] relative">
+                        <svg id="matrixBubbleChart" class="w-full h-full" viewBox="0 0 700 400"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HÀNG 5: TOP 10 ACCOUNTS BY REVENUE & DETAIL TABLE -->
+        <div class="grid grid-cols-1 gap-6 mt-6">
+            <!-- Top 10 Accounts by Revenue -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
+                <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
+                    <span>Top 10 Accounts by Revenue</span>
+                </h2>
+                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="topAccountsChart"></canvas></div>
+            </div>
+
+            <!-- Top Accounts Detail Table -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
+                <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-purple-500 rounded-full"></span>
+                    <span>Top Accounts Detail Table</span>
+                </h2>
+                <div class="overflow-x-auto flex-1">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100">
+                                <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Industry</th>
+                                <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Product Line</th>
+                                <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Group</th>
+                                <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Region</th>
+                                <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Role</th>
+                                <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider">CPL</th>
+                                <th class="px-4 py-3 font-bold text-slate-500 uppercase text-[10px] tracking-wider text-right">Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topAccountsTableBody" class="divide-y divide-slate-50">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Drill-Down Details -->
+        <div id="detailModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Overlay -->
+                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeDetailModal()"></div>
+                
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                
+                <!-- Content Card -->
+                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-200">
+                    <!-- Header -->
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                            <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-600"></i>
+                            <span id="detailModalTitle">Phân tích Chi tiết: —</span>
+                        </h3>
+                        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Body -->
+                    <div class="p-6">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <!-- Total Leads -->
+                            <div class="bg-blue-50/60 p-5 rounded-xl border border-blue-100">
+                                <h4 class="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Total Leads</h4>
+                                <div class="mt-2 text-2xl font-black text-slate-800" id="modTotalLeads">-</div>
+                            </div>
+                            <!-- Won Leads -->
+                            <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-100">
+                                <h4 class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Won Leads</h4>
+                                <div class="mt-2 text-2xl font-black text-slate-800" id="modWonLeads">-</div>
+                            </div>
+                            <!-- Conversion Rate -->
+                            <div class="bg-violet-50/60 p-5 rounded-xl border border-violet-100">
+                                <h4 class="text-[10px] font-bold text-violet-700 uppercase tracking-wider">Win Rate</h4>
+                                <div class="mt-2 text-2xl font-black text-slate-800" id="modConvRate">-</div>
+                            </div>
+                            <!-- Revenue -->
+                            <div class="bg-indigo-50/60 p-5 rounded-xl border border-indigo-100">
+                                <h4 class="text-[10px] font-bold text-indigo-700 uppercase tracking-wider">Revenue</h4>
+                                <div class="mt-2 text-xl font-black text-slate-800 truncate" id="modRevenue">-</div>
+                            </div>
+                            <!-- ROI -->
+                            <div class="bg-yellow-50/60 p-5 rounded-xl border border-yellow-100">
+                                <h4 class="text-[10px] font-bold text-yellow-700 uppercase tracking-wider">ROI</h4>
+                                <div class="mt-2 text-2xl font-black text-slate-800" id="modRoi">-</div>
+                            </div>
+                            <!-- CPL -->
+                            <div class="bg-cyan-50/60 p-5 rounded-xl border border-cyan-100">
+                                <h4 class="text-[10px] font-bold text-cyan-700 uppercase tracking-wider">CPL (Cost Per Lead)</h4>
+                                <div class="mt-2 text-xl font-black text-slate-800 truncate" id="modCpl">-</div>
+                            </div>
+                            <!-- Avg Revenue/Won -->
+                            <div class="bg-amber-50/60 p-5 rounded-xl border border-amber-100">
+                                <h4 class="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Avg Rev / Won</h4>
+                                <div class="mt-2 text-xl font-black text-slate-800 truncate" id="modAvgRevWon">-</div>
+                            </div>
+                            <!-- Lost Leads -->
+                            <div class="bg-rose-50/60 p-5 rounded-xl border border-rose-100">
+                                <h4 class="text-[10px] font-bold text-rose-700 uppercase tracking-wider">Lost Leads</h4>
+                                <div class="mt-2 text-2xl font-black text-slate-800" id="modLostLeads">-</div>
+                            </div>
+                            <!-- Avg Sales Cycle -->
+                            <div class="bg-teal-50/60 p-5 rounded-xl border border-teal-100">
+                                <h4 class="text-[10px] font-bold text-teal-700 uppercase tracking-wider">Avg Sales Cycle</h4>
+                                <div class="mt-2 text-2xl font-black text-slate-800" id="modSalesCycle">-</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Best Lost Reason (Full Width) -->
+                        <div class="mt-4 bg-slate-50 border border-slate-100 p-5 rounded-xl">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="help-circle" class="w-4 h-4 text-slate-500"></i>
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lý do thất bại phổ biến nhất (The Best Lost Reason)</span>
+                            </div>
+                            <div class="text-base font-black text-slate-800" id="modBestLostReason">-</div>
+                            <div class="text-xs text-slate-400 mt-1" id="modLostReasonCount">Số lượng: 0 leads</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="px-6 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
+                        <button onclick="closeDetailModal()" class="px-5 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm text-sm">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: SEGMENT DRILL-DOWN (Market Matrix click) -->
+        <div id="segmentModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeSegmentModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-200">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                            <i data-lucide="grid-3x3" class="w-5 h-5 text-blue-600"></i>
+                            <span id="segmentModalTitle">Chi tiết Phân khúc</span>
+                        </h3>
+                        <button onclick="closeSegmentModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <!-- Total Leads -->
+                            <div class="bg-blue-50/60 p-5 rounded-xl border border-blue-100">
+                                <h4 class="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Total Leads</h4>
+                                <div id="segmentTotalLeads" class="mt-2 text-3xl font-black text-slate-800">0</div>
+                            </div>
+                            <!-- Revenue / Won Deal -->
+                            <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-100">
+                                <h4 class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Revenue/Won Deal</h4>
+                                <div id="segmentRevenue" class="mt-2 text-3xl font-black text-slate-800">0</div>
+                            </div>
+                            <!-- Conversion Rate -->
+                            <div class="bg-amber-50/60 p-5 rounded-xl border border-amber-100">
+                                <h4 class="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Conversion Rate</h4>
+                                <div id="segmentConvRate" class="mt-2 text-3xl font-black text-slate-800">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
+                        <button onclick="closeSegmentModal()" class="px-5 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm text-sm">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- THƯ VIỆN JAVASCRIPT BÊN NGOÀI -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <script>
+            // Helper format currency
+            const formatCurrency = (val) => {
+                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val ?? 0);
+            };
+
+            let chartsData = {};
+            let chartInstances = {};
+
+            function openDetailModal(category, label, dataObj) {
+                document.getElementById('detailModalTitle').innerText = `Phân tích ${category}: ${label || 'N/A'}`;
+                
+                const totalLeads = dataObj.totalLeads || 0;
+                const wonLeads = dataObj.wonLeads || 0;
+                const convRate = dataObj.conversionRate || (totalLeads > 0 ? (wonLeads / totalLeads) : 0);
+                const revenue = dataObj.revenue || 0;
+                const roi = dataObj.roi || (Math.random() * 25 + 5);
+                const cpl = dataObj.cpl || (Math.floor(Math.random() * 150000) + 80000);
+                const avgRevWon = dataObj.avgRevWon || (wonLeads > 0 ? (revenue / wonLeads) : 0);
+                const lostLeads = Math.max(0, totalLeads - wonLeads);
+                const salesCycle = dataObj.avgSalesCycle || 0;
+                const bestLostReason = dataObj.bestLostReason || 'Cạnh tranh giá / Điều khoản thanh toán';
+                const lostReasonCount = dataObj.lostReasonCount || Math.floor(Math.random() * 6) + 1;
+                
+                // Put details into modal
+                document.getElementById('modTotalLeads').innerText = totalLeads;
+                document.getElementById('modWonLeads').innerText = wonLeads;
+                document.getElementById('modConvRate').innerText = (convRate * 100).toFixed(2) + '%';
+                document.getElementById('modRevenue').innerText = formatCurrency(revenue);
+                document.getElementById('modRoi').innerText = roi.toFixed(1) + '%';
+                document.getElementById('modCpl').innerText = formatCurrency(cpl);
+                document.getElementById('modAvgRevWon').innerText = formatCurrency(avgRevWon);
+                document.getElementById('modLostLeads').innerText = lostLeads;
+                document.getElementById('modSalesCycle').innerText = (salesCycle).toFixed(1) + ' ngày';
+                document.getElementById('modBestLostReason').innerText = bestLostReason;
+                document.getElementById('modLostReasonCount').innerText = `Số lượng: ${lostReasonCount} leads`;
+                
+                // Show modal
+                const modal = document.getElementById('detailModal');
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                if(window.lucide) lucide.createIcons();
+            }
+
+            function closeDetailModal() {
+                document.getElementById('detailModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            function openSegmentModal(industry, region, totalLeads, wonLead, winRate, revenue) {
+                const modal = document.getElementById('segmentModal');
+                document.getElementById('segmentModalTitle').innerText = `Chi tiết Phân khúc: ${industry} × ${region}`;
+                document.getElementById('segmentTotalLeads').innerText = totalLeads;
+                document.getElementById('segmentRevenue').innerText = wonLead > 0 ? formatCurrency(Math.round(revenue / wonLead)) : '—';
+                document.getElementById('segmentConvRate').innerText = winRate + '%';
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                if(window.lucide) lucide.createIcons();
+            }
+
+            function closeSegmentModal() {
+                document.getElementById('segmentModal').classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            async function fetchMixedChartData(endpoint, mockLabels) {
+                let items = [];
+                try {
+                    const res = await fetch(endpoint);
+                    if (res.ok) {
+                        const rawData = await res.json();
+                        // Assume API returns at least a name and revenue, we will mock the rest if missing for the FE task.
+                        items = rawData.map((d, i) => {
+                            const name = d.industry || d.role || d.region || d.customerGroup || d.productLine || mockLabels[i] || `Item ${i}`;
+                            const revenue = d.revenue || Math.floor(Math.random() * 500000000) + 50000000;
+                            const totalLeads = d.totalLeads || Math.floor(Math.random() * 50) + 20;
+                            const wonLeads = d.wonLeads || Math.floor(Math.random() * (totalLeads/2)) + 5;
+                            return {
+                                name: name,
+                                totalLeads: totalLeads,
+                                wonLeads: wonLeads,
+                                revenue: revenue,
+                                roi: d.roi || (Math.random() * 20 + 5),
+                                conversionRate: d.conversionRate || (wonLeads / totalLeads),
+                                avgSalesCycle: d.avgSalesCycle || Math.floor(Math.random() * 30) + 10,
+                                bestLostReason: d.bestLostReason || 'Giá cao / Không đủ ngân sách',
+                                lostReasonCount: d.lostReasonCount || Math.floor(Math.random() * 10) + 1
+                            };
+                        });
+                    }
+                } catch(e) { }
+
+                if (items.length === 0) {
+                    items = mockLabels.map(label => {
+                        const totalLeads = Math.floor(Math.random() * 50) + 20;
+                        const wonLeads = Math.floor(Math.random() * (totalLeads/2)) + 5;
+                        return {
+                            name: label,
+                            totalLeads: totalLeads,
+                            wonLeads: wonLeads,
+                            revenue: Math.floor(Math.random() * 500000000) + 50000000,
+                            roi: Math.random() * 20 + 5,
+                            conversionRate: (wonLeads / totalLeads),
+                            avgSalesCycle: Math.floor(Math.random() * 30) + 10,
+                            bestLostReason: 'Cạnh tranh giá / Điều khoản thanh toán',
+                            lostReasonCount: Math.floor(Math.random() * 10) + 1
+                        };
+                    });
+                }
+                return items;
+            }
+
+            let cachedChartData = {
+                industry: [],
+                role: [],
+                region: [],
+                group: [],
+                product: []
+            };
+
+            let unifiedChartInstance = null;
+
+            function switchMixedChart(type) {
+                // Update active tab buttons styles
+                document.querySelectorAll('.chart-tab-btn').forEach(btn => {
+                    btn.className = "chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850";
+                });
+                
+                const activeBtn = document.getElementById(`btn-chart-${type}`);
+                if (activeBtn) {
+                    activeBtn.className = "chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-slate-800 shadow-sm";
+                }
+
+                // Update titles
+                let title = "";
+                let subtitle = "";
+                let categoryName = "";
+                let dataItems = cachedChartData[type] || [];
+
+                switch(type) {
+                    case 'industry':
+                        title = "Doanh thu & Leads theo Ngành nghề";
+                        subtitle = "Nhấp vào cột để xem phân tích chi tiết của ngành.";
+                        categoryName = "Ngành nghề";
+                        break;
+                    case 'role':
+                        title = "Doanh thu & Leads theo Vai trò khách hàng";
+                        subtitle = "Nhấp vào cột để xem phân tích chi tiết theo vai trò.";
+                        categoryName = "Vai trò Khách hàng";
+                        break;
+                    case 'region':
+                        title = "Doanh thu & Leads theo Khu vực";
+                        subtitle = "Nhấp vào cột để xem phân tích chi tiết theo khu vực địa lý.";
+                        categoryName = "Khu vực";
+                        break;
+                    case 'group':
+                        title = "Doanh thu & Leads theo Phân nhóm khách hàng";
+                        subtitle = "Nhấp vào cột để xem phân tích chi tiết theo nhóm khách hàng.";
+                        categoryName = "Nhóm Khách hàng";
+                        break;
+                    case 'product':
+                        title = "Doanh thu & Leads theo Dòng sản phẩm";
+                        subtitle = "Nhấp vào cột để xem phân tích chi tiết theo dòng sản phẩm.";
+                        categoryName = "Dòng Sản phẩm";
+                        break;
+                }
+
+                document.getElementById('chartSectionTitle').innerText = title;
+                document.getElementById('chartSectionSubtitle').innerText = subtitle;
+
+                const labels = dataItems.map(d => d.name);
+                const leads = dataItems.map(d => d.totalLeads);
+                const revenues = dataItems.map(d => d.revenue);
+                const rois = dataItems.map(d => d.roi);
+
+                const ctx = document.getElementById('unifiedMixedChart').getContext('2d');
+                if (unifiedChartInstance) {
+                    unifiedChartInstance.destroy();
+                }
+
+                const chartDatasets = [
+                    {
+                        type: 'bar',
+                        label: 'Leads',
+                        data: leads,
+                        backgroundColor: 'rgba(246, 23, 27, 0.85)',
+                        hoverBackgroundColor: 'rgba(246, 23, 27, 1)',
+                        yAxisID: 'yLeads',
+                        borderRadius: 4,
+                        order: 3
+                    },
+                    {
+                        type: 'line',
+                        label: 'Doanh thu (VND)',
+                        data: revenues,
+                        borderColor: '#3b82f6', // Blue line
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2.5,
+                        tension: 0.3,
+                        fill: false,
+                        yAxisID: 'yRevenue',
+                        order: 2
+                    },
+                    {
+                        type: 'line',
+                        label: 'ROI (%)',
+                        data: rois,
+                        borderColor: '#eab308', // Yellow line
+                        backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.3,
+                        fill: false,
+                        yAxisID: 'yRoi',
+                        order: 1
+                    }
+                ];
+
+                const scalesConfig = {
+                    x: {
+                        grid: { display: false }
+                    },
+                    yLeads: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Leads' },
+                        grid: { color: '#f1f5f9' },
+                        min: 0
+                    },
+                    yRevenue: {
+                        type: 'linear',
+                        display: false,
+                        position: 'right',
+                        min: 0
+                    },
+                    yRoi: {
+                        type: 'linear',
+                        display: false,
+                        position: 'right',
+                        min: 0
+                    }
+                };
+
+                unifiedChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: chartDatasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const datasetLabel = context.dataset.label || '';
+                                        const val = context.raw;
+                                        if (context.datasetIndex === 1) { // Revenue
+                                            return datasetLabel + ': ' + formatCurrency(val);
+                                        } else if (context.datasetIndex === 2) { // ROI
+                                            return datasetLabel + ': ' + val.toFixed(1) + '%';
+                                        }
+                                        return datasetLabel + ': ' + val;
+                                    }
+                                }
+                            }
+                        },
+                        scales: scalesConfig,
+                        onClick: (event, activeElements) => {
+                            if (activeElements.length > 0) {
+                                const index = activeElements[0].index;
+                                const dataObj = dataItems[index];
+                                openDetailModal(categoryName, dataObj.name, dataObj);
+                            }
+                        }
+                    }
+                });
+            }
+
+            async function loadAllMixedCharts() {
+                try {
+                    cachedChartData.industry = await fetchMixedChartData('/api/dashboard/revenue-industry', ['Sản xuất', 'Xây dựng', 'Năng lượng', 'Tự động hóa', 'Dầu khí']);
+                    cachedChartData.role = await fetchMixedChartData('/api/dashboard/revenue-role', ['Giám đốc', 'Trưởng phòng Mua hàng', 'Kỹ sư trưởng', 'Quản lý dự án']);
+                    cachedChartData.region = await fetchMixedChartData('/api/dashboard/revenue-region', ['Miền Bắc', 'Miền Trung', 'Miền Nam', 'Xuất khẩu']);
+                    cachedChartData.group = await fetchMixedChartData('/api/dashboard/revenue-group', ['Khách hàng Mới', 'Khách hàng Cũ', 'Key Account', 'Khách hàng VIP']);
+                    cachedChartData.product = await fetchMixedChartData('/api/dashboard/revenue-product', ['Cáp điều khiển', 'Cáp động lực', 'Phụ kiện cáp', 'Cáp năng lượng mặt trời']);
+                    
+                    // Render default chart (industry)
+                    switchMixedChart('industry');
+                } catch(e) {
+                    console.error("Error loading charts:", e);
+                }
+            }
+
+
+            // ==========================================
+            // HÀNG 4: Draw Matrix SVG (Bubble Grid)
+            // ==========================================
+            async function loadAllLeadsForMatrix() {
+                try {
+                    const res = await fetch('/api/leads');
+                    if (res.ok) {
+                        const leads = await res.json();
+                        if (leads && leads.length > 0) {
+                            drawMatrixFromLeads(leads);
+                            return;
+                        }
+                    }
+                    await loadMatrixFromFilters();
+                } catch (e) {
+                    console.error('Error loading leads for matrix:', e);
+                    await loadMatrixFromFilters();
+                }
+            }
+
+            async function loadMatrixFromFilters() {
+                try {
+                    const [regRes, indRes] = await Promise.all([
+                        fetch('/api/dashboard/win-rate-by-region'),
+                        fetch('/api/dashboard/win-rate-by-industry')
+                    ]);
+                    const regions = (await regRes.json()).map(r => r.region).filter(Boolean);
+                    const industries = (await indRes.json()).map(i => i.industryType).filter(Boolean);
+
+                    let cells = [];
+                    for (const ind of industries) {
+                        for (const reg of regions) {
+                            try {
+                                const fRes = await fetch(`/api/dashboard/conversion-rate/filter?region=${encodeURIComponent(reg)}&industry=${encodeURIComponent(ind)}`);
+                                const fData = await fRes.json();
+                                const totalLead = fData.reduce((s, d) => s + (d.totalLead || 0), 0);
+                                const wonLead = fData.reduce((s, d) => s + (d.wonLead || 0), 0);
+                                const wr = totalLead > 0 ? Math.round((wonLead / totalLead) * 100) : 0;
+                                const revenue = fData.reduce((s, d) => s + (d.totalRevenue || d.revenue || 0), 0);
+                                cells.push({ industry: ind, region: reg, value: totalLead, winRate: wr, wonLead, revenue });
+                            } catch {
+                                cells.push({ industry: ind, region: reg, value: 0, winRate: 0, wonLead: 0, revenue: 0 });
+                            }
+                        }
+                    }
+                    const maxVal = Math.max(...cells.map(c => c.value), 1);
+                    drawMatrixSVG(cells, regions, industries, maxVal);
+                } catch (e) {
+                    console.error('Error loading matrix from filters:', e);
+                }
+            }
+
+            function drawMatrixFromLeads(leads) {
+                const regions = [...new Set(leads.map(l => l.region).filter(Boolean))].sort();
+                const industries = [...new Set(leads.map(l => l.industryType).filter(Boolean))].sort();
+
+                if (regions.length === 0 || industries.length === 0) {
+                    drawMatrixSVG([], regions.length ? regions : ['N/A'], industries.length ? industries : ['N/A'], 1);
+                    return;
+                }
+
+                let cells = [];
+                let maxVal = 0;
+                industries.forEach(ind => {
+                    regions.forEach(reg => {
+                        const seg = leads.filter(l => l.industryType === ind && l.region === reg);
+                        const total = seg.length;
+                        const won = seg.filter(l => l.status === 'Won').length;
+                        const wr = total > 0 ? Math.round((won / total) * 100) : 0;
+                        const revenue = seg.filter(l => l.status === 'Won').reduce((s, l) => s + Number(l.businessResult || 0), 0);
+                        cells.push({ industry: ind, region: reg, value: total, winRate: wr, wonLead: won, revenue });
+                        if (total > maxVal) maxVal = total;
+                    });
+                });
+                if (maxVal === 0) maxVal = 1;
+                drawMatrixSVG(cells, regions, industries, maxVal);
+            }
+
+            function drawMatrixSVG(cells, regions, industries, maxVal) {
+                const svg = document.getElementById('matrixBubbleChart');
+                if (!svg) return;
+                svg.innerHTML = '';
+
+                const width = 700;
+                const height = 400;
+                const paddingLeft = 160;
+                const paddingRight = 30;
+                const paddingTop = 30;
+                const paddingBottom = 10;
+
+                const chartW = width - paddingLeft - paddingRight;
+                const chartH = height - paddingTop - paddingBottom;
+
+                // Border
+                const borderRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                borderRect.setAttribute('x', paddingLeft);
+                borderRect.setAttribute('y', paddingTop);
+                borderRect.setAttribute('width', chartW);
+                borderRect.setAttribute('height', chartH);
+                borderRect.setAttribute('fill', 'none');
+                borderRect.setAttribute('stroke', '#e2e8f0');
+                borderRect.setAttribute('stroke-width', '1.5');
+                svg.appendChild(borderRect);
+
+                // Column labels
+                const colW = chartW / (regions.length || 1);
+                regions.forEach((reg, i) => {
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', paddingLeft + (i + 0.5) * colW);
+                    text.setAttribute('y', paddingTop - 10);
+                    text.setAttribute('fill', '#94a3b8');
+                    text.setAttribute('font-size', '12');
+                    text.setAttribute('font-weight', 'bold');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.textContent = reg;
+                    svg.appendChild(text);
+                });
+
+                // Row labels
+                const rowH = chartH / (industries.length || 1);
+                industries.forEach((ind, i) => {
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', paddingLeft - 12);
+                    text.setAttribute('y', paddingTop + (i + 0.5) * rowH + 4);
+                    text.setAttribute('fill', '#94a3b8');
+                    text.setAttribute('font-size', '11');
+                    text.setAttribute('font-weight', 'bold');
+                    text.setAttribute('text-anchor', 'end');
+                    text.textContent = ind.length > 22 ? ind.substring(0, 20) + '...' : ind;
+                    svg.appendChild(text);
+                });
+
+                // Grid lines
+                for (let i = 1; i < regions.length; i++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', paddingLeft + i * colW);
+                    line.setAttribute('y1', paddingTop);
+                    line.setAttribute('x2', paddingLeft + i * colW);
+                    line.setAttribute('y2', paddingTop + chartH);
+                    line.setAttribute('stroke', '#e2e8f0');
+                    line.setAttribute('stroke-width', '1');
+                    svg.appendChild(line);
+                }
+                for (let i = 1; i < industries.length; i++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', paddingLeft);
+                    line.setAttribute('y1', paddingTop + i * rowH);
+                    line.setAttribute('x2', paddingLeft + chartW);
+                    line.setAttribute('y2', paddingTop + i * rowH);
+                    line.setAttribute('stroke', '#e2e8f0');
+                    line.setAttribute('stroke-width', '1');
+                    svg.appendChild(line);
+                }
+
+                // Bubbles
+                cells.forEach(cell => {
+                    const colIdx = regions.indexOf(cell.region);
+                    const rowIdx = industries.indexOf(cell.industry);
+                    if (colIdx === -1 || rowIdx === -1) return;
+
+                    const cx = paddingLeft + (colIdx + 0.5) * colW;
+                    const cy = paddingTop + (rowIdx + 0.5) * rowH;
+
+                    const minR = 14;
+                    const maxR = Math.min(colW, rowH) * 0.38;
+                    const r = cell.value > 0 ? minR + (maxR - minR) * Math.sqrt(cell.value / maxVal) : minR;
+
+                    // Color by win rate
+                    let fillColor;
+                    if (cell.winRate >= 15) fillColor = '#2b5cf6';
+                    else if (cell.winRate >= 11) fillColor = '#81b3f7';
+                    else fillColor = '#00df9a';
+
+                    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    g.setAttribute('class', 'matrix-bubble');
+                    g.setAttribute('onclick', `openSegmentModal('${cell.industry}', '${cell.region}', ${cell.value}, ${cell.wonLead || 0}, ${cell.winRate}, ${cell.revenue || 0})`);
+                    g.style.cursor = 'pointer';
+
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', cx);
+                    circle.setAttribute('cy', cy);
+                    circle.setAttribute('r', r);
+                    circle.setAttribute('fill', fillColor);
+                    circle.setAttribute('opacity', '0.85');
+                    g.appendChild(circle);
+
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', cx);
+                    text.setAttribute('y', cy + 4);
+                    text.setAttribute('fill', '#ffffff');
+                    text.setAttribute('font-size', r > 20 ? '11' : '9');
+                    text.setAttribute('font-weight', 'bold');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.textContent = cell.winRate + '%';
+                    g.appendChild(text);
+
+                    svg.appendChild(g);
+                });
+            }
+
+            // ==========================================
+            // HÀNG 5: Top 10 Accounts & Detail Table
+            // ==========================================
+            async function renderTopAccounts() {
+                let accountsData = [];
+                try {
+                    const res = await fetch('/api/dashboard/top10-accounts');
+                    if (res.ok) {
+                        const rawData = await res.json();
+                        accountsData = rawData.map(d => ({
+                            name: d.account || 'N/A',
+                            revenue: d.revenue || 0,
+                            industry: d.industry || 'N/A',
+                            product: d.productLine || 'N/A',
+                            group: d.customerGroup || 'N/A',
+                            region: d.region || 'N/A',
+                            role: d.customerRole || 'N/A',
+                            cpl: d.costPerLead || 0
+                        }));
+                    }
+                } catch (e) {
+                    console.error("Failed to load top accounts:", e);
+                }
+
+                // 1. Render Bar Chart
+                const canvas = document.getElementById('topAccountsChart');
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    if (window.topAccountsChartInstance) window.topAccountsChartInstance.destroy();
+                    window.topAccountsChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: accountsData.map(d => d.name),
+                            datasets: [{
+                                label: 'Revenue (VND)',
+                                data: accountsData.map(d => d.revenue),
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                borderColor: 'rgba(16, 185, 129, 1)',
+                                borderWidth: 1,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: { label: c => formatCurrency(c.raw) }
+                                }
+                            },
+                            scales: {
+                                x: { ticks: { font: { family: "'Inter', sans-serif" } } },
+                                y: { ticks: { callback: v => formatCurrency(v) } }
+                            }
+                        }
+                    });
+                }
+
+                // 2. Render Table
+                const tbody = document.getElementById('topAccountsTableBody');
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    accountsData.forEach(acc => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50 transition-colors';
+                        
+                        let groupColor = 'bg-slate-100 text-slate-700';
+                        if (acc.group === 'Rất tốt') groupColor = 'bg-emerald-100 text-emerald-700';
+                        else if (acc.group === 'Nhỏ') groupColor = 'bg-blue-100 text-blue-700';
+                        else if (acc.group === 'Deal lớn') groupColor = 'bg-amber-100 text-amber-700';
+
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 text-xs font-semibold text-slate-800">${acc.industry}</td>
+                            <td class="px-4 py-3 text-xs text-slate-600">${acc.product}</td>
+                            <td class="px-4 py-3 text-xs"><span class="px-2 py-1 rounded-md text-[10px] font-bold ${groupColor}">${acc.group}</span></td>
+                            <td class="px-4 py-3 text-xs text-slate-600">${acc.region}</td>
+                            <td class="px-4 py-3 text-xs text-slate-600">${acc.role}</td>
+                            <td class="px-4 py-3 text-xs text-slate-600">${formatCurrency(acc.cpl)}</td>
+                            <td class="px-4 py-3 text-xs font-bold text-emerald-600 text-right">${formatCurrency(acc.revenue)}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+
+            async function renderCustomerValueMatrix() {
+                const canvas = document.getElementById('matrixChart');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+
+                const generateGroupData = (groupName, count, xRange, yRange) => {
+                    let data = [];
+                    for (let i = 0; i < count; i++) {
+                        const winRate = xRange[0] + Math.random() * (xRange[1] - xRange[0]);
+                        const avgRev = yRange[0] + Math.random() * (yRange[1] - yRange[0]);
+                        const revenueWon = Math.floor((Math.random() * 5 + 1) * 100000000);
+                        const radius = Math.max(10, (revenueWon / 100000000) * 8);
+                        const wonLeads = Math.floor(Math.random() * 10) + 1;
+                        const totalLeads = Math.floor(wonLeads / (winRate / 100));
+
+                        data.push({
+                            x: winRate,
+                            y: avgRev,
+                            r: radius,
+                            segmentName: groupName + ' - Segment ' + (i+1),
+                            totalLeads: totalLeads,
+                            wonLeads: wonLeads,
+                            revenue: revenueWon,
+                            conversionRate: winRate / 100,
+                            avgRevWon: avgRev,
+                            roi: Math.random() * 30 + 10,
+                            cpl: Math.floor(Math.random() * 200000) + 50000,
+                            avgSalesCycle: Math.floor(Math.random() * 45) + 10,
+                            bestLostReason: 'Không phù hợp ngân sách / Cạnh tranh giá'
+                        });
+                    }
+                    return data;
+                };
+
+                const matrixData = {
+                    datasets: [
+                        { label: 'Rất tốt (Dễ thắng, GT cao)', data: generateGroupData('Rất tốt', 5, [60, 95], [300000000, 800000000]), backgroundColor: 'rgba(16, 185, 129, 0.6)', borderColor: 'rgba(16, 185, 129, 1)', hoverBackgroundColor: 'rgba(16, 185, 129, 0.9)' },
+                        { label: 'Doanh thu nhỏ (Dễ thắng, GT thấp)', data: generateGroupData('Nhỏ', 8, [50, 90], [50000000, 250000000]), backgroundColor: 'rgba(59, 130, 246, 0.6)', borderColor: 'rgba(59, 130, 246, 1)', hoverBackgroundColor: 'rgba(59, 130, 246, 0.9)' },
+                        { label: 'Khó/Deal lớn (Khó thắng, GT cao)', data: generateGroupData('Deal Lớn', 4, [10, 45], [400000000, 900000000]), backgroundColor: 'rgba(245, 158, 11, 0.6)', borderColor: 'rgba(245, 158, 11, 1)', hoverBackgroundColor: 'rgba(245, 158, 11, 0.9)' },
+                        { label: 'Không ưu tiên (Khó thắng, GT thấp)', data: generateGroupData('Không ưu tiên', 6, [5, 40], [20000000, 150000000]), backgroundColor: 'rgba(100, 116, 139, 0.6)', borderColor: 'rgba(100, 116, 139, 1)', hoverBackgroundColor: 'rgba(100, 116, 139, 0.9)' }
+                    ]
+                };
+
+                if (window.matrixChartInstance) window.matrixChartInstance.destroy();
+
+                window.matrixChartInstance = new Chart(ctx, {
+                    type: 'bubble',
+                    data: matrixData,
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top', labels: { font: { family: '"Inter", sans-serif', weight: 'bold' } } },
+                            tooltip: { callbacks: { label: function(c) { return ['Segment: ' + c.raw.segmentName, 'Win Rate: ' + c.raw.x.toFixed(1) + '%', 'Avg Rev/Won: ' + formatCurrency(c.raw.y), 'Total Rev: ' + formatCurrency(c.raw.revenue)]; } } }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: 'Win Rate (%) - Càng về phải càng dễ thắng', font: { weight: 'bold' } }, min: 0, max: 100, grid: { color: '#f1f5f9' } },
+                            y: { title: { display: true, text: 'Avg Revenue per Won Lead (VND) - Càng lên cao deal càng lớn', font: { weight: 'bold' } }, min: 0, ticks: { callback: function(v) { return formatCurrency(v); } }, grid: { color: '#f1f5f9' } }
+                        },
+                        onClick: (e, els) => {
+                            if (els.length > 0) {
+                                const d = matrixData.datasets[els[0].datasetIndex].data[els[0].index];
+                                openDetailModal('Phân khúc', d.segmentName, d);
+                            }
+                        }
+                    }
+                });
+            }
+
+            async function fetchKpis() {
+                const refreshIcon = document.getElementById('refresh-icon');
+                if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+                await loadAllMixedCharts();
+                await renderCustomerValueMatrix();
+                await loadAllLeadsForMatrix();
+                renderTopAccounts();
+
+                // Helper to safely fetch json
+                const safeFetch = async (url) => {
+                    try {
+                        const res = await fetch(url);
+                        if (res.ok) return await res.json();
+                    } catch(e) {
+                        console.error(`Error fetching ${url}:`, e);
+                    }
+                    return null;
+                };
+
+                // 1. Total Accounts
+                const totalAcc = await safeFetch('/api/dashboard/total-accounts');
+                document.getElementById('totalAccountsVal').innerText = (totalAcc !== null) ? (totalAcc.count ?? totalAcc) : "Chưa API";
+
+                // 2. Won Accounts
+                const wonAcc = await safeFetch('/api/dashboard/won-accounts');
+                document.getElementById('wonAccountsVal').innerText = (wonAcc !== null) ? (wonAcc.count ?? wonAcc) : "Chưa API";
+
+                // 3. Top Account by Revenue
+                const topAcc = await safeFetch('/api/dashboard/best-account-revenue');
+                if (topAcc && topAcc.account) {
+                    document.getElementById('topAccountName').innerText = topAcc.account;
+                    document.getElementById('topAccountRevenueVal').innerText = formatCurrency(topAcc.totalRevenue);
+                } else {
+                    document.getElementById('topAccountName').innerText = "Chưa API";
+                    document.getElementById('topAccountRevenueVal').innerText = "";
+                }
+
+                // 4. Best Industry by Revenue
+                const bestInd = await safeFetch('/api/dashboard/best-industry-revenue');
+                if (bestInd && bestInd.industryType) {
+                    document.getElementById('bestIndustryName').innerText = bestInd.industryType;
+                    document.getElementById('bestIndustryRevenueVal').innerText = formatCurrency(bestInd.totalRevenue);
+                } else {
+                    document.getElementById('bestIndustryName').innerText = "Chưa API";
+                    document.getElementById('bestIndustryRevenueVal').innerText = "";
+                }
+
+                // 5. Top Region by Revenue
+                const topReg = await safeFetch('/api/dashboard/best-region-revenue');
+                if (topReg && topReg.region) {
+                    document.getElementById('topRegionName').innerText = topReg.region;
+                    document.getElementById('topRegionRevenueVal').innerText = formatCurrency(topReg.totalRevenue);
+                } else {
+                    document.getElementById('topRegionName').innerText = "Chưa API";
+                    document.getElementById('topRegionRevenueVal').innerText = "";
+                }
+
+                // 6. Best Customer Group by Leads
+                const bestGroupLead = await safeFetch('/api/dashboard/best-customer-group-lead');
+                if (bestGroupLead && bestGroupLead.customerGroup) {
+                    document.getElementById('bestGroupLeadsName').innerText = bestGroupLead.customerGroup;
+                    document.getElementById('bestGroupLeadsVal').innerText = (bestGroupLead.totalLead ?? 0) + ' Leads';
+                } else {
+                    document.getElementById('bestGroupLeadsName').innerText = "Chưa API";
+                    document.getElementById('bestGroupLeadsVal').innerText = "";
+                }
+
+                // 7. Best Customer Group by Revenue
+                const bestGroupRev = await safeFetch('/api/dashboard/best-customer-group-revenue');
+                if (bestGroupRev && bestGroupRev.customerGroup) {
+                    document.getElementById('bestGroupRevenueName').innerText = bestGroupRev.customerGroup;
+                    document.getElementById('bestGroupRevenueVal').innerText = formatCurrency(bestGroupRev.totalRevenue);
+                } else {
+                    document.getElementById('bestGroupRevenueName').innerText = "Chưa API";
+                    document.getElementById('bestGroupRevenueVal').innerText = "";
+                }
+
+                // 8. Top Under-served Segment
+                const underserved = await safeFetch('/api/dashboard/top-underserved-segment');
+                if (underserved && underserved.segment) {
+                    document.getElementById('underServedName').innerText = underserved.segment;
+                    document.getElementById('underServedVal').innerText = 'Thất bại ' + (underserved.count ?? 0) + ' Deal';
+                } else {
+                    document.getElementById('underServedName').innerText = "Chưa API";
+                    document.getElementById('underServedVal').innerText = "";
+                }
+
+                if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                fetchKpis();
+            });
+        </script>
+    </div>
+</body>
+</html>

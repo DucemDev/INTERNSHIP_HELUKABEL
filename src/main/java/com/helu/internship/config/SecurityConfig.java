@@ -23,14 +23,17 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/customer-value-matrix.html", "/css/customer-value-matrix.css", "/js/customer-value-matrix.js").permitAll()
 
                         // Cho chatbot Python gọi API dashboard không cần đăng nhập
                         .requestMatchers("/api/dashboard/**").permitAll()
 
                         .requestMatchers("/users/**").hasRole("Admin")
-                        .requestMatchers("/dashboard/**").hasAnyRole("Admin", "Staff")
-                        .requestMatchers("/staff/**").hasAnyRole("Staff")
+                        .requestMatchers("/customer-analysis").hasRole("Admin")
+                        .requestMatchers("/dashboard/**").hasAnyRole("Admin", "Seller")
+                        .requestMatchers("/seller/**").hasAnyRole("Seller")
+                        .requestMatchers("/api/seller/**").hasRole("Seller")
+                        .requestMatchers("/chatbot", "/api/chatbot/**").hasAnyRole("Admin", "Seller")
 
                         .anyRequest().authenticated()
                 )

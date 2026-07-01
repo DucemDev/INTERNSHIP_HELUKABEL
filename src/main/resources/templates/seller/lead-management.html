@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
+<body>
+<main class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Quản lý Leads cá nhân</h1>
+            <p class="mt-1 text-sm font-medium text-gray-500">Xem danh sách, chấm điểm BANT và cập nhật tiến trình của các Leads được phân bổ.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="inline-flex items-center gap-2 rounded-xl bg-helu-red px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all active:scale-95" onclick="fetchLeads()">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Tải lại dữ liệu
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Overview Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left: KPI Card (Leads của tôi) -->
+        <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between">
+            <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Leads của tôi</h3>
+                <div id="statTotal" class="mt-4 text-5xl font-black text-gray-900 kpi-val">0</div>
+            </div>
+            <div class="mt-8 flex items-center justify-between">
+                <p class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">Đang hoạt động</p>
+                <div class="rounded-2xl bg-slate-100 p-4 text-slate-600">
+                    <i data-lucide="users" class="w-8 h-8"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Leads Status Distribution Doughnut Chart -->
+        <div class="lg:col-span-2 rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
+                <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
+                Cơ cấu Trạng thái Leads
+            </h2>
+            <div class="relative h-[200px] flex items-center justify-center">
+                <canvas id="leadsStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="rounded-3xl border border-helu-border bg-white p-6 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="space-y-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Tìm kiếm</label>
+                <div class="relative group">
+                    <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-helu-red transition-colors"></i>
+                    <input type="text" id="searchInput" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" placeholder="Tìm tên KH, ID, Công ty..." onkeyup="filterLeads()">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Trạng thái</label>
+                <select id="statusFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterLeads()">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="New">New</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Won">Won</option>
+                    <option value="Lost">Lost</option>
+                </select>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Phân loại BANT</label>
+                <select id="heatFilter" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" onchange="filterLeads()">
+                    <option value="">Tất cả độ nóng</option>
+                    <option value="HOT">HOT (>= 80 điểm)</option>
+                    <option value="WARM">WARM (60-79 điểm)</option>
+                    <option value="COLD">COLD (&lt; 60 điểm)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leads Table / Grid -->
+    <div class="rounded-3xl border border-helu-border bg-white shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left" id="leadsTable">
+                <thead>
+                <tr class="border-b border-gray-100" style="background-color: #fafafa;">
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b] w-16 text-center">STT</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Mã Lead</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Khách hàng</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Trạng thái</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Phân loại BANT</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Điểm số chi tiết</th>
+                    <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-[#52525b]">Nguồn / Dòng sản phẩm</th>
+                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-[#52525b] pr-10">Thao tác</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    <!-- Dynamic load via JS -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Record Count & Pagination -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-100 bg-transparent px-6 py-4">
+            <div class="text-sm font-medium text-gray-500" id="recordCount">
+                Hiển thị 0/0 bản ghi
+            </div>
+            <div class="flex items-center gap-2" id="paginationControls">
+                <button id="prevBtn" onclick="changePage(currentPage - 1)" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Trước
+                </button>
+                <span class="text-xs font-bold text-gray-600 px-2" id="pageInfo">Trang 1 / 1</span>
+                <button id="nextBtn" onclick="changePage(currentPage + 1)" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    Sau <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Status Update -->
+    <div id="statusModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div class="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-extrabold text-gray-900 tracking-tight">Cập nhật Trạng thái Lead</h2>
+                <button onclick="closeStatusModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="statusForm" class="space-y-6">
+                <input type="hidden" id="statusLeadId">
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-gray-700">Trạng thái mới <span class="text-helu-red">*</span></label>
+                    <select id="newStatusSelect" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all cursor-pointer">
+                        <option value="New">New</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Won">Won</option>
+                        <option value="Lost">Lost</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
+                    <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeStatusModal()">Hủy</button>
+                    <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal BANT Update -->
+    <div id="bantModal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div class="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+                <div>
+                    <h2 class="text-xl font-extrabold text-gray-900 tracking-tight">Đánh giá tiêu chí BANT</h2>
+                    <p class="text-xs text-gray-400 mt-1" id="bantLeadLabel"></p>
+                </div>
+                <button onclick="closeBantModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="bantForm" class="space-y-6">
+                <input type="hidden" id="bantLeadId">
+
+                <!-- Budget Slider -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <label class="font-bold text-gray-700">Budget (Ngân sách)</label>
+                        <span id="valBudget" class="font-bold text-helu-red">0 / 25</span>
+                    </div>
+                    <input type="range" id="sliderBudget" min="0" max="25" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600" oninput="updateBantTotalLive()">
+                    <p class="text-[10px] text-gray-400">Khả năng tài chính và ngân sách của khách hàng dành cho giải pháp cáp.</p>
+                </div>
+
+                <!-- Authority Slider -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <label class="font-bold text-gray-700">Authority (Quyền quyết định)</label>
+                        <span id="valAuthority" class="font-bold text-helu-red">0 / 25</span>
+                    </div>
+                    <input type="range" id="sliderAuthority" min="0" max="25" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600" oninput="updateBantTotalLive()">
+                    <p class="text-[10px] text-gray-400">Mức độ tiếp cận trực tiếp với người ký quyết định mua hàng.</p>
+                </div>
+
+                <!-- Need Slider -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <label class="font-bold text-gray-700">Need (Nhu cầu thực tế)</label>
+                        <span id="valNeed" class="font-bold text-helu-red">0 / 25</span>
+                    </div>
+                    <input type="range" id="sliderNeed" min="0" max="25" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600" oninput="updateBantTotalLive()">
+                    <p class="text-[10px] text-gray-400">Độ cấp thiết và tính tương thích của sản phẩm Helukabel với yêu cầu kỹ thuật.</p>
+                </div>
+
+                <!-- Timeline Slider -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <label class="font-bold text-gray-700">Timeline (Thời gian mua)</label>
+                        <span id="valTimeline" class="font-bold text-helu-red">0 / 25</span>
+                    </div>
+                    <input type="range" id="sliderTimeline" min="0" max="25" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-600" oninput="updateBantTotalLive()">
+                    <p class="text-[10px] text-gray-400">Kế hoạch mua hàng và thời gian triển khai lắp đặt của dự án.</p>
+                </div>
+
+                <!-- Live Score Dashboard Card -->
+                <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4 flex items-center justify-between mt-4">
+                    <div>
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tổng điểm đánh giá</div>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span id="liveTotalScore" class="text-3xl font-black text-gray-900">0</span>
+                            <span class="text-sm font-bold text-gray-400">/ 100</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wider text-right mb-1">Nhiệt độ Lead</div>
+                        <span id="liveHeatBadge" class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-white bg-slate-400">
+                            COLD
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
+                    <button type="button" class="rounded-xl px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all" onclick="closeBantModal()">Hủy</button>
+                    <button type="submit" class="rounded-xl bg-helu-red px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all active:scale-95">Lưu điểm số</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Load Chart.js for stats doughnut chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Script logic -->
+    <script th:inline="javascript">
+        const apiBase = '/api/seller/leads';
+        let allLeads = [];
+        let filteredLeads = [];
+        let currentPage = 1;
+        const pageSize = 10;
+
+        let statusChartInstance = null;
+
+        async function fetchLeads() {
+            try {
+                const response = await fetch(apiBase);
+                if (response.ok) {
+                    allLeads = await response.json();
+                    filteredLeads = [...allLeads];
+                    currentPage = 1;
+                    updateStats();
+                    renderLeads();
+                    fetchStatusChart();
+                } else {
+                    console.error('Không thể lấy danh sách lead.');
+                }
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách leads:', error);
+            }
+        }
+
+        function updateStats() {
+            const total = allLeads.length;
+            document.getElementById('statTotal').innerText = total;
+        }
+
+        async function fetchStatusChart() {
+            try {
+                const response = await fetch('/api/dashboard/seller/leads-by-status-count');
+                if (!response.ok) return;
+                const data = await response.json();
+
+                const labels = data.map(item => item.status || 'N/A');
+                const values = data.map(item => item.total || 0);
+
+                const colors = {
+                    'New': 'rgba(59, 130, 246, 0.85)',
+                    'In Progress': 'rgba(245, 158, 11, 0.85)',
+                    'In Negotiation': 'rgba(139, 92, 246, 0.85)',
+                    'Proposal Sent': 'rgba(6, 182, 212, 0.85)',
+                    'Contacted': 'rgba(236, 72, 153, 0.85)',
+                    'Won': 'rgba(16, 185, 129, 0.85)',
+                    'Lost': 'rgba(239, 68, 68, 0.85)',
+                    'Disqualified': 'rgba(107, 114, 128, 0.85)'
+                };
+
+                const backgroundColors = labels.map(label => colors[label] || 'rgba(156, 163, 175, 0.85)');
+
+                if (statusChartInstance) {
+                    statusChartInstance.destroy();
+                }
+
+                const ctx = document.getElementById('leadsStatusChart').getContext('2d');
+                statusChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: backgroundColors,
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 12,
+                                    font: { size: 11, weight: 'bold' },
+                                    padding: 10
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            } catch (error) {
+                console.error('Error rendering status chart:', error);
+            }
+        }
+
+        function renderLeads() {
+            const tbody = document.getElementById('leadsTable').querySelector('tbody');
+            tbody.innerHTML = '';
+
+            const totalRecords = filteredLeads.length;
+            const totalPages = Math.ceil(totalRecords / pageSize) || 1;
+
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
+
+            const startIdx = (currentPage - 1) * pageSize;
+            const endIdx = startIdx + pageSize;
+            const paginatedLeads = filteredLeads.slice(startIdx, endIdx);
+
+            if (paginatedLeads.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="py-8 text-center text-sm font-medium text-gray-400">
+                            Không tìm thấy khách hàng tiềm năng nào phù hợp.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('recordCount').innerText = 'Hiển thị 0/0 bản ghi';
+                document.getElementById('prevBtn').disabled = true;
+                document.getElementById('nextBtn').disabled = true;
+                document.getElementById('pageInfo').innerText = 'Trang 1 / 1';
+                document.getElementById('paginationControls').innerHTML = '';
+                return;
+            }
+
+            const statusColors = {
+                'New': 'bg-blue-50 text-blue-600 border-blue-100',
+                'In Progress': 'bg-amber-50 text-amber-600 border-amber-100',
+                'Won': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+                'Lost': 'bg-rose-50 text-rose-600 border-rose-100',
+                'In Negotiation': 'bg-purple-50 text-purple-600 border-purple-100',
+                'Proposal Sent': 'bg-cyan-50 text-cyan-600 border-cyan-100'
+            };
+
+            const heatColors = {
+                'HOT': 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-sm',
+                'WARM': 'bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-sm',
+                'COLD': 'bg-gradient-to-r from-slate-400 to-slate-500 text-white shadow-sm'
+            };
+
+            paginatedLeads.forEach((lead, index) => {
+                const tr = document.createElement('tr');
+                tr.className = `border-b border-gray-50 hover:bg-gray-50/50 transition-all group ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]/50'}`;
+
+                const totalBant = (lead.bantBudget || 0) + (lead.bantAuthority || 0) + (lead.bantNeed || 0) + (lead.bantTimeline || 0);
+
+                tr.innerHTML = `
+                    <td class="py-4 px-6 text-center font-semibold text-gray-500 text-xs">
+                        ${startIdx + index + 1}
+                    </td>
+                    <td class="py-4 px-6">
+                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">${lead.leadId}</span>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="font-bold text-gray-900 text-xs hover:text-helu-red cursor-pointer" onclick="viewDetail('${lead.leadId}')">${lead.fullName}</div>
+                        <div class="text-[10px] font-medium text-gray-500">${lead.account}</div>
+                    </td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${statusColors[lead.status] || 'bg-gray-50 text-gray-600'}">
+                            ${lead.status}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${heatColors[lead.leadHeat] || 'bg-slate-400 text-white'}">
+                            ${lead.leadHeat === 'HOT' ? '<i data-lucide="flame" class="w-3 h-3"></i>' : ''}
+                            ${lead.leadHeat || 'COLD'} (${totalBant}đ)
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <div class="flex flex-col gap-0.5 w-28">
+                            <div class="flex justify-between text-[9px] font-bold text-gray-400">
+                                <span>BANT Score</span>
+                                <span>${totalBant}/100</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="h-full rounded-full ${lead.leadHeat === 'HOT' ? 'bg-[#f6171b]' : lead.leadHeat === 'WARM' ? 'bg-amber-400' : 'bg-slate-400'}" style="width: ${totalBant}%"></div>
+                            </div>
+                            <div class="flex gap-1.5 text-[8px] font-bold text-gray-400 mt-0.5">
+                                <span>B: ${lead.bantBudget || 0}</span>
+                                <span>A: ${lead.bantAuthority || 0}</span>
+                                <span>N: ${lead.bantNeed || 0}</span>
+                                <span>T: ${lead.bantTimeline || 0}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <div class="text-xs font-bold text-gray-800">${lead.sourceName || 'N/A'}</div>
+                        <div class="text-[9px] font-medium text-gray-400">${lead.productName || 'N/A'}</div>
+                    </td>
+                    <td class="py-4 px-6 text-right pr-10">
+                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="viewDetail('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Xem chi tiết">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                   </button>
+                            <button onclick="openBantModal('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-helu-red transition-all" title="Đánh giá BANT">
+                                <i data-lucide="sliders" class="w-4 h-4"></i>
+                            </button>
+                            <button onclick="openStatusModal('${lead.leadId}', '${lead.status}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Cập nhật trạng thái">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('recordCount').innerText = `Hiển thị ${startIdx + 1}-${Math.min(endIdx, totalRecords)}/${totalRecords} bản ghi`;
+            document.getElementById('pageInfo').innerText = `Trang ${currentPage} / ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+            lucide.createIcons();
+        }
+
+        function changePage(page) {
+            const totalRecords = filteredLeads.length;
+            const totalPages = Math.ceil(totalRecords / pageSize) || 1;
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderLeads();
+        }
+
+        function viewDetail(id) {
+            window.location.href = `/leads/${id}`;
+        }
+
+        function filterLeads() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            const heat = document.getElementById('heatFilter').value;
+
+            filteredLeads = allLeads.filter(l => {
+                const matchesSearch = l.fullName.toLowerCase().includes(search) || 
+                                     l.account.toLowerCase().includes(search) ||
+                                     l.leadId.toLowerCase().includes(search);
+                const matchesStatus = !status || l.status === status;
+                const matchesHeat = !heat || l.leadHeat === heat;
+
+                return matchesSearch && matchesStatus && matchesHeat;
+            });
+
+            currentPage = 1;
+            renderLeads();
+        }
+
+        // Status Modal Actions
+        function openStatusModal(id, currentStatus) {
+            document.getElementById('statusLeadId').value = id;
+            document.getElementById('newStatusSelect').value = currentStatus;
+            const modal = document.getElementById('statusModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeStatusModal() {
+            const modal = document.getElementById('statusModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('statusForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('statusLeadId').value;
+            const status = document.getElementById('newStatusSelect').value;
+
+            try {
+                const response = await fetch(`${apiBase}/${id}/status?status=${encodeURIComponent(status)}`, {
+                    method: 'PUT'
+                });
+                if (response.ok) {
+                    closeStatusModal();
+                    fetchLeads();
+                } else {
+                    alert('Không có quyền hoặc trạng thái không hợp lệ.');
+                }
+            } catch (error) {
+                console.error('Lỗi khi cập nhật trạng thái:', error);
+            }
+        };
+
+        // BANT Modal Actions
+        function openBantModal(id) {
+            const lead = allLeads.find(l => l.leadId === id);
+            if (!lead) return;
+
+            document.getElementById('bantLeadId').value = id;
+            document.getElementById('bantLeadLabel').innerText = `${lead.fullName} (${lead.account})`;
+
+            // Set sliders
+            document.getElementById('sliderBudget').value = lead.bantBudget || 0;
+            document.getElementById('sliderAuthority').value = lead.bantAuthority || 0;
+            document.getElementById('sliderNeed').value = lead.bantNeed || 0;
+            document.getElementById('sliderTimeline').value = lead.bantTimeline || 0;
+
+            updateBantTotalLive();
+
+            const modal = document.getElementById('bantModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeBantModal() {
+            const modal = document.getElementById('bantModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function updateBantTotalLive() {
+            const b = parseInt(document.getElementById('sliderBudget').value) || 0;
+            const a = parseInt(document.getElementById('sliderAuthority').value) || 0;
+            const n = parseInt(document.getElementById('sliderNeed').value) || 0;
+            const t = parseInt(document.getElementById('sliderTimeline').value) || 0;
+
+            document.getElementById('valBudget').innerText = `${b} / 25`;
+            document.getElementById('valAuthority').innerText = `${a} / 25`;
+            document.getElementById('valNeed').innerText = `${n} / 25`;
+            document.getElementById('valTimeline').innerText = `${t} / 25`;
+
+            const total = b + a + n + t;
+            document.getElementById('liveTotalScore').innerText = total;
+
+            const badge = document.getElementById('liveHeatBadge');
+            badge.className = 'inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-white';
+
+            if (total >= 80) {
+                badge.innerText = 'HOT';
+                badge.classList.add('bg-gradient-to-r', 'from-red-500', 'to-orange-500');
+            } else if (total >= 60) {
+                badge.innerText = 'WARM';
+                badge.classList.add('bg-gradient-to-r', 'from-amber-400', 'to-amber-500');
+            } else {
+                badge.innerText = 'COLD';
+                badge.classList.add('bg-gradient-to-r', 'from-slate-400', 'to-slate-500');
+            }
+        }
+
+        document.getElementById('bantForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('bantLeadId').value;
+            const budget = parseInt(document.getElementById('sliderBudget').value) || 0;
+            const authority = parseInt(document.getElementById('sliderAuthority').value) || 0;
+            const need = parseInt(document.getElementById('sliderNeed').value) || 0;
+            const timeline = parseInt(document.getElementById('sliderTimeline').value) || 0;
+
+            const data = { budget, authority, need, timeline };
+
+            try {
+                const response = await fetch(`${apiBase}/${id}/bant`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    closeBantModal();
+                    fetchLeads();
+                } else {
+                    alert('Lỗi cập nhật điểm BANT. Điểm số từ 0 - 25.');
+                }
+            } catch (error) {
+                console.error('Lỗi khi cập nhật điểm BANT:', error);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchLeads();
+
+            // Auto-shrinking text logic for long numbers
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    const target = mutation.target;
+                    const len = target.innerText.trim().length;
+                    if (len > 12) {
+                        target.style.fontSize = '1.5rem';
+                    } else if (len > 8) {
+                        target.style.fontSize = '2rem';
+                    } else {
+                        target.style.fontSize = '';
+                    }
+                });
+            });
+            document.querySelectorAll('.kpi-val').forEach(el => {
+                observer.observe(el, { childList: true, characterData: true, subtree: true });
+                // Initial check
+                const len = el.innerText.trim().length;
+                if (len > 12) {
+                    el.style.fontSize = '1.5rem';
+                } else if (len > 8) {
+                    el.style.fontSize = '2rem';
+                }
+            });
+        });
+    </script>
+</main>
+</body>
+</html>

@@ -61,7 +61,6 @@
                     <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.status}">Trạng thái</th>
                     <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{label.assigned_to}">Phụ trách</th>
                     <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-400" th:text="#{manage.source_product}">Nguồn / Sản phẩm</th>
-                    <th class="py-4 px-6 text-right text-xs font-bold uppercase tracking-wider text-gray-400 pr-10" th:text="#{manage.col.actions}">Thao tác</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -112,7 +111,29 @@
                         <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" th:placeholder="#{form.placeholder.email}">
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.role}">Vai trò KH</span> <span class="text-helu-red">*</span></label>
+                        <select id="customerRole" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required>
+                            <option value="Manufacturer">Manufacturer</option>
+                            <option value="Contractor">Contractor</option>
+                            <option value="Trading">Trading</option>
+                            <option value="Distributor">Distributor</option>
+                            <option value="System Integrator">System Integrator</option>
+                            <option value="End User">End User</option>
+                            <option value="Consultant">Consultant</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{dashboard.col.region}">Địa điểm</span> <span class="text-helu-red">*</span></label>
+                        <input type="text" id="location" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Hồ Chí Minh">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.cost}">Chi phí dự kiến</span> <span class="text-helu-red">*</span></label>
+                        <input type="number" id="cost" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required value="0">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700"><span th:text="#{form.company}">Công ty / Tổ chức</span> <span class="text-helu-red">*</span></label>
                         <input type="text" id="account" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required>
@@ -126,29 +147,45 @@
                             <option value="Lost">Lost</option>
                         </select>
                     </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{label.assigned_to}">Người phụ trách</span> <span class="text-helu-red">*</span></label>
+                        <select id="userId" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required>
+                            <option value="" disabled selected>-- Chọn người phụ trách --</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700" th:text="#{form.group}">Nhóm KH</label>
-                        <input type="text" id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <select id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">-- Chọn nhóm KH --</option>
+                        </select>
                     </div>
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700" th:text="#{form.industry}">Ngành</label>
-                        <input type="text" id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <select id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">-- Chọn ngành --</option>
+                        </select>
                     </div>
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700" th:text="#{form.region}">Khu vực</label>
-                        <input type="text" id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <select id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">-- Chọn khu vực --</option>
+                        </select>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700" th:text="#{form.source}">Nguồn khách hàng</label>
-                        <input type="text" id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.source}">Nguồn khách hàng</span> <span class="text-helu-red">*</span></label>
+                        <select id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required>
+                            <option value="" disabled selected>-- Chọn nguồn KH --</option>
+                        </select>
                     </div>
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700" th:text="#{form.product}">Sản phẩm quan tâm</label>
-                        <input type="text" id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <select id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">-- Chọn sản phẩm --</option>
+                        </select>
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
@@ -163,6 +200,8 @@
         const apiBase = '/api/leads';
         let allLeads = [];
         let filteredLeads = [];
+        let currentPage = 1;
+        const pageSize = 10;
         const unassignedText = /*[[#{status.unassigned}]]*/ 'Chưa gán';
         const addLeadText = /*[[#{manage.btn.add}]]*/ 'Thêm Lead mới';
         const updateLeadText = /*[[#{detail.btn.edit}]]*/ 'Cập nhật thông tin Lead';
@@ -172,6 +211,7 @@
                 const response = await fetch(apiBase);
                 allLeads = await response.json();
                 filteredLeads = [...allLeads];
+                currentPage = 1;
                 renderLeads();
             } catch (error) { console.error('Error fetching leads:', error); }
         }
@@ -179,9 +219,38 @@
         function renderLeads() {
             const tbody = document.getElementById('leadsTable').querySelector('tbody');
             tbody.innerHTML = '';
-            filteredLeads.forEach(lead => {
+
+            const totalRecords = filteredLeads.length;
+            const totalPages = Math.ceil(totalRecords / pageSize);
+            
+            // Adjust current page if it is out of bounds
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const paginatedLeads = filteredLeads.slice(startIndex, endIndex);
+
+            if (paginatedLeads.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="py-8 text-center text-sm font-medium text-gray-400">
+                            Không tìm thấy khách hàng tiềm năng nào phù hợp.
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('recordCount').innerText = 'Hiển thị 0/0 bản ghi';
+                document.getElementById('paginationControls').innerHTML = '';
+                return;
+            }
+
+            paginatedLeads.forEach(lead => {
                 const tr = document.createElement('tr');
-                tr.className = 'border-b border-gray-50 hover:bg-gray-50/50 transition-all group';
+                tr.className = 'border-b border-gray-50 hover:bg-gray-50/50 transition-all group cursor-pointer';
+                tr.onclick = () => {
+                    window.location.href = `/leads/${lead.leadId}`;
+                };
                 
                 const statusColors = {
                     'New': 'bg-blue-50 text-blue-600 border-blue-100',
@@ -189,45 +258,90 @@
                     'Won': 'bg-emerald-50 text-emerald-600 border-emerald-100',
                     'Lost': 'bg-rose-50 text-rose-600 border-rose-100'
                 };
-
                 tr.innerHTML = `
-                    <td class="py-4 px-6">
-                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">${lead.leadId}</span>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest">${lead.leadId}</span>
                     </td>
-                    <td class="py-4 px-6">
-                        <div class="font-bold text-gray-900">${lead.fullName}</div>
-                        <div class="text-xs font-medium text-gray-500">${lead.account}</div>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <div class="font-bold text-gray-900 text-xs">${lead.fullName}</div>
+                        <div class="text-[10px] font-medium text-gray-500">${lead.account}</div>
                     </td>
-                    <td class="py-4 px-6">
-                        <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-[10px] font-bold text-gray-600">${lead.customerGroup || '-'}</span>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <span class="inline-flex items-center rounded-lg bg-gray-100 px-2 py-0.5 text-[9px] font-bold text-gray-600">${lead.customerGroup || '-'}</span>
                     </td>
-                    <td class="py-4 px-6 text-sm font-medium text-gray-600">${lead.industryType || '-'}</td>
-                    <td class="py-4 px-6 text-sm font-medium text-gray-600">${lead.region || '-'}</td>
-                    <td class="py-4 px-6">
-                        <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${statusColors[lead.status] || 'bg-gray-50 text-gray-600'}">
+                    <td class="py-3 px-4 text-xs font-medium text-gray-600 whitespace-nowrap">${lead.industryType || '-'}</td>
+                    <td class="py-3 px-4 text-xs font-medium text-gray-600 whitespace-nowrap">${lead.region || '-'}</td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${statusColors[lead.status] || 'bg-gray-50 text-gray-600'}">
                             ${lead.status}
                         </span>
                     </td>
-                    <td class="py-4 px-6">
-                        <div class="flex items-center gap-2">
-                            <div class="flex h-6 w-6 items-center justify-center rounded bg-helu-red font-bold text-white text-[10px]">${lead.userName ? lead.userName.charAt(0) : '?'}</div>
-                            <span class="text-sm font-bold text-gray-700">${lead.userName || unassignedText}</span>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <div class="flex items-center gap-1.5">
+                            <div class="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-helu-red font-bold text-white text-[9px]">${lead.userName ? lead.userName.charAt(0) : '?'}</div>
+                            <span class="text-xs font-bold text-gray-700">${lead.userName || unassignedText}</span>
                         </div>
                     </td>
-                    <td class="py-4 px-6">
-                        <div class="text-xs font-bold text-gray-800">${lead.sourceName || '-'}</div>
-                        <div class="text-[10px] font-medium text-gray-400">${lead.productName || '-'}</div>
-                    </td>
-                    <td class="py-4 px-6 text-right pr-10">
-                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="viewDetail('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Xem chi tiết"><i data-lucide="eye" class="w-4 h-4"></i></button>
-                            <button onclick="openModal('edit', '${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Chỉnh sửa"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                            <button onclick="deleteLead('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-rose-50 hover:text-rose-600 transition-all" title="Xóa"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </div>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <div class="text-[11px] font-bold text-gray-800">${lead.sourceName || '-'}</div>
+                        <div class="text-[9px] font-medium text-gray-400">${lead.productName || '-'}</div>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+
+            // Update record count text
+            const startRecord = startIndex + 1;
+            const endRecord = Math.min(endIndex, totalRecords);
+            document.getElementById('recordCount').innerText = `Hiển thị ${startRecord}-${endRecord}/${totalRecords} bản ghi`;
+
+            // Render pagination buttons
+            const paginationControls = document.getElementById('paginationControls');
+            paginationControls.innerHTML = '';
+            if (totalPages > 1) {
+                // Previous Button
+                const prevBtn = document.createElement('button');
+                prevBtn.type = 'button';
+                prevBtn.className = `rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 hover:text-helu-red transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`;
+                prevBtn.innerText = 'Trước';
+                if (currentPage > 1) {
+                    prevBtn.onclick = () => { currentPage--; renderLeads(); };
+                }
+                paginationControls.appendChild(prevBtn);
+                // Current Page Input Container (Middle)
+                const pageContainer = document.createElement('div');
+                pageContainer.className = 'flex items-center gap-1.5 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm';
+                pageContainer.innerHTML = `
+                    <span>Trang</span>
+                    <input type="number" id="pageInput" min="1" max="${totalPages}" value="${currentPage}" class="w-12 h-7 text-center border border-gray-300 rounded-lg focus:border-helu-red outline-none bg-white font-black" />
+                    <span>/ ${totalPages}</span>
+                `;
+                paginationControls.appendChild(pageContainer);
+
+                const pageInput = pageContainer.querySelector('#pageInput');
+                pageInput.onchange = (e) => {
+                    let val = parseInt(e.target.value);
+                    if (isNaN(val) || val < 1) val = 1;
+                    if (val > totalPages) val = totalPages;
+                    currentPage = val;
+                    renderLeads();
+                };
+                pageInput.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        pageInput.blur();
+                    }
+                };
+
+                // Next Button
+                const nextBtn = document.createElement('button');
+                nextBtn.type = 'button';
+                nextBtn.className = `rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 hover:text-helu-red transition-all ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`;
+                nextBtn.innerText = 'Sau';
+                if (currentPage < totalPages) {
+                    nextBtn.onclick = () => { currentPage++; renderLeads(); };
+                }
+                paginationControls.appendChild(nextBtn);
+            }
             lucide.createIcons();
         }
 
@@ -252,15 +366,77 @@
             if (sort === 'newest') filteredLeads.sort((a, b) => b.leadId.localeCompare(a.leadId));
             else filteredLeads.sort((a, b) => a.leadId.localeCompare(b.leadId));
 
+            currentPage = 1;
             renderLeads();
         }
 
-        function openModal(mode, id = null) {
+        let metadata = null;
+
+        async function fetchMetadata() {
+            try {
+                const response = await fetch('/api/leads/metadata');
+                metadata = await response.json();
+                populateDropdowns();
+            } catch (error) {
+                console.error('Error fetching metadata:', error);
+            }
+        }
+
+        function populateDropdowns() {
+            if (!metadata) return;
+
+            // Populate Customer Groups
+            const groupSelect = document.getElementById('customerGroup');
+            groupSelect.innerHTML = '<option value="">-- Chọn nhóm KH --</option>';
+            metadata.customerGroups.forEach(g => {
+                groupSelect.innerHTML += `<option value="${g}">${g}</option>`;
+            });
+
+            // Populate Industries
+            const indSelect = document.getElementById('industryType');
+            indSelect.innerHTML = '<option value="">-- Chọn ngành --</option>';
+            metadata.industries.forEach(i => {
+                indSelect.innerHTML += `<option value="${i}">${i}</option>`;
+            });
+
+            // Populate Regions
+            const regSelect = document.getElementById('region');
+            regSelect.innerHTML = '<option value="">-- Chọn khu vực --</option>';
+            metadata.regions.forEach(r => {
+                regSelect.innerHTML += `<option value="${r}">${r}</option>`;
+            });
+
+            // Populate Sources
+            const srcSelect = document.getElementById('sourceName');
+            srcSelect.innerHTML = '<option value="" disabled selected>-- Chọn nguồn KH --</option>';
+            metadata.sources.forEach(s => {
+                srcSelect.innerHTML += `<option value="${s}">${s}</option>`;
+            });
+
+            // Populate Products
+            const prodSelect = document.getElementById('productName');
+            prodSelect.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+            metadata.products.forEach(p => {
+                prodSelect.innerHTML += `<option value="${p}">${p}</option>`;
+            });
+
+            // Populate Users
+            const userSelect = document.getElementById('userId');
+            userSelect.innerHTML = '<option value="" disabled selected>-- Chọn người phụ trách --</option>';
+            metadata.users.forEach(u => {
+                userSelect.innerHTML += `<option value="${u.userId}">${u.fullName}</option>`;
+            });
+        }
+
+        async function openModal(mode, id = null) {
             const modal = document.getElementById('leadModal');
             const form = document.getElementById('leadForm');
             const title = document.getElementById('modalTitle');
             form.reset();
             document.getElementById('leadId').value = '';
+
+            // Ensure dropdowns are populated
+            populateDropdowns();
 
             if (mode === 'edit' && id) {
                 title.innerText = updateLeadText;
@@ -271,6 +447,9 @@
                     document.getElementById('fullName').value = lead.fullName;
                     document.getElementById('phoneNumber').value = lead.phoneNumber || '';
                     document.getElementById('email').value = lead.email || '';
+                    document.getElementById('customerRole').value = lead.customerRole || 'Manufacturer';
+                    document.getElementById('location').value = lead.location || '';
+                    document.getElementById('cost').value = lead.cost || 0;
                     document.getElementById('account').value = lead.account;
                     document.getElementById('status').value = lead.status;
                     document.getElementById('customerGroup').value = lead.customerGroup || '';
@@ -278,10 +457,25 @@
                     document.getElementById('region').value = lead.region || '';
                     document.getElementById('sourceName').value = lead.sourceName || '';
                     document.getElementById('productName').value = lead.productName || '';
+                    
+                    if (metadata && metadata.users) {
+                        const foundUser = metadata.users.find(u => u.fullName === lead.userName);
+                        document.getElementById('userId').value = foundUser ? foundUser.userId : '';
+                    }
                 }
             } else {
                 title.innerText = addLeadText;
-                document.getElementById('leadIdInput').value = 'L-2026-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+                try {
+                    const res = await fetch('/api/leads/next-id');
+                    const nextIdData = await res.json();
+                    document.getElementById('leadIdInput').value = nextIdData.nextId;
+                } catch (err) {
+                    console.error('Error fetching next lead ID:', err);
+                    document.getElementById('leadIdInput').value = 'L-2026-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+                }
+                document.getElementById('customerRole').value = 'Manufacturer';
+                document.getElementById('location').value = 'Hồ Chí Minh';
+                document.getElementById('cost').value = '0';
             }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -298,6 +492,7 @@
             const id = document.getElementById('leadId').value;
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${apiBase}/${id}` : apiBase;
+            const lead = id ? allLeads.find(l => l.leadId === id) : null;
 
             const data = {
                 leadId: document.getElementById('leadIdInput').value,
@@ -306,13 +501,18 @@
                 email: document.getElementById('email').value,
                 account: document.getElementById('account').value,
                 status: document.getElementById('status').value,
+                customerRole: document.getElementById('customerRole').value,
+                location: document.getElementById('location').value,
+                cost: parseFloat(document.getElementById('cost').value) || 0,
                 customerGroup: document.getElementById('customerGroup').value,
                 industryType: document.getElementById('industryType').value,
                 region: document.getElementById('region').value,
                 productName: document.getElementById('productName').value,
                 sourceName: document.getElementById('sourceName').value,
-                createdDate: new Date().toISOString().split('T')[0],
-                userId: '498e0fc7-6278-45fc-a374-1a81096727d2' // Mock user ID
+                createdDate: id ? lead.createdDate : new Date().toISOString().split('T')[0],
+                userId: document.getElementById('userId').value || null,
+                lossReason: id ? lead.lossReason : null,
+                businessResult: id ? lead.businessResult : null
             };
 
             try {
@@ -321,8 +521,17 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                if (response.ok) { closeModal(); fetchLeads(); }
-            } catch (error) { console.error('Error saving lead:', error); }
+                if (response.ok) { 
+                    closeModal(); 
+                    fetchLeads(); 
+                } else {
+                    const errText = await response.text();
+                    alert("Lỗi lưu Lead: " + errText);
+                }
+            } catch (error) { 
+                console.error('Error saving lead:', error); 
+                alert("Lỗi kết nối: " + error.message);
+            }
         };
 
         async function deleteLead(id) {
@@ -334,7 +543,10 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', fetchLeads);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMetadata();
+            fetchLeads();
+        });
     </script>
 </main>
 </body>

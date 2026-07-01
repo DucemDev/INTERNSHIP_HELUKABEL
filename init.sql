@@ -120,15 +120,18 @@ CREATE TABLE activity_log
 GO
 
 CREATE TABLE notification
-(notification_id BIGINT IDENTITY(1,1) NOT NULL,
- user_id         UNIQUEIDENTIFIER                NOT NULL,
- title           NVARCHAR(150) NOT NULL,
- message         NVARCHAR(MAX) NOT NULL,
- is_read         BIT       DEFAULT 0             NOT NULL,
- related_link    VARCHAR(255) NULL,
- created_at      DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
- CONSTRAINT PK_notification PRIMARY KEY (notification_id),
- CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id));
+(
+    id          UNIQUEIDENTIFIER DEFAULT NEWID() NOT NULL,
+    user_id     UNIQUEIDENTIFIER NOT NULL,
+    title       NVARCHAR(200) NOT NULL,
+    message     NVARCHAR(1000) NOT NULL,
+    is_read     BIT DEFAULT 0 NOT NULL,
+    type        VARCHAR(50) NOT NULL,
+    link        VARCHAR(255) NULL,
+    created_at  DATETIME2 DEFAULT SYSDATETIME() NOT NULL,
+    CONSTRAINT PK_notification PRIMARY KEY (id),
+    CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE CASCADE
+);
 GO
 
 CREATE TABLE sales_target
@@ -255,7 +258,7 @@ GO
 -- 3.2 INSERT USERS (ADMIN & SELLERS)
 INSERT INTO [user] (user_id, user_code, username, password, full_name, email, role_id, is_active) VALUES
 ('21cf3ed1-c2eb-410c-8098-bf3020e06991', 'AD001', 'admin', '123', N'Administrator', 'admin@helukabel.vn', 1, 1),
-('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 'NV001', 'seller_thanh', '123', N'Vo Duc Thanh', 'seller_thanh@helukabel.vn', 2, 1),
+('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 'NV001', 'seller_thanh', '123', N'Vo Duc Thanh', 'thanh0@helukabel.vn', 2, 1),
 ('f3f1ab23-29da-4ea3-8377-befc37b314f1', 'NV002', 'seller_huong', '123', N'Nguyen Thi Thu Huong', 'seller_huong@helukabel.vn', 2, 1),
 ('45f0d7fa-7580-4d9e-98e2-495aa86f75c9', 'NV003', 'seller_minh', '123', N'Tran Quoc Minh', 'seller_minh@helukabel.vn', 2, 1),
 ('655612cb-fc04-4fa8-a2de-87a6a55d30c7', 'NV004', 'seller_lan', '123', N'Pham Thi Ngoc Lan', 'seller_lan@helukabel.vn', 2, 1),
@@ -264,17 +267,62 @@ INSERT INTO [user] (user_id, user_code, username, password, full_name, email, ro
 GO
 
 
--- INSERT sales_target moved after users to satisfy FK
-INSERT INTO sales_target (user_id, period_month, period_year, revenue_target, created_by) VALUES
--- Target Tháng 5/2026
-('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 5, 2026, 2000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 5 Tỷ
-('f3f1ab23-29da-4ea3-8377-befc37b314f1', 5, 2026, 1500000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 4.5 Tỷ
-('45f0d7fa-7580-4d9e-98e2-495aa86f75c9', 5, 2026, 2000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 6 Tỷ
-
--- Target Tháng 6/2026
-('d3e4851b-02e7-4bc3-86d8-cbd82d96c2e5', 6, 2026, 1500000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 5.5 Tỷ
-('f3f1ab23-29da-4ea3-8377-befc37b314f1', 6, 2026, 2000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'), -- 5 Tỷ
-('45f0d7fa-7580-4d9e-98e2-495aa86f75c9', 6, 2026, 1500000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'); -- 6.5 Tỷ
+-- Giao chỉ tiêu Target cho các năm 2024, 2025, 2026 với tỷ trọng Quý phân bổ thực tế (Q1: 15%, Q2: 25%, Q3: 20%, Q4: 40%)
+INSERT INTO sales_target (user_id, period_month, period_year, revenue_target, created_by)
+SELECT 
+    u.user_id, 
+    m.val, 
+    y.year_val, 
+    CASE u.user_code
+        WHEN 'NV001' THEN -- Võ Đức Thành (Năm: 12B)
+            CASE 
+                WHEN m.val IN (1, 2, 3) THEN 600000000.00    -- Q1 (600M/tháng)
+                WHEN m.val IN (4, 5, 6) THEN 1000000000.00   -- Q2 (1B/tháng)
+                WHEN m.val IN (7, 8, 9) THEN 800000000.00    -- Q3 (800M/tháng)
+                ELSE 1600000000.00                           -- Q4 (1.6B/tháng)
+            END
+        WHEN 'NV002' THEN -- Nguyễn Thị Thu Hướng (Năm: 600M)
+            CASE 
+                WHEN m.val IN (1, 2, 3) THEN 30000000.00     -- Q1 (30M/tháng)
+                WHEN m.val IN (4, 5, 6) THEN 50000000.00     -- Q2 (50M/tháng)
+                WHEN m.val IN (7, 8, 9) THEN 40000000.00     -- Q3 (40M/tháng)
+                ELSE 80000000.00                             -- Q4 (80M/tháng)
+            END
+        WHEN 'NV003' THEN -- Trần Quốc Minh (Năm: 10.2B)
+            CASE 
+                WHEN m.val IN (1, 2, 3) THEN 510000000.00    -- Q1 (510M/tháng)
+                WHEN m.val IN (4, 5, 6) THEN 850000000.00    -- Q2 (850M/tháng)
+                WHEN m.val IN (7, 8, 9) THEN 680000000.00    -- Q3 (680M/tháng)
+                ELSE 1360000000.00                           -- Q4 (1.36B/tháng)
+            END
+        WHEN 'NV004' THEN -- Phạm Thị Ngọc Lan (Năm: 9B)
+            CASE 
+                WHEN m.val IN (1, 2, 3) THEN 450000000.00    -- Q1 (450M/tháng)
+                WHEN m.val IN (4, 5, 6) THEN 750000000.00    -- Q2 (750M/tháng)
+                WHEN m.val IN (7, 8, 9) THEN 600000000.00    -- Q3 (600M/tháng)
+                ELSE 1200000000.00                           -- Q4 (1.2B/tháng)
+            END
+        WHEN 'NV005' THEN -- Lê Văn Hùng (Năm: 8.4B)
+            CASE 
+                WHEN m.val IN (1, 2, 3) THEN 420000000.00    -- Q1 (420M/tháng)
+                WHEN m.val IN (4, 5, 6) THEN 700000000.00    -- Q2 (700M/tháng)
+                WHEN m.val IN (7, 8, 9) THEN 560000000.00    -- Q3 (560M/tháng)
+                ELSE 1120000000.00                           -- Q4 (1.12B/tháng)
+            END
+        WHEN 'NV006' THEN -- Hoàng Minh Tuấn (Năm: 2.16B)
+            CASE 
+                WHEN m.val IN (1, 2, 3) THEN 108000000.00    -- Q1 (108M/tháng)
+                WHEN m.val IN (4, 5, 6) THEN 180000000.00    -- Q2 (180M/tháng)
+                WHEN m.val IN (7, 8, 9) THEN 144000000.00    -- Q3 (144M/tháng)
+                ELSE 288000000.00                            -- Q4 (288M/tháng)
+            END
+        ELSE 1500000000.00
+    END,
+    '21cf3ed1-c2eb-410c-8098-bf3020e06991'
+FROM [user] u
+CROSS JOIN (VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12)) m(val)
+CROSS JOIN (VALUES (2024),(2025),(2026)) y(year_val)
+WHERE u.role_id = 2; -- Role Seller
 GO
 
 
@@ -1503,3 +1551,6 @@ VALUES
     ('QUARTERLY', 2, 2026, 65000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991'),
     ('QUARTERLY', 3, 2026, 80000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991');
 GO
+
+-- NOTE: CREATE TABLE notification is defined at the beginning of the script.
+

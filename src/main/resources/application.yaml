@@ -9,9 +9,9 @@ spring:
     url: jdbc:sqlserver://localhost:1433;databaseName=INTERNSHIP_2026;encrypt=true;trustServerCertificate=true
 
 
-#//đúng cấu hình SQL của m khum hình như kum
-    username: sa2
-    password: Password.1
+
+    username: sa
+    password: 123456789
 
 
 

@@ -14,6 +14,9 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
+                <button onclick="deleteLead()" class="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-6 py-3 text-sm font-bold text-rose-600 hover:bg-rose-100 transition-all shadow-sm">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> <span>Xóa lead</span>
+                </button>
                 <button onclick="openModal('edit')" class="inline-flex items-center gap-2 rounded-xl bg-helu-red px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all">
                     <i data-lucide="edit-3" class="w-4 h-4"></i> <span th:text="#{detail.btn.edit}">Chỉnh sửa thông tin</span>
                 </button>
@@ -170,7 +173,29 @@
                             <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" th:placeholder="#{form.placeholder.email}">
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{form.role}">Vai trò KH</span> <span class="text-helu-red">*</span></label>
+                            <select id="customerRole" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required>
+                                <option value="Manufacturer">Manufacturer</option>
+                                <option value="Contractor">Contractor</option>
+                                <option value="Trading">Trading</option>
+                                <option value="Distributor">Distributor</option>
+                                <option value="System Integrator">System Integrator</option>
+                                <option value="End User">End User</option>
+                                <option value="Consultant">Consultant</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{dashboard.col.region}">Địa điểm</span> <span class="text-helu-red">*</span></label>
+                            <input type="text" id="location" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Hồ Chí Minh">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{form.cost}">Chi phí dự kiến</span> <span class="text-helu-red">*</span></label>
+                            <input type="number" id="cost" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required value="0">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2">
                             <label class="text-sm font-bold text-gray-700"><span th:text="#{form.company}">Công ty / Tổ chức</span> <span class="text-helu-red">*</span></label>
                             <input type="text" id="account" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required>
@@ -184,29 +209,45 @@
                                 <option value="Lost">Lost</option>
                             </select>
                         </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{label.assigned_to}">Người phụ trách</span> <span class="text-helu-red">*</span></label>
+                            <select id="userId" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required>
+                                <option value="" disabled selected>-- Chọn người phụ trách --</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2">
                             <label class="text-sm font-bold text-gray-700" th:text="#{form.group}">Nhóm KH</label>
-                            <input type="text" id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                            <select id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                                <option value="">-- Chọn nhóm KH --</option>
+                            </select>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-bold text-gray-700" th:text="#{form.industry}">Ngành</label>
-                            <input type="text" id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                            <select id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                                <option value="">-- Chọn ngành --</option>
+                            </select>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-bold text-gray-700" th:text="#{form.region}">Khu vực</label>
-                            <input type="text" id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                            <select id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                                <option value="">-- Chọn khu vực --</option>
+                            </select>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-bold text-gray-700" th:text="#{form.source}">Nguồn khách hàng</label>
-                            <input type="text" id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                            <label class="text-sm font-bold text-gray-700"><span th:text="#{form.source}">Nguồn khách hàng</span> <span class="text-helu-red">*</span></label>
+                            <select id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required>
+                                <option value="" disabled selected>-- Chọn nguồn KH --</option>
+                            </select>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-bold text-gray-700" th:text="#{form.product}">Sản phẩm quan tâm</label>
-                            <input type="text" id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                            <select id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                                <option value="">-- Chọn sản phẩm --</option>
+                            </select>
                         </div>
                     </div>
                     <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
@@ -273,16 +314,80 @@
                 lucide.createIcons();
             }
 
+            let metadata = null;
+
+            async function fetchMetadata() {
+                try {
+                    const response = await fetch('/api/leads/metadata');
+                    metadata = await response.json();
+                    populateDropdowns();
+                } catch (error) {
+                    console.error('Error fetching metadata:', error);
+                }
+            }
+
+            function populateDropdowns() {
+                if (!metadata) return;
+
+                // Populate Customer Groups
+                const groupSelect = document.getElementById('customerGroup');
+                groupSelect.innerHTML = '<option value="">-- Chọn nhóm KH --</option>';
+                metadata.customerGroups.forEach(g => {
+                    groupSelect.innerHTML += `<option value="${g}">${g}</option>`;
+                });
+
+                // Populate Industries
+                const indSelect = document.getElementById('industryType');
+                indSelect.innerHTML = '<option value="">-- Chọn ngành --</option>';
+                metadata.industries.forEach(i => {
+                    indSelect.innerHTML += `<option value="${i}">${i}</option>`;
+                });
+
+                // Populate Regions
+                const regSelect = document.getElementById('region');
+                regSelect.innerHTML = '<option value="">-- Chọn khu vực --</option>';
+                metadata.regions.forEach(r => {
+                    regSelect.innerHTML += `<option value="${r}">${r}</option>`;
+                });
+
+                // Populate Sources
+                const srcSelect = document.getElementById('sourceName');
+                srcSelect.innerHTML = '<option value="" disabled selected>-- Chọn nguồn KH --</option>';
+                metadata.sources.forEach(s => {
+                    srcSelect.innerHTML += `<option value="${s}">${s}</option>`;
+                });
+
+                // Populate Products
+                const prodSelect = document.getElementById('productName');
+                prodSelect.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+                metadata.products.forEach(p => {
+                    prodSelect.innerHTML += `<option value="${p}">${p}</option>`;
+                });
+
+                // Populate Users
+                const userSelect = document.getElementById('userId');
+                userSelect.innerHTML = '<option value="" disabled selected>-- Chọn người phụ trách --</option>';
+                metadata.users.forEach(u => {
+                    userSelect.innerHTML += `<option value="${u.userId}">${u.fullName}</option>`;
+                });
+            }
+
             async function openModal(mode) {
                 const modal = document.getElementById('leadModal');
                 const form = document.getElementById('leadForm');
                 
+                // Ensure dropdowns are populated
+                populateDropdowns();
+
                 if (currentLead) {
                     document.getElementById('leadId').value = currentLead.leadId;
                     document.getElementById('leadIdInput').value = currentLead.leadId;
                     document.getElementById('fullName').value = currentLead.fullName;
                     document.getElementById('phoneNumber').value = currentLead.phoneNumber || '';
                     document.getElementById('email').value = currentLead.email || '';
+                    document.getElementById('customerRole').value = currentLead.customerRole || 'Manufacturer';
+                    document.getElementById('location').value = currentLead.location || '';
+                    document.getElementById('cost').value = currentLead.cost || 0;
                     document.getElementById('account').value = currentLead.account;
                     document.getElementById('status').value = currentLead.status;
                     document.getElementById('customerGroup').value = currentLead.customerGroup || '';
@@ -290,6 +395,11 @@
                     document.getElementById('region').value = currentLead.region || '';
                     document.getElementById('sourceName').value = currentLead.sourceName || '';
                     document.getElementById('productName').value = currentLead.productName || '';
+                    
+                    if (metadata && metadata.users) {
+                        const foundUser = metadata.users.find(u => u.fullName === currentLead.userName);
+                        document.getElementById('userId').value = foundUser ? foundUser.userId : '';
+                    }
                 }
 
                 modal.classList.remove('hidden');
@@ -314,6 +424,9 @@
                     email: document.getElementById('email').value,
                     account: document.getElementById('account').value,
                     status: document.getElementById('status').value,
+                    customerRole: document.getElementById('customerRole').value,
+                    location: document.getElementById('location').value,
+                    cost: parseFloat(document.getElementById('cost').value) || 0,
                     customerGroup: document.getElementById('customerGroup').value,
                     industryType: document.getElementById('industryType').value,
                     region: document.getElementById('region').value,
@@ -321,10 +434,7 @@
                     sourceName: document.getElementById('sourceName').value,
                     // Keep original values for other fields
                     createdDate: currentLead.createdDate,
-                    userId: '498e0fc7-6278-45fc-a374-1a81096727d2', // Mock
-                    customerRole: currentLead.customerRole,
-                    location: currentLead.location,
-                    cost: currentLead.cost,
+                    userId: document.getElementById('userId').value || null,
                     businessResult: currentLead.businessResult,
                     lossReason: currentLead.lossReason
                 };
@@ -338,11 +448,31 @@
                     if (response.ok) { 
                         closeModal(); 
                         fetchLeadDetail(); // Refresh data
+                    } else {
+                        const errText = await response.text();
+                        alert("Lỗi cập nhật Lead: " + errText);
                     }
-                } catch (error) { console.error('Error updating lead:', error); }
+                } catch (error) { 
+                    console.error('Error updating lead:', error); 
+                    alert("Lỗi kết nối: " + error.message);
+                }
             };
 
-            document.addEventListener('DOMContentLoaded', fetchLeadDetail);
+            async function deleteLead() {
+                if (confirm('Bạn có muốn xóa lead này?')) {
+                    try {
+                        const response = await fetch(`${apiBase}/${leadId}`, { method: 'DELETE' });
+                        if (response.ok) {
+                            window.location.href = '/leads';
+                        }
+                    } catch (error) { console.error('Error deleting lead:', error); }
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', async () => {
+                await fetchMetadata();
+                fetchLeadDetail();
+            });
         </script>
     </main>
 </body>
