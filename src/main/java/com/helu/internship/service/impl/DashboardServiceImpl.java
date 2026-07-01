@@ -76,6 +76,7 @@ public class DashboardServiceImpl implements DashboardService {
         return leadStatusHistoryRepo.getAverageDaysToWon();
     }
 
+
     @Override
     public List<PipelineCoverageProjection> getPipelineCoverage(String sellerCode) {
         return pipelineCoverageRepo.getPipelineCoverage(sellerCode);

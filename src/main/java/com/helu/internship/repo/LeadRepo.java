@@ -1879,7 +1879,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     FROM lead l
 
     INNER JOIN [user] u
-        ON LOWER(l.user_id) = LOWER(CAST(u.user_id AS VARCHAR(36)))
+        ON l.user_id = u.user_id
 
     LEFT JOIN (
 
@@ -1932,7 +1932,7 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     FROM lead l
 
     INNER JOIN [user] u
-        ON LOWER(l.user_id) = LOWER(CAST(u.user_id AS VARCHAR(36)))
+        ON l.user_id = u.user_id
 
     LEFT JOIN (
 

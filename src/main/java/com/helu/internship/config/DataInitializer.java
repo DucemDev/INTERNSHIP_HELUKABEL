@@ -109,32 +109,6 @@ public class DataInitializer implements CommandLineRunner {
             System.err.println("Failed to sync product_name: " + e.getMessage());
         }
 
-        // Khớp ngày tạo của lead và lịch sử trạng thái về năm 2026 một cách ĐƠN TRỊ (Idempotent / Deterministic)
-        // Dựa vào 4 chữ số cuối của lead_id để phân bổ tháng (1-6) và ngày (1-28) cố định, không bị thay đổi khi restart nhiều lần.
-        try {
-            jdbcTemplate.execute(
-                "UPDATE lead " +
-                "SET created_date = DATEFROMPARTS( " +
-                "    2026, " +
-                "    (CAST(RIGHT(lead_id, 4) AS INT) % 6) + 1, " +
-                "    (CAST(RIGHT(lead_id, 4) AS INT) % 28) + 1 " +
-                ")"
-            );
-            jdbcTemplate.execute(
-                "UPDATE h " +
-                "SET h.changed_at = DATEFROMPARTS( " +
-                "    2026, " +
-                "    MONTH(l.created_date), " +
-                "    (CAST(RIGHT(h.lead_id, 4) AS INT) % 28) + 1 " +
-                ") " +
-                "FROM lead_status_history h " +
-                "JOIN lead l ON h.lead_id = l.lead_id"
-            );
-            System.out.println("Distributed lead and history dates deterministically into 2026 Q1-Q2 periods.");
-        } catch (Exception e) {
-            System.err.println("Failed to distribute lead dates: " + e.getMessage());
-        }
-
         // Đổi tên role 'Staff' thành 'Seller' nếu tồn tại
         roleRepo.findByRoleName("Staff").ifPresent(role -> {
             role.setRoleName("Seller");
