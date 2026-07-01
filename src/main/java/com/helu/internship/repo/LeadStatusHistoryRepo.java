@@ -8,6 +8,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LeadStatusHistoryRepo extends JpaRepository<LeadStatusHistoryEntity, Long> {
 
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @Query("DELETE FROM LeadStatusHistoryEntity h WHERE h.lead.leadId = :leadId")
+    void deleteByLeadId(@org.springframework.data.repository.query.Param("leadId") String leadId);
+
     @Query(value = """
         SELECT
             AVG(DATEDIFF(DAY, new_stage.changed_at, won_stage.changed_at))

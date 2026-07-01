@@ -141,8 +141,19 @@ public class DashboardController {
     }
 
     @GetMapping("/seller/pipeline-coverage")
-    public List<PipelineCoverageProjection> getStaffPipelineCoverage(Principal principal) {
-        return dashboardService.getStaffPipelineCoverage(principal.getName());
+    public List<PipelineCoverageProjection> getStaffPipelineCoverage(
+            @RequestParam(value = "quarter", required = false) Integer quarter,
+            @RequestParam(value = "year", required = false) Integer year,
+            Principal principal) {
+        return dashboardService.getStaffPipelineCoverage(principal.getName(), quarter, year);
+    }
+
+    @GetMapping("/seller/kpi-leads")
+    public java.util.Map<String, Object> getStaffKpiLeads(
+            @RequestParam(value = "quarter", required = false) Integer quarter,
+            @RequestParam(value = "year", required = false) Integer year,
+            Principal principal) {
+        return dashboardService.getStaffKpiLeads(principal.getName(), quarter, year);
     }
 
     @GetMapping("/seller/leads-by-status-count")
@@ -501,6 +512,20 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
     @GetMapping("/source/avg-cost-per-lead")
     public List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource() {
         return dashboardService.getAvgCostPerLeadBySource();
+    }
+    // sales theo industry
+    @GetMapping("/sales-owner/by-industry")
+    public List<SalesOwnerByIndustryResponse> getSalesOwnerByIndustry(
+            @RequestParam(required = false) String industry
+    ) {
+        return dashboardService.getSalesOwnerByIndustry(industry);
+    }
+    // sales theo sản phẩm
+    @GetMapping("/sales-owner/product-line")
+    public List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(
+            @RequestParam(required = false) String productLine
+    ) {
+        return dashboardService.getSalesOwnerByProductLine(productLine);
     }
 
 

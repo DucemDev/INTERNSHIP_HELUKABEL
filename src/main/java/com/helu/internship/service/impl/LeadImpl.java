@@ -25,6 +25,9 @@ public class LeadImpl implements LeadService {
     private final UserRepo userRepo;
     private final LeadBantPointRepo leadBantPointRepo;
     private final NotificationService notificationService;
+    private final LeadSourceRepo leadSourceRepo;
+    private final ProductRepo productRepo;
+    private final LeadStatusHistoryRepo leadStatusHistoryRepo;
 
     @Override
     @Transactional(readOnly = true)
@@ -52,6 +55,12 @@ public class LeadImpl implements LeadService {
                     .orElseThrow(() -> new RuntimeException("User not found"));
         }
 
+        if (request.getSourceName() == null || request.getSourceName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Nguồn khách hàng không được để trống");
+        }
+        LeadSourceEntity leadSource = leadSourceRepo.findBySourceName(request.getSourceName())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nguồn khách hàng: " + request.getSourceName()));
+
         LeadEntity lead = LeadEntity.builder()
                 .leadId(request.getLeadId())
                 .createdDate(request.getCreatedDate())
@@ -70,6 +79,7 @@ public class LeadImpl implements LeadService {
                 .businessResult(request.getBusinessResult())
                 .productName(request.getProductName())
                 .sourceName(request.getSourceName())
+                .leadSource(leadSource)
                 .user(user)
                 .build();
 
@@ -111,6 +121,12 @@ public class LeadImpl implements LeadService {
             lead.setUser(null);
         }
 
+        if (request.getSourceName() == null || request.getSourceName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Nguồn khách hàng không được để trống");
+        }
+        LeadSourceEntity leadSource = leadSourceRepo.findBySourceName(request.getSourceName())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nguồn khách hàng: " + request.getSourceName()));
+
         lead.setFullName(request.getFullName());
         lead.setPhoneNumber(request.getPhoneNumber());
         lead.setEmail(request.getEmail());
@@ -126,6 +142,7 @@ public class LeadImpl implements LeadService {
         lead.setBusinessResult(request.getBusinessResult());
         lead.setProductName(request.getProductName());
         lead.setSourceName(request.getSourceName());
+        lead.setLeadSource(leadSource);
 
         LeadEntity saved = leadRepo.save(lead);
 
@@ -193,7 +210,48 @@ public class LeadImpl implements LeadService {
     @Override
     @Transactional
     public void deleteLead(String id) {
+        leadStatusHistoryRepo.deleteByLeadId(id);
         leadRepo.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public java.util.Map<String, Object> getLeadMetadata() {
+        java.util.Map<String, Object> metadata = new java.util.HashMap<>();
+        metadata.put("customerGroups", leadRepo.findDistinctCustomerGroups());
+        metadata.put("industries", leadRepo.findDistinctIndustryTypes());
+        metadata.put("regions", leadRepo.findDistinctRegions());
+        metadata.put("sources", leadSourceRepo.findAll().stream()
+                .map(LeadSourceEntity::getSourceName)
+                .distinct()
+                .collect(Collectors.toList()));
+        metadata.put("products", productRepo.findAll().stream()
+                .map(ProductEntity::getProductName)
+                .distinct()
+                .collect(Collectors.toList()));
+        metadata.put("users", userRepo.findAll().stream()
+                .map(u -> java.util.Map.of("userId", u.getUserId().toString(), "fullName", u.getFullName()))
+                .collect(Collectors.toList()));
+        return metadata;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getNextLeadId() {
+        int currentYear = java.time.LocalDate.now().getYear();
+        String prefix = "L-" + currentYear + "-%";
+        String maxId = leadRepo.findMaxLeadIdWithPrefix(prefix);
+        if (maxId == null || maxId.trim().isEmpty()) {
+            return String.format("L-%d-0001", currentYear);
+        }
+        try {
+            String suffix = maxId.substring(maxId.lastIndexOf("-") + 1);
+            int number = Integer.parseInt(suffix);
+            int nextNumber = number + 1;
+            return String.format("L-%d-%04d", currentYear, nextNumber);
+        } catch (Exception e) {
+            return "L-" + currentYear + "-" + String.format("%04d", (int) (Math.random() * 10000));
+        }
     }
 
     // MAPPER AN TOÀN TUYỆT ĐỐI (Phòng thủ mọi NullPointerException)

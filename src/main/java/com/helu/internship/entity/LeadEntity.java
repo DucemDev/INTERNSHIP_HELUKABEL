@@ -71,6 +71,10 @@ public class LeadEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "source_id", nullable = false)
+    private LeadSourceEntity leadSource;
+
     @OneToOne(mappedBy = "lead", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private LeadBantPointEntity bantPoint;
 }

@@ -53,10 +53,26 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- SVG Progress Ring -->
             <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow" onclick="openDetailModal('kpi')">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-helu-red rounded-full"></span> 
-                    Tiến độ Target & Chỉ tiêu KPI
-                </h2>
+                <div class="flex justify-between items-center mb-6" onclick="event.stopPropagation()">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-1.5 h-5 bg-helu-red rounded-full"></span> 
+                        Tiến độ Target & Chỉ tiêu KPI
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <select id="kpiYearSelect" class="text-xs font-bold border border-gray-200 rounded-xl px-3 py-1.5 bg-slate-50 text-slate-600 outline-none focus:border-helu-red transition-all cursor-pointer" onchange="changeKpiQuarter()">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                        <select id="kpiQuarterSelect" class="text-xs font-bold border border-gray-200 rounded-xl px-3 py-1.5 bg-slate-50 text-slate-600 outline-none focus:border-helu-red transition-all cursor-pointer" onchange="changeKpiQuarter()">
+                            <option value="1">Quý 1</option>
+                            <option value="2">Quý 2</option>
+                            <option value="3">Quý 3</option>
+                            <option value="4">Quý 4</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-4 flex-1">
                     <!-- Circle Gauge -->
                     <div class="relative w-40 h-40 flex items-center justify-center">
@@ -75,7 +91,7 @@
                         <!-- Doanh số đã chốt (Won) -->
                         <div class="space-y-1">
                             <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                <span>Doanh số đã chốt (Won)</span>
+                                <span>Doanh số đã chốt (Won Quý)</span>
                                 <span id="txtWonRevenue" class="text-slate-800 font-extrabold">0 đ</span>
                             </div>
                             <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -86,7 +102,7 @@
                         <!-- Cơ hội (Pipeline) -->
                         <div class="space-y-1">
                             <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                <span>Cơ hội (Pipeline)</span>
+                                <span>Cơ hội (Pipeline Quý)</span>
                                 <span id="txtPipeline" class="text-slate-800 font-extrabold">0 đ</span>
                             </div>
                             <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -97,7 +113,7 @@
                         <!-- Chỉ tiêu (Target) -->
                         <div class="space-y-1">
                             <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                <span>Chỉ tiêu (Target)</span>
+                                <span>Chỉ tiêu (Target Quý)</span>
                                 <span id="txtTarget" class="text-slate-800 font-extrabold">0 đ</span>
                             </div>
                             <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -157,9 +173,69 @@
                 }
             }
 
-            async function loadKpiProgress() {
+            function updateQuarterOptions() {
+                const ySelect = document.getElementById('kpiYearSelect');
+                const qSelect = document.getElementById('kpiQuarterSelect');
+                if (!ySelect || !qSelect) return;
+                
+                const selectedYear = ySelect.value;
+                const currentQuarter = qSelect.value;
+
+                qSelect.innerHTML = '';
+
+                if (selectedYear === '2024') {
+                    // Only show Q4
+                    const opt = document.createElement('option');
+                    opt.value = '4';
+                    opt.text = 'Quý 4';
+                    qSelect.appendChild(opt);
+                    qSelect.value = '4';
+                } else {
+                    // Show Q1 to Q4
+                    for (let i = 1; i <= 4; i++) {
+                        const opt = document.createElement('option');
+                        opt.value = i.toString();
+                        opt.text = `Quý ${i}`;
+                        qSelect.appendChild(opt);
+                    }
+                    // Restore previous value if it's still valid
+                    if (currentQuarter && currentQuarter !== '4') {
+                        qSelect.value = currentQuarter;
+                    } else if (currentQuarter === '4') {
+                        qSelect.value = '4';
+                    } else {
+                        qSelect.value = '1';
+                    }
+                }
+            }
+
+            async function loadKpiProgress(quarter = null, year = null) {
                 try {
-                    const response = await fetch('/api/dashboard/seller/pipeline-coverage');
+                    const qSelect = document.getElementById('kpiQuarterSelect');
+                    const ySelect = document.getElementById('kpiYearSelect');
+                    
+                    let q = quarter;
+                    let y = year;
+                    
+                    if (!y) {
+                        const now = new Date();
+                        y = now.getFullYear().toString();
+                        ySelect.value = y;
+                    }
+                    
+                    // Update dropdown options list dynamically based on the selected year
+                    updateQuarterOptions();
+
+                    if (!q) {
+                        const now = new Date();
+                        q = (Math.floor(now.getMonth() / 3) + 1).toString();
+                        if (y === '2024') {
+                            q = '4';
+                        }
+                        qSelect.value = q;
+                    }
+
+                    const response = await fetch(`/api/dashboard/seller/pipeline-coverage?quarter=${q}&year=${y}`);
                     if (!response.ok) return;
                     const data = await response.json();
                     if (data.length === 0) return;
@@ -204,6 +280,12 @@
                 } catch (error) {
                     console.error('Error loading KPI progress:', error);
                 }
+            }
+
+            function changeKpiQuarter() {
+                const qSelect = document.getElementById('kpiQuarterSelect');
+                const ySelect = document.getElementById('kpiYearSelect');
+                loadKpiProgress(qSelect.value, ySelect.value);
             }
 
             async function loadFunnelChart() {
@@ -521,7 +603,7 @@
                 }
             }
 
-            function openDetailModal(type) {
+            async function openDetailModal(type) {
                 const modal = document.getElementById('chartDetailModal');
                 const title = document.getElementById('modalDetailTitle');
                 const subtitle = document.getElementById('modalDetailSubtitle');
@@ -540,43 +622,66 @@
                         return;
                     }
                     
-                    const wonLeads = cachedLeads.filter(l => l.status === 'Won');
-                    const pipelineLeads = cachedLeads.filter(l => l.status !== 'Won' && l.status !== 'Lost' && l.status !== 'Disqualified');
-                    
+                    // Show a loading indicator while fetching the dynamic lead list
                     body.innerHTML = `
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-                                <div class="text-xs font-bold text-emerald-600 uppercase">Đã chốt (Won)</div>
-                                <div class="text-2xl font-black text-emerald-800 mt-1">${(cachedKpi.wonRevenue || 0).toLocaleString('vi-VN')} đ</div>
-                                <div class="text-[10px] text-emerald-500 mt-1">${wonLeads.length} leads chốt thành công</div>
-                            </div>
-                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                                <div class="text-xs font-bold text-blue-600 uppercase">Cơ hội (Pipeline)</div>
-                                <div class="text-2xl font-black text-blue-800 mt-1">${(cachedKpi.openPipeline || 0).toLocaleString('vi-VN')} đ</div>
-                                <div class="text-[10px] text-blue-500 mt-1">${pipelineLeads.length} leads đang theo sát</div>
-                            </div>
-                            <div class="p-4 bg-red-50 rounded-lg border border-red-100">
-                                <div class="text-xs font-bold text-[#f6171b] uppercase">Chỉ tiêu (Target)</div>
-                                <div class="text-2xl font-black text-red-800 mt-1">${(cachedKpi.targetRevenue || 0).toLocaleString('vi-VN')} đ</div>
-                                <div class="text-[10px] text-red-500 mt-1">Đạt chỉ tiêu: ${cachedKpi.targetRevenue > 0 ? Math.round((cachedKpi.wonRevenue / cachedKpi.targetRevenue) * 100) : 0}%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-6">
-                            <div>
-                                <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Hợp đồng đã chốt thành công (Won)
-                                </h4>
-                                ${renderDetailTable(wonLeads)}
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Cơ hội đang chăm sóc (Pipeline)
-                                </h4>
-                                ${renderDetailTable(pipelineLeads)}
-                            </div>
+                        <div class="flex items-center justify-center py-12">
+                            <div class="w-8 h-8 border-4 border-helu-red border-t-transparent rounded-full animate-spin"></div>
                         </div>
                     `;
+
+                    try {
+                        const ySelect = document.getElementById('kpiYearSelect');
+                        const qSelect = document.getElementById('kpiQuarterSelect');
+                        const q = qSelect ? qSelect.value : '3';
+                        const y = ySelect ? ySelect.value : '2026';
+
+                        const response = await fetch(`/api/dashboard/seller/kpi-leads?quarter=${q}&year=${y}`);
+                        if (!response.ok) {
+                            body.innerHTML = `<p class="text-sm text-red-500">Không thể tải chi tiết danh sách lead.</p>`;
+                            return;
+                        }
+                        const details = await response.json();
+                        const wonLeads = details.wonLeads || [];
+                        const pipelineLeads = details.pipelineLeads || [];
+
+                        body.innerHTML = `
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                                    <div class="text-xs font-bold text-emerald-600 uppercase">Đã chốt (Won)</div>
+                                    <div class="text-2xl font-black text-emerald-800 mt-1">${(cachedKpi.wonRevenue || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-[10px] text-emerald-500 mt-1">${wonLeads.length} leads chốt thành công</div>
+                                </div>
+                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                    <div class="text-xs font-bold text-blue-600 uppercase">Cơ hội (Pipeline)</div>
+                                    <div class="text-2xl font-black text-blue-800 mt-1">${(cachedKpi.openPipeline || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-[10px] text-blue-500 mt-1">${pipelineLeads.length} leads đang theo sát</div>
+                                </div>
+                                <div class="p-4 bg-red-50 rounded-lg border border-red-100">
+                                    <div class="text-xs font-bold text-[#f6171b] uppercase">Chỉ tiêu (Target)</div>
+                                    <div class="text-2xl font-black text-red-800 mt-1">${(cachedKpi.targetRevenue || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-[10px] text-red-500 mt-1">Đạt chỉ tiêu: ${cachedKpi.targetRevenue > 0 ? Math.round((cachedKpi.wonRevenue / cachedKpi.targetRevenue) * 100) : 0}%</div>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Hợp đồng đã chốt thành công (Won)
+                                    </h4>
+                                    ${renderDetailTable(wonLeads, false, true)}
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Cơ hội đang chăm sóc (Pipeline)
+                                    </h4>
+                                    ${renderDetailTable(pipelineLeads, false, false)}
+                                </div>
+                            </div>
+                        `;
+                    } catch (error) {
+                        console.error('Error loading KPI details:', error);
+                        body.innerHTML = `<p class="text-sm text-red-500">Đã xảy ra lỗi khi tải dữ liệu chi tiết.</p>`;
+                    }
                 } else if (type === 'funnel') {
                     title.innerText = 'Chi tiết Phễu Chuyển đổi Khách hàng';
                     subtitle.innerText = 'Danh sách khách hàng tiềm năng chia theo từng giai đoạn chuyển đổi.';
@@ -652,7 +757,7 @@
                 }
             }
 
-            function renderDetailTable(leads, showBantDetails = false) {
+            function renderDetailTable(leads, showBantDetails = false, showWonDate = false) {
                 if (leads.length === 0) {
                     return `<p class="text-xs text-gray-400 py-3 text-center">Không có bản ghi nào.</p>`;
                 }
@@ -676,7 +781,6 @@
                     <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Mã Lead</th>
                     <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Khách hàng</th>
                     <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Trạng thái</th>
-                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Phân loại</th>
                 `;
                 
                 if (showBantDetails) {
@@ -689,7 +793,11 @@
                     `;
                 }
                 
-                headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-right">Doanh thu dự kiến</th>`;
+                if (showWonDate) {
+                    headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Thời gian Win</th>`;
+                }
+                
+                headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-right">Doanh thu</th>`;
                 
                 let rows = '';
                 leads.forEach((l, index) => {
@@ -706,25 +814,30 @@
                         `;
                     }
                     
+                    let rowWonDate = '';
+                    if (showWonDate) {
+                        rowWonDate = `<td class="py-3 px-4 text-xs font-semibold text-emerald-600">${l.wonDate || '—'}</td>`;
+                    }
+
+                    const rev = l.revenue !== undefined ? l.revenue : (l.expectedRevenue || 0);
+                    const company = l.companyName !== undefined ? l.companyName : (l.account || '');
+                    
                     rows += `
                         <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]/50'}">
                             <td class="py-3 px-4 text-xs font-black text-gray-400 uppercase">${l.leadId}</td>
                             <td class="py-3 px-4">
                                 <div class="text-xs font-bold text-gray-900">${l.fullName}</div>
-                                <div class="text-[10px] text-gray-400">${l.account}</div>
+                                <div class="text-[10px] text-gray-400">${company}</div>
                             </td>
                             <td class="py-3 px-4">
                                 <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase ${statusColors[l.status] || 'bg-gray-50 text-gray-600 border-gray-100'}">
                                     ${l.status}
                                 </span>
                             </td>
-                            <td class="py-3 px-4">
-                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[9px] font-bold ${heatColors[l.leadHeat] || 'bg-slate-400 text-white'}">
-                                    ${l.leadHeat || 'COLD'}
-                                </span>
-                            </td>
+
                             ${rowBant}
-                            <td class="py-3 px-4 text-xs font-bold text-gray-800 text-right">${(l.expectedRevenue || 0).toLocaleString('vi-VN')} đ</td>
+                            ${rowWonDate}
+                            <td class="py-3 px-4 text-xs font-bold text-gray-800 text-right">${(rev || 0).toLocaleString('vi-VN')} đ</td>
                         </tr>
                     `;
                 });

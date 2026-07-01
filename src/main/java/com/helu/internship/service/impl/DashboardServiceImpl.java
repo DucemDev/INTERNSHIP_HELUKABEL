@@ -160,18 +160,24 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<PipelineCoverageProjection> getStaffPipelineCoverage(String email) {
+    public List<PipelineCoverageProjection> getStaffPipelineCoverage(String email, Integer quarter, Integer year) {
         String userCode = userRepo.findByEmail(email)
                 .map(u -> u.getUserCode())
                 .orElse(null);
-        List<PipelineCoverageProjection> list = pipelineCoverageRepo.getPipelineCoverage(userCode);
-        return list.stream()
-                .sorted((a, b) -> {
-                    int yearComp = Integer.compare(b.getPeriodYear(), a.getPeriodYear());
-                    if (yearComp != 0) return yearComp;
-                    return Integer.compare(b.getPeriodMonth(), a.getPeriodMonth());
-                })
-                .toList();
+        int q = (quarter != null) ? quarter : ((java.time.LocalDate.now().getMonthValue() - 1) / 3 + 1);
+        int y = (year != null) ? year : java.time.LocalDate.now().getYear();
+        return pipelineCoverageRepo.getQuarterlyPipelineCoverage(q, y, userCode);
+    }
+
+    @Override
+    public java.util.Map<String, Object> getStaffKpiLeads(String email, Integer quarter, Integer year) {
+        int q = (quarter != null) ? quarter : ((java.time.LocalDate.now().getMonthValue() - 1) / 3 + 1);
+        int y = (year != null) ? year : java.time.LocalDate.now().getYear();
+
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("wonLeads", pipelineCoverageRepo.getQuarterlyWonLeads(email, q, y));
+        result.put("pipelineLeads", pipelineCoverageRepo.getQuarterlyPipelineLeads(email, q, y));
+        return result;
     }
     @Override
     public List<LostBySellerProjection> getLostBySeller() {
@@ -489,6 +495,14 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource() {
         return leadRepo.getAvgCostPerLeadBySource();
+    }
+    @Override
+    public List<SalesOwnerByIndustryResponse> getSalesOwnerByIndustry(String industry) {
+        return leadRepo.getSalesOwnerByIndustry(industry);
+    }
+    @Override
+    public List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(String productLine) {
+        return leadRepo.getSalesOwnerByProductLine(productLine);
     }
 
     @Override

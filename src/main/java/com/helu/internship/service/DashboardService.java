@@ -65,7 +65,9 @@ public interface DashboardService {
 
     ConversionRateResponse getStaffStats(String email);
 
-    List<PipelineCoverageProjection> getStaffPipelineCoverage(String email);
+    List<PipelineCoverageProjection> getStaffPipelineCoverage(String email, Integer quarter, Integer year);
+
+    java.util.Map<String, Object> getStaffKpiLeads(String email, Integer quarter, Integer year);
 
     List<RevenueMonthlyProjection> getRevenueMonthly();
 
@@ -144,6 +146,8 @@ public interface DashboardService {
 
 //    SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
     List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource();
+    List<SalesOwnerByIndustryResponse> getSalesOwnerByIndustry(String industry);
+    List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(String productLine);
 
 
     // Retrieves data for Customer Value Matrix chart

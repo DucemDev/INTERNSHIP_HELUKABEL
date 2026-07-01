@@ -22,6 +22,43 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // Tự động sửa cấu trúc bảng notification nếu nó bị sai (trường hợp bị tạo theo định nghĩa đầu trong init.sql)
+        try {
+            boolean hasNotificationId = false;
+            try {
+                jdbcTemplate.execute("SELECT notification_id FROM notification");
+                hasNotificationId = true;
+            } catch (Exception e) {
+                // Bảng dùng id hoặc chưa có
+            }
+
+            if (hasNotificationId) {
+                System.out.println("Re-creating incorrect 'notification' table...");
+                try {
+                    jdbcTemplate.execute("DROP TABLE notification");
+                    jdbcTemplate.execute(
+                        "CREATE TABLE notification ( " +
+                        "    id UNIQUEIDENTIFIER DEFAULT NEWID() NOT NULL, " +
+                        "    user_id UNIQUEIDENTIFIER NOT NULL, " +
+                        "    title NVARCHAR(200) NOT NULL, " +
+                        "    message NVARCHAR(1000) NOT NULL, " +
+                        "    is_read BIT DEFAULT 0 NOT NULL, " +
+                        "    type VARCHAR(50) NOT NULL, " +
+                        "    link VARCHAR(255) NULL, " +
+                        "    created_at DATETIME2 DEFAULT SYSDATETIME() NOT NULL, " +
+                        "    CONSTRAINT PK_notification PRIMARY KEY (id), " +
+                        "    CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE CASCADE " +
+                        ")"
+                    );
+                    System.out.println("Re-created 'notification' table successfully.");
+                } catch (Exception e) {
+                    System.err.println("Failed to drop and recreate notification table: " + e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to check notification table: " + e.getMessage());
+        }
+
         // Tự động sửa cấu trúc bảng notification nếu sai schema (dùng notification_id thay vì id)
         try {
             jdbcTemplate.execute("SELECT TOP 1 notification_id FROM notification");
@@ -109,6 +146,8 @@ public class DataInitializer implements CommandLineRunner {
             System.err.println("Failed to sync product_name: " + e.getMessage());
         }
 
+
+
         // Đổi tên role 'Staff' thành 'Seller' nếu tồn tại
         roleRepo.findByRoleName("Staff").ifPresent(role -> {
             role.setRoleName("Seller");
@@ -126,5 +165,7 @@ public class DataInitializer implements CommandLineRunner {
                 System.out.println("Encoded password for user: " + user.getEmail());
             }
         }
+
+
     }
 }
