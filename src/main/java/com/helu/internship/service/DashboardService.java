@@ -65,7 +65,9 @@ public interface DashboardService {
 
     ConversionRateResponse getStaffStats(String email);
 
-    List<PipelineCoverageProjection> getStaffPipelineCoverage(String email);
+    List<PipelineCoverageProjection> getStaffPipelineCoverage(String email, Integer quarter, Integer year);
+
+    java.util.Map<String, Object> getStaffKpiLeads(String email, Integer quarter, Integer year);
 
     List<RevenueMonthlyProjection> getRevenueMonthly();
 

@@ -22,6 +22,43 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // Tự động sửa cấu trúc bảng notification nếu nó bị sai (trường hợp bị tạo theo định nghĩa đầu trong init.sql)
+        try {
+            boolean hasNotificationId = false;
+            try {
+                jdbcTemplate.execute("SELECT notification_id FROM notification");
+                hasNotificationId = true;
+            } catch (Exception e) {
+                // Bảng dùng id hoặc chưa có
+            }
+
+            if (hasNotificationId) {
+                System.out.println("Re-creating incorrect 'notification' table...");
+                try {
+                    jdbcTemplate.execute("DROP TABLE notification");
+                    jdbcTemplate.execute(
+                        "CREATE TABLE notification ( " +
+                        "    id UNIQUEIDENTIFIER DEFAULT NEWID() NOT NULL, " +
+                        "    user_id UNIQUEIDENTIFIER NOT NULL, " +
+                        "    title NVARCHAR(200) NOT NULL, " +
+                        "    message NVARCHAR(1000) NOT NULL, " +
+                        "    is_read BIT DEFAULT 0 NOT NULL, " +
+                        "    type VARCHAR(50) NOT NULL, " +
+                        "    link VARCHAR(255) NULL, " +
+                        "    created_at DATETIME2 DEFAULT SYSDATETIME() NOT NULL, " +
+                        "    CONSTRAINT PK_notification PRIMARY KEY (id), " +
+                        "    CONSTRAINT FK_notification_user FOREIGN KEY (user_id) REFERENCES [user](user_id) ON DELETE CASCADE " +
+                        ")"
+                    );
+                    System.out.println("Re-created 'notification' table successfully.");
+                } catch (Exception e) {
+                    System.err.println("Failed to drop and recreate notification table: " + e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to check notification table: " + e.getMessage());
+        }
+
         // Tự động kiểm tra và thêm các cột thiếu trong bảng lead
         String[] columns = {
             "email VARCHAR(100) NULL",
@@ -72,31 +109,7 @@ public class DataInitializer implements CommandLineRunner {
             System.err.println("Failed to sync product_name: " + e.getMessage());
         }
 
-        // Khớp ngày tạo của lead và lịch sử trạng thái về năm 2026 một cách ĐƠN TRỊ (Idempotent / Deterministic)
-        // Dựa vào 4 chữ số cuối của lead_id để phân bổ tháng (1-6) và ngày (1-28) cố định, không bị thay đổi khi restart nhiều lần.
-        try {
-            jdbcTemplate.execute(
-                "UPDATE lead " +
-                "SET created_date = DATEFROMPARTS( " +
-                "    2026, " +
-                "    (CAST(RIGHT(lead_id, 4) AS INT) % 6) + 1, " +
-                "    (CAST(RIGHT(lead_id, 4) AS INT) % 28) + 1 " +
-                ")"
-            );
-            jdbcTemplate.execute(
-                "UPDATE h " +
-                "SET h.changed_at = DATEFROMPARTS( " +
-                "    2026, " +
-                "    MONTH(l.created_date), " +
-                "    (CAST(RIGHT(h.lead_id, 4) AS INT) % 28) + 1 " +
-                ") " +
-                "FROM lead_status_history h " +
-                "JOIN lead l ON h.lead_id = l.lead_id"
-            );
-            System.out.println("Distributed lead and history dates deterministically into 2026 Q1-Q2 periods.");
-        } catch (Exception e) {
-            System.err.println("Failed to distribute lead dates: " + e.getMessage());
-        }
+
 
         // Đổi tên role 'Staff' thành 'Seller' nếu tồn tại
         roleRepo.findByRoleName("Staff").ifPresent(role -> {
@@ -115,5 +128,7 @@ public class DataInitializer implements CommandLineRunner {
                 System.out.println("Encoded password for user: " + user.getEmail());
             }
         }
+
+
     }
 }
