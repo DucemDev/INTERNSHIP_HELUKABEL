@@ -513,6 +513,20 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
     public List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource() {
         return dashboardService.getAvgCostPerLeadBySource();
     }
+    // sales theo industry
+    @GetMapping("/sales-owner/by-industry")
+    public List<SalesOwnerByIndustryResponse> getSalesOwnerByIndustry(
+            @RequestParam(required = false) String industry
+    ) {
+        return dashboardService.getSalesOwnerByIndustry(industry);
+    }
+    // sales theo sản phẩm
+    @GetMapping("/sales-owner/product-line")
+    public List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(
+            @RequestParam(required = false) String productLine
+    ) {
+        return dashboardService.getSalesOwnerByProductLine(productLine);
+    }
 
 
     @GetMapping("/daily-compare")
