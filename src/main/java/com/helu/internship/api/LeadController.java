@@ -26,6 +26,16 @@ public class LeadController {
         return ResponseEntity.ok(leadService.getLeadById(id));
     }
 
+    @GetMapping("/next-id")
+    public ResponseEntity<java.util.Map<String, String>> getNextLeadId() {
+        return ResponseEntity.ok(java.util.Map.of("nextId", leadService.getNextLeadId()));
+    }
+
+    @GetMapping("/metadata")
+    public ResponseEntity<java.util.Map<String, Object>> getLeadMetadata() {
+        return ResponseEntity.ok(leadService.getLeadMetadata());
+    }
+
     @PostMapping
     public ResponseEntity<LeadResponse> createLead(@RequestBody LeadRequest request) {
         return ResponseEntity.ok(leadService.createLead(request));

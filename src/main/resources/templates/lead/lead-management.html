@@ -111,7 +111,29 @@
                         <input type="email" id="email" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" th:placeholder="#{form.placeholder.email}">
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.role}">Vai trò KH</span> <span class="text-helu-red">*</span></label>
+                        <select id="customerRole" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required>
+                            <option value="Manufacturer">Manufacturer</option>
+                            <option value="Contractor">Contractor</option>
+                            <option value="Trading">Trading</option>
+                            <option value="Distributor">Distributor</option>
+                            <option value="System Integrator">System Integrator</option>
+                            <option value="End User">End User</option>
+                            <option value="Consultant">Consultant</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{dashboard.col.region}">Địa điểm</span> <span class="text-helu-red">*</span></label>
+                        <input type="text" id="location" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required placeholder="Hồ Chí Minh">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.cost}">Chi phí dự kiến</span> <span class="text-helu-red">*</span></label>
+                        <input type="number" id="cost" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required value="0">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700"><span th:text="#{form.company}">Công ty / Tổ chức</span> <span class="text-helu-red">*</span></label>
                         <input type="text" id="account" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all" required>
@@ -125,29 +147,45 @@
                             <option value="Lost">Lost</option>
                         </select>
                     </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{label.assigned_to}">Người phụ trách</span> <span class="text-helu-red">*</span></label>
+                        <select id="userId" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required>
+                            <option value="" disabled selected>-- Chọn người phụ trách --</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700" th:text="#{form.group}">Nhóm KH</label>
-                        <input type="text" id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <select id="customerGroup" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">-- Chọn nhóm KH --</option>
+                        </select>
                     </div>
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700" th:text="#{form.industry}">Ngành</label>
-                        <input type="text" id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <select id="industryType" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">-- Chọn ngành --</option>
+                        </select>
                     </div>
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700" th:text="#{form.region}">Khu vực</label>
-                        <input type="text" id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <select id="region" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">-- Chọn khu vực --</option>
+                        </select>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-sm font-bold text-gray-700" th:text="#{form.source}">Nguồn khách hàng</label>
-                        <input type="text" id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <label class="text-sm font-bold text-gray-700"><span th:text="#{form.source}">Nguồn khách hàng</span> <span class="text-helu-red">*</span></label>
+                        <select id="sourceName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer" required>
+                            <option value="" disabled selected>-- Chọn nguồn KH --</option>
+                        </select>
                     </div>
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-gray-700" th:text="#{form.product}">Sản phẩm quan tâm</label>
-                        <input type="text" id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all">
+                        <select id="productName" class="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium outline-none focus:border-helu-red focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">-- Chọn sản phẩm --</option>
+                        </select>
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
@@ -332,12 +370,73 @@
             renderLeads();
         }
 
-        function openModal(mode, id = null) {
+        let metadata = null;
+
+        async function fetchMetadata() {
+            try {
+                const response = await fetch('/api/leads/metadata');
+                metadata = await response.json();
+                populateDropdowns();
+            } catch (error) {
+                console.error('Error fetching metadata:', error);
+            }
+        }
+
+        function populateDropdowns() {
+            if (!metadata) return;
+
+            // Populate Customer Groups
+            const groupSelect = document.getElementById('customerGroup');
+            groupSelect.innerHTML = '<option value="">-- Chọn nhóm KH --</option>';
+            metadata.customerGroups.forEach(g => {
+                groupSelect.innerHTML += `<option value="${g}">${g}</option>`;
+            });
+
+            // Populate Industries
+            const indSelect = document.getElementById('industryType');
+            indSelect.innerHTML = '<option value="">-- Chọn ngành --</option>';
+            metadata.industries.forEach(i => {
+                indSelect.innerHTML += `<option value="${i}">${i}</option>`;
+            });
+
+            // Populate Regions
+            const regSelect = document.getElementById('region');
+            regSelect.innerHTML = '<option value="">-- Chọn khu vực --</option>';
+            metadata.regions.forEach(r => {
+                regSelect.innerHTML += `<option value="${r}">${r}</option>`;
+            });
+
+            // Populate Sources
+            const srcSelect = document.getElementById('sourceName');
+            srcSelect.innerHTML = '<option value="" disabled selected>-- Chọn nguồn KH --</option>';
+            metadata.sources.forEach(s => {
+                srcSelect.innerHTML += `<option value="${s}">${s}</option>`;
+            });
+
+            // Populate Products
+            const prodSelect = document.getElementById('productName');
+            prodSelect.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+            metadata.products.forEach(p => {
+                prodSelect.innerHTML += `<option value="${p}">${p}</option>`;
+            });
+
+            // Populate Users
+            const userSelect = document.getElementById('userId');
+            userSelect.innerHTML = '<option value="" disabled selected>-- Chọn người phụ trách --</option>';
+            metadata.users.forEach(u => {
+                userSelect.innerHTML += `<option value="${u.userId}">${u.fullName}</option>`;
+            });
+        }
+
+        async function openModal(mode, id = null) {
             const modal = document.getElementById('leadModal');
             const form = document.getElementById('leadForm');
             const title = document.getElementById('modalTitle');
             form.reset();
             document.getElementById('leadId').value = '';
+
+            // Ensure dropdowns are populated
+            populateDropdowns();
 
             if (mode === 'edit' && id) {
                 title.innerText = updateLeadText;
@@ -348,6 +447,9 @@
                     document.getElementById('fullName').value = lead.fullName;
                     document.getElementById('phoneNumber').value = lead.phoneNumber || '';
                     document.getElementById('email').value = lead.email || '';
+                    document.getElementById('customerRole').value = lead.customerRole || 'Manufacturer';
+                    document.getElementById('location').value = lead.location || '';
+                    document.getElementById('cost').value = lead.cost || 0;
                     document.getElementById('account').value = lead.account;
                     document.getElementById('status').value = lead.status;
                     document.getElementById('customerGroup').value = lead.customerGroup || '';
@@ -355,10 +457,25 @@
                     document.getElementById('region').value = lead.region || '';
                     document.getElementById('sourceName').value = lead.sourceName || '';
                     document.getElementById('productName').value = lead.productName || '';
+                    
+                    if (metadata && metadata.users) {
+                        const foundUser = metadata.users.find(u => u.fullName === lead.userName);
+                        document.getElementById('userId').value = foundUser ? foundUser.userId : '';
+                    }
                 }
             } else {
                 title.innerText = addLeadText;
-                document.getElementById('leadIdInput').value = 'L-2026-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+                try {
+                    const res = await fetch('/api/leads/next-id');
+                    const nextIdData = await res.json();
+                    document.getElementById('leadIdInput').value = nextIdData.nextId;
+                } catch (err) {
+                    console.error('Error fetching next lead ID:', err);
+                    document.getElementById('leadIdInput').value = 'L-2026-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+                }
+                document.getElementById('customerRole').value = 'Manufacturer';
+                document.getElementById('location').value = 'Hồ Chí Minh';
+                document.getElementById('cost').value = '0';
             }
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -375,6 +492,7 @@
             const id = document.getElementById('leadId').value;
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${apiBase}/${id}` : apiBase;
+            const lead = id ? allLeads.find(l => l.leadId === id) : null;
 
             const data = {
                 leadId: document.getElementById('leadIdInput').value,
@@ -383,13 +501,18 @@
                 email: document.getElementById('email').value,
                 account: document.getElementById('account').value,
                 status: document.getElementById('status').value,
+                customerRole: document.getElementById('customerRole').value,
+                location: document.getElementById('location').value,
+                cost: parseFloat(document.getElementById('cost').value) || 0,
                 customerGroup: document.getElementById('customerGroup').value,
                 industryType: document.getElementById('industryType').value,
                 region: document.getElementById('region').value,
                 productName: document.getElementById('productName').value,
                 sourceName: document.getElementById('sourceName').value,
-                createdDate: new Date().toISOString().split('T')[0],
-                userId: '498e0fc7-6278-45fc-a374-1a81096727d2' // Mock user ID
+                createdDate: id ? lead.createdDate : new Date().toISOString().split('T')[0],
+                userId: document.getElementById('userId').value || null,
+                lossReason: id ? lead.lossReason : null,
+                businessResult: id ? lead.businessResult : null
             };
 
             try {
@@ -398,8 +521,17 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                if (response.ok) { closeModal(); fetchLeads(); }
-            } catch (error) { console.error('Error saving lead:', error); }
+                if (response.ok) { 
+                    closeModal(); 
+                    fetchLeads(); 
+                } else {
+                    const errText = await response.text();
+                    alert("Lỗi lưu Lead: " + errText);
+                }
+            } catch (error) { 
+                console.error('Error saving lead:', error); 
+                alert("Lỗi kết nối: " + error.message);
+            }
         };
 
         async function deleteLead(id) {
@@ -411,7 +543,10 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', fetchLeads);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMetadata();
+            fetchLeads();
+        });
     </script>
 </main>
 </body>
