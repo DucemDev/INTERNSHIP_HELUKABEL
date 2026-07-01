@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LeadSourceRepo extends JpaRepository<LeadSourceEntity, String> {
+    java.util.Optional<LeadSourceEntity> findBySourceName(String sourceName);
 }
