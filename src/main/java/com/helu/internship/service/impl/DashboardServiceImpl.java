@@ -430,6 +430,14 @@ public class DashboardServiceImpl implements DashboardService {
     public List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource() {
         return leadRepo.getAvgCostPerLeadBySource();
     }
+    @Override
+    public List<SalesOwnerByIndustryResponse> getSalesOwnerByIndustry(String industry) {
+        return leadRepo.getSalesOwnerByIndustry(industry);
+    }
+    @Override
+    public List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(String productLine) {
+        return leadRepo.getSalesOwnerByProductLine(productLine);
+    }
 
 
 
