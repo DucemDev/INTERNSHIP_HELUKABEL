@@ -2195,7 +2195,32 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource();
 
     @Query(value = """
+            SELECT
+                l.customer_group AS customerGroup,
+                l.industry_type AS segmentName,
+                CAST(COUNT(CASE WHEN l.status = 'Won' THEN 1 END) * 100.0 / NULLIF(COUNT(*),0) AS DECIMAL(5,2)) AS winRate,
+                CAST(AVG(CASE WHEN l.status = 'Won' THEN l.business_result END) AS DECIMAL(18,2)) AS avgRevenuePerWonLead,
+                CAST(SUM(CASE WHEN l.status = 'Won' THEN l.business_result END) AS DECIMAL(18,2)) AS revenueWon
+            FROM lead l
+            GROUP BY l.customer_group, l.industry_type
+            """, nativeQuery = true)
+    List<CustomerValueMatrixResponse> getCustomerValueMatrix();
 
+    @Query(value = """
+        SELECT 
+            COUNT(l.lead_id) as totalLeads,
+            CAST(SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS BIGINT) as wonLeads,
+            CAST(SUM(CASE WHEN l.status = 'Lost' THEN 1 ELSE 0 END) AS BIGINT) as lostLeads
+        FROM lead l
+        WHERE l.user_id = :userId
+          AND l.created_date >= :sinceDate
+        """, nativeQuery = true)
+    PerformanceStatsProjection getPerformanceStatsForUser(
+        @Param("userId") java.util.UUID userId,
+        @Param("sinceDate") java.time.LocalDate sinceDate
+    );
+
+    @Query(value = """
     SELECT
 
         CAST(u.user_id AS VARCHAR(50)) AS userId,
@@ -2290,5 +2315,4 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(
             @Param("productLine") String productLine
     );
-
 }
