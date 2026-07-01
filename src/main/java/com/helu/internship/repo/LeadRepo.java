@@ -92,49 +92,73 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     ConversionRateResponse getConversionRate();
 
     @Query(value = """
-            SELECT
-                l.user_id AS userId,
-                u.full_name AS userName,
-                SUM(
-                    CASE
-                        WHEN l.status IN ('Qualified','Won')
-                        THEN 1
-                        ELSE 0
-                    END
-                ) AS qualifiedLead,
+        SELECT
+            l.user_id AS userId,
+            u.full_name AS userName,
+
+            SUM(
+                CASE
+                    WHEN l.status IN (
+                        'Qualified',
+                        'Proposal Sent',
+                        'In Negotiation',
+                        'Won'
+                    )
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS qualifiedLead,
+
+            SUM(
+                CASE
+                    WHEN l.status = 'Won'
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS wonLead,
+
+            ROUND(
                 SUM(
                     CASE
                         WHEN l.status = 'Won'
                         THEN 1
                         ELSE 0
                     END
-                ) AS wonLead,
-                (
+                ) * 100.0
+                /
+                NULLIF(
                     SUM(
                         CASE
-                            WHEN l.status = 'Won'
+                            WHEN l.status IN (
+                                'Qualified',
+                                'Proposal Sent',
+                                'In Negotiation',
+                                'Won'
+                            )
                             THEN 1
                             ELSE 0
                         END
-                    ) * 100.0
-                    /
-                    NULLIF(
-                        SUM(
-                            CASE
-                                WHEN l.status IN ('Qualified','Won')
-                                THEN 1
-                                ELSE 0
-                            END
-                        ),
-                        0
-                    )
-                ) AS winRate
-            FROM lead l
-            LEFT JOIN [user] u ON l.user_id = u.user_id
-            WHERE (:region IS NULL OR l.region = :region)
-              AND (:industry IS NULL OR l.industry_type = :industry)
-            GROUP BY l.user_id, u.full_name
-            """, nativeQuery = true)
+                    ),
+                    0
+                ),
+                2
+            ) AS winRate
+
+        FROM lead l
+
+        LEFT JOIN [user] u
+            ON l.user_id = u.user_id
+
+        WHERE (:region IS NULL OR l.region = :region)
+          AND (:industry IS NULL OR l.industry_type = :industry)
+
+        GROUP BY
+            l.user_id,
+            u.full_name
+
+        ORDER BY
+            winRate DESC
+        """, nativeQuery = true)
     List<WinRateBySalesResponse> getWinRateBySalesOwner(
             @Param("region") String region,
             @Param("industry") String industry
@@ -2196,4 +2220,99 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         @Param("sinceDate") java.time.LocalDate sinceDate
     );
 
+    @Query(value = """
+    SELECT
+
+        CAST(u.user_id AS VARCHAR(50)) AS userId,
+
+        u.full_name AS userName,
+
+        l.industry_type AS industry,
+
+        COUNT(DISTINCT l.lead_id) AS totalLead,
+
+        COUNT(DISTINCT CASE
+            WHEN l.status = 'Won'
+            THEN l.lead_id
+        END) AS wonLead,
+
+        SUM(
+            CASE
+                WHEN l.status = 'Won'
+                THEN ISNULL(l.business_result,0)
+                ELSE 0
+            END
+        ) AS revenue
+
+    FROM lead l
+
+    INNER JOIN [user] u
+        ON l.user_id = u.user_id
+
+    WHERE (:industry IS NULL
+            OR l.industry_type = :industry)
+
+    GROUP BY
+
+        u.user_id,
+        u.full_name,
+        l.industry_type
+
+    ORDER BY
+        revenue DESC
+    """, nativeQuery = true)
+    List<SalesOwnerByIndustryResponse> getSalesOwnerByIndustry(
+            @Param("industry") String industry
+    );
+
+    @Query(value = """
+    SELECT
+
+        CAST(u.user_id AS VARCHAR(50)) AS userId,
+
+        u.full_name AS userName,
+
+        p.product_name AS productLine,
+
+        COUNT(DISTINCT l.lead_id) AS totalLead,
+
+        COUNT(DISTINCT CASE
+            WHEN l.status = 'Won'
+            THEN l.lead_id
+        END) AS wonLead,
+
+        SUM(
+            CASE
+                WHEN l.status = 'Won'
+                THEN ISNULL(l.business_result,0)
+                ELSE 0
+            END
+        ) AS revenue
+
+    FROM lead l
+
+    INNER JOIN [user] u
+        ON l.user_id = u.user_id
+
+    INNER JOIN lead_item li
+        ON l.lead_id = li.lead_id
+
+    INNER JOIN product p
+        ON li.product_id = p.product_id
+
+    WHERE (:productLine IS NULL
+            OR p.product_name = :productLine)
+
+    GROUP BY
+
+        u.user_id,
+        u.full_name,
+        p.product_name
+
+    ORDER BY
+        revenue DESC
+    """, nativeQuery = true)
+    List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(
+            @Param("productLine") String productLine
+    );
 }

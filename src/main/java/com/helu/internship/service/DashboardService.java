@@ -146,6 +146,8 @@ public interface DashboardService {
 
 //    SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
     List<AvgCostPerLeadBySourceResponse> getAvgCostPerLeadBySource();
+    List<SalesOwnerByIndustryResponse> getSalesOwnerByIndustry(String industry);
+    List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(String productLine);
 
 
     // Retrieves data for Customer Value Matrix chart
