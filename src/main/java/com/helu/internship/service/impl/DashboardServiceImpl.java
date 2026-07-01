@@ -511,6 +511,11 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
+    public List<RevenueGroupResponse> getRevenueByCustomerGroup() {
+        return leadRepo.getRevenueByCustomerGroup();
+    }
+
+    @Override
     public DailyCompareResponse getDailyCompare() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);

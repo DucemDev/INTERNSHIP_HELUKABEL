@@ -91,49 +91,52 @@
         </div>
 
         <!-- ROW 2: Total Leads (Bar) + Conversion Rate (Line) by Source -->
-        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Total Leads & Win Rate by Source</h3>
+        <div id="sectionSourceLeadsCr" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Tổng Leads & Tỷ lệ chốt theo Nguồn</h3>
             <div class="relative w-full h-[400px]">
                 <canvas id="leadsCrChart"></canvas>
             </div>
         </div>
 
-        <!-- ROW 3: Avg Cost per Lead vs Avg Revenue per Won & ROI by Source -->
+        <!-- ROW 3: Avg Cost per Lead vs Avg Revenue per Won -->
+        <div id="sectionSourceAvgCost" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Chi phí Lead TB vs Doanh thu TB chốt</h3>
+            <div class="relative w-full h-[450px]">
+                <canvas id="avgCostRevChart"></canvas>
+            </div>
+        </div>
+
+        <!-- ROW 4: Lead Funnel by Source & ROI by Source -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
-            <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 shadow-sm">
-                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Avg Cost per Lead vs Avg Revenue per Won</h3>
-                <div class="relative w-full h-[350px]">
-                    <canvas id="avgCostRevChart"></canvas>
+            <!-- Cột trái: Lead Funnel by Source -->
+            <div id="sectionSourceFunnel" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 flex flex-col justify-between shadow-sm min-h-[460px]">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Phễu Leads theo Nguồn</h3>
+                    <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
+                        <label for="funnelSourceFilter" class="text-xs font-bold text-slate-500">Nguồn:</label>
+                        <select id="funnelSourceFilter" onchange="loadFunnelData()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
+                            <!-- Will be dynamically populated -->
+                        </select>
+                    </div>
+                </div>
+                <div class="relative w-full max-w-[400px] flex-1 mx-auto flex items-center justify-center" id="leadStatusFunnelContainer">
+                    <!-- Will be populated with a single beautiful SVG funnel -->
                 </div>
             </div>
-            <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 shadow-sm">
-                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">ROI by Source</h3>
-                <div class="relative w-full h-[350px]">
+
+            <!-- Cột phải: ROI by Source -->
+            <div id="sectionSourceRoi" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 flex flex-col justify-between shadow-sm min-h-[460px]">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Chỉ số ROI theo Nguồn</h3>
+                <div class="relative w-full flex-1 min-h-[350px]">
                     <canvas id="roiSourceChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- ROW 4: Lead Funnel by Source -->
-        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Lead Funnel by Source</h3>
-                <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
-                    <label for="funnelSourceFilter" class="text-xs font-bold text-slate-500">Nguồn:</label>
-                    <select id="funnelSourceFilter" onchange="loadFunnelData()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
-                        <!-- Will be dynamically populated -->
-                    </select>
-                </div>
-            </div>
-            <div class="relative w-full max-w-[450px] min-h-[320px] mx-auto flex items-center justify-center" id="leadStatusFunnelContainer">
-                <!-- Will be populated with a single beautiful SVG funnel -->
-            </div>
-        </div>
-
         <!-- ROW 5: Lead Source by Product Line -->
-        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+        <div id="sectionSourceProductLine" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Lead Source by Product Line</h3>
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Nguồn Leads theo Dòng sản phẩm</h3>
                 <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
                     <label for="productLineFilter" class="text-xs font-bold text-slate-500">Dòng sản phẩm:</label>
                     <select id="productLineFilter" onchange="renderProductLineChart()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
@@ -194,12 +197,7 @@
                         </div>
                     </div>
 
-                    <!-- Modal Footer -->
-                    <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex justify-end">
-                        <button onclick="closeModal()" class="px-5 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all text-xs">
-                            Đóng cửa sổ
-                        </button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -298,7 +296,25 @@
             }
         });
 
+        function applyChartVisibility() {
+            const keys = [
+                { storageKey: 'source_leads_cr', elementId: 'sectionSourceLeadsCr' },
+                { storageKey: 'source_avg_cost_rev', elementId: 'sectionSourceAvgCost' },
+                { storageKey: 'source_roi', elementId: 'sectionSourceRoi' },
+                { storageKey: 'source_funnel', elementId: 'sectionSourceFunnel' },
+                { storageKey: 'source_product_line', elementId: 'sectionSourceProductLine' }
+            ];
+            keys.forEach(item => {
+                const show = localStorage.getItem('dashboard_show_' + item.storageKey) !== 'false';
+                const el = document.getElementById(item.elementId);
+                if (el) {
+                    el.style.display = show ? '' : 'none';
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
+            applyChartVisibility();
             await reloadData();
             
             // KPI text auto-shrinking Mutation Observer logic
@@ -598,7 +614,7 @@
                             title: { display: true, text: 'Avg Revenue (Won)', color: 'rgba(16, 185, 129, 1)', font: { weight: 'bold', size: 11 } },
                             grid: { color: '#f1f5f9' },
                             ticks: {
-                                callback: val => (val / 1000000).toLocaleString() + 'M',
+                                callback: val => (val / 1000000000).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2}) + 'B',
                                 color: '#475569'
                             }
                         },
@@ -608,7 +624,7 @@
                             title: { display: true, text: 'Avg Cost (Lead)', color: 'rgba(239, 68, 68, 1)', font: { weight: 'bold', size: 11 } },
                             grid: { drawOnChartArea: false },
                             ticks: {
-                                callback: val => (val / 1000000).toLocaleString() + 'M',
+                                callback: val => (val / 1000000000).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 3}) + 'B',
                                 color: '#475569'
                             }
                         }

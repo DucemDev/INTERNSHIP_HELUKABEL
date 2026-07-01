@@ -27,44 +27,7 @@
         }
     </style>
 
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Quản lý Leads cá nhân</h1>
-            <p class="mt-1 text-sm font-medium text-gray-500">Xem danh sách, chấm điểm BANT và cập nhật tiến trình của các Leads được phân bổ.</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <button class="inline-flex items-center gap-2 rounded-xl bg-helu-red px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-200 hover:bg-red-700 transition-all active:scale-95" onclick="fetchLeads()">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Tải lại dữ liệu
-            </button>
-        </div>
-    </div>
 
-    <!-- Dashboard Overview Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left: KPI Card (Leads của tôi) -->
-        <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between">
-            <div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Leads của tôi</h3>
-                <div id="statTotal" class="mt-4 text-5xl font-black text-gray-900 kpi-val">0</div>
-            </div>
-            <div class="mt-8 flex items-center justify-between">
-                <p class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">Đang hoạt động</p>
-                <div class="rounded-2xl bg-slate-100 p-4 text-slate-600">
-                    <i data-lucide="users" class="w-8 h-8"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right: Leads Status Distribution Funnel Chart -->
-        <div class="lg:col-span-2 rounded-2xl border border-helu-border bg-white p-8 flex flex-col justify-between">
-            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
-                <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span> 
-                Cơ cấu Trạng thái Leads (Phễu)
-            </h2>
-            <div class="relative w-full flex-1 min-h-[220px] flex items-center justify-center" id="leadStatusFunnelContainer"></div>
-        </div>
-    </div>
 
     <!-- Filter Bar -->
     <div class="rounded-2xl border border-helu-border bg-white p-6">
@@ -276,7 +239,8 @@
 
         function updateStats() {
             const total = allLeads.length;
-            document.getElementById('statTotal').innerText = total;
+            const el = document.getElementById('statTotal');
+            if (el) el.innerText = total;
         }
 
         function filterByFunnel(stageKey) {
@@ -502,7 +466,8 @@
                 }
 
                 svgHtml += `</svg>`;
-                document.getElementById('leadStatusFunnelContainer').innerHTML = svgHtml;
+                const container = document.getElementById('leadStatusFunnelContainer');
+                if (container) container.innerHTML = svgHtml;
             } catch (error) {
                 console.error('Error rendering status chart:', error);
             }
@@ -611,7 +576,7 @@
                         <div class="text-[9px] font-medium text-gray-400">${lead.productName || 'N/A'}</div>
                     </td>
                     <td class="py-4 px-6 text-right pr-10">
-                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="flex items-center justify-end gap-2">
                             <button onclick="viewDetail('${lead.leadId}')" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all" title="Xem chi tiết">
                                 <i data-lucide="eye" class="w-4 h-4"></i>
                    </button>

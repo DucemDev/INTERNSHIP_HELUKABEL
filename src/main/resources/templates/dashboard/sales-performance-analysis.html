@@ -69,8 +69,8 @@
         </div>
 
         <!-- ROW 2: Sales Owner Win Rate Performance [Qualified Leads, Won Leads (cột) vs Win Rate (đường)] -->
-        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Sales Owner Win Rate Performance</h3>
+        <div id="sectionSalesWinRatePerf" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Hiệu suất Tỷ lệ thắng (Win Rate) theo Sales Owner</h3>
             <div class="relative w-full h-[400px]">
                 <canvas id="winRatePerformanceChart"></canvas>
             </div>
@@ -78,8 +78,8 @@
         </div>
 
         <!-- ROW 3: Average Sales Cycle by Sales Owner -->
-        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Average Sales Cycle by Sales Owner (Days)</h3>
+        <div id="sectionSalesAvgCycle" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)</h3>
             <div class="relative w-full h-[380px]">
                 <canvas id="avgSalesCycleChart"></canvas>
             </div>
@@ -87,16 +87,16 @@
         </div>
 
         <!-- ROW 4: Top Loss Reasons by Product Line (Stacked Bar Chart) -->
-        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Top Loss Reasons by Product Line</h3>
+        <div id="sectionSalesLossReasons" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Các lý do thất bại hàng đầu theo Dòng sản phẩm</h3>
             <div class="relative w-full h-[420px]">
                 <canvas id="lossReasonsProductChart"></canvas>
             </div>
         </div>
 
         <!-- ROW 5: Workload vs Result Matrix (Bubble Chart) -->
-        <div class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Workload vs Result Matrix (Bubble Chart)</h3>
+        <div id="sectionSalesWorkload" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Ma trận Khối lượng công việc vs Kết quả (Biểu đồ Bong bóng)</h3>
             <div class="relative w-full h-[500px]">
                 <canvas id="workloadBubbleChart"></canvas>
             </div>
@@ -133,9 +133,7 @@
                         <span id="gen-modal-sales-cycle" class="text-2xl font-black text-sky-600 mt-1 block">0 Ngày</span>
                     </div>
                 </div>
-                <div class="flex justify-end p-6 border-t border-slate-100">
-                    <button onclick="closeGeneralModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all text-sm">Đóng</button>
-                </div>
+
             </div>
         </div>
 
@@ -174,12 +172,10 @@
                     </div>
                     <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
                         <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Avg BANT Score</span>
-                        <span id="bant-modal-avg-score" class="text-xl font-black text-sky-600 mt-1 block">0 / 4.0</span>
+                        <span id="bant-modal-avg-score" class="text-xl font-black text-sky-600 mt-1 block">0</span>
                     </div>
                 </div>
-                <div class="flex justify-end p-6 border-t border-slate-100">
-                    <button onclick="closeBantModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-all text-sm">Đóng</button>
-                </div>
+
             </div>
         </div>
 
@@ -234,7 +230,24 @@
             }
         });
 
+        function applyChartVisibility() {
+            const keys = [
+                { storageKey: 'sales_winrate_perf', elementId: 'sectionSalesWinRatePerf' },
+                { storageKey: 'sales_avg_cycle', elementId: 'sectionSalesAvgCycle' },
+                { storageKey: 'sales_loss_reasons', elementId: 'sectionSalesLossReasons' },
+                { storageKey: 'sales_workload', elementId: 'sectionSalesWorkload' }
+            ];
+            keys.forEach(item => {
+                const show = localStorage.getItem('dashboard_show_' + item.storageKey) !== 'false';
+                const el = document.getElementById(item.elementId);
+                if (el) {
+                    el.style.display = show ? '' : 'none';
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
+            applyChartVisibility();
             await reloadData();
         });
 
@@ -816,7 +829,7 @@
 
                 // 3. Avg BANT score
                 const scoreObj = bantScoreList.find(d => d.fullName === fullName || d.userCode === userCode);
-                document.getElementById('bant-modal-avg-score').innerText = scoreObj ? (scoreObj.avgBantScore || 0).toFixed(2) + ' / 4.0' : 'N/A';
+                document.getElementById('bant-modal-avg-score').innerText = scoreObj ? (scoreObj.avgBantScore || 0).toFixed(2) : 'N/A';
 
             } catch (err) {
                 console.error("Bant modal load error", err);

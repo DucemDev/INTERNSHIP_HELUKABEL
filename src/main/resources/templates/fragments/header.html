@@ -50,11 +50,8 @@
             
             <!-- Profile Dropdown -->
             <div id="userDropdown" class="absolute right-0 top-[calc(100%+10px)] hidden w-56 rounded-2xl border border-white/60 bg-white/80 backdrop-blur-xl p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
-                <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-white/50 hover:text-helu-red transition-all">
-                    <i data-lucide="user" class="w-4 h-4"></i> Hồ sơ cá nhân
-                </a>
-                <a href="#" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-white/50 hover:text-helu-red transition-all">
-                    <i data-lucide="key" class="w-4 h-4"></i> Đổi mật khẩu
+                <a sec:authorize="hasRole('Admin')" href="/admin/settings" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-600 hover:bg-white/50 hover:text-helu-red transition-all">
+                    <i data-lucide="settings" class="w-4 h-4"></i> Cấu hình Hệ thống
                 </a>
                 <div class="my-2 h-[1px] bg-white/30"></div>
                 <form th:action="@{/logout}" method="post">
@@ -80,7 +77,14 @@
                     const roleEl = document.getElementById('displayUserRole');
                     if (nameEl) nameEl.innerText = user.fullName;
                     if (roleEl) {
-                        roleEl.innerText = user.roleName === 'ADMIN' ? 'Quản trị viên' : 'Seller (Nhân viên)';
+                        const role = (user.roleName || '').toUpperCase();
+                        if (role === 'ADMIN') {
+                            roleEl.innerText = 'Quản trị viên';
+                        } else if (role === 'SELLER') {
+                            roleEl.innerText = 'Nhân viên';
+                        } else {
+                            roleEl.innerText = user.roleName;
+                        }
                     }
                     
                     const avatarEl = document.querySelector('button[onclick="toggleUserDropdown()"] div.bg-helu-red');

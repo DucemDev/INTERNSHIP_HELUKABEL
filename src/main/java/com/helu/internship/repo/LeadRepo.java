@@ -505,6 +505,17 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
     @Query(value = """
             SELECT
+                l.customer_group AS customerGroup,
+                SUM(l.business_result) AS revenue
+            FROM lead l
+            WHERE l.customer_group IS NOT NULL AND l.customer_group <> ''
+            GROUP BY l.customer_group
+            ORDER BY revenue DESC
+            """, nativeQuery = true)
+    List<RevenueGroupResponse> getRevenueByCustomerGroup();
+
+    @Query(value = """
+            SELECT
                 CAST(ISNULL(SUM(business_result),0) AS DECIMAL(18,2)) AS totalRevenue,
                 CAST(COUNT(*) AS BIGINT) AS wonLead,
                 CAST(

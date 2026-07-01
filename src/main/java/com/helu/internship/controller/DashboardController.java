@@ -95,6 +95,11 @@ public class DashboardController {
         return dashboardService.getRevenueByIndustry();
     }
 
+    @GetMapping("/revenue-group")
+    public List<RevenueGroupResponse> getRevenueByCustomerGroup() {
+        return dashboardService.getRevenueByCustomerGroup();
+    }
+
     @GetMapping("/roi-lead-source")
     public List<RoiLeadSourceResponse> getROIByLeadSource() {
         return dashboardService.getROIByLeadSource();

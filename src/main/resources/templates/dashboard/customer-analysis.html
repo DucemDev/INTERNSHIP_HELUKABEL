@@ -29,13 +29,6 @@
         </style>
         <div id="debug-error-log" class="text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-100 hidden"></div>
         
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-black text-slate-800 tracking-tight">Customer Analysis Dashboard</h1>
-                <p class="text-slate-500 font-medium">Báo cáo phân tích khách hàng và các chỉ số KPI quan trọng của HELUKABEL.</p>
-            </div>
-        </div>
 
 
         <!-- HÀNG 1: KPI CARDS -->
@@ -47,7 +40,7 @@
                     <div class="bg-blue-50 text-blue-600 p-1.5 rounded-lg">
                         <i data-lucide="building" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Accounts</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tổng số Khách hàng</h3>
                 </div>
                 <div>
                     <h4 class="text-2xl font-black text-slate-800" id="totalAccountsVal">-</h4>
@@ -62,7 +55,7 @@
                     <div class="bg-emerald-50 text-emerald-600 p-1.5 rounded-lg">
                         <i data-lucide="award" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Won Accounts</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Khách hàng chốt Won</h3>
                 </div>
                 <div>
                     <h4 class="text-2xl font-black text-slate-800" id="wonAccountsVal">-</h4>
@@ -77,7 +70,7 @@
                     <div class="bg-amber-50 text-amber-600 p-1.5 rounded-lg">
                         <i data-lucide="crown" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Account</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Khách hàng lớn nhất</h3>
                 </div>
                 <div>
                     <h4 class="text-base font-black text-slate-800 truncate" id="topAccountName" title="-">-</h4>
@@ -92,7 +85,7 @@
                     <div class="bg-indigo-50 text-indigo-600 p-1.5 rounded-lg">
                         <i data-lucide="factory" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Industry</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Ngành lớn nhất</h3>
                 </div>
                 <div>
                     <h4 class="text-base font-black text-slate-800 truncate" id="bestIndustryName" title="-">-</h4>
@@ -107,7 +100,7 @@
                     <div class="bg-purple-50 text-purple-600 p-1.5 rounded-lg">
                         <i data-lucide="map-pin" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Region</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Khu vực lớn nhất</h3>
                 </div>
                 <div>
                     <h4 class="text-base font-black text-slate-800 truncate" id="topRegionName" title="-">-</h4>
@@ -122,7 +115,7 @@
                     <div class="bg-rose-50 text-rose-600 p-1.5 rounded-lg">
                         <i data-lucide="users" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Group (Leads)</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nhóm KH nhiều Lead nhất</h3>
                 </div>
                 <div>
                     <h4 class="text-base font-black text-slate-800 truncate" id="bestGroupLeadsName" title="-">-</h4>
@@ -137,7 +130,7 @@
                     <div class="bg-teal-50 text-teal-600 p-1.5 rounded-lg">
                         <i data-lucide="wallet" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Group (Rev)</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nhóm KH doanh thu cao nhất</h3>
                 </div>
                 <div>
                     <h4 class="text-base font-black text-slate-800 truncate" id="bestGroupRevenueName" title="-">-</h4>
@@ -152,7 +145,7 @@
                     <div class="bg-red-50 text-red-600 p-1.5 rounded-lg">
                         <i data-lucide="alert-triangle" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Underserved</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Chưa khai phá</h3>
                 </div>
                 <div>
                     <h4 class="text-base font-black text-slate-800 truncate" id="underServedName" title="-">-</h4>
@@ -162,7 +155,7 @@
         </div>
 
         <!-- HÀNG 2: CHARTS -->
-        <div class="grid grid-cols-1 gap-6">
+        <div class="grid grid-cols-1 gap-6" id="sectionCustomerUnified" style="display: none;">
             <!-- Unified Mixed Chart Card -->
             <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -196,11 +189,11 @@
         </div>
 
         <!-- HÀNG 3: CUSTOMER VALUE MATRIX -->
-        <div class="grid grid-cols-1 gap-6 mt-6">
+        <div class="grid grid-cols-1 gap-6 mt-6" id="sectionCustomerValueMatrix" style="display: none;">
             <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-800 tracking-tight">Customer Value Matrix</h2>
+                        <h2 class="text-lg font-bold text-slate-800 tracking-tight">Ma trận Giá trị Khách hàng</h2>
                         <p class="text-xs text-slate-500 font-medium mt-0.5">Biểu đồ ma trận phân tích giá trị khách hàng. X: Win Rate | Y: Avg Revenue/Won | Size: Total Revenue.</p>
                     </div>
                     <div class="bg-indigo-50 text-indigo-600 p-2 rounded-xl">
@@ -216,13 +209,13 @@
 
 
         <!-- HÀNG 4: MARKET SEGMENT PERFORMANCE MATRIX -->
-        <div class="grid grid-cols-1 gap-6 mt-6">
+        <div class="grid grid-cols-1 gap-6 mt-6" id="sectionCustomerSegmentMatrix">
             <div class="p-6 rounded-2xl shadow-sm border bg-white border-slate-100 flex flex-col min-h-[520px]">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
                     <div>
                         <h2 class="text-base font-bold flex items-center gap-2 text-slate-800">
                             <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
-                            <span>Market Segment Performance Matrix</span>
+                            <span>Hiệu suất Phân khúc</span>
                         </h2>
                         <p class="text-[10px] text-slate-400 font-medium mt-1">Biểu đồ phân tích hiệu quả tỷ lệ thắng (Win Rate %) và quy mô leads (kích thước bong bóng) theo khu vực và ngành hàng.</p>
                     </div>
@@ -250,12 +243,12 @@
         </div>
 
         <!-- HÀNG 5: TOP 10 ACCOUNTS BY REVENUE & DETAIL TABLE -->
-        <div class="grid grid-cols-1 gap-6 mt-6">
+        <div class="grid grid-cols-1 gap-6 mt-6" id="sectionCustomerTopAccounts">
             <!-- Top 10 Accounts by Revenue -->
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
-                    <span>Top 10 Accounts by Revenue</span>
+                    <span>Top 10 Khách hàng theo Doanh thu</span>
                 </h2>
                 <div class="relative w-full flex-1 min-h-[400px]"><canvas id="topAccountsChart"></canvas></div>
             </div>
@@ -264,7 +257,7 @@
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-purple-500 rounded-full"></span>
-                    <span>Top Accounts Detail Table</span>
+                    <span>Bảng chi tiết Khách hàng lớn</span>
                 </h2>
                 <div class="overflow-x-auto flex-1">
                     <table class="w-full text-left border-collapse min-w-[600px]">
@@ -382,7 +375,7 @@
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeSegmentModal()"></div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full border border-slate-200">
+                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full border border-slate-200">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
                             <i data-lucide="grid-3x3" class="w-5 h-5 text-blue-600"></i>
@@ -397,22 +390,19 @@
                             <!-- Total Leads -->
                             <div class="bg-blue-50/60 p-5 rounded-xl border border-blue-100">
                                 <h4 class="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Total Leads</h4>
-                                <div id="segmentTotalLeads" class="mt-2 text-3xl font-black text-slate-800">0</div>
+                                <div id="segmentTotalLeads" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0</div>
                             </div>
                             <!-- Revenue / Won Deal -->
                             <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-100">
                                 <h4 class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Revenue/Won Deal</h4>
-                                <div id="segmentRevenue" class="mt-2 text-3xl font-black text-slate-800">0</div>
+                                <div id="segmentRevenue" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0</div>
                             </div>
                             <!-- Conversion Rate -->
                             <div class="bg-amber-50/60 p-5 rounded-xl border border-amber-100">
                                 <h4 class="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Conversion Rate</h4>
-                                <div id="segmentConvRate" class="mt-2 text-3xl font-black text-slate-800">0%</div>
+                                <div id="segmentConvRate" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0%</div>
                             </div>
                         </div>
-                    </div>
-                    <div class="px-6 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
-                        <button onclick="closeSegmentModal()" class="px-5 py-2 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm text-sm">Đóng</button>
                     </div>
                 </div>
             </div>
@@ -670,50 +660,31 @@
                 document.body.style.overflow = '';
             }
 
-            async function fetchMixedChartData(endpoint, mockLabels) {
+            async function fetchMixedChartData(endpoint) {
                 let items = [];
                 try {
                     const res = await fetch(endpoint);
                     if (res.ok) {
                         const rawData = await res.json();
-                        // Assume API returns at least a name and revenue, we will mock the rest if missing for the FE task.
                         items = rawData.map((d, i) => {
-                            const name = d.industry || d.role || d.region || d.customerGroup || d.productLine || mockLabels[i] || `Item ${i}`;
-                            const revenue = d.revenue || Math.floor(Math.random() * 500000000) + 50000000;
-                            const totalLeads = d.totalLeads || Math.floor(Math.random() * 50) + 20;
-                            const wonLeads = d.wonLeads || Math.floor(Math.random() * (totalLeads/2)) + 5;
+                            const name = d.industry || d.customerRole || d.role || d.region || d.customerGroup || d.productLine || `Item ${i}`;
+                            const revenue = d.revenue || 0;
+                            const totalLeads = d.totalLeads || 0;
+                            const wonLeads = d.wonLeads || 0;
                             return {
                                 name: name,
                                 totalLeads: totalLeads,
                                 wonLeads: wonLeads,
                                 revenue: revenue,
-                                roi: d.roi || (Math.random() * 20 + 5),
-                                conversionRate: d.conversionRate || (wonLeads / totalLeads),
-                                avgSalesCycle: d.avgSalesCycle || Math.floor(Math.random() * 30) + 10,
-                                bestLostReason: d.bestLostReason || 'Giá cao / Không đủ ngân sách',
-                                lostReasonCount: d.lostReasonCount || Math.floor(Math.random() * 10) + 1
+                                roi: d.roi || 0,
+                                conversionRate: d.conversionRate || (totalLeads > 0 ? wonLeads / totalLeads : 0),
+                                avgSalesCycle: d.avgSalesCycle || 0,
+                                bestLostReason: d.bestLostReason || 'N/A',
+                                lostReasonCount: d.lostReasonCount || 0
                             };
                         });
                     }
                 } catch(e) { }
-
-                if (items.length === 0) {
-                    items = mockLabels.map(label => {
-                        const totalLeads = Math.floor(Math.random() * 50) + 20;
-                        const wonLeads = Math.floor(Math.random() * (totalLeads/2)) + 5;
-                        return {
-                            name: label,
-                            totalLeads: totalLeads,
-                            wonLeads: wonLeads,
-                            revenue: Math.floor(Math.random() * 500000000) + 50000000,
-                            roi: Math.random() * 20 + 5,
-                            conversionRate: (wonLeads / totalLeads),
-                            avgSalesCycle: Math.floor(Math.random() * 30) + 10,
-                            bestLostReason: 'Cạnh tranh giá / Điều khoản thanh toán',
-                            lostReasonCount: Math.floor(Math.random() * 10) + 1
-                        };
-                    });
-                }
                 return items;
             }
 
@@ -893,11 +864,11 @@
 
             async function loadAllMixedCharts() {
                 try {
-                    cachedChartData.industry = await fetchMixedChartData('/api/dashboard/revenue-industry', ['Sản xuất', 'Xây dựng', 'Năng lượng', 'Tự động hóa', 'Dầu khí']);
-                    cachedChartData.role = await fetchMixedChartData('/api/dashboard/revenue-role', ['Giám đốc', 'Trưởng phòng Mua hàng', 'Kỹ sư trưởng', 'Quản lý dự án']);
-                    cachedChartData.region = await fetchMixedChartData('/api/dashboard/revenue-region', ['Miền Bắc', 'Miền Trung', 'Miền Nam', 'Xuất khẩu']);
-                    cachedChartData.group = await fetchMixedChartData('/api/dashboard/revenue-group', ['Khách hàng Mới', 'Khách hàng Cũ', 'Key Account', 'Khách hàng VIP']);
-                    cachedChartData.product = await fetchMixedChartData('/api/dashboard/revenue-product', ['Cáp điều khiển', 'Cáp động lực', 'Phụ kiện cáp', 'Cáp năng lượng mặt trời']);
+                    cachedChartData.industry = await fetchMixedChartData('/api/dashboard/revenue-industry');
+                    cachedChartData.role = await fetchMixedChartData('/api/dashboard/customer-role/revenue');
+                    cachedChartData.region = await fetchMixedChartData('/api/dashboard/revenue-region');
+                    cachedChartData.group = await fetchMixedChartData('/api/dashboard/revenue-group');
+                    cachedChartData.product = await fetchMixedChartData('/api/dashboard/revenue-product-line');
                     
                     // Render default chart (industry)
                     switchMixedChart('industry');
@@ -1597,7 +1568,26 @@
                 if (refreshIcon) refreshIcon.classList.remove('animate-spin');
             }
 
+            function applyChartVisibility() {
+                const defaultHidden = ['customer_unified_mixed_v2', 'customer_value_matrix_v2'];
+                const keys = [
+                    { storageKey: 'customer_unified_mixed_v2', elementId: 'sectionCustomerUnified' },
+                    { storageKey: 'customer_value_matrix_v2', elementId: 'sectionCustomerValueMatrix' },
+                    { storageKey: 'customer_segment_matrix', elementId: 'sectionCustomerSegmentMatrix' },
+                    { storageKey: 'customer_top_accounts', elementId: 'sectionCustomerTopAccounts' }
+                ];
+                keys.forEach(item => {
+                    const stored = localStorage.getItem('dashboard_show_' + item.storageKey);
+                    const show = defaultHidden.includes(item.storageKey) ? (stored === 'true') : (stored !== 'false');
+                    const el = document.getElementById(item.elementId);
+                    if (el) {
+                        el.style.display = show ? '' : 'none';
+                    }
+                });
+            }
+
             document.addEventListener('DOMContentLoaded', () => {
+                applyChartVisibility();
                 fetchKpis();
             });
         </script>

@@ -91,10 +91,7 @@
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.total_leads}">Total Leads</h3>
                 </div>
                 <div id="kpiTotalLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div id="totalLeadsCompare" class="text-slate-400 mt-1 flex items-center gap-1.5" style="font-size: 0.78rem !important;">
-                    <span id="totalLeadsPercent"></span>
-                    <span th:text="#{dashboard.vs_yesterday}">so với hôm qua</span>
-                </div>
+                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
             </div>
             <!-- Qualified Leads -->
             <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
@@ -114,10 +111,7 @@
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.new_leads}">New Leads</h3>
                 </div>
                 <div id="kpiNewLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div id="newLeadsCompare" class="text-slate-400 mt-1 flex items-center gap-1.5" style="font-size: 0.78rem !important;">
-                    <span id="newLeadsPercent"></span>
-                    <span th:text="#{dashboard.vs_yesterday}">so với hôm qua</span>
-                </div>
+                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
             </div>
             <!-- Won Leads -->
             <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
@@ -147,10 +141,7 @@
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.revenue_won}">Revenue Won</h3>
                 </div>
                 <div id="kpiRevenueWon" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div id="revenueWonCompare" class="text-slate-400 mt-1 flex items-center gap-1.5" style="font-size: 0.78rem !important;">
-                    <span id="revenueWonPercent"></span>
-                    <span th:text="#{dashboard.vs_yesterday}">so với hôm qua</span>
-                </div>
+                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
             </div>
             <!-- Pipeline Value -->
             <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
@@ -242,55 +233,29 @@
 
 
         <!-- ========================================== -->
-        <!-- [HÀNG 2] LEAD SOURCE SUMMARY (2 biểu đồ) -->
-        <!-- ========================================== -->
-        <div class="grid grid-cols-1 gap-8">
-            <!-- Biểu đồ trái: Lead Source Profitability -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
-                    <span th:text="#{dashboard.lead_source_profitability}">Lead Source Profitability</span>
-                    <span class="text-sm font-normal text-slate-400 font-mono ml-2">(/cost-per-win-source)</span>
-                </h2>
-                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="leadSourceProfitChart"></canvas></div>
-            </div>
-
-            <!-- Biểu đồ phải: Lead Source Efficiency -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
-                    <span th:text="#{dashboard.lead_source_efficiency}">Lead Source Efficiency</span>
-                    <span class="text-sm font-normal text-slate-400 font-mono ml-2">(/lead-source-cost)</span>
-                </h2>
-                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="leadSourceEfficiencyChart"></canvas></div>
-            </div>
-        </div>
-
-
-        <!-- ========================================== -->
-        <!-- [HÀNG 3] PHỄU (giữ) + MARKET MATRIX + TOP ACCOUNTS -->
+        <!-- [HÀNG 2] PHỄU (giữ) + MARKET MATRIX + TOP ACCOUNTS -->
         <!-- ========================================== -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Cột trái: Biểu đồ Phễu Cơ cấu Trạng thái Leads -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[520px]">
+            <div id="sectionFunnel" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[520px]">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                         <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
                         <span th:text="#{dashboard.status_structure}">Cơ cấu Trạng thái Leads</span>
-                        <span class="text-sm font-normal text-slate-400 font-mono ml-2">(/lead-status)</span>
+
                     </h2>
                 </div>
                 <div class="relative w-full flex-1 min-h-[400px] flex items-center justify-center" id="leadStatusFunnelContainer"></div>
             </div>
 
             <!-- Cột phải: Market Segment Performance Matrix (Light Theme) -->
-            <div class="p-6 rounded-2xl shadow-sm border bg-white border-slate-100 flex flex-col min-h-[520px]">
+            <div id="sectionSegment" class="p-6 rounded-2xl shadow-sm border bg-white border-slate-100 flex flex-col min-h-[520px]">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
                     <div>
                         <h2 class="text-base font-bold flex items-center gap-2 text-slate-800">
                             <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
                             <span th:text="#{dashboard.market_segment_matrix}">Market Segment Performance Matrix</span>
-                            <span class="text-xs font-normal text-slate-400 font-mono ml-2">(/win-rate-by-region)</span>
+
                         </h2>
                         <p class="text-[10px] text-slate-400 font-medium mt-1" th:text="#{dashboard.matrix_desc}">Phân tích Win Rate...</p>
                     </div>
@@ -317,14 +282,40 @@
             </div>
         </div>
 
+
+        <!-- ========================================== -->
+        <!-- [HÀNG 3] LEAD SOURCE SUMMARY (2 biểu đồ) -->
+        <!-- ========================================== -->
+        <div class="grid grid-cols-1 gap-8">
+            <!-- Biểu đồ trái: Lead Source Profitability -->
+            <div id="sectionProfitability" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
+                    <span th:text="#{dashboard.lead_source_profitability}">Lead Source Profitability</span>
+
+                </h2>
+                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="leadSourceProfitChart"></canvas></div>
+            </div>
+
+            <!-- Biểu đồ phải: Lead Source Efficiency -->
+            <div id="sectionEfficiency" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
+                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
+                    <span th:text="#{dashboard.lead_source_efficiency}">Lead Source Efficiency</span>
+
+                </h2>
+                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="leadSourceEfficiencyChart"></canvas></div>
+            </div>
+        </div>
+
         <!-- [HÀNG PHỤ] TOP ACCOUNTS BY REVENUE -->
         <div class="grid grid-cols-1 gap-8">
             <!-- Top 10 Accounts by Revenue -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
+            <div id="sectionTopAccounts" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
                     <span th:text="#{dashboard.top_accounts}">Top 10 Accounts by Revenue</span>
-                    <span class="text-xs font-normal text-slate-400 font-mono ml-2">(/api/leads)</span>
+
                 </h2>
                 <div class="relative w-full flex-1 min-h-[400px]"><canvas id="topAccountsChart"></canvas></div>
             </div>
@@ -334,12 +325,12 @@
         <!-- ========================================== -->
         <!-- [HÀNG 4] SALES OWNER SUMMARY (QUARTERLY COMPARISONS) -->
         <!-- ========================================== -->
-        <div class="mt-8">
+        <div id="sectionSalesOwnerSummary" class="mt-8" style="display: none;">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                 <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-indigo-500 rounded-full"></span>
                     <span>Sales Owner Summary: Total Leads & Wins (This vs Last Quarter)</span>
-                    <span class="text-[11px] font-normal text-slate-400 font-mono ml-2 block">(/sales-owner-dashboard-by-quarter)</span>
+
                 </h2>
                 <div class="flex items-center gap-3">
                     <label for="yearFilter" class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chọn Năm:</label>
@@ -358,21 +349,21 @@
 
         <div class="grid grid-cols-1 gap-8 mt-8">
             <!-- Chart 1: Win Rate by Sales Owner (This quarter) vs Win Rate by Sales Owner (Last quarter) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
+            <div id="sectionSalesWinRate" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]" style="display: none;">
                 <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
                     <span>Win Rate by Sales Owner (This vs Last Quarter)</span>
-                    <span class="text-[11px] font-normal text-slate-400 font-mono ml-2 block">(/win-rate-by-saleowner-by-quarter)</span>
+
                 </h2>
                 <div class="relative w-full flex-1 min-h-[400px]"><canvas id="salesWinRateQuarterlyComparisonChart"></canvas></div>
             </div>
 
             <!-- Chart 2: Target by Sales Owner (This quarter) vs Target by Sales Owner (Last quarter) -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
+            <div id="sectionSalesTarget" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]" style="display: none;">
                 <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
                     <span>Target by Sales Owner (This vs Last Quarter)</span>
-                    <span class="text-[11px] font-normal text-slate-400 font-mono ml-2 block">(/pipeline-coverage-by-quarter)</span>
+
                 </h2>
                 <div class="relative w-full flex-1 min-h-[400px]"><canvas id="salesTargetQuarterlyComparisonChart"></canvas></div>
             </div>
@@ -463,7 +454,7 @@
         <div id="segmentModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
             <div class="flex items-center justify-center min-h-screen p-4 md:p-10">
                 <div class="segment-modal-overlay fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" onclick="closeSegmentModal()"></div>
-                <div class="relative z-[2010] bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all max-w-3xl w-full border border-slate-200">
+                <div class="relative z-[2010] bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all max-w-5xl w-full border border-slate-200">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
                             <i data-lucide="grid-3x3" class="w-5 h-5 text-blue-600"></i>
@@ -478,17 +469,17 @@
                             <!-- Total Leads -->
                             <div class="bg-blue-50/60 p-5 rounded-xl border border-blue-100">
                                 <h4 class="text-[10px] font-bold text-blue-700 uppercase tracking-wider" th:text="#{dashboard.segment_total_leads}">Total Leads</h4>
-                                <div id="segmentTotalLeads" class="mt-2 text-3xl font-black text-slate-800">0</div>
+                                <div id="segmentTotalLeads" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0</div>
                             </div>
                             <!-- Revenue / Won Deal -->
                             <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-100">
                                 <h4 class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider" th:text="#{dashboard.segment_revenue}">Revenue/Won Deal</h4>
-                                <div id="segmentRevenue" class="mt-2 text-3xl font-black text-slate-800">0</div>
+                                <div id="segmentRevenue" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0</div>
                             </div>
                             <!-- Conversion Rate -->
                             <div class="bg-amber-50/60 p-5 rounded-xl border border-amber-100">
                                 <h4 class="text-[10px] font-bold text-amber-700 uppercase tracking-wider" th:text="#{dashboard.segment_conv_rate}">Conversion Rate</h4>
-                                <div id="segmentConvRate" class="mt-2 text-3xl font-black text-slate-800">0%</div>
+                                <div id="segmentConvRate" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0%</div>
                             </div>
                         </div>
                     </div>
@@ -558,7 +549,34 @@
             // ==========================================
             // KHỞI CHẠY
             // ==========================================
+            function applyChartVisibility() {
+                const defaultHidden = ['salesOwnerSummary_v2', 'salesWinRate_v2', 'salesTarget_v2'];
+                const keys = [
+                    { storageKey: 'funnel', elementId: 'sectionFunnel' },
+                    { storageKey: 'segment', elementId: 'sectionSegment' },
+                    { storageKey: 'profitability', elementId: 'sectionProfitability' },
+                    { storageKey: 'efficiency', elementId: 'sectionEfficiency' },
+                    { storageKey: 'topAccounts', elementId: 'sectionTopAccounts' },
+                    { storageKey: 'salesOwnerSummary_v2', elementId: 'sectionSalesOwnerSummary' },
+                    { storageKey: 'salesWinRate_v2', elementId: 'sectionSalesWinRate' },
+                    { storageKey: 'salesTarget_v2', elementId: 'sectionSalesTarget' }
+                ];
+                keys.forEach(item => {
+                    const stored = localStorage.getItem('dashboard_show_' + item.storageKey);
+                    const show = defaultHidden.includes(item.storageKey) ? (stored === 'true') : (stored !== 'false');
+                    const el = document.getElementById(item.elementId);
+                    if (el) {
+                        if (show) {
+                            el.style.display = '';
+                        } else {
+                            el.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
             document.addEventListener('DOMContentLoaded', () => {
+                applyChartVisibility();
                 refreshDashboard();
             });
 
@@ -656,29 +674,7 @@
                     document.getElementById('kpiTopIndustry').innerText = topInd ? (topInd.industryType || 'N/A') : 'N/A';
                     document.getElementById('kpiTopRegion').innerText = topReg ? (topReg.region || 'N/A') : 'N/A';
 
-                    // Daily Comparisons
-                    try {
-                        const dailyRes = await fetch(`${API_BASE}/daily-compare`);
-                        if (dailyRes.ok) {
-                            const daily = await dailyRes.json();
-                            
-                            const formatComparePercent = (percent) => {
-                                 if (percent > 0) {
-                                     return `<span class="bg-emerald-50 text-emerald-600 font-bold px-1.5 py-0.5 rounded-lg text-[12px] inline-flex items-center gap-0.5">↑&nbsp;${percent.toFixed(1)}%</span>`;
-                                 } else if (percent < 0) {
-                                     return `<span class="bg-rose-50 text-rose-600 font-bold px-1.5 py-0.5 rounded-lg text-[12px] inline-flex items-center gap-0.5">↓&nbsp;${Math.abs(percent).toFixed(1)}%</span>`;
-                                 } else {
-                                     return `<span class="bg-slate-50 text-slate-500 font-bold px-1.5 py-0.5 rounded-lg text-[12px] inline-flex items-center gap-0.5">0.0%</span>`;
-                                 }
-                             };
-
-                            document.getElementById('totalLeadsPercent').innerHTML = formatComparePercent(daily.totalLeadsChangePercent);
-                            document.getElementById('newLeadsPercent').innerHTML = formatComparePercent(daily.newLeadsChangePercent);
-                            document.getElementById('revenueWonPercent').innerHTML = formatComparePercent(daily.revenueWonChangePercent);
-                        }
-                    } catch (e) {
-                        console.error('Error fetching daily comparison:', e);
-                    }
+                    // Daily Comparisons skipped (comparisons removed from KPI cards)
 
                 } catch (error) {
                     console.error('Error loading KPIs:', error);
@@ -1293,7 +1289,7 @@
                         scales: {
                             x: {
                                 beginAtZero: true,
-                                max: 60000000000,
+                                max: 20000000000,
                                 border: { display: false },
                                 grid: { color: '#f1f5f9' },
                                 ticks: { callback: v => fmtShortNum(v) }
