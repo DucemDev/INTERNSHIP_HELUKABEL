@@ -10,8 +10,8 @@ spring:
 
 
 
-    username: sa2
-    password: Password.1
+    username: sa
+    password: 123456789
 
 
 

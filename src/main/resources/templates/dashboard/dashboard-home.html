@@ -332,13 +332,10 @@
                     <span>Sales Owner Summary: Total Leads & Wins (This vs Last Quarter)</span>
 
                 </h2>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 hidden">
                     <label for="yearFilter" class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chọn Năm:</label>
-                    <select id="yearFilter" onchange="onYearChange()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer outline-none transition-all">
+                    <select id="yearFilter" onchange="onYearChange()">
                         <option value="2026" selected>2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
                     </select>
                 </div>
             </div>
@@ -1470,7 +1467,8 @@
             // ==========================================
             async function loadQuarterlyComparisons() {
                 try {
-                    const selectedYear = document.getElementById('yearFilter')?.value || new Date().getFullYear();
+                    const globalYearVal = document.getElementById('globalYearFilter')?.value;
+                    const selectedYear = (globalYearVal && globalYearVal !== 'all') ? globalYearVal : new Date().getFullYear();
                     const yearParam = `&year=${selectedYear}`;
                     const [soThis, soLast, wrThis, wrLast, pcThis, pcLast] = await Promise.all([
                         fetch(`${API_BASE}/sales-owner-dashboard-by-quarter?quarter=this${yearParam}`).then(r => r.json()),

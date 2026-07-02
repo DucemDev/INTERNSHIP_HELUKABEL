@@ -3,7 +3,14 @@ from pydantic import BaseModel
 import requests
 from datetime import datetime
 import unicodedata
+import contextvars
+import re
+
 app = FastAPI()
+
+# Context variables for year/quarter filters (thread/async-safe)
+current_year = contextvars.ContextVar('current_year', default=None)
+current_quarter = contextvars.ContextVar('current_quarter', default=None)
 from fastapi.middleware.cors import CORSMiddleware
 
 # Thêm cấu hình này để Frontend gọi được API của bạn
@@ -39,9 +46,18 @@ def has_any(text, keywords):
 
 def call_api(endpoint):
     url = BASE_URL + endpoint
+    
+    # Retrieve active year/quarter filters from context
+    params = {}
+    y = current_year.get()
+    q = current_quarter.get()
+    if y:
+        params['year'] = y
+    if q:
+        params['quarter'] = q
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, params=params)
 
         if DEBUG:
             print("URL:", url)
@@ -1933,7 +1949,23 @@ def ask_dashboard(question):
 
 @app.post("/ask")
 def ask(request: QuestionRequest):
-    answer = ask_dashboard(request.question)
+    # Extract year (e.g. 2023, 2024, 2025, 2026, 2027)
+    year_match = re.search(r'\b(202\d)\b', request.question)
+    year = int(year_match.group(1)) if year_match else None
+    
+    # Extract quarter (e.g. quý 1, q2)
+    q_match = re.search(r'(?:quý|q)\s*([1-4])', request.question, re.IGNORECASE)
+    quarter = int(q_match.group(1)) if q_match else None
+
+    # Set context variables for the API calls in this request session
+    y_token = current_year.set(year)
+    q_token = current_quarter.set(quarter)
+
+    try:
+        answer = ask_dashboard(request.question)
+    finally:
+        current_year.reset(y_token)
+        current_quarter.reset(q_token)
 
     return {
         "question": request.question,

@@ -100,3 +100,11 @@ Báo cáo này chia nhỏ danh sách các API và bộ lọc được định ng
 | **Lọc chi tiết nguồn lead (sourceId, sourceType)** | **CHƯA HIỂN THỊ** | Backend hỗ trợ lọc tỷ lệ chuyển đổi và phễu theo nguồn cụ thể, UI chưa có dropdown chọn nguồn. |
 | **Lọc theo Seller (salesOwnerId)** | **CHƯA HIỂN THỊ** | Backend hỗ trợ lọc tỷ lệ chuyển đổi theo nhân viên, UI chưa có dropdown chọn nhân viên để lọc. |
 | **Lọc theo sản phẩm thất bại (productId)** | **CHƯA HIỂN THỊ** | API lý do mất deal (`/lost-reasons`) có nhận `productId` để xem chi tiết lý do mất deal của sản phẩm đó, nhưng UI chưa có dropdown chọn sản phẩm để lọc. |
+
+
+
+    # Cài đặt nếu chưa có                                                                                                                        
+    pip install fastapi uvicorn[standard] requests pydantic                                                                                      
+                                                                                                                                                 
+    # Khởi động server                                                                                                                           
+    uvicorn app:app --host 0.0.0.0 --port 8000 --reload    

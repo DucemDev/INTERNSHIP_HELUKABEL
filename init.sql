@@ -1552,5 +1552,91 @@ VALUES
     ('QUARTERLY', 3, 2026, 80000000000.00, '21cf3ed1-c2eb-410c-8098-bf3020e06991');
 GO
 
--- NOTE: CREATE TABLE notification is defined at the beginning of the script.
+-- =================================================================================
+-- 4. ROW-LEVEL SECURITY & POWER BI VIEWS FOR DYNAMIC YEAR/QUARTER FILTERING
+-- =================================================================================
+
+-- Create schema for security objects if not exists
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'Security')
+BEGIN
+    EXEC('CREATE SCHEMA Security');
+END
+GO
+
+-- Create Predicate Function for Lead filtering
+CREATE OR ALTER FUNCTION Security.fn_lead_securitypredicate(@created_date DATE)
+    RETURNS TABLE
+WITH SCHEMABINDING
+AS
+    RETURN SELECT 1 AS fn_securitypredicate_result
+    WHERE (SESSION_CONTEXT(N'selected_year') IS NULL OR YEAR(@created_date) = CAST(SESSION_CONTEXT(N'selected_year') AS INT))
+      AND (SESSION_CONTEXT(N'selected_quarter') IS NULL OR DATEPART(QUARTER, @created_date) = CAST(SESSION_CONTEXT(N'selected_quarter') AS INT));
+GO
+
+-- Create Security Policy for Lead table
+IF EXISTS (SELECT * FROM sys.security_policies WHERE name = 'LeadFilter')
+BEGIN
+    DROP SECURITY POLICY Security.LeadFilter;
+END
+GO
+
+CREATE SECURITY POLICY Security.LeadFilter
+ADD FILTER PREDICATE Security.fn_lead_securitypredicate(created_date) ON dbo.lead
+WITH (STATE = ON);
+GO
+
+-- Create Predicate Function for Sales Target filtering
+CREATE OR ALTER FUNCTION Security.fn_target_securitypredicate(@period_year INT, @period_month INT)
+    RETURNS TABLE
+WITH SCHEMABINDING
+AS
+    RETURN SELECT 1 AS fn_target_securitypredicate_result
+    WHERE (SESSION_CONTEXT(N'selected_year') IS NULL OR @period_year = CAST(SESSION_CONTEXT(N'selected_year') AS INT))
+      AND (SESSION_CONTEXT(N'selected_quarter') IS NULL OR ((@period_month - 1) / 3 + 1) = CAST(SESSION_CONTEXT(N'selected_quarter') AS INT));
+GO
+
+-- Create Security Policy for Sales Target table
+IF EXISTS (SELECT * FROM sys.security_policies WHERE name = 'TargetFilter')
+BEGIN
+    DROP SECURITY POLICY Security.TargetFilter;
+END
+GO
+
+CREATE SECURITY POLICY Security.TargetFilter
+ADD FILTER PREDICATE Security.fn_target_securitypredicate(period_year, period_month) ON dbo.sales_target
+WITH (STATE = ON);
+GO
+
+-- Create Predicate Function for Company Target filtering
+CREATE OR ALTER FUNCTION Security.fn_company_target_securitypredicate(@period_quarter INT, @period_year INT)
+    RETURNS TABLE
+WITH SCHEMABINDING
+AS
+    RETURN SELECT 1 AS fn_company_target_securitypredicate_result
+    WHERE (SESSION_CONTEXT(N'selected_year') IS NULL OR @period_year = CAST(SESSION_CONTEXT(N'selected_year') AS INT))
+      AND (SESSION_CONTEXT(N'selected_quarter') IS NULL OR @period_quarter IS NULL OR @period_quarter = CAST(SESSION_CONTEXT(N'selected_quarter') AS INT));
+GO
+
+-- Create Security Policy for Company Target table
+IF EXISTS (SELECT * FROM sys.security_policies WHERE name = 'CompanyTargetFilter')
+BEGIN
+    DROP SECURITY POLICY Security.CompanyTargetFilter;
+END
+GO
+
+CREATE SECURITY POLICY Security.CompanyTargetFilter
+ADD FILTER PREDICATE Security.fn_company_target_securitypredicate(period_quarter, period_year) ON dbo.company_target
+WITH (STATE = ON);
+GO
+
+-- View giúp Power BI dễ dàng phân tích theo năm/quý/tháng
+CREATE OR ALTER VIEW v_lead_power_bi AS
+SELECT 
+    l.*,
+    YEAR(l.created_date) AS created_year,
+    DATEPART(QUARTER, l.created_date) AS created_quarter,
+    MONTH(l.created_date) AS created_month,
+    DATENAME(MONTH, l.created_date) AS created_month_name
+FROM lead l;
+GO
 

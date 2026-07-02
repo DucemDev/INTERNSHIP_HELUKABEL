@@ -1,6 +1,30 @@
 <header class="fixed top-0 right-0 z-[1000] flex h-20 w-full items-center justify-between border-b border-white/30 bg-white/45 backdrop-blur-xl px-10 transition-all duration-300 lg:w-[calc(100%-16rem)] shadow-[0_4px_20px_rgba(0,0,0,0.01)]" th:fragment="header">
     <div class="flex items-center flex-1">
-        <!-- Search bar removed -->
+        <!-- Filter Year and Quarter (Global) -->
+        <div class="flex items-center gap-3 bg-white/30 backdrop-blur-md p-1.5 rounded-2xl border border-white/50 shadow-sm">
+            <div class="flex items-center gap-1.5 text-slate-500 pl-2">
+                <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Bộ lọc:</span>
+            </div>
+            
+            <!-- Select Year -->
+            <select id="globalYearFilter" onchange="applyGlobalFilters()" class="bg-white/80 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-red-500 focus:border-red-500 cursor-pointer outline-none transition-all shadow-sm">
+                <option value="all">Tất cả năm</option>
+                <option value="2026">Năm 2026</option>
+                <option value="2025">Năm 2025</option>
+                <option value="2024">Năm 2024</option>
+                <option value="2023">Năm 2023</option>
+            </select>
+
+            <!-- Select Quarter -->
+            <select id="globalQuarterFilter" onchange="applyGlobalFilters()" class="bg-white/80 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-1.5 focus:ring-2 focus:ring-red-500 focus:border-red-500 cursor-pointer outline-none transition-all shadow-sm">
+                <option value="all">Cả năm (Tất cả quý)</option>
+                <option value="1">Quý 1 (Q1)</option>
+                <option value="2">Quý 2 (Q2)</option>
+                <option value="3">Quý 3 (Q3)</option>
+                <option value="4">Quý 4 (Q4)</option>
+            </select>
+        </div>
     </div>
 
     <div class="flex items-center gap-6">
@@ -67,6 +91,64 @@
     <div id="toastContainer" class="fixed top-24 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
     <script>
+        // Setup global filter script
+        const urlParams = new URLSearchParams(window.location.search);
+        const yearParam = urlParams.get('year');
+        const quarterParam = urlParams.get('quarter');
+
+        // Global function to apply filters
+        function applyGlobalFilters() {
+            const year = document.getElementById('globalYearFilter').value;
+            const quarter = document.getElementById('globalQuarterFilter').value;
+            
+            const url = new URL(window.location.href);
+            if (year === 'all') {
+                url.searchParams.delete('year');
+            } else {
+                url.searchParams.set('year', year);
+            }
+            if (quarter === 'all') {
+                url.searchParams.delete('quarter');
+            } else {
+                url.searchParams.set('quarter', quarter);
+            }
+            window.location.href = url.toString();
+        }
+
+        // Initialize selectors on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const ySelect = document.getElementById('globalYearFilter');
+            const qSelect = document.getElementById('globalQuarterFilter');
+            if (ySelect) ySelect.value = yearParam || 'all';
+            if (qSelect) qSelect.value = quarterParam || 'all';
+        });
+
+        // Intercept global fetch requests to append year and quarter parameters dynamically
+        if (yearParam || quarterParam) {
+            const originalFetch = window.fetch;
+            window.fetch = function(input, init) {
+                let url = typeof input === 'string' ? input : input.url;
+                // Only intercept local API endpoints
+                if (url.includes('/api/')) {
+                    const separator = url.includes('?') ? '&' : '?';
+                    let newUrl = url;
+                    if (yearParam && !url.includes('year=')) {
+                        newUrl += separator + 'year=' + yearParam;
+                    }
+                    if (quarterParam && !newUrl.includes('quarter=')) {
+                        const sep2 = newUrl.includes('?') ? '&' : '?';
+                        newUrl += sep2 + 'quarter=' + quarterParam;
+                    }
+                    if (typeof input === 'string') {
+                        input = newUrl;
+                    } else {
+                        input = new Request(newUrl, input);
+                    }
+                }
+                return originalFetch(input, init);
+            };
+        }
+
         async function loadUserProfile() {
             try {
                 const response = await fetch('/api/users/me');
