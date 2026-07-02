@@ -1864,11 +1864,23 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
 
         u.full_name AS fullName,
 
-        COUNT(l.lead_id) AS totalLead,
+        SUM(
+            CASE
+                WHEN l.status IN (
+                    'Qualified',
+                    'Proposal Sent',
+                    'In Negotiation',
+                    'Won'
+                )
+                THEN 1
+                ELSE 0
+            END
+        ) AS totalLead,
 
         SUM(
             CASE
-                WHEN l.status = 'Won' THEN 1
+                WHEN l.status = 'Won'
+                THEN 1
                 ELSE 0
             END
         ) AS wonLead,
@@ -1876,12 +1888,27 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         ROUND(
             SUM(
                 CASE
-                    WHEN l.status = 'Won' THEN 1
+                    WHEN l.status = 'Won'
+                    THEN 1
                     ELSE 0
                 END
             ) * 100.0
             /
-            COUNT(l.lead_id),
+            NULLIF(
+                SUM(
+                    CASE
+                        WHEN l.status IN (
+                            'Qualified',
+                            'Proposal Sent',
+                            'In Negotiation',
+                            'Won'
+                        )
+                        THEN 1
+                        ELSE 0
+                    END
+                ),
+                0
+            ),
             2
         ) AS winRate
 
@@ -1894,10 +1921,23 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         u.user_code,
         u.full_name
 
-    HAVING COUNT(l.lead_id) > 0
+    HAVING
+        SUM(
+            CASE
+                WHEN l.status IN (
+                    'Qualified',
+                    'Proposal Sent',
+                    'In Negotiation',
+                    'Won'
+                )
+                THEN 1
+                ELSE 0
+            END
+        ) > 0
 
-    ORDER BY winRate DESC,
-             wonLead DESC
+    ORDER BY
+        winRate DESC,
+        wonLead DESC
     """, nativeQuery = true)
     TopSalesOwnerWinRateResponse getTopSalesOwnerWinRate();
 
@@ -2121,7 +2161,12 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     SELECT
 
         COUNT(DISTINCT CASE
-            WHEN l.status IN ('Qualified','Proposal','Negotiation','Won')
+            WHEN l.status IN (
+                'Qualified',
+                'Proposal Sent',
+                'In Negotiation',
+                'Won'
+            )
             THEN l.lead_id
         END) AS qualifiedLeads,
 
@@ -2141,7 +2186,18 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 THEN l.lead_id
             END) * 100.0
             /
-            COUNT(DISTINCT l.lead_id)
+            NULLIF(
+                COUNT(DISTINCT CASE
+                    WHEN l.status IN (
+                        'Qualified',
+                        'Proposal Sent',
+                        'In Negotiation',
+                        'Won'
+                    )
+                    THEN l.lead_id
+                END),
+                0
+            )
         ,2) AS winRate,
 
         ROUND(
@@ -2174,24 +2230,21 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
         ON l.user_id = u.user_id
 
     LEFT JOIN (
-
         SELECT
             lead_id,
             MIN(CAST(changed_at AS DATE)) AS wonDate
-
         FROM lead_status_history
-
         WHERE new_status = 'Won'
-
         GROUP BY lead_id
-
     ) h
         ON l.lead_id = h.lead_id
 
-    WHERE u.user_code = :userCode OR CAST(u.user_id AS VARCHAR(36)) = :userCode
+    WHERE u.user_code = :userCode
+       OR CAST(u.user_id AS VARCHAR(36)) = :userCode
     """, nativeQuery = true)
     SalesOwnerDetailResponse getSalesOwnerDetail(
             @Param("userCode") String userCode
+
     );
     @Query(value = """
     SELECT
