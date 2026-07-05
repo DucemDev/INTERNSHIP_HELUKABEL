@@ -353,6 +353,7 @@ GO
 -- 3.5 INSERT LEADS (WITHOUT product_id)
 INSERT INTO lead (lead_id, created_date, full_name, account, industry_type, customer_group, customer_role, location, region, status, cost, loss_reason, business_result, source_id, user_id) VALUES
 
+
  ('L-2026-0001', '2026-04-09', N'Dang Quoc Viet', N'VinFast Automotive', N'Automotive & EV', N'Industry', N'Manufacturer', N'Can Tho', N'South', N'New', 1917000, NULL, NULL, 'SRC01', 'd3e4851b-02e7-4bc3-86d8-cbd82d96c2e5'),
  ('L-2026-0002', '2025-04-17', N'Le Quoc Viet', N'VinFast Automotive', N'Automotive & EV', N'Industry', N'Manufacturer', N'Quang Ninh', N'North', N'Won', 3051000, NULL, 1069807500.00, 'SRC01', 'd3e4851b-02e7-4bc3-86d8-cbd82d96c2e5'),
  ('L-2026-0003', '2026-01-05', N'Huynh Hong Huong', N'Samsung Electronics V', N'Industrial Machinery', N'Industry', N'Manufacturer', N'Tay Ninh', N'South', N'Won', 486000, NULL, 3211162500.00, 'SRC02', 'f3f1ab23-29da-4ea3-8377-befc37b314f1'),
