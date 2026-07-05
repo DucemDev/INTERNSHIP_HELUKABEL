@@ -22,9 +22,9 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
             FROM lead l
             LEFT JOIN lead_item li ON l.lead_id = li.lead_id
             WHERE l.user_id = u.user_id
-              AND l.status NOT IN ('Won', 'Lost')
+              AND l.status IN ('Qualified', 'Proposal Sent', 'In Negotiation', 'Won', 'Lost')
               AND YEAR(l.created_date) = st.period_year
-              AND MONTH(l.created_date) = st.period_month
+              AND DATEPART(QUARTER, l.created_date) * 3 = st.period_month
         ) AS openPipeline,
 
         (
@@ -33,7 +33,7 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
             WHERE l.user_id = u.user_id
               AND l.status = 'Won'
               AND YEAR(l.created_date) = st.period_year
-              AND MONTH(l.created_date) = st.period_month
+              AND DATEPART(QUARTER, l.created_date) * 3 = st.period_month
         ) AS wonRevenue,
 
         st.revenue_target AS targetRevenue,
@@ -46,9 +46,9 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
                     FROM lead l
                     LEFT JOIN lead_item li ON l.lead_id = li.lead_id
                     WHERE l.user_id = u.user_id
-                      AND l.status NOT IN ('Won', 'Lost')
+                      AND l.status IN ('Qualified', 'Proposal Sent', 'In Negotiation', 'Won', 'Lost')
                       AND YEAR(l.created_date) = st.period_year
-                      AND MONTH(l.created_date) = st.period_month
+                      AND DATEPART(QUARTER, l.created_date) * 3 = st.period_month
                 ) / st.revenue_target
             AS DECIMAL(18,2))
         END AS pipelineCoverage
@@ -100,7 +100,7 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
 
     LEFT JOIN lead l
         ON u.user_id = l.user_id
-        AND l.status NOT IN ('Won','Lost')
+        AND l.status IN ('Qualified', 'Proposal Sent', 'In Negotiation', 'Won', 'Lost')
         AND (
             DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = :targetQuarter
             AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = :targetYear
@@ -143,7 +143,7 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
               AND l.created_date < DATEADD(MONTH, 3, DATEFROMPARTS(:year, (:quarter - 1) * 3 + 1, 1))
               AND l.created_date <= GETDATE()
               AND (
-                  l.status NOT IN ('Won', 'Lost')
+                  l.status IN ('Qualified', 'Proposal Sent', 'In Negotiation', 'Won', 'Lost')
                   OR COALESCE(resolved_stage.changed_at, l.created_date) >= DATEADD(MONTH, 3, DATEFROMPARTS(:year, (:quarter - 1) * 3 + 1, 1))
               )
         ) AS openPipeline,
@@ -234,7 +234,7 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
       AND l.created_date < DATEADD(MONTH, 3, DATEFROMPARTS(:year, (:quarter - 1) * 3 + 1, 1))
       AND l.created_date <= GETDATE()
       AND (
-          l.status NOT IN ('Won', 'Lost')
+          l.status IN ('Qualified', 'Proposal Sent', 'In Negotiation', 'Won', 'Lost')
           OR COALESCE(resolved_stage.changed_at, l.created_date) >= DATEADD(MONTH, 3, DATEFROMPARTS(:year, (:quarter - 1) * 3 + 1, 1))
       )
     """, nativeQuery = true)

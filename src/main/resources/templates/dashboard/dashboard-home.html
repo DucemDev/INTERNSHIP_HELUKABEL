@@ -840,9 +840,9 @@
                         const xMid = X_c + (rXt + rXb) / 2;
                         const yMid = yTop + h / 2;
 
-                        const statusesJson = JSON.stringify(stage.statuses);
+                        const statusesStr = stage.statuses.join(',');
 
-                        svgHtml += `<a href="javascript:void(0)" onclick='openLeadStatusModal(${statusesJson})' style="cursor: pointer; text-decoration: none; pointer-events: auto;">`;
+                        svgHtml += `<a href="javascript:void(0)" onclick="openLeadStatusModal('${statusesStr}')" style="cursor: pointer; text-decoration: none; pointer-events: auto;">`;
                         svgHtml += `<g class="funnel-stage" cursor="pointer" style="pointer-events: auto;">`;
                         svgHtml += `<ellipse cx="${X_c}" cy="${yTop}" rx="${rXt}" ry="${rYt}" fill="${stage.topColor}" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" />`;
                         svgHtml += `<path d="${pathD}" fill="${stage.color}" />`;
@@ -1691,6 +1691,9 @@
             // MODAL LOGIC: Lead Status (GIỮ NGUYÊN)
             // ==========================================
             async function openLeadStatusModal(status) {
+                if (typeof status === 'string' && status.includes(',')) {
+                    status = status.split(',');
+                }
                 const modal = document.getElementById('leadStatusModal');
                 const title = document.getElementById('modalStatusTitle');
                 const tbody = document.getElementById('modalTableBody');
@@ -1787,7 +1790,7 @@
                 empty.classList.add('hidden');
                 container.classList.add('hidden');
                 if (summaryBlock) summaryBlock.classList.add('hidden');
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
 
                 try {
                     const res = await fetch('/api/leads');
@@ -1851,7 +1854,7 @@
                         `;
                         tbody.appendChild(tr);
                     });
-                    lucide.createIcons();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
                 } catch (error) {
                     console.error('Error fetching leads for account modal:', error);
                     loading.classList.add('hidden');
@@ -1883,7 +1886,7 @@
                 document.getElementById('segmentConvRate').innerText = winRate + '%';
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             }
 
             function closeSegmentModal() {
