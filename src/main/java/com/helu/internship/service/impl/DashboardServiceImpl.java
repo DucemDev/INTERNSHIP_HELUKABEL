@@ -553,5 +553,22 @@ public class DashboardServiceImpl implements DashboardService {
                 revenueWonChange
         );
     }
+    @Override
+    public List<BusinessResultByStatusResponse> getBusinessResultByStatus() {
+        return leadRepo.getBusinessResultByStatus();
+    }
+    @Override
+    public List<BusinessResultByStatusResponse> getBusinessResultByStatusBySource(String sourceId) {
+        return leadRepo.getBusinessResultByStatusBySource(sourceId);
+    }
+
+    @Override
+    public WinRateResponse getWinRate() {
+        return leadRepo.getWinRate();
+    }
+    @Override
+    public QualifiedLeadResponse getQualifiedLead() {
+        return leadRepo.getQualifiedLead();
+    }
 }
 

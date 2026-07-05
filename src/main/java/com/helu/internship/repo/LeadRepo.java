@@ -104,73 +104,93 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     ConversionRateResponse getConversionRate();
 
     @Query(value = """
-        SELECT
-            l.user_id AS userId,
-            u.full_name AS userName,
+    SELECT
 
-            SUM(
-                CASE
-                    WHEN l.status IN (
-                        'Qualified',
-                        'Proposal Sent',
-                        'In Negotiation',
-                        'Won'
-                    )
-                    THEN 1
-                    ELSE 0
-                END
-            ) AS qualifiedLead,
+        l.user_id AS userId,
 
+        u.full_name AS userName,
+
+        SUM(
+            CASE
+                WHEN l.status IN (
+                    'Qualified',
+                    'Proposal Sent',
+                    'In Negotiation',
+                    'Won',
+                    'Lost'
+                )
+                THEN 1
+                ELSE 0
+            END
+        ) AS qualifiedLead,
+
+        SUM(
+            CASE
+                WHEN l.status = 'Won'
+                THEN 1
+                ELSE 0
+            END
+        ) AS wonLead,
+
+        ROUND(
             SUM(
                 CASE
                     WHEN l.status = 'Won'
                     THEN 1
                     ELSE 0
                 END
-            ) AS wonLead,
-
-            ROUND(
+            ) * 100.0
+            /
+            NULLIF(
                 SUM(
                     CASE
-                        WHEN l.status = 'Won'
+                        WHEN l.status IN (
+                            'Qualified',
+                            'Proposal Sent',
+                            'In Negotiation',
+                            'Won',
+                            'Lost'
+                        )
                         THEN 1
                         ELSE 0
                     END
-                ) * 100.0
-                /
-                NULLIF(
-                    SUM(
-                        CASE
-                            WHEN l.status IN (
-                                'Qualified',
-                                'Proposal Sent',
-                                'In Negotiation',
-                                'Won'
-                            )
-                            THEN 1
-                            ELSE 0
-                        END
-                    ),
-                    0
                 ),
-                2
-            ) AS winRate
+                0
+            ),
+            2
+        ) AS winRate
 
-        FROM lead l
+    FROM lead l
 
-        LEFT JOIN [user] u
-            ON l.user_id = u.user_id
+    LEFT JOIN [user] u
+        ON l.user_id = u.user_id
 
-        WHERE (:region IS NULL OR l.region = :region)
-          AND (:industry IS NULL OR l.industry_type = :industry)
+    WHERE (:region IS NULL OR l.region = :region)
+      AND (:industry IS NULL OR l.industry_type = :industry)
 
-        GROUP BY
-            l.user_id,
-            u.full_name
+    GROUP BY
+        l.user_id,
+        u.full_name
 
-        ORDER BY
-            winRate DESC
-        """, nativeQuery = true)
+    HAVING
+        SUM(
+            CASE
+                WHEN l.status IN (
+                    'Qualified',
+                    'Proposal Sent',
+                    'In Negotiation',
+                    'Won',
+                    'Lost'
+                )
+                THEN 1
+                ELSE 0
+            END
+        ) > 0
+
+    ORDER BY
+        winRate DESC,
+        wonLead DESC
+    """, nativeQuery = true)
     List<WinRateBySalesResponse> getWinRateBySalesOwner(
             @Param("region") String region,
             @Param("industry") String industry
@@ -224,97 +244,173 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(@Param("quarter") String quarter, @Param("year") Integer year);
 
     @Query(value = """
-            SELECT
-                industry_type AS industryType,
-            
-                CAST(SUM(
-                    CASE
-                        WHEN status IN ('Qualified','Won')
-                        THEN 1
-                        ELSE 0
-                    END
-                ) AS BIGINT) AS qualifiedLead,
-            
-                CAST(SUM(
+    SELECT
+
+        industry_type AS industryType,
+
+        CAST(
+            SUM(
+                CASE
+                    WHEN status IN (
+                        'Qualified',
+                        'Proposal Sent',
+                        'In Negotiation',
+                        'Won',
+                        'Lost'
+                    )
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS BIGINT
+        ) AS qualifiedLead,
+
+        CAST(
+            SUM(
+                CASE
+                    WHEN status = 'Won'
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS BIGINT
+        ) AS wonLead,
+
+        CAST(
+            (
+                SUM(
                     CASE
                         WHEN status = 'Won'
                         THEN 1
                         ELSE 0
                     END
-                ) AS BIGINT) AS wonLead,
-            
-                CAST((
+                ) * 100.0
+                /
+                NULLIF(
                     SUM(
                         CASE
-                            WHEN status = 'Won'
+                            WHEN status IN (
+                                'Qualified',
+                                'Proposal Sent',
+                                'In Negotiation',
+                                'Won',
+                                'Lost'
+                            )
                             THEN 1
                             ELSE 0
                         END
-                    ) * 100.0
-                    /
-                    NULLIF(
-                        SUM(
-                            CASE
-                                WHEN status IN ('Qualified','Won')
-                                THEN 1
-                                ELSE 0
-                            END
-                        ),
-                        0
-                    )
-                ) AS DECIMAL(18,2)) AS winRate
-            
-            FROM lead
-            GROUP BY industry_type
-            ORDER BY winRate DESC
-            """, nativeQuery = true)
+                    ),
+                    0
+                )
+            ) AS DECIMAL(18,2)
+        ) AS winRate
+
+    FROM lead
+
+    GROUP BY industry_type
+
+    HAVING
+        SUM(
+            CASE
+                WHEN status IN (
+                    'Qualified',
+                    'Proposal Sent',
+                    'In Negotiation',
+                    'Won',
+                    'Lost'
+                )
+                THEN 1
+                ELSE 0
+            END
+        ) > 0
+
+    ORDER BY
+        winRate DESC,
+        wonLead DESC
+    """, nativeQuery = true)
     List<WinRateByIndustryProjection> getWinRateByIndustry();
 
     @Query(value = """
-            SELECT
-                region AS region,
-            
-                CAST(SUM(
-                    CASE
-                        WHEN status IN ('Qualified','Won')
-                        THEN 1
-                        ELSE 0
-                    END
-                ) AS BIGINT) AS qualifiedLead,
-            
-                CAST(SUM(
+    SELECT
+
+        region AS region,
+
+        CAST(
+            SUM(
+                CASE
+                    WHEN status IN (
+                        'Qualified',
+                        'Proposal Sent',
+                        'In Negotiation',
+                        'Won',
+                        'Lost'
+                    )
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS BIGINT
+        ) AS qualifiedLead,
+
+        CAST(
+            SUM(
+                CASE
+                    WHEN status = 'Won'
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS BIGINT
+        ) AS wonLead,
+
+        CAST(
+            (
+                SUM(
                     CASE
                         WHEN status = 'Won'
                         THEN 1
                         ELSE 0
                     END
-                ) AS BIGINT) AS wonLead,
-            
-                CAST((
+                ) * 100.0
+                /
+                NULLIF(
                     SUM(
                         CASE
-                            WHEN status = 'Won'
+                            WHEN status IN (
+                                'Qualified',
+                                'Proposal Sent',
+                                'In Negotiation',
+                                'Won',
+                                'Lost'
+                            )
                             THEN 1
                             ELSE 0
                         END
-                    ) * 100.0
-                    /
-                    NULLIF(
-                        SUM(
-                            CASE
-                                WHEN status IN ('Qualified','Won')
-                                THEN 1
-                                ELSE 0
-                            END
-                        ),
-                        0
-                    )
-                ) AS DECIMAL(18,2)) AS winRate
-            
-            FROM lead
-            GROUP BY region
-            ORDER BY winRate DESC
-            """, nativeQuery = true)
+                    ),
+                    0
+                )
+            ) AS DECIMAL(18,2)
+        ) AS winRate
+
+    FROM lead
+
+    GROUP BY region
+
+    HAVING
+        SUM(
+            CASE
+                WHEN status IN (
+                    'Qualified',
+                    'Proposal Sent',
+                    'In Negotiation',
+                    'Won',
+                    'Lost'
+                )
+                THEN 1
+                ELSE 0
+            END
+        ) > 0
+
+    ORDER BY
+        winRate DESC,
+        wonLead DESC
+    """, nativeQuery = true)
     List<WinRateByRegionProjection> getWinRateByRegion();
 
     @Query(value = """
@@ -2154,7 +2250,8 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                 'Qualified',
                 'Proposal Sent',
                 'In Negotiation',
-                'Won'
+                'Won',
+                'Lost'
             )
             THEN l.lead_id
         END) AS qualifiedLeads,
@@ -2181,7 +2278,8 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                         'Qualified',
                         'Proposal Sent',
                         'In Negotiation',
-                        'Won'
+                        'Won',
+                        'Lost'
                     )
                     THEN l.lead_id
                 END),
@@ -2233,7 +2331,6 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     """, nativeQuery = true)
     SalesOwnerDetailResponse getSalesOwnerDetail(
             @Param("userCode") String userCode
-
     );
     @Query(value = """
     SELECT
@@ -2380,4 +2477,128 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(
             @Param("productLine") String productLine
     );
+
+    @Query(value = """
+    SELECT
+
+        l.status AS status,
+
+        SUM(ISNULL(l.business_result,0)) AS businessResult
+
+    FROM lead l
+
+    WHERE l.status IN (
+        'Qualified',
+        'Proposal Sent',
+        'In Negotiation',
+        'Won',
+        'Lost'
+    )
+
+    GROUP BY
+        l.status
+
+    ORDER BY
+        CASE l.status
+            WHEN 'Qualified' THEN 1
+            WHEN 'Proposal Sent' THEN 2
+            WHEN 'In Negotiation' THEN 3
+            WHEN 'Won' THEN 4
+            WHEN 'Lost' THEN 5
+        END
+    """, nativeQuery = true)
+    List<BusinessResultByStatusResponse> getBusinessResultByStatus();
+
+    @Query(value = """
+    SELECT
+
+        l.status AS status,
+
+        SUM(ISNULL(l.business_result,0)) AS businessResult
+
+    FROM lead l
+
+    WHERE l.status IN (
+        'Qualified',
+        'Proposal Sent',
+        'In Negotiation',
+        'Won',
+        'Lost'
+    )
+    AND (:sourceId IS NULL OR l.source_id = :sourceId)
+
+    GROUP BY
+        l.status
+
+    ORDER BY
+        CASE l.status
+            WHEN 'Qualified' THEN 1
+            WHEN 'Proposal Sent' THEN 2
+            WHEN 'In Negotiation' THEN 3
+            WHEN 'Won' THEN 4
+            WHEN 'Lost' THEN 5
+        END
+    """, nativeQuery = true)
+    List<BusinessResultByStatusResponse> getBusinessResultByStatusBySource(
+            @Param("sourceId") String sourceId
+    );
+
+    @Query(value = """
+    SELECT
+
+        COUNT(DISTINCT CASE
+            WHEN l.status = 'Won'
+            THEN l.lead_id
+        END) AS wonLead,
+
+        COUNT(DISTINCT CASE
+            WHEN l.status IN (
+                'Qualified',
+                'Proposal Sent',
+                'In Negotiation',
+                'Won',
+                'Lost'
+            )
+            THEN l.lead_id
+        END) AS qualifiedLead,
+
+        ROUND(
+            COUNT(DISTINCT CASE
+                WHEN l.status = 'Won'
+                THEN l.lead_id
+            END) * 100.0
+            /
+            NULLIF(
+                COUNT(DISTINCT CASE
+                    WHEN l.status IN (
+                        'Qualified',
+                        'Proposal Sent',
+                        'In Negotiation',
+                        'Won',
+                        'Lost'
+                    )
+                    THEN l.lead_id
+                END),
+                0
+            ),
+            2
+        ) AS winRate
+
+    FROM lead l
+    """, nativeQuery = true)
+    WinRateResponse getWinRate();
+
+    @Query(value = """
+    SELECT
+        COUNT(DISTINCT lead_id) AS qualifiedLead
+    FROM lead
+    WHERE status IN (
+        'Qualified',
+        'Proposal Sent',
+        'In Negotiation',
+        'Won',
+        'Lost'
+    )
+    """, nativeQuery = true)
+    QualifiedLeadResponse getQualifiedLead();
 }
