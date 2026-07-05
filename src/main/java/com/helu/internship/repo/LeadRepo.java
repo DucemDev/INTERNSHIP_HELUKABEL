@@ -237,11 +237,11 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
             FROM lead l
             LEFT JOIN [user] u ON l.user_id = u.user_id
             WHERE
-                (:quarter = 'this' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, GETDATE()) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = COALESCE(:year, YEAR(GETDATE())))
-                OR (:quarter = 'last' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = (COALESCE(:year, YEAR(GETDATE())) - (CASE WHEN DATEPART(QUARTER, GETDATE()) = 1 THEN 1 ELSE 0 END)))
+                DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = :targetQuarter
+                AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = :targetYear
             GROUP BY l.user_id, u.full_name
             """, nativeQuery = true)
-    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(@Param("quarter") String quarter, @Param("year") Integer year);
+    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(@Param("targetQuarter") int targetQuarter, @Param("targetYear") int targetYear);
 
     @Query(value = """
     SELECT

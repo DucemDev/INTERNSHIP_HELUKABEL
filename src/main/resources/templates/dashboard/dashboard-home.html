@@ -259,24 +259,24 @@
                         </h2>
                         <p class="text-[10px] text-slate-400 font-medium mt-1" th:text="#{dashboard.matrix_desc}">Phân tích Win Rate...</p>
                     </div>
-                    <div class="flex items-center gap-3 text-[10px] font-semibold bg-slate-50 p-2 rounded-lg border border-slate-200">
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #2b5cf6;"></span>
-                            <span class="text-slate-600" th:text="#{dashboard.high_wr}">High (≥ 15%)</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #81b3f7;"></span>
-                            <span class="text-slate-600" th:text="#{dashboard.medium_wr}">Medium</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: #00df9a;"></span>
-                            <span class="text-slate-600" th:text="#{dashboard.low_wr}">Low (< 11%)</span>
-                        </div>
-                    </div>
                 </div>
                 <div class="w-full overflow-x-auto flex justify-center items-center py-2 flex-1">
                     <div class="min-w-[400px] w-full max-w-[700px] h-[350px] relative">
                         <svg id="matrixBubbleChart" class="w-full h-full" viewBox="0 0 700 400"></svg>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center gap-4 text-[10px] font-semibold bg-slate-50 p-2 rounded-lg border border-slate-200 mt-2">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #10b981;"></span>
+                        <span class="text-slate-600" th:text="#{dashboard.high_wr}">High (≥ 15%)</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #f59e0b;"></span>
+                        <span class="text-slate-600" th:text="#{dashboard.medium_wr}">Medium</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #ef4444;"></span>
+                        <span class="text-slate-600" th:text="#{dashboard.low_wr}">Low (< 11%)</span>
                     </div>
                 </div>
             </div>
@@ -510,7 +510,18 @@
             const locale = /*[[${#locale.language}]]*/ 'vi';
             const currency = locale === 'vi' ? ' VNĐ' : ' VND';
             const fmtNum = (v) => Number(v || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
-            const fmtCurrency = (v) => fmtNum(v) + currency;
+            const fmtCurrency = (v) => {
+                const absVal = Math.abs(v);
+                let formatted = '';
+                if (absVal >= 1e9) {
+                    formatted = (v / 1e9).toFixed(2).replace(/\.?0+$/, '') + ' tỷ';
+                } else if (absVal >= 1e6) {
+                    formatted = (v / 1e6).toFixed(2).replace(/\.?0+$/, '') + ' triệu';
+                } else {
+                    formatted = fmtNum(v);
+                }
+                return (v < 0 ? '-' : '') + formatted + currency;
+            };
             const fmtShortNum = (v) => {
                 const absV = Math.abs(v);
                 if (locale === 'vi') {
@@ -1426,11 +1437,11 @@
                     const maxR = Math.min(colW, rowH) * 0.38;
                     const r = cell.winRate > 0 ? minR + (maxR - minR) * Math.sqrt(cell.winRate / maxWinRate) : minR;
 
-                    // Color by win rate
+                    // Color by win rate (High contrast, semantic palette: Green for high, Amber for medium, Red for low)
                     let fillColor;
-                    if (cell.winRate >= 15) fillColor = '#2b5cf6';
-                    else if (cell.winRate >= 11) fillColor = '#81b3f7';
-                    else fillColor = '#00df9a';
+                    if (cell.winRate >= 15) fillColor = '#10b981'; // Emerald Green (High)
+                    else if (cell.winRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium)
+                    else fillColor = '#ef4444'; // Rose Red (Low)
 
                     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                     g.setAttribute('class', 'matrix-bubble');
@@ -1468,15 +1479,19 @@
             async function loadQuarterlyComparisons() {
                 try {
                     const globalYearVal = document.getElementById('globalYearFilter')?.value;
-                    const selectedYear = (globalYearVal && globalYearVal !== 'all') ? globalYearVal : new Date().getFullYear();
+                    const selectedYear = (globalYearVal && globalYearVal !== 'all') ? parseInt(globalYearVal) : new Date().getFullYear();
                     const yearParam = `&year=${selectedYear}`;
+                    
+                    const globalQuarterVal = document.getElementById('globalQuarterFilter')?.value;
+                    const refQuarterParam = (globalQuarterVal && globalQuarterVal !== 'all') ? `&refQuarter=${globalQuarterVal}` : '';
+
                     const [soThis, soLast, wrThis, wrLast, pcThis, pcLast] = await Promise.all([
-                        fetch(`${API_BASE}/sales-owner-dashboard-by-quarter?quarter=this${yearParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/sales-owner-dashboard-by-quarter?quarter=last${yearParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/win-rate-by-saleowner-by-quarter?quarter=this${yearParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/win-rate-by-saleowner-by-quarter?quarter=last${yearParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/pipeline-coverage-by-quarter?quarter=this${yearParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/pipeline-coverage-by-quarter?quarter=last${yearParam}`).then(r => r.json())
+                        fetch(`${API_BASE}/sales-owner-dashboard-by-quarter?quarter=this${yearParam}${refQuarterParam}`).then(r => r.json()),
+                        fetch(`${API_BASE}/sales-owner-dashboard-by-quarter?quarter=last${yearParam}${refQuarterParam}`).then(r => r.json()),
+                        fetch(`${API_BASE}/win-rate-by-saleowner-by-quarter?quarter=this${yearParam}${refQuarterParam}`).then(r => r.json()),
+                        fetch(`${API_BASE}/win-rate-by-saleowner-by-quarter?quarter=last${yearParam}${refQuarterParam}`).then(r => r.json()),
+                        fetch(`${API_BASE}/pipeline-coverage-by-quarter?quarter=this${yearParam}${refQuarterParam}`).then(r => r.json()),
+                        fetch(`${API_BASE}/pipeline-coverage-by-quarter?quarter=last${yearParam}${refQuarterParam}`).then(r => r.json())
                     ]);
 
                     // 1. KPI Cards
@@ -1493,9 +1508,14 @@
                         sumLeadsLast += (d.totalLead || 0);
                     });
 
-                    const today = new Date();
-                    const currentMonth = today.getMonth();
-                    const thisQ = Math.floor(currentMonth / 3) + 1;
+                    let thisQ;
+                    if (globalQuarterVal && globalQuarterVal !== 'all') {
+                        thisQ = parseInt(globalQuarterVal);
+                    } else {
+                        const today = new Date();
+                        const currentMonth = today.getMonth();
+                        thisQ = Math.floor(currentMonth / 3) + 1;
+                    }
                     const lastQ = thisQ === 1 ? 4 : thisQ - 1;
                     const lastQYear = lastQ === 4 ? selectedYear - 1 : selectedYear;
 
@@ -1577,14 +1597,14 @@
                             x: { grid: { display: false } },
                             y: {
                                 beginAtZero: true,
-                                suggestedMax: 100,
+                                suggestedMax: 120,
                                 border: { display: false },
                                 grid: { color: '#f1f5f9' },
                                 ticks: { callback: v => v + '%' }
                             }
                         },
                         plugins: {
-                            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11, weight: 'bold' } } },
+                            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11, weight: 'bold' } } },
                             datalabels: {
                                 display: true,
                                 anchor: 'end',
@@ -1637,13 +1657,14 @@
                             x: { grid: { display: false } },
                             y: {
                                 beginAtZero: true,
+                                grace: '15%',
                                 border: { display: false },
                                 grid: { color: '#f1f5f9' },
                                 ticks: { callback: v => fmtNum(v) }
                             }
                         },
                         plugins: {
-                            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11, weight: 'bold' } } },
+                            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11, weight: 'bold' } } },
                             tooltip: {
                                 callbacks: {
                                     label: ctx => ` ${ctx.dataset.label}: ${fmtCurrency(ctx.parsed.y)}`

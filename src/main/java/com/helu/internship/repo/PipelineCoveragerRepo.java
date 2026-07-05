@@ -102,16 +102,16 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
         ON u.user_id = l.user_id
         AND l.status NOT IN ('Won','Lost')
         AND (
-            (:quarter = 'this' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, GETDATE()) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = COALESCE(:year, YEAR(GETDATE())))
-            OR (:quarter = 'last' AND DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = (COALESCE(:year, YEAR(GETDATE())) - (CASE WHEN DATEPART(QUARTER, GETDATE()) = 1 THEN 1 ELSE 0 END)))
+            DATEPART(QUARTER, ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = :targetQuarter
+            AND YEAR(ISNULL((SELECT MIN(changed_at) FROM lead_status_history h WHERE h.lead_id = l.lead_id), l.created_date)) = :targetYear
         )
 
     LEFT JOIN lead_item li
         ON l.lead_id = li.lead_id
 
     WHERE
-        (:quarter = 'this' AND st.period_year = COALESCE(:year, YEAR(GETDATE())) AND st.period_month IN ((DATEPART(QUARTER, GETDATE()) - 1) * 3 + 1, (DATEPART(QUARTER, GETDATE()) - 1) * 3 + 2, (DATEPART(QUARTER, GETDATE()) - 1) * 3 + 3))
-        OR (:quarter = 'last' AND st.period_year = (COALESCE(:year, YEAR(GETDATE())) - (CASE WHEN DATEPART(QUARTER, GETDATE()) = 1 THEN 1 ELSE 0 END)) AND st.period_month IN ((DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) - 1) * 3 + 1, (DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) - 1) * 3 + 2, (DATEPART(QUARTER, DATEADD(QUARTER, -1, GETDATE())) - 1) * 3 + 3))
+        st.period_year = :targetYear
+        AND st.period_month IN ((:targetQuarter - 1) * 3 + 1, (:targetQuarter - 1) * 3 + 2, (:targetQuarter - 1) * 3 + 3)
 
     GROUP BY
         u.user_code,
@@ -119,7 +119,7 @@ public interface PipelineCoveragerRepo extends JpaRepository<LeadStatusHistoryEn
 
     ORDER BY pipelineCoverage DESC
     """, nativeQuery = true)
-    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(@Param("quarter") String quarter, @Param("year") Integer year);
+    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(@Param("targetQuarter") int targetQuarter, @Param("targetYear") int targetYear);
 
     @Query(value = """
     SELECT

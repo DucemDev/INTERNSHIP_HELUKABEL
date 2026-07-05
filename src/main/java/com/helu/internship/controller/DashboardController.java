@@ -170,16 +170,25 @@ public class DashboardController {
         return dashboardService.getSalesOwnerDashboard();
     }
     @GetMapping("/sales-owner-dashboard-by-quarter")
-    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(@RequestParam String quarter, @RequestParam(required = false) Integer year) {
-        return dashboardService.getSalesOwnerDashboardByQuarter(quarter, year);
+    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(
+            @RequestParam String quarter,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer refQuarter) {
+        return dashboardService.getSalesOwnerDashboardByQuarter(quarter, year, refQuarter);
     }
     @GetMapping("/win-rate-by-saleowner-by-quarter")
-    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(@RequestParam String quarter, @RequestParam(required = false) Integer year) {
-        return dashboardService.getWinRateBySalesOwnerByQuarter(quarter, year);
+    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(
+            @RequestParam String quarter,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer refQuarter) {
+        return dashboardService.getWinRateBySalesOwnerByQuarter(quarter, year, refQuarter);
     }
     @GetMapping("/pipeline-coverage-by-quarter")
-    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(@RequestParam String quarter, @RequestParam(required = false) Integer year) {
-        return dashboardService.getPipelineCoverageByQuarter(quarter, year);
+    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(
+            @RequestParam String quarter,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer refQuarter) {
+        return dashboardService.getPipelineCoverageByQuarter(quarter, year, refQuarter);
     }
     @GetMapping("/revenue-summary")
     public RevenueSummaryProjection getRevenueSummary() {

@@ -54,9 +54,9 @@ public interface DashboardService {
             LocalDate timeTo
     );
     List<SalesOwnerDashboardProjection> getSalesOwnerDashboard();
-    List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter, Integer year);
-    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter, Integer year);
-    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter, Integer year);
+    List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter, Integer year, Integer refQuarter);
+    List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter, Integer year, Integer refQuarter);
+    List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter, Integer year, Integer refQuarter);
     RevenueSummaryProjection getRevenueSummary();
 
     List<RevenueRegionProjection> getRevenueByRegion();

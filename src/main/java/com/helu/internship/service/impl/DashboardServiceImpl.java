@@ -202,17 +202,46 @@ public class DashboardServiceImpl implements DashboardService {
     public List<SalesOwnerDashboardProjection> getSalesOwnerDashboard() {
         return salesOwnerDashboardRepo.getSalesOwnerDashboard();
     }
+    private int[] calculateTargetQuarterAndYear(String quarter, Integer year, Integer refQuarter) {
+        int currentQuarter;
+        if (refQuarter != null && refQuarter >= 1 && refQuarter <= 4) {
+            currentQuarter = refQuarter;
+        } else {
+            currentQuarter = (java.time.LocalDate.now().getMonthValue() - 1) / 3 + 1;
+        }
+        int currentYear = (year != null && year > 0) ? year : java.time.LocalDate.now().getYear();
+        
+        int targetQuarter;
+        int targetYear;
+        if ("last".equalsIgnoreCase(quarter)) {
+            if (currentQuarter == 1) {
+                targetQuarter = 4;
+                targetYear = currentYear - 1;
+            } else {
+                targetQuarter = currentQuarter - 1;
+                targetYear = currentYear;
+            }
+        } else {
+            targetQuarter = currentQuarter;
+            targetYear = currentYear;
+        }
+        return new int[]{targetQuarter, targetYear};
+    }
+
     @Override
-    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter, Integer year) {
-        return salesOwnerDashboardRepo.getSalesOwnerDashboardByQuarter(quarter, year);
+    public List<SalesOwnerDashboardProjection> getSalesOwnerDashboardByQuarter(String quarter, Integer year, Integer refQuarter) {
+        int[] params = calculateTargetQuarterAndYear(quarter, year, refQuarter);
+        return salesOwnerDashboardRepo.getSalesOwnerDashboardByQuarter(params[0], params[1]);
     }
     @Override
-    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter, Integer year) {
-        return leadRepo.getWinRateBySalesOwnerByQuarter(quarter, year);
+    public List<WinRateBySalesResponse> getWinRateBySalesOwnerByQuarter(String quarter, Integer year, Integer refQuarter) {
+        int[] params = calculateTargetQuarterAndYear(quarter, year, refQuarter);
+        return leadRepo.getWinRateBySalesOwnerByQuarter(params[0], params[1]);
     }
     @Override
-    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter, Integer year) {
-        return pipelineCoverageRepo.getPipelineCoverageByQuarter(quarter, year);
+    public List<PipelineCoverageProjection> getPipelineCoverageByQuarter(String quarter, Integer year, Integer refQuarter) {
+        int[] params = calculateTargetQuarterAndYear(quarter, year, refQuarter);
+        return pipelineCoverageRepo.getPipelineCoverageByQuarter(params[0], params[1]);
     }
     @Override
     public List<RevenueMonthlyProjection> getRevenueMonthly() {
