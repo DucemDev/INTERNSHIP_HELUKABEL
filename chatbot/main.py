@@ -31,6 +31,7 @@ from chatbot.config import (
 )
 from chatbot.api_client import CachedAPIClient
 from chatbot.intent_detector import detect_intent
+from chatbot.gemini_client import GeminiClient
 from chatbot.analyzers import (
     get_dashboard_context,
     make_ai_summary, format_status_table, answer_status_count,
@@ -53,6 +54,8 @@ client = CachedAPIClient(
     cache_ttl=CACHE_TTL,
     timeout=API_TIMEOUT
 )
+# Initialise Gemini client for fallback LLM responses
+gemini_client = GeminiClient()
 
 # ==================
 # APP LIFESPAN
@@ -124,6 +127,18 @@ async def ask_dashboard(question: str) -> str:
     """Process a question and return the chatbot response."""
     intent = detect_intent(question)
     logger.info(f"Question: {question[:100]}... | Intent: {intent}")
+    # If intent could not be determined, fall back to Gemini LLM
+    if intent == "unknown":
+        # Use Gemini to generate a response based on the raw question
+        try:
+            return gemini_client.generate_content(
+                prompt=question,
+                system_instruction="Bạn là trợ lý AI cho Helukabel CRM. Trả lời các câu hỏi bằng tiếng Việt, dựa trên dữ liệu dashboard nếu cần."
+            )
+        except Exception as e:
+            logger.error("Gemini fallback failed: %s", e)
+            return "Xin lỗi, tôi không thể trả lời câu hỏi lúc này. Vui lòng thử lại sau."
+
 
     # --- SALES OWNER ---
     if intent in [
