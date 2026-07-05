@@ -155,5 +155,11 @@ public interface DashboardService {
     SalesOwnerDetailResponse getSalesOwnerDetail(String userCode);
     List<com.helu.internship.entity.LeadSourceEntity> getAllLeadSources();
     DailyCompareResponse getDailyCompare();
+
+    List<BusinessResultByStatusResponse> getBusinessResultByStatus();
+    List<BusinessResultByStatusResponse> getBusinessResultByStatusBySource(String sourceId);
+    WinRateResponse getWinRate();
+    QualifiedLeadResponse getQualifiedLead();
+
 }
 

@@ -538,6 +538,29 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
     public DailyCompareResponse getDailyCompare() {
         return dashboardService.getDailyCompare();
     }
+// phễu theo giá trị
+    @GetMapping("/funnel/business-result")
+    public List<BusinessResultByStatusResponse> getBusinessResultByStatus() {
+        return dashboardService.getBusinessResultByStatus();
+    }
+    // tỷ lệ thắng (win rate )
+    @GetMapping("/win-rate")
+    public WinRateResponse getWinRate() {
+        return dashboardService.getWinRate();
+    }
+
+    // phễu theo giá trị theo source
+    @GetMapping("/funnel/business-result-by-source")
+    public List<BusinessResultByStatusResponse> getBusinessResultByStatusBySource(
+            @RequestParam(required = false) String sourceId
+    ) {
+        return dashboardService.getBusinessResultByStatusBySource(sourceId);
+    }
+    // qualified
+    @GetMapping("/qualified-leads")
+    public QualifiedLeadResponse getQualifiedLead() {
+        return dashboardService.getQualifiedLead();
+    }
 
 
 
