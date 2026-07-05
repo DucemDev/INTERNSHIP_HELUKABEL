@@ -18,12 +18,22 @@ import os
 import logging
 from typing import Optional
 
+# Load environment variables from a .env file if present
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    # dotenv optional; ignore if not installed
+    pass
+
 # Lazy import of the official SDK.
 try:
-    import google.generativeai as genai  # type: ignore
+    from google import genai  # type: ignore
+    from google.genai import types  # type: ignore
 except Exception as e:  # pragma: no cover
     genai = None
-    logging.getLogger(__name__).warning("google-generativeai SDK not available: %s", e)
+    types = None
+    logging.getLogger(__name__).warning("google-genai SDK not available: %s", e)
 
 logger = logging.getLogger(__name__)
 
@@ -37,14 +47,14 @@ class GeminiClient:
     """
 
     def __init__(self, model_name: Optional[str] = None) -> None:
-        if genai is None:
-            raise ImportError("google-generativeai SDK is required for Gemini integration.")
+        if genai is None or types is None:
+            raise ImportError("google-genai SDK is required for Gemini integration.")
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             raise EnvironmentError("GEMINI_API_KEY environment variable not set.")
-        genai.configure(api_key=api_key)
-        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
-        self.model = genai.GenerativeModel(self.model_name)
+        # Initialize a client with the API key
+        self.client = genai.Client(api_key=api_key)
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
         logger.info("GeminiClient initialised with model %s", self.model_name)
 
     def generate_content(
@@ -54,16 +64,22 @@ class GeminiClient:
         temperature: float = 0.7,
         max_output_tokens: Optional[int] = None,
     ) -> str:
-        """Generate a response from the Gemini model.
-        """
+        """Generate a response from the Gemini model."""
         try:
-            response = self.model.generate_content(
-                prompt,
-                system_instruction=system_instruction,
+            config = types.GenerateContentConfig(
                 temperature=temperature,
                 max_output_tokens=max_output_tokens,
+                system_instruction=system_instruction,
             )
-            answer = response.text.strip()
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=config,
+            )
+            answer = (response.text or "").strip()
+            if not answer:
+                logger.warning("Gemini returned empty response, using fallback message")
+                return "Xin lỗi, tôi không thể tạo nội dung trả lời lúc này. Vui lòng thử lại sau."
             logger.debug("Gemini response: %s", answer[:200])
             return answer
         except Exception as exc:  # pragma: no cover

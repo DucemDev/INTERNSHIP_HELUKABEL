@@ -1466,3 +1466,216 @@ async def analyze_forecast(client: CachedAPIClient, intent: str, question: str):
             return ans + FORECAST_DISCLAIMER
 
     return "Không thể nhận diện kịch bản dự báo tương ứng."
+
+
+# =========================
+# BANT ANALYSIS
+# =========================
+
+async def get_sales_owner_bant_complete_rate(client: CachedAPIClient):
+    data = await client.get("/sales-owner/bant-complete-rate")
+    if not data:
+        return []
+
+    result = []
+    for item in data:
+        result.append({
+            "userCode": item.get("userCode") or "Không xác định",
+            "fullName": item.get("fullName") or "Không xác định",
+            "totalLead": int(item.get("totalLead") or 0),
+            "completeLead": int(item.get("completeLead") or 0),
+            "bantCompleteRate": float(item.get("bantCompleteRate") or 0)
+        })
+    return result
+
+
+async def get_sales_owner_avg_bant_score(client: CachedAPIClient):
+    data = await client.get("/sales-owner/avg-bant-score")
+    if not data:
+        return []
+
+    result = []
+    for item in data:
+        result.append({
+            "userCode": item.get("userCode") or "Không xác định",
+            "fullName": item.get("fullName") or "Không xác định",
+            "avgBantScore": float(item.get("avgBantScore") or 0)
+        })
+    return result
+
+
+async def analyze_bant(client: CachedAPIClient, intent: str):
+    if intent == "bant_info":
+        return (
+            "📊 **Thông tin về BANT & Phân loại Nhiệt độ Lead tại HELUKABEL CRM:**\n\n"
+            "Hệ thống tính điểm BANT dựa trên 4 tiêu chí chính (mỗi tiêu chí tối đa 25 điểm, tổng cộng 100 điểm):\n"
+            "- 💰 **Budget (Ngân sách - 25đ)**: Khách hàng có ngân sách rõ ràng và phù hợp với sản phẩm cáp Helukabel.\n"
+            "- 👑 **Authority (Quyền quyết định - 25đ)**: Người liên hệ có quyền phê duyệt hoặc ảnh hưởng lớn đến quyết định mua hàng.\n"
+            "- 🎯 **Need (Nhu cầu - 25đ)**: Khách hàng có nhu cầu thực tế đối với sản phẩm/giải pháp cáp và phụ kiện của Helukabel.\n"
+            "- ⏳ **Timeline (Thời gian - 25đ)**: Khách hàng có kế hoạch mua hàng/lắp đặt trong thời gian xác định (ngắn hạn được điểm cao hơn).\n\n"
+            "🔥 **Phân loại nhiệt độ Lead theo tổng điểm BANT:**\n"
+            "- **HOT (Nóng) [>= 80 điểm]**: Khách hàng nét, cơ hội chốt deal rất cao, cần ưu tiên chăm sóc ngay.\n"
+            "- **WARM (Ấm) [60 - 79 điểm]**: Khách hàng tiềm năng, cần tiếp tục nuôi dưỡng và khai thác thêm thông tin.\n"
+            "- **COLD (Lạnh) [< 60 điểm]**: Khách hàng chưa sẵn sàng hoặc ít tiềm năng, xếp độ ưu tiên thấp hơn.\n\n"
+            "💡 Bạn có thể hỏi thêm:\n"
+            "• 'Tỷ lệ hoàn thành BANT theo seller?'\n"
+            "• 'Điểm BANT trung bình theo seller?'"
+        )
+
+    if intent == "bant_complete_rate":
+        data = await get_sales_owner_bant_complete_rate(client)
+        if not data:
+            return "Không lấy được dữ liệu tỷ lệ hoàn thành BANT từ API."
+
+        answer = "📊 **Tỷ lệ hoàn thành BANT theo từng Seller (Sales Owner):**\n\n"
+        for i, item in enumerate(sorted(data, key=lambda x: x["bantCompleteRate"], reverse=True), start=1):
+            answer += (
+                f"{i}. **{item['fullName']}** ({item['userCode']}):\n"
+                f"   - Tỷ lệ hoàn thành BANT: **{item['bantCompleteRate']}%**\n"
+                f"   - Số lead hoàn thành BANT: {item['completeLead']}/{item['totalLead']} lead\n"
+            )
+
+        answer += "\n💡 Nhận xét: Tỷ lệ hoàn thành BANT thể hiện mức độ đầy đủ của thông tin Lead ở 4 khía cạnh Budget, Authority, Need, Timeline mà seller đã thu thập."
+        return answer
+
+    if intent == "bant_avg_score":
+        data = await get_sales_owner_avg_bant_score(client)
+        if not data:
+            return "Không lấy được dữ liệu điểm BANT trung bình từ API."
+
+        answer = "📈 **Điểm BANT trung bình theo từng Seller (Sales Owner):**\n\n"
+        for i, item in enumerate(sorted(data, key=lambda x: x["avgBantScore"], reverse=True), start=1):
+            answer += (
+                f"{i}. **{item['fullName']}** ({item['userCode']}):\n"
+                f"   - Điểm BANT trung bình: **{item['avgBantScore']:.2f} / 100 điểm**\n"
+            )
+
+        answer += "\n💡 Nhận xét: Điểm trung bình BANT cao cho thấy các Lead do Seller phụ trách có độ nét (chất lượng tiềm năng) cao hơn."
+        return answer
+
+    return "Tôi chưa hiểu câu hỏi về BANT."
+
+
+# =========================
+# SYSTEM DATA COMPILATION FOR LLM CONTEXT
+# =========================
+
+async def get_system_db_context(client: CachedAPIClient) -> str:
+    """Fetch all database metrics and compile them into a text context for the LLM."""
+    try:
+        import asyncio
+        (
+            ctx_summary,
+            sources,
+            sellers,
+            pipelines,
+            lost_reasons,
+            rev_summary,
+            bant_rate,
+            bant_avg
+        ) = await asyncio.gather(
+            get_dashboard_context(client),
+            get_lead_source_data(client),
+            get_sales_owner_data(client),
+            get_pipeline_data(client),
+            get_lost_reasons_data(client),
+            get_revenue_summary_data(client),
+            get_sales_owner_bant_complete_rate(client),
+            get_sales_owner_avg_bant_score(client),
+            return_exceptions=True
+        )
+
+        context_parts = []
+
+        # 1. Lead Summary & Statuses
+        if not isinstance(ctx_summary, Exception) and ctx_summary:
+            context_parts.append(
+                f"### TỔNG QUAN LEAD HỆ THỐNG:\n"
+                f"- Tổng số lead: {ctx_summary.get('total', 0)}\n"
+                f"- Lead mới (New): {ctx_summary.get('new', 0)}\n"
+                f"- Lead đã liên hệ (Connected): {ctx_summary.get('connected', 0)}\n"
+                f"- Lead đạt yêu cầu (Qualified): {ctx_summary.get('qualified', 0)}\n"
+                f"- Lead gửi báo giá (Proposal Sent): {ctx_summary.get('proposal', 0)}\n"
+                f"- Lead đang thương lượng (In Negotiation): {ctx_summary.get('negotiation', 0)}\n"
+                f"- Lead thành công (Won): {ctx_summary.get('won', 0)} (Tỷ lệ: {ctx_summary.get('won_rate', 0)}%)\n"
+                f"- Lead thất bại (Lost): {ctx_summary.get('lost', 0)} (Tỷ lệ: {ctx_summary.get('lost_rate', 0)}%)\n"
+                f"- Lead đang xử lý (Open): {ctx_summary.get('open_leads', 0)}\n"
+            )
+
+        # 2. Revenue Summary
+        if not isinstance(rev_summary, Exception) and rev_summary:
+            context_parts.append(
+                f"### DOANH THU CHUNG:\n"
+                f"- Tổng doanh thu chốt (Won): {rev_summary.get('totalRevenue', 0):,.0f} VNĐ\n"
+                f"- Doanh thu trung bình mỗi lead Won: {rev_summary.get('avgRevenuePerWonLead', 0):,.0f} VNĐ\n"
+                f"- Doanh thu tháng này: {rev_summary.get('thisMonthRevenue', 0):,.0f} VNĐ\n"
+                f"- Doanh thu tháng trước: {rev_summary.get('lastMonthRevenue', 0):,.0f} VNĐ\n"
+            )
+
+        # 3. Sales Owners / Sellers
+        if not isinstance(sellers, Exception) and sellers:
+            context_parts.append("### HIỆU SUẤT TỪNG SELLER (SALES OWNER):")
+            for s in sellers:
+                context_parts.append(
+                    f"- {s['userName']}: Doanh thu {s['totalRevenue']:,.0f} VNĐ, "
+                    f"Tổng lead phụ trách: {s['totalLead']:.0f}, Won: {s['wonLead']:.0f}, "
+                    f"Open: {s['openLead']:.0f}, Tỷ lệ thắng (Win Rate): {s['winRate']}%, "
+                    f"Thời gian chốt deal TB: {s['avgDaysToWon']} ngày"
+                )
+            context_parts.append("")
+
+        # 4. Lead Sources
+        if not isinstance(sources, Exception) and sources:
+            context_parts.append("### HIỆU QUẢ CÁC NGUỒN LEAD (LEAD SOURCES):")
+            for src in sources:
+                context_parts.append(
+                    f"- Nguồn {src['leadSource']}: Doanh thu {src['revenue']:,.0f} VNĐ, "
+                    f"Tổng lead: {src['totalLeads']:.0f}, Won: {src['wonLeads']:.0f}, "
+                    f"Chi phí: {src['cost']:,.0f} VNĐ, ROI: {src['roi']}%, "
+                    f"CPL (Chi phí/Lead): {src['costPerLead']:,.0f} VNĐ, CPW (Chi phí/Win): {src['costPerWin']:,.0f} VNĐ"
+                )
+            context_parts.append("")
+
+        # 5. Lost Reasons
+        if not isinstance(lost_reasons, Exception) and lost_reasons:
+            context_parts.append("### LÝ DO THẤT BẠI (LOST REASONS):")
+            for r in lost_reasons:
+                context_parts.append(
+                    f"- {r['reason']}: {r['lostLead']:.0f} lead bị lost (Tỷ lệ: {r['lostRate']}%)"
+                )
+            context_parts.append("")
+
+        # 6. Pipeline Coverage
+        if not isinstance(pipelines, Exception) and pipelines:
+            context_parts.append("### ĐỘ PHỦ PIPELINE (PIPELINE COVERAGE):")
+            for p in pipelines:
+                context_parts.append(
+                    f"- Seller {p['sellerName']}: Open Pipeline {p['openPipeline']:,.0f} VNĐ, "
+                    f"Mục tiêu (Target): {p['target']:,.0f} VNĐ, Độ phủ: {p['pipelineCoverage']} lần"
+                )
+            context_parts.append("")
+
+        # 7. BANT Completion Rate
+        if not isinstance(bant_rate, Exception) and bant_rate:
+            context_parts.append("### TỶ LỆ HOÀN THÀNH BANT THEO SELLER:")
+            for item in bant_rate:
+                context_parts.append(
+                    f"- Seller {item['fullName']} ({item['userCode']}): Hoàn thành BANT {item['bantCompleteRate']}% ({item['completeLead']}/{item['totalLead']} lead)"
+                )
+            context_parts.append("")
+
+        # 8. BANT Average Score
+        if not isinstance(bant_avg, Exception) and bant_avg:
+            context_parts.append("### ĐIỂM BANT TRUNG BÌNH THEO SELLER:")
+            for item in bant_avg:
+                context_parts.append(
+                    f"- Seller {item['fullName']} ({item['userCode']}): Điểm trung bình {item['avgBantScore']:.2f} / 100 điểm"
+                )
+            context_parts.append("")
+
+        return "\n".join(context_parts)
+    except Exception as e:
+        logger.error(f"Error compiling database context: {e}")
+        return "Không lấy được dữ liệu động từ hệ thống."
+
+
