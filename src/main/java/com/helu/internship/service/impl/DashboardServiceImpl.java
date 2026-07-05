@@ -76,6 +76,7 @@ public class DashboardServiceImpl implements DashboardService {
         return leadStatusHistoryRepo.getAverageDaysToWon();
     }
 
+
     @Override
     public List<PipelineCoverageProjection> getPipelineCoverage(String sellerCode) {
         return pipelineCoverageRepo.getPipelineCoverage(sellerCode);
@@ -507,6 +508,11 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<com.helu.internship.entity.LeadSourceEntity> getAllLeadSources() {
         return leadSourceRepo.findAll();
+    }
+
+    @Override
+    public List<RevenueGroupResponse> getRevenueByCustomerGroup() {
+        return leadRepo.getRevenueByCustomerGroup();
     }
 
     @Override

@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/seller/**").hasRole("Seller")
                         .requestMatchers("/chatbot", "/api/chatbot/**").hasAnyRole("Admin", "Seller")
 
+                        .requestMatchers("/admin/**").hasRole("Admin")
                         .anyRequest().authenticated()
                 )
             .formLogin(form -> form

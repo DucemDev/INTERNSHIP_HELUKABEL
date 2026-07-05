@@ -37,6 +37,7 @@ public interface DashboardService {
     List<LostByIndustryProjection> getLostByIndustry();
 
     List<RevenueIndustryResponse> getRevenueByIndustry();
+    List<RevenueGroupResponse> getRevenueByCustomerGroup();
 
     List<RoiLeadSourceResponse> getROIByLeadSource();
     List<LeadSourceSummaryResponse> getLeadSourceSummary();

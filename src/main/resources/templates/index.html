@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HELUKABEL CRM</title>
+    <title>HELUKABEL CRM Portal</title>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -24,149 +24,89 @@
     </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        body {
+            font-family: 'Inter', sans-serif;
         }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
+        /* Inertia Cursor Glow Background */
+        #glow-bg {
+            background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(246, 23, 27, 0.12), rgba(30, 41, 59, 0.04) 70%, transparent 100%);
+            will-change: transform;
         }
-        .hover-lift {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .hover-lift:hover {
-            transform: translateY(-5px);
-        }
-        .text-glow:hover {
-            text-shadow: 0 0 15px rgba(246, 23, 27, 0.2);
-            color: #f6171b;
-        }
-        .feature-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .feature-card:hover {
-            background-color: white;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
-            border-color: #f6171b20;
-        }
-        .feature-card:hover .icon-box {
-            transform: scale(1.1) rotate(5deg);
-            color: #f6171b;
+        /* Mock browser window style */
+        .browser-mockup {
+            box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.12);
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
     </style>
 </head>
-<body class="font-['Inter'] antialiased bg-white text-slate-600 selection:bg-red-50 selection:text-helu-red">
+<body class="antialiased bg-slate-50/70 text-slate-600 h-screen overflow-hidden flex flex-col relative">
 
-    <!-- [1] NAVIGATION -->
-    <nav class="fixed top-0 w-full z-50 bg-white/40 backdrop-blur-xl border-b border-transparent transition-all duration-300" id="mainNav">
-        <div class="max-w-6xl mx-auto px-8 h-20 flex items-center justify-between">
-            <!-- Simple Logo - No Borders -->
-            <img th:src="@{/images/helu-logo.png}" alt="Logo" class="h-5 w-auto hover:scale-105 transition-transform cursor-pointer">
-            
-            <div class="hidden md:flex items-center gap-10 text-[13px] font-semibold tracking-wide text-slate-500">
-                <a href="#features" class="hover:text-helu-red transition-all relative group">
-                    Tính năng
-                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-helu-red transition-all group-hover:w-full"></span>
-                </a>
-                <a href="#preview" class="hover:text-helu-red transition-all relative group">
-                    Giao diện
-                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-helu-red transition-all group-hover:w-full"></span>
-                </a>
-                <a th:href="@{/login}" class="px-5 py-2 bg-slate-900 text-white rounded-full hover:bg-helu-red transition-all active:scale-95 shadow-sm hover:shadow-lg hover:shadow-red-200">
-                    Đăng nhập
-                </a>
-            </div>
+    <!-- Dynamic Hover Interactive Particle Network Canvas -->
+    <canvas id="particle-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Interactive Glow Background (Smooth Lerping) -->
+    <div id="glow-bg" class="fixed inset-0 pointer-events-none z-10 opacity-70"></div>
+
+    <!-- NAVIGATION -->
+    <nav class="w-full bg-white border-b border-slate-100 flex-none z-50 relative">
+        <div class="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between">
+            <img th:src="@{/images/helu-logo.png}" alt="HELUKABEL" class="h-5 w-auto object-contain">
+            <a th:href="@{/login}" class="px-5 py-2 bg-slate-900 hover:bg-helu-red text-white text-xs font-bold rounded-lg transition-all active:scale-95">
+                Đăng nhập
+            </a>
         </div>
     </nav>
 
-    <!-- [2] HERO SECTION -->
-    <section class="relative pt-48 pb-24 overflow-hidden">
-        <div class="max-w-4xl mx-auto px-8 text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight leading-[1.2] reveal">
-                Quản trị khách hàng <br class="hidden md:block"> 
-                <span class="text-slate-400 font-medium hover:text-helu-red transition-colors duration-500 cursor-default">Chuyên nghiệp & Hiệu quả</span>
+    <!-- MAIN SECTION -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-8 py-4 flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-12 overflow-hidden z-20 relative">
+        
+        <!-- Left Side: Corporate Portal Info -->
+        <div class="w-full lg:w-5/12 space-y-6 text-left">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-lg text-slate-700 text-[10px] font-bold tracking-wider uppercase border border-slate-200">
+                Hệ thống CRM Nội bộ
+            </div>
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight leading-[1.15]">
+                Hệ thống CRM <br>
+                <span class="text-helu-red">HELU</span>
             </h1>
-            
-            <p class="text-base md:text-lg text-slate-500 mb-10 max-w-xl mx-auto leading-relaxed reveal" style="transition-delay: 0.1s">
-                Giải pháp CRM nội bộ giúp tối ưu hóa quy trình làm việc, <br class="hidden md:block">
-                mang lại cái nhìn toàn diện về hoạt động kinh doanh.
+            <p class="text-sm md:text-base text-slate-500 leading-relaxed max-w-lg font-medium">
+                Hệ thống quản trị khách hàng, đánh giá Leads và phân tích hiệu suất kinh doanh của HELUKABEL.
             </p>
-            
-            <div class="flex items-center justify-center gap-6 reveal" style="transition-delay: 0.2s">
-                <a th:href="@{/login}" class="text-[14px] font-bold text-helu-red hover:underline flex items-center gap-2 group p-2 rounded-lg hover:bg-red-50 transition-all">
+            <div class="pt-2">
+                <a th:href="@{/login}" id="magnetic-btn" class="inline-flex items-center gap-2.5 px-7 py-3.5 bg-helu-red text-white text-sm font-bold rounded-xl shadow-lg shadow-red-200 hover:bg-red-700 transition-all duration-200 active:scale-95 ease-out">
                     Bắt đầu làm việc
-                    <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
             </div>
         </div>
-    </section>
 
-    <!-- [3] PRODUCT PREVIEW - Slideshow -->
-    <section id="preview" class="pb-32 px-8 reveal" style="transition-delay: 0.3s">
-        <div class="max-w-5xl mx-auto">
-            <div class="relative bg-white rounded-3xl p-2 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-slate-100 overflow-hidden group">
-                <div class="relative rounded-2xl overflow-hidden aspect-[16/10] md:aspect-[21/11]">
-                    <img th:src="@{/images/index1.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-100 transition-opacity duration-700" alt="Dashboard 1">
-                    <img th:src="@{/images/index2.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-0 transition-opacity duration-700" alt="Dashboard 2">
-                    <img th:src="@{/images/index3.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-0 transition-opacity duration-700" alt="Dashboard 3">
-                    <img th:src="@{/images/index4.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-0 transition-opacity duration-700" alt="Dashboard 4">
+        <!-- Right Side: Simple Slideshow Showcase -->
+        <div class="w-full lg:w-7/12 flex items-center justify-center overflow-hidden max-h-[70vh]">
+            <div id="slideshow-container" class="relative w-full bg-white rounded-2xl p-1 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-slate-100/80 overflow-hidden group transition-all duration-300 ease-out" style="transform-style: preserve-3d; transform: perspective(1000px) rotateX(0deg) rotateY(0deg);">
+                <div class="relative rounded-xl overflow-hidden aspect-[16/10] md:aspect-[21/13] pointer-events-none">
+                    <img th:src="@{/images/index1.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-100 scale-100 translate-x-0 transition-all duration-700 ease-out" alt="Dashboard View 1">
+                    <img th:src="@{/images/index2.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-0 scale-95 translate-x-8 transition-all duration-700 ease-out" alt="Dashboard View 2">
+                    <img th:src="@{/images/index3.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-0 scale-95 translate-x-8 transition-all duration-700 ease-out" alt="Dashboard View 3">
+                    <img th:src="@{/images/index4.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-0 scale-95 translate-x-8 transition-all duration-700 ease-out" alt="Dashboard View 4">
                 </div>
                 
-                <!-- Dots Navigation -->
-                <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button class="w-2.5 h-2.5 rounded-full bg-white/40 hover:bg-white transition-all dot bg-white ring-4 ring-black/5"></button>
-                    <button class="w-2.5 h-2.5 rounded-full bg-white/20 hover:bg-white transition-all dot ring-4 ring-black/5"></button>
-                    <button class="w-2.5 h-2.5 rounded-full bg-white/20 hover:bg-white transition-all dot ring-4 ring-black/5"></button>
-                    <button class="w-2.5 h-2.5 rounded-full bg-white/20 hover:bg-white transition-all dot ring-4 ring-black/5"></button>
+                <!-- Navigation Dots -->
+                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button class="w-2 h-2 rounded-full bg-white/40 hover:bg-white transition-all dot bg-white ring-2 ring-black/5"></button>
+                    <button class="w-2 h-2 rounded-full bg-white/20 hover:bg-white transition-all dot ring-2 ring-black/5"></button>
+                    <button class="w-2 h-2 rounded-full bg-white/20 hover:bg-white transition-all dot ring-2 ring-black/5"></button>
+                    <button class="w-2 h-2 rounded-full bg-white/20 hover:bg-white transition-all dot ring-2 ring-black/5"></button>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- [4] FEATURES - Minimalist -->
-    <section id="features" class="py-32 bg-slate-50/50 border-y border-slate-50">
-        <div class="max-w-6xl mx-auto px-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
-                <!-- Feature 1 -->
-                <div class="feature-card p-8 rounded-3xl border border-transparent space-y-4 reveal">
-                    <div class="text-slate-400 icon-box transition-all duration-300"><i data-lucide="layers" class="w-6 h-6"></i></div>
-                    <h4 class="text-sm font-bold text-slate-900 uppercase tracking-widest">Dữ liệu tập trung</h4>
-                    <p class="text-[14px] leading-relaxed text-slate-500">Mọi thông tin khách hàng được tổ chức khoa học, dễ dàng truy xuất và quản lý trong một nền tảng duy nhất.</p>
-                </div>
+    </main>
 
-                <!-- Feature 2 -->
-                <div class="feature-card p-8 rounded-3xl border border-transparent space-y-4 reveal" style="transition-delay: 0.1s">
-                    <div class="text-slate-400 icon-box transition-all duration-300"><i data-lucide="bar-chart-2" class="w-6 h-6"></i></div>
-                    <h4 class="text-sm font-bold text-slate-900 uppercase tracking-widest">Chỉ số trực quan</h4>
-                    <p class="text-[14px] leading-relaxed text-slate-500">Theo dõi tiến độ doanh thu và hiệu suất làm việc thông qua hệ thống biểu đồ thời gian thực tinh gọn.</p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="feature-card p-8 rounded-3xl border border-transparent space-y-4 reveal" style="transition-delay: 0.2s">
-                    <div class="text-slate-400 icon-box transition-all duration-300"><i data-lucide="shield" class="w-6 h-6"></i></div>
-                    <h4 class="text-sm font-bold text-slate-900 uppercase tracking-widest">Bảo mật & Phân quyền</h4>
-                    <p class="text-[14px] leading-relaxed text-slate-500">Đảm bảo an toàn dữ liệu với cơ chế phân quyền chi tiết cho từng vai trò trong hệ thống kinh doanh.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- [5] SUBTLE CTA -->
-    <section class="py-40 text-center px-8 reveal">
-        <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Nâng cao hiệu suất ngay hôm nay.</h2>
-        <a th:href="@{/login}" class="inline-flex items-center justify-center px-10 py-4 bg-helu-red text-white text-[14px] font-bold rounded-full shadow-lg shadow-red-100 hover:scale-105 hover:shadow-red-300 transition-all active:scale-95">
-            Truy cập CRM ngay bây giờ
-        </a>
-    </section>
-
-    <!-- [6] FOOTER - Ultra Minimal -->
-    <footer class="py-12 border-t border-slate-100">
-        <div class="max-w-6xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-            <img th:src="@{/images/helu-logo.png}" alt="Logo" class="h-3 w-auto grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer">
-            <div class="flex gap-8 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-                <span>&copy; 2026 HELUKABEL VIETNAM</span>
+    <!-- FOOTER (Ultra Compact) -->
+    <footer class="w-full bg-white border-t border-slate-100 py-4 flex-none z-20 relative">
+        <div class="max-w-7xl mx-auto px-8 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            <span>&copy; 2026 HELUKABEL VIETNAM</span>
+            <div class="flex gap-6">
                 <a href="#" class="hover:text-helu-red transition-colors">Bảo mật</a>
                 <a href="#" class="hover:text-helu-red transition-colors">Hỗ trợ</a>
             </div>
@@ -176,50 +116,165 @@
     <script>
         lucide.createIcons();
 
-        // Scroll Reveal Logic
-        const reveal = () => {
-            const reveals = document.querySelectorAll('.reveal');
-            reveals.forEach(el => {
-                const windowHeight = window.innerHeight;
-                const elementTop = el.getBoundingClientRect().top;
-                const elementVisible = 100;
-                if (elementTop < windowHeight - elementVisible) {
-                    el.classList.add('active');
-                }
-            });
-        };
-        window.addEventListener('scroll', reveal);
-        reveal(); // Initial check
+        // Mouse coordinates for tracking
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let glowX = mouseX;
+        let glowY = mouseY;
+        let isMouseActive = false;
 
-        // Navbar Scroll Effect
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('mainNav');
-            if (window.scrollY > 50) {
-                nav.classList.add('bg-white/80', 'shadow-sm', 'border-slate-100');
-            } else {
-                nav.classList.remove('bg-white/80', 'shadow-sm', 'border-slate-100');
-            }
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            isMouseActive = true;
         });
 
-        // Slideshow Logic
+        window.addEventListener('mouseleave', () => {
+            isMouseActive = false;
+        });
+
+        // 1. Inertia Glow Background Effect
+        function updateGlowPosition() {
+            // Smooth LERP (inertia drag)
+            glowX += (mouseX - glowX) * 0.08;
+            glowY += (mouseY - glowY) * 0.08;
+            
+            const glow = document.getElementById('glow-bg');
+            if (glow) {
+                glow.style.setProperty('--mouse-x', `${glowX}px`);
+                glow.style.setProperty('--mouse-y', `${glowY}px`);
+            }
+            requestAnimationFrame(updateGlowPosition);
+        }
+        updateGlowPosition();
+
+        // 2. Interactive Constellation Particle Canvas
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Create particles
+        const particles = [];
+        const particleCount = 45;
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                radius: Math.random() * 2 + 1.2,
+                originalVx: 0,
+                originalVy: 0
+            });
+            particles[i].originalVx = particles[i].vx;
+            particles[i].originalVy = particles[i].vy;
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw connections
+            for (let i = 0; i < particles.length; i++) {
+                const p1 = particles[i];
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 130) {
+                        const alpha = (1 - dist / 130) * 0.15;
+                        ctx.strokeStyle = `rgba(148, 163, 184, ${alpha})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Update & Draw particles
+            particles.forEach(p => {
+                // Update position
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Mouse interaction: push away/repel
+                if (isMouseActive) {
+                    const dx = p.x - mouseX;
+                    const dy = p.y - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const repelRadius = 140;
+
+                    if (dist < repelRadius) {
+                        const force = (repelRadius - dist) / repelRadius;
+                        const angle = Math.atan2(dy, dx);
+                        
+                        // Push away from mouse
+                        p.x += Math.cos(angle) * force * 3.5;
+                        p.y += Math.sin(angle) * force * 3.5;
+                    }
+                }
+
+                // Smoothly return velocity to normal
+                p.vx += (p.originalVx - p.vx) * 0.05;
+                p.vy += (p.originalVy - p.vy) * 0.05;
+
+                // Boundary collision
+                if (p.x < 0 || p.x > canvas.width) {
+                    p.vx = -p.vx;
+                    p.originalVx = -p.originalVx;
+                }
+                if (p.y < 0 || p.y > canvas.height) {
+                    p.vy = -p.vy;
+                    p.originalVy = -p.originalVy;
+                }
+
+                // Draw particle
+                ctx.fillStyle = 'rgba(148, 163, 184, 0.35)';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // 3. Slideshow Logic
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
         const dots = document.querySelectorAll('.dot');
         let slideInterval;
 
         function showSlide(n) {
-            // Remove active states
             slides.forEach(slide => {
                 slide.classList.replace('opacity-100', 'opacity-0');
+                slide.classList.replace('scale-100', 'scale-95');
+                slide.classList.remove('translate-x-0');
+                slide.classList.add('translate-x-8');
             });
             dots.forEach(dot => {
                 dot.classList.remove('bg-white');
                 dot.classList.add('bg-white/20');
             });
 
-            // Set new active state
             currentSlide = (n + slides.length) % slides.length;
-            slides[currentSlide].classList.replace('opacity-0', 'opacity-100');
+            
+            const activeSlide = slides[currentSlide];
+            activeSlide.classList.replace('opacity-0', 'opacity-100');
+            activeSlide.classList.replace('scale-95', 'scale-100');
+            activeSlide.classList.remove('translate-x-8');
+            activeSlide.classList.add('translate-x-0');
+
             dots[currentSlide].classList.add('bg-white');
             dots[currentSlide].classList.remove('bg-white/20');
         }
@@ -227,7 +282,7 @@
         function startSlideshow() {
             slideInterval = setInterval(() => {
                 showSlide(currentSlide + 1);
-            }, 3000);
+            }, 3500);
         }
 
         function resetSlideshow() {
@@ -243,8 +298,61 @@
         });
 
         startSlideshow();
+
+        // 4. 3D Tilt Effect on Slideshow Container
+        const tiltContainer = document.getElementById('slideshow-container');
+        if (tiltContainer) {
+            tiltContainer.addEventListener('mousemove', (e) => {
+                const rect = tiltContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const maxRotateX = 5;
+                const maxRotateY = 5;
+                
+                const rotateX = ((centerY - y) / centerY) * maxRotateX;
+                const rotateY = ((x - centerX) / centerX) * maxRotateY;
+                
+                tiltContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.025)`;
+            });
+            
+            tiltContainer.addEventListener('mouseleave', () => {
+                tiltContainer.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+            });
+        }
+
+        // 5. Magnetic Button Effect (Attracts 'Bắt đầu làm việc' to cursor)
+        const magneticBtn = document.getElementById('magnetic-btn');
+        if (magneticBtn) {
+            document.addEventListener('mousemove', (e) => {
+                const rect = magneticBtn.getBoundingClientRect();
+                const btnX = rect.left + rect.width / 2;
+                const btnY = rect.top + rect.height / 2;
+                
+                const dx = e.clientX - btnX;
+                const dy = e.clientY - btnY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const activeRadius = 90; // Pull starts within 90px
+
+                if (dist < activeRadius) {
+                    // Pull intensity increases as cursor gets closer (max pull: 12px)
+                    const pullFactor = (activeRadius - dist) / activeRadius;
+                    const pullX = (dx / dist) * pullFactor * 12;
+                    const pullY = (dy / dist) * pullFactor * 12;
+                    
+                    magneticBtn.style.transform = `translate(${pullX}px, ${pullY}px) scale(1.02)`;
+                } else {
+                    magneticBtn.style.transform = 'translate(0px, 0px) scale(1)';
+                }
+            });
+
+            magneticBtn.addEventListener('mouseleave', () => {
+                magneticBtn.style.transform = 'translate(0px, 0px) scale(1)';
+            });
+        }
     </script>
-</body>
-</html>
 </body>
 </html>

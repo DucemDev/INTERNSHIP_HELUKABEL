@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
+<body>
+    <main class="space-y-8 pb-12">
+        <style>
+            /* Bulletproof Green/Red Switch Styling */
+            .toggle-switch {
+                background-color: #ef4444 !important; /* Red 500 (OFF) */
+                transition: background-color 0.25s ease-in-out;
+                position: relative;
+            }
+            .toggle-checkbox:checked + .toggle-switch {
+                background-color: #10b981 !important; /* Emerald 500 (ON) */
+            }
+            .toggle-switch::after {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                background-color: #ffffff;
+                border-radius: 9999px;
+                height: 20px;
+                width: 20px;
+                transition: transform 0.25s ease-in-out;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            .toggle-checkbox:checked + .toggle-switch::after {
+                transform: translateX(20px);
+            }
+        </style>
+
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Cấu hình Hệ thống</h1>
+            <p class="mt-1 text-sm font-medium text-gray-500">Bật/tắt để ẩn hoặc hiện các thành phần/biểu đồ trên toàn bộ trang Dashboard.</p>
+        </div>
+
+        <div class="max-w-4xl space-y-8">
+            <!-- PAGE 1: OVERVIEW DASHBOARD -->
+            <div class="rounded-3xl border border-white/60 bg-white/80 backdrop-blur-xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-6">
+                <h2 class="text-lg font-black text-gray-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 text-emerald-500"></i>
+                    Trang Tổng Quan (Overview Dashboard)
+                </h2>
+                <div class="divide-y divide-slate-100">
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Cơ cấu Trạng thái Leads (Phễu)</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ hình phễu hiển thị trạng thái Leads.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleFunnel" class="sr-only toggle-checkbox" checked onchange="saveSetting('funnel', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Hiệu suất Phân khúc</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ ma trận bong bóng Hiệu suất Phân khúc.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSegment" class="sr-only toggle-checkbox" checked onchange="saveSetting('segment', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Lợi nhuận theo Nguồn Lead</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ cột biểu thị Lợi nhuận theo Nguồn Lead.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleProfitability" class="sr-only toggle-checkbox" checked onchange="saveSetting('profitability', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Hiệu quả Nguồn Lead</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ cột biểu thị Hiệu quả Nguồn Lead.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleEfficiency" class="sr-only toggle-checkbox" checked onchange="saveSetting('efficiency', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Top 10 Khách hàng theo Doanh thu</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ thanh ngang Top 10 Khách hàng theo Doanh thu.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleTopAccounts" class="sr-only toggle-checkbox" checked onchange="saveSetting('topAccounts', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Tổng quan theo Nhân viên KD (Sales Owner Summary)</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện các thẻ tóm tắt số liệu theo Quý của nhân viên kinh doanh.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSalesOwnerSummary" class="sr-only toggle-checkbox" onchange="saveSetting('salesOwnerSummary_v2', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">So sánh Win Rate theo Nhân viên KD</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ so sánh Win Rate giữa các Quý của nhân viên KD.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSalesWinRate" class="sr-only toggle-checkbox" onchange="saveSetting('salesWinRate_v2', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">So sánh Target theo Nhân viên KD</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ so sánh Target/Open Pipeline giữa các Quý của nhân viên KD.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSalesTarget" class="sr-only toggle-checkbox" onchange="saveSetting('salesTarget_v2', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 2: CUSTOMER ANALYSIS -->
+            <div class="rounded-3xl border border-white/60 bg-white/80 backdrop-blur-xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-6">
+                <h2 class="text-lg font-black text-gray-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <i data-lucide="pie-chart" class="w-5 h-5 text-emerald-500"></i>
+                    Trang Phân Tích Khách Hàng (Customer Analysis)
+                </h2>
+                <div class="divide-y divide-slate-100">
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Doanh thu & Leads theo Ngành nghề (Unified Mixed Chart)</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ hỗn hợp thể hiện doanh thu và leads.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleCustomerUnified" class="sr-only toggle-checkbox" onchange="saveSetting('customer_unified_mixed_v2', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Customer Value Matrix</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện ma trận phân tích giá trị của khách hàng.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleCustomerValueMatrix" class="sr-only toggle-checkbox" onchange="saveSetting('customer_value_matrix_v2', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Market Segment Performance Matrix</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện ma trận bong bóng hiệu suất phân khúc thị trường.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleCustomerSegmentMatrix" class="sr-only toggle-checkbox" checked onchange="saveSetting('customer_segment_matrix', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Top 10 Khách hàng theo Doanh thu</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ cột ngang top 10 khách hàng lớn nhất.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleCustomerTopAccounts" class="sr-only toggle-checkbox" checked onchange="saveSetting('customer_top_accounts', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 3: LEAD SOURCE ANALYSIS -->
+            <div class="rounded-3xl border border-white/60 bg-white/80 backdrop-blur-xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-6">
+                <h2 class="text-lg font-black text-gray-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-emerald-500"></i>
+                    Trang Phân Tích Nguồn Lead (Lead Source Analysis)
+                </h2>
+                <div class="divide-y divide-slate-100">
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Total Leads & Win Rate by Source</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ xu hướng/cột về Leads & tỷ lệ thắng theo nguồn.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSourceLeadsCr" class="sr-only toggle-checkbox" checked onchange="saveSetting('source_leads_cr', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Avg Cost per Lead vs Avg Revenue per Won</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ so sánh chi phí trung bình và doanh thu trung bình.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSourceAvgCost" class="sr-only toggle-checkbox" checked onchange="saveSetting('source_avg_cost_rev', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">ROI by Source</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ phân tích ROI của các nguồn Leads.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSourceRoi" class="sr-only toggle-checkbox" checked onchange="saveSetting('source_roi', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Lead Funnel by Source</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện phễu chuyển đổi nguồn leads.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSourceFunnel" class="sr-only toggle-checkbox" checked onchange="saveSetting('source_funnel', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Lead Source by Product Line</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ nguồn leads theo dòng sản phẩm.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSourceProductLine" class="sr-only toggle-checkbox" checked onchange="saveSetting('source_product_line', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 4: SALES PERFORMANCE -->
+            <div class="rounded-3xl border border-white/60 bg-white/80 backdrop-blur-xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-6">
+                <h2 class="text-lg font-black text-gray-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                    <i data-lucide="line-chart" class="w-5 h-5 text-emerald-500"></i>
+                    Trang Hiệu Suất Nhân Viên (Sales Performance)
+                </h2>
+                <div class="divide-y divide-slate-100">
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Sales Owner Win Rate Performance</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ hiệu suất tỷ lệ thắng của nhân viên sales.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSalesWinRatePerf" class="sr-only toggle-checkbox" checked onchange="saveSetting('sales_winrate_perf', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Average Sales Cycle by Sales Owner</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ chu kỳ bán hàng trung bình của từng nhân viên.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSalesAvgCycle" class="sr-only toggle-checkbox" checked onchange="saveSetting('sales_avg_cycle', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Top Loss Reasons by Product Line</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ nguyên nhân thất bại của các dòng sản phẩm.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSalesLossReasons" class="sr-only toggle-checkbox" checked onchange="saveSetting('sales_loss_reasons', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between py-4">
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Workload vs Result Matrix</h4>
+                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ ma trận bong bóng khối lượng công việc và hiệu quả.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="toggleSalesWorkload" class="sr-only toggle-checkbox" checked onchange="saveSetting('sales_workload', this.checked)">
+                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // All toggle settings keys mapping to element IDs in this page
+            const configSettings = [
+                // Overview
+                { key: 'funnel', id: 'toggleFunnel' },
+                { key: 'segment', id: 'toggleSegment' },
+                { key: 'profitability', id: 'toggleProfitability' },
+                { key: 'efficiency', id: 'toggleEfficiency' },
+                { key: 'topAccounts', id: 'toggleTopAccounts' },
+                { key: 'salesOwnerSummary_v2', id: 'toggleSalesOwnerSummary' },
+                { key: 'salesWinRate_v2', id: 'toggleSalesWinRate' },
+                { key: 'salesTarget_v2', id: 'toggleSalesTarget' },
+                // Customer Analysis
+                { key: 'customer_unified_mixed_v2', id: 'toggleCustomerUnified' },
+                { key: 'customer_value_matrix_v2', id: 'toggleCustomerValueMatrix' },
+                { key: 'customer_segment_matrix', id: 'toggleCustomerSegmentMatrix' },
+                { key: 'customer_top_accounts', id: 'toggleCustomerTopAccounts' },
+                // Lead Source Analysis
+                { key: 'source_leads_cr', id: 'toggleSourceLeadsCr' },
+                { key: 'source_avg_cost_rev', id: 'toggleSourceAvgCost' },
+                { key: 'source_roi', id: 'toggleSourceRoi' },
+                { key: 'source_funnel', id: 'toggleSourceFunnel' },
+                { key: 'source_product_line', id: 'toggleSourceProductLine' },
+                // Sales Performance
+                { key: 'sales_winrate_perf', id: 'toggleSalesWinRatePerf' },
+                { key: 'sales_avg_cycle', id: 'toggleSalesAvgCycle' },
+                { key: 'sales_loss_reasons', id: 'toggleSalesLossReasons' },
+                { key: 'sales_workload', id: 'toggleSalesWorkload' }
+            ];
+            
+            const defaultHiddenKeys = ['customer_value_matrix_v2', 'customer_unified_mixed_v2', 'salesOwnerSummary_v2', 'salesWinRate_v2', 'salesTarget_v2'];
+
+            function loadSettings() {
+                configSettings.forEach(item => {
+                    const storedVal = localStorage.getItem('dashboard_show_' + item.key);
+                    const checkbox = document.getElementById(item.id);
+                    if (checkbox) {
+                        if (defaultHiddenKeys.includes(item.key)) {
+                            checkbox.checked = storedVal === 'true';
+                        } else {
+                            checkbox.checked = storedVal !== 'false';
+                        }
+                    }
+                });
+            }
+
+            function saveSetting(key, isChecked) {
+                localStorage.setItem('dashboard_show_' + key, isChecked);
+            }
+
+            document.addEventListener('DOMContentLoaded', loadSettings);
+        </script>
+    </main>
+</body>
+</html>

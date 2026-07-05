@@ -23,4 +23,5 @@ public interface LeadStatusHistoryRepo extends JpaRepository<LeadStatusHistoryEn
           AND won_stage.new_status = 'Won'
         """, nativeQuery = true)
     Double getAverageDaysToWon();
+
 }
