@@ -25,13 +25,21 @@
     <!-- Icons (Lucide) -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        #glow-bg {
+            background: radial-gradient(circle 350px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(246, 23, 27, 0.12), rgba(30, 41, 59, 0.04) 70%, transparent 100%);
+            will-change: transform;
+        }
+    </style>
 </head>
 <body class="font-['Inter'] antialiased flex items-center justify-center min-h-screen p-6 relative overflow-hidden">
+<canvas id="particle-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+<div id="glow-bg" class="fixed inset-0 pointer-events-none z-10 opacity-70"></div>
 <!-- Glowing Glassmorphism Background Orbs -->
 <div class="bg-glow-orb w-[500px] h-[500px] bg-red-200/30 -top-40 -left-40"></div>
 <div class="bg-glow-orb w-[600px] h-[600px] bg-blue-200/20 -bottom-40 -right-40" style="animation-duration: 25s; animation-direction: reverse;"></div>
 
-<div class="relative w-full max-w-xl z-10">
+<div class="relative w-full max-w-xl z-20">
     <div class="glass-panel rounded-[2.5rem] px-10 py-6 border border-white/60 shadow-[0_20px_50px_rgba(31,38,135,0.04)] overflow-hidden">
         <!-- Branding -->
         <div class="text-center mb-6">
@@ -118,6 +126,128 @@
 
 <script>
     lucide.createIcons();
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let glowX = mouseX;
+    let glowY = mouseY;
+    let isMouseActive = false;
+
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        isMouseActive = true;
+    });
+
+    window.addEventListener('mouseleave', () => {
+        isMouseActive = false;
+    });
+
+    function updateGlowPosition() {
+        glowX += (mouseX - glowX) * 0.08;
+        glowY += (mouseY - glowY) * 0.08;
+
+        const glow = document.getElementById('glow-bg');
+        if (glow) {
+            glow.style.setProperty('--mouse-x', `${glowX}px`);
+            glow.style.setProperty('--mouse-y', `${glowY}px`);
+        }
+
+        requestAnimationFrame(updateGlowPosition);
+    }
+
+    updateGlowPosition();
+
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const particles = [];
+    const particleCount = 45;
+
+    for (let i = 0; i < particleCount; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            radius: Math.random() * 2 + 1.2,
+            originalVx: 0,
+            originalVy: 0
+        });
+        particles[i].originalVx = particles[i].vx;
+        particles[i].originalVy = particles[i].vy;
+    }
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < particles.length; i++) {
+            const p1 = particles[i];
+            for (let j = i + 1; j < particles.length; j++) {
+                const p2 = particles[j];
+                const dx = p1.x - p2.x;
+                const dy = p1.y - p2.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 130) {
+                    const alpha = (1 - dist / 130) * 0.15;
+                    ctx.strokeStyle = `rgba(148, 163, 184, ${alpha})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if (isMouseActive) {
+                const dx = p.x - mouseX;
+                const dy = p.y - mouseY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const repelRadius = 140;
+
+                if (dist < repelRadius) {
+                    const force = (repelRadius - dist) / repelRadius;
+                    const angle = Math.atan2(dy, dx);
+                    p.x += Math.cos(angle) * force * 3.5;
+                    p.y += Math.sin(angle) * force * 3.5;
+                }
+            }
+
+            p.vx += (p.originalVx - p.vx) * 0.05;
+            p.vy += (p.originalVy - p.vy) * 0.05;
+
+            if (p.x < 0 || p.x > canvas.width) {
+                p.vx = -p.vx;
+                p.originalVx = -p.originalVx;
+            }
+            if (p.y < 0 || p.y > canvas.height) {
+                p.vy = -p.vy;
+                p.originalVy = -p.originalVy;
+            }
+
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.35)';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
     function fillCredentials(btn) {
         const container = btn.closest('.test-account');
         const username = container.dataset.username;

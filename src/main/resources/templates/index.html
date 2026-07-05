@@ -82,8 +82,8 @@
 
         <!-- Right Side: Simple Slideshow Showcase -->
         <div class="w-full lg:w-7/12 flex items-center justify-center overflow-hidden max-h-[70vh]">
-            <div id="slideshow-container" class="relative w-full bg-white rounded-2xl p-1 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-slate-100/80 overflow-hidden group transition-all duration-300 ease-out" style="transform-style: preserve-3d; transform: perspective(1000px) rotateX(0deg) rotateY(0deg);">
-                <div class="relative rounded-xl overflow-hidden aspect-[16/10] md:aspect-[21/13] pointer-events-none">
+            <div id="slideshow-container" class="relative w-full bg-white rounded-none p-1 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-slate-100/80 overflow-hidden group transition-all duration-300 ease-out" style="transform-style: preserve-3d; transform: perspective(1000px) rotateX(0deg) rotateY(0deg); border-radius: 0;">
+                <div class="slideshow-clip relative rounded-none aspect-[16/10] md:aspect-[21/13] pointer-events-none" style="border-radius: 0;">
                     <img th:src="@{/images/index1.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-100 scale-100 translate-x-0 transition-all duration-700 ease-out" alt="Dashboard View 1">
                     <img th:src="@{/images/index2.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-0 scale-95 translate-x-8 transition-all duration-700 ease-out" alt="Dashboard View 2">
                     <img th:src="@{/images/index3.png}" class="absolute inset-0 w-full h-full object-cover object-top slide opacity-0 scale-95 translate-x-8 transition-all duration-700 ease-out" alt="Dashboard View 3">
