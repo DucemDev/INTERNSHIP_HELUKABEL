@@ -29,24 +29,17 @@
             r: 5.5px;
         }
 
-        /* KPI Card gradient bars */
+        /* KPI Card styles matching Lead Source Analysis style */
         main .kpi-card {
             position: relative;
             overflow: hidden;
-            transition: none !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
         main .kpi-card:hover {
-            transform: none !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
-            background-color: #ffffff !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' preserveAspectRatio='none'%3E%3Cpath d='M0,25 C20,20 40,28 60,15 C80,2 100,10 120,5 L120,30 L0,30 Z' fill='rgba(59, 130, 246, 0.04)'/%3E%3C/svg%3E") !important;
-            border: 1px solid rgba(226, 232, 240, 0.9) !important;
-        }
-        .kpi-card .accent-bar {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-            border-radius: 0 0 999px 999px;
+            transform: translateY(-4px) !important;
+            box-shadow: 0 12px 22px rgba(0, 0, 0, 0.06) !important;
         }
 
         /* Matrix bubble hover */
@@ -84,150 +77,192 @@
         <!-- Dòng 1: 7 thẻ -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
             <!-- Total Leads -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-blue-500 to-blue-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-blue-50 text-blue-600 p-2 rounded-xl"><i data-lucide="users" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.total_leads}">Total Leads</h3>
                 </div>
-                <div id="kpiTotalLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiTotalLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #3b82f6); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Qualified Leads -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-purple-500 to-purple-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-purple-50 text-purple-600 p-2 rounded-xl"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.qualified_leads}">Qualified</h3>
                 </div>
-                <div id="kpiQualifiedLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiQualifiedLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #8b5cf6); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- New Leads -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-cyan-500 to-cyan-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-cyan-50 text-cyan-600 p-2 rounded-xl"><i data-lucide="user-plus" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.new_leads}">New Leads</h3>
                 </div>
-                <div id="kpiNewLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiNewLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #06b6d4); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Won Leads -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-emerald-50 text-emerald-600 p-2 rounded-xl"><i data-lucide="check-square" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.won_leads}">Won Leads</h3>
                 </div>
-                <div id="kpiWonLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiWonLeads" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #10b981); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Conversion Rate -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-emerald-50 text-emerald-600 p-2 rounded-xl"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.conversion_rate}">Conversion Rate</h3>
                 </div>
-                <div id="kpiConversionRate" class="text-2xl font-black text-slate-800 animate-counter">0%</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiConversionRate" class="text-2xl font-black text-slate-800 animate-counter">0%</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #059669); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Revenue Won -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-amber-500 to-amber-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-amber-50 text-amber-600 p-2 rounded-xl"><i data-lucide="banknote" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.revenue_won}">Revenue Won</h3>
                 </div>
-                <div id="kpiRevenueWon" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiRevenueWon" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f59e0b); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Pipeline Value -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-indigo-500 to-indigo-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-indigo-50 text-indigo-600 p-2 rounded-xl"><i data-lucide="git-branch" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.pipeline_value}">Pipeline Value</h3>
                 </div>
-                <div id="kpiPipelineValue" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiPipelineValue" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #6366f1); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
         </div>
         <!-- Dòng 2: 7 thẻ -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4 -mt-4">
             <!-- Total Cost -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-rose-500 to-rose-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-rose-50 text-rose-600 p-2 rounded-xl"><i data-lucide="wallet" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.total_cost}">Total Cost</h3>
                 </div>
-                <div id="kpiTotalCost" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiTotalCost" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f43f5e); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- CPL -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-orange-500 to-orange-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-orange-50 text-orange-600 p-2 rounded-xl"><i data-lucide="calculator" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.cpl}">CPL</h3>
                 </div>
-                <div id="kpiCPL" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiCPL" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f97316); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Cost per Won Deal -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-rose-400 to-rose-500"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-rose-50 text-rose-600 p-2 rounded-xl"><i data-lucide="credit-card" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.cost_per_won_deal}">Cost / Won Deal</h3>
                 </div>
-                <div id="kpiCostPerWon" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiCostPerWon" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #fb7185); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Win Rate -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-teal-500 to-teal-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-teal-50 text-teal-600 p-2 rounded-xl"><i data-lucide="trophy" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.win_rate}">Win Rate</h3>
                 </div>
-                <div id="kpiWinRate" class="text-2xl font-black text-slate-800 animate-counter">0%</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiWinRate" class="text-2xl font-black text-slate-800 animate-counter">0%</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #14b8a6); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Avg Sales Cycle -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-violet-500 to-violet-600"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-violet-50 text-violet-600 p-2 rounded-xl"><i data-lucide="clock" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.avg_sales_cycle}">Avg Sales Cycle</h3>
                 </div>
-                <div class="flex items-baseline gap-1">
-                    <div id="kpiAvgSalesCycle" class="text-2xl font-black text-slate-800 animate-counter">0</div>
-                    <span class="text-xs font-bold text-slate-400" th:text="#{dashboard.days}">ngày</span>
+                <div class="relative z-10">
+                    <div class="flex items-baseline gap-1">
+                        <div id="kpiAvgSalesCycle" class="text-2xl font-black text-slate-800 animate-counter">0</div>
+                        <span class="text-xs font-bold text-slate-400" th:text="#{dashboard.days}">ngày</span>
+                    </div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
                 </div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #8b5cf6); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Top Industry -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-amber-400 to-amber-500"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-amber-50 text-amber-600 p-2 rounded-xl"><i data-lucide="building" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.top_industry}">Top Industry</h3>
                 </div>
-                <div id="kpiTopIndustry" class="text-lg font-black text-slate-800 animate-counter truncate" style="max-width: 100%;">N/A</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiTopIndustry" class="text-lg font-black text-slate-800 animate-counter truncate" style="max-width: 100%;">N/A</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f59e0b); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
             <!-- Top Region -->
-            <div class="kpi-card bg-white p-7 rounded-2xl shadow-sm border border-slate-100">
-                <div class="accent-bar bg-gradient-to-r from-blue-400 to-blue-500"></div>
-                <div class="flex items-center gap-2.5 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2.5 mb-3 mt-1 relative z-10">
                     <div class="bg-blue-50 text-blue-600 p-2 rounded-xl"><i data-lucide="map-pin" class="w-4 h-4"></i></div>
                     <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="#{dashboard.top_region}">Top Region</h3>
                 </div>
-                <div id="kpiTopRegion" class="text-2xl font-black text-slate-800 animate-counter">N/A</div>
-                <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                <div class="relative z-10">
+                    <div id="kpiTopRegion" class="text-2xl font-black text-slate-800 animate-counter">N/A</div>
+                    <div class="text-slate-400 mt-1 flex items-baseline gap-1 invisible" style="font-size: 0.78rem !important;">&nbsp;</div>
+                </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[45px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #60a5fa); clip-path: path('M0,25 Q20,10 40,25 T80,25 T120,25 T160,25 T200,25 T240,25 T280,25 L280,50 L0,50 Z');"></div>
             </div>
         </div>
 
@@ -524,15 +559,9 @@
             };
             const fmtShortNum = (v) => {
                 const absV = Math.abs(v);
-                if (locale === 'vi') {
-                    if (absV >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + ' Tỷ';
-                    if (absV >= 1e6) return (v / 1e6).toFixed(1).replace(/\.0$/, '') + ' Tr';
-                    return fmtNum(v);
-                } else {
-                    if (absV >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
-                    if (absV >= 1e6) return (v / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
-                    return fmtNum(v);
-                }
+                if (absV >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + ' tỷ';
+                if (absV >= 1e6) return (v / 1e6).toFixed(1).replace(/\.0$/, '') + ' triệu';
+                return fmtNum(v);
             };
             const fmtShortCurrency = (v) => fmtShortNum(v) + currency;
 
@@ -610,7 +639,7 @@
             // ==========================================
             async function loadKPIs() {
                 try {
-                    const [convRes, avgRes, revRes, pipeRes, costRes, statusRes, topIndRes, topRegRes] = await Promise.all([
+                    const [convRes, avgRes, revRes, pipeRes, costRes, statusRes, topIndRes, topRegRes, winRateRes, qualRes] = await Promise.all([
                         fetch(`${API_BASE}/conversion-rate`),
                         fetch(`${API_BASE}/average-days-to-won`),
                         fetch(`${API_BASE}/revenue-summary`),
@@ -618,7 +647,9 @@
                         fetch(`${API_BASE}/lead-source-cost`),
                         fetch(`${API_BASE}/lead-status`),
                         fetch(`${API_BASE}/best-industry-won-deal`),
-                        fetch(`${API_BASE}/best-region-won-deal`)
+                        fetch(`${API_BASE}/best-region-won-deal`),
+                        fetch(`${API_BASE}/win-rate`),
+                        fetch(`${API_BASE}/qualified-leads`)
                     ]);
 
                     const conv = await convRes.json();
@@ -629,15 +660,15 @@
                     const statusData = await statusRes.json();
                     const topInd = await topIndRes.json();
                     const topReg = await topRegRes.json();
+                    const winRateData = await winRateRes.json();
+                    const qualData = await qualRes.json();
 
                     // Total Leads
                     const totalLeads = conv.totalLead || 0;
                     document.getElementById('kpiTotalLeads').innerText = fmtNum(totalLeads);
 
-                    // Qualified Leads
-                    const qualifiedLeads = statusData
-                        .filter(s => s.status === 'Qualified')
-                        .reduce((sum, s) => sum + (s.total || 0), 0);
+                    // Qualified Leads (using API data)
+                    const qualifiedLeads = qualData.qualifiedLead || 0;
                     document.getElementById('kpiQualifiedLeads').innerText = fmtNum(qualifiedLeads);
 
                     // New Leads
@@ -664,11 +695,11 @@
                     const cpl = totalLeads > 0 ? totalCost / totalLeads : 0;
                     document.getElementById('kpiCPL').innerText = fmtCurrency(Math.round(cpl));
 
-                    // Win Rate & Won Leads
+                    // Win Rate & Won Leads (using API data)
                     const wonLeads = conv.wonLead || 0;
                     document.getElementById('kpiWonLeads').innerText = fmtNum(wonLeads);
                     
-                    const winRate = totalLeads > 0 ? ((wonLeads / totalLeads) * 100) : 0;
+                    const winRate = winRateData.winRate || 0;
                     document.getElementById('kpiWinRate').innerText = `${winRate.toFixed(1)}%`;
 
                     // Cost per Won Deal
@@ -695,20 +726,20 @@
             // ==========================================
             async function loadLeadStatusChart() {
                 try {
-                    const res = await fetch(`${API_BASE}/lead-status`);
+                    const res = await fetch(`${API_BASE}/funnel/business-result`);
                     const data = await res.json();
 
-                    const getCount = (statuses) => {
+                    const getValue = (statuses) => {
                         return data
                             .filter(item => statuses.includes(item.status))
-                            .reduce((sum, item) => sum + item.total, 0);
+                            .reduce((sum, item) => sum + (item.businessResult || 0), 0);
                     };
 
-                    const v1 = getCount(['New', 'Contacted']);
-                    const v2 = getCount(['Qualified']);
-                    const v3 = getCount(['Proposal Sent']);
-                    const v4 = getCount(['In Negotiation']);
-                    const v5 = getCount(['Won']);
+                    const v1 = getValue(['New', 'Contacted']);
+                    const v2 = getValue(['Qualified']);
+                    const v3 = getValue(['Proposal Sent']);
+                    const v4 = getValue(['In Negotiation']);
+                    const v5 = getValue(['Won']);
 
                     const values = [v1, v2, v3, v4, v5];
                     const totalActive = values.reduce((a, b) => a + b, 0);
@@ -868,11 +899,11 @@
                         if (h >= 35) {
                             svgHtml += `
                             <text x="280" y="${yMid - 3}" font-family="'Inter', sans-serif" font-size="13" font-weight="bold" fill="#1e293b">${stage.label}</text>
-                            <text x="280" y="${yMid + 13}" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#64748b">${val.toLocaleString()} Leads (${pct}%)</text>
+                            <text x="280" y="${yMid + 13}" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#64748b">${fmtCurrency(val)} (${pct}%)</text>
                             `;
                         } else {
                             svgHtml += `
-                            <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${val.toLocaleString()} (${pct}%)</tspan></text>
+                            <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${fmtCurrency(val)} (${pct}%)</tspan></text>
                             `;
                         }
                         svgHtml += `</g></a>`;
@@ -1261,6 +1292,8 @@
 
                     const labels = data.map(d => d.account || 'N/A');
                     const values = data.map(d => d.revenue || 0);
+                    const maxVal = Math.max(...values);
+                    const roundedMax = Math.ceil((maxVal + 10000000000) / 5000000000) * 5000000000;
 
                     // Gradient colors for bars
                     const colors = values.map((_, i) => {
@@ -1297,7 +1330,7 @@
                         scales: {
                             x: {
                                 beginAtZero: true,
-                                max: 20000000000,
+                                max: roundedMax,
                                 border: { display: false },
                                 grid: { color: '#f1f5f9' },
                                 ticks: { callback: v => fmtShortNum(v) }

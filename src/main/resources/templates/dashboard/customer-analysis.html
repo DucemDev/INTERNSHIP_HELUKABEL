@@ -7,24 +7,17 @@
                 backdrop-filter: none !important;
                 -webkit-backdrop-filter: none !important;
             }
-            /* KPI Card gradient bars */
+            /* KPI Card styles matching Lead Source Analysis style */
             .customer-analysis-container .kpi-card {
                 position: relative;
                 overflow: hidden;
-                transition: none !important;
+                border: none !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
             }
             .customer-analysis-container .kpi-card:hover {
-                transform: none !important;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
-                background-color: #ffffff !important;
-                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' preserveAspectRatio='none'%3E%3Cpath d='M0,25 C20,20 40,28 60,15 C80,2 100,10 120,5 L120,30 L0,30 Z' fill='rgba(59, 130, 246, 0.04)'/%3E%3C/svg%3E") !important;
-                border: 1px solid rgba(226, 232, 240, 0.9) !important;
-            }
-            .customer-analysis-container .kpi-card .accent-bar {
-                position: absolute;
-                top: 0; left: 0; right: 0;
-                height: 4px;
-                border-radius: 0 0 999px 999px;
+                transform: translateY(-4px) !important;
+                box-shadow: 0 12px 22px rgba(0, 0, 0, 0.06) !important;
             }
         </style>
         <div id="debug-error-log" class="text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-100 hidden"></div>
@@ -34,123 +27,132 @@
         <!-- HÀNG 1: KPI CARDS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- 1. Total Accounts -->
-            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
-                <div class="accent-bar bg-gradient-to-r from-blue-500 to-blue-600"></div>
-                <div class="flex items-center gap-2 mb-3 mt-1">
+            <!-- 1. Total Accounts -->
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 mt-1 relative z-10">
                     <div class="bg-blue-50 text-blue-600 p-1.5 rounded-lg">
                         <i data-lucide="building" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tổng số Khách hàng</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Tổng số Khách hàng' : 'Total Customers'}">Tổng số Khách hàng</h3>
                 </div>
-                <div>
+                <div class="relative z-10">
                     <h4 class="text-2xl font-black text-slate-800" id="totalAccountsVal">-</h4>
-                    <p class="text-slate-400 mt-1" style="font-size: 0.72rem !important; line-height: 1rem;">Tổng tài khoản</p>
+                    <p class="text-slate-400 mt-1" style="font-size: 0.72rem !important; line-height: 1rem;" th:text="${#locale.language == 'vi' ? 'Tổng tài khoản' : 'Total accounts'}">Tổng tài khoản</p>
                 </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #3b82f6); clip-path: path('M0,30 Q20,10 40,30 T80,30 T120,30 T160,30 T200,30 T240,30 T280,30 L280,60 L0,60 Z');"></div>
             </div>
 
             <!-- 2. Won Accounts -->
-            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
-                <div class="accent-bar bg-gradient-to-r from-emerald-400 to-emerald-500"></div>
-                <div class="flex items-center gap-2 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 mt-1 relative z-10">
                     <div class="bg-emerald-50 text-emerald-600 p-1.5 rounded-lg">
                         <i data-lucide="award" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Khách hàng chốt Won</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Khách hàng chốt Won' : 'Won Customers'}">Khách hàng chốt Won</h3>
                 </div>
-                <div>
+                <div class="relative z-10">
                     <h4 class="text-2xl font-black text-slate-800" id="wonAccountsVal">-</h4>
-                    <p class="text-slate-400 mt-1" style="font-size: 0.72rem !important; line-height: 1rem;">Thắng deal</p>
+                    <p class="text-slate-400 mt-1" style="font-size: 0.72rem !important; line-height: 1rem;" th:text="${#locale.language == 'vi' ? 'Thắng deal' : 'Won deals'}">Thắng deal</p>
                 </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #10b981); clip-path: path('M0,30 Q20,10 40,30 T80,30 T120,30 T160,30 T200,30 T240,30 T280,30 L280,60 L0,60 Z');"></div>
             </div>
 
             <!-- 3. Top accounts by Revenue -->
-            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
-                <div class="accent-bar bg-gradient-to-r from-amber-500 to-amber-600"></div>
-                <div class="flex items-center gap-2 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 mt-1 relative z-10">
                     <div class="bg-amber-50 text-amber-600 p-1.5 rounded-lg">
                         <i data-lucide="crown" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Khách hàng lớn nhất</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Khách hàng lớn nhất' : 'Top Customer'}">Khách hàng lớn nhất</h3>
                 </div>
-                <div>
+                <div class="relative z-10">
                     <h4 class="text-base font-black text-slate-800 truncate" id="topAccountName" title="-">-</h4>
                     <p class="text-amber-600 font-bold mt-0.5" id="topAccountRevenueVal" style="font-size: 0.8rem;">-</p>
                 </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f59e0b); clip-path: path('M0,35 Q30,15 60,35 T120,35 T180,35 T240,35 T300,35 L300,60 L0,60 Z');"></div>
             </div>
 
             <!-- 4. The best Industry by revenue -->
-            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
-                <div class="accent-bar bg-gradient-to-r from-indigo-500 to-indigo-600"></div>
-                <div class="flex items-center gap-2 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 mt-1 relative z-10">
                     <div class="bg-indigo-50 text-indigo-600 p-1.5 rounded-lg">
                         <i data-lucide="factory" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Ngành lớn nhất</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Ngành lớn nhất' : 'Top Industry'}">Ngành lớn nhất</h3>
                 </div>
-                <div>
+                <div class="relative z-10">
                     <h4 class="text-base font-black text-slate-800 truncate" id="bestIndustryName" title="-">-</h4>
                     <p class="text-indigo-600 font-bold mt-0.5" id="bestIndustryRevenueVal" style="font-size: 0.8rem;">-</p>
                 </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #6366f1); clip-path: path('M0,30 Q20,10 40,30 T80,30 T120,30 T160,30 T200,30 T240,30 T280,30 L280,60 L0,60 Z');"></div>
             </div>
 
             <!-- 5. Top Region by revenue -->
-            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
-                <div class="accent-bar bg-gradient-to-r from-purple-500 to-purple-600"></div>
-                <div class="flex items-center gap-2 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 mt-1 relative z-10">
                     <div class="bg-purple-50 text-purple-600 p-1.5 rounded-lg">
                         <i data-lucide="map-pin" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Khu vực lớn nhất</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Khu vực lớn nhất' : 'Top Region'}">Khu vực lớn nhất</h3>
                 </div>
-                <div>
+                <div class="relative z-10">
                     <h4 class="text-base font-black text-slate-800 truncate" id="topRegionName" title="-">-</h4>
                     <p class="text-purple-600 font-bold mt-0.5" id="topRegionRevenueVal" style="font-size: 0.8rem;">-</p>
                 </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #8b5cf6); clip-path: path('M0,35 Q30,15 60,35 T120,35 T180,35 T240,35 T300,35 L300,60 L0,60 Z');"></div>
             </div>
 
             <!-- 6. The best Customer Group by leads -->
-            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
-                <div class="accent-bar bg-gradient-to-r from-rose-500 to-rose-600"></div>
-                <div class="flex items-center gap-2 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 mt-1 relative z-10">
                     <div class="bg-rose-50 text-rose-600 p-1.5 rounded-lg">
                         <i data-lucide="users" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nhóm KH nhiều Lead nhất</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Nhóm KH nhiều Lead nhất' : 'Top Group by Leads'}">Nhóm KH nhiều Lead nhất</h3>
                 </div>
-                <div>
+                <div class="relative z-10">
                     <h4 class="text-base font-black text-slate-800 truncate" id="bestGroupLeadsName" title="-">-</h4>
                     <p class="text-rose-600 font-bold mt-0.5" id="bestGroupLeadsVal" style="font-size: 0.8rem;">-</p>
                 </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #f43f5e); clip-path: path('M0,30 Q20,10 40,30 T80,30 T120,30 T160,30 T200,30 T240,30 T280,30 L280,60 L0,60 Z');"></div>
             </div>
 
             <!-- 7. The best Customer Group by revenue -->
-            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
-                <div class="accent-bar bg-gradient-to-r from-teal-500 to-teal-600"></div>
-                <div class="flex items-center gap-2 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 mt-1 relative z-10">
                     <div class="bg-teal-50 text-teal-600 p-1.5 rounded-lg">
                         <i data-lucide="wallet" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nhóm KH doanh thu cao nhất</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Nhóm KH doanh thu cao nhất' : 'Top Group by Revenue'}">Nhóm KH doanh thu cao nhất</h3>
                 </div>
-                <div>
+                <div class="relative z-10">
                     <h4 class="text-base font-black text-slate-800 truncate" id="bestGroupRevenueName" title="-">-</h4>
                     <p class="text-teal-600 font-bold mt-0.5" id="bestGroupRevenueVal" style="font-size: 0.8rem;">-</p>
                 </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #14b8a6); clip-path: path('M0,30 Q20,10 40,30 T80,30 T120,30 T160,30 T200,30 T240,30 T280,30 L280,60 L0,60 Z');"></div>
             </div>
 
             <!-- 8. Top Under-served Segment -->
-            <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
-                <div class="accent-bar bg-gradient-to-r from-red-500 to-red-600"></div>
-                <div class="flex items-center gap-2 mb-3 mt-1">
+            <div class="kpi-card bg-white p-5 rounded-2xl flex flex-col justify-between min-h-[140px] relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 mt-1 relative z-10">
                     <div class="bg-red-50 text-red-600 p-1.5 rounded-lg">
                         <i data-lucide="alert-triangle" class="w-4 h-4"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Chưa khai phá</h3>
+                    <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Chưa khai phá' : 'Under-served Segment'}">Chưa khai phá</h3>
                 </div>
-                <div>
+                <div class="relative z-10">
                     <h4 class="text-base font-black text-slate-800 truncate" id="underServedName" title="-">-</h4>
                     <p class="text-red-500 font-bold mt-0.5" id="underServedVal" style="font-size: 0.72rem; line-height: 1rem;">-</p>
                 </div>
+                <!-- Wave Background Element -->
+                <div class="absolute bottom-0 left-0 right-0 h-[60px] opacity-10 pointer-events-none" style="background: linear-gradient(180deg, transparent, #ef4444); clip-path: path('M0,35 Q30,15 60,35 T120,35 T180,35 T240,35 T300,35 L300,60 L0,60 Z');"></div>
             </div>
         </div>
 
@@ -160,24 +162,24 @@
             <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-800 tracking-tight" id="chartSectionTitle">Doanh thu & Leads theo Ngành nghề</h2>
-                        <p class="text-xs text-slate-500 font-medium mt-0.5" id="chartSectionSubtitle">Nhấp vào một cột để xem phân tích chi tiết của phân khúc.</p>
+                        <h2 class="text-lg font-bold text-slate-800 tracking-tight" id="chartSectionTitle" th:text="${#locale.language == 'vi' ? 'Doanh thu & Leads theo Ngành nghề' : 'Revenue & Leads by Industry'}">Doanh thu & Leads theo Ngành nghề</h2>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5" id="chartSectionSubtitle" th:text="${#locale.language == 'vi' ? 'Nhấp vào một cột để xem phân tích chi tiết của phân khúc.' : 'Click on a column to view detailed segment analysis.'}">Nhấp vào một cột để xem phân tích chi tiết của phân khúc.</p>
                     </div>
                     <!-- Filter Tab Buttons -->
                     <div class="flex flex-wrap items-center gap-1.5 bg-slate-100/80 p-1 rounded-xl">
-                        <button onclick="switchMixedChart('industry')" id="btn-chart-industry" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-slate-800 shadow-sm">
+                        <button onclick="switchMixedChart('industry')" id="btn-chart-industry" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-slate-800 shadow-sm" th:text="${#locale.language == 'vi' ? 'Ngành nghề' : 'Industry'}">
                             Ngành nghề
                         </button>
-                        <button onclick="switchMixedChart('role')" id="btn-chart-role" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850">
+                        <button onclick="switchMixedChart('role')" id="btn-chart-role" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850" th:text="${#locale.language == 'vi' ? 'Vai trò khách hàng' : 'Customer Role'}">
                             Vai trò khách hàng
                         </button>
-                        <button onclick="switchMixedChart('region')" id="btn-chart-region" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850">
+                        <button onclick="switchMixedChart('region')" id="btn-chart-region" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850" th:text="${#locale.language == 'vi' ? 'Khu vực' : 'Region'}">
                             Khu vực
                         </button>
-                        <button onclick="switchMixedChart('group')" id="btn-chart-group" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850">
+                        <button onclick="switchMixedChart('group')" id="btn-chart-group" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850" th:text="${#locale.language == 'vi' ? 'Nhóm khách hàng' : 'Customer Group'}">
                             Nhóm khách hàng
                         </button>
-                        <button onclick="switchMixedChart('product')" id="btn-chart-product" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850">
+                        <button onclick="switchMixedChart('product')" id="btn-chart-product" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850" th:text="${#locale.language == 'vi' ? 'Dòng sản phẩm' : 'Product Line'}">
                             Dòng sản phẩm
                         </button>
                     </div>
@@ -187,14 +189,14 @@
                 </div>
             </div>
         </div>
-
+ 
         <!-- HÀNG 3: CUSTOMER VALUE MATRIX -->
         <div class="grid grid-cols-1 gap-6 mt-6" id="sectionCustomerValueMatrix" style="display: none;">
             <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-800 tracking-tight">Ma trận Giá trị Khách hàng</h2>
-                        <p class="text-xs text-slate-500 font-medium mt-0.5">Biểu đồ ma trận phân tích giá trị khách hàng. X: Win Rate | Y: Avg Revenue/Won | Size: Total Revenue.</p>
+                        <h2 class="text-lg font-bold text-slate-800 tracking-tight" th:text="${#locale.language == 'vi' ? 'Ma trận Giá trị Khách hàng' : 'Customer Value Matrix'}">Ma trận Giá trị Khách hàng</h2>
+                        <p class="text-xs text-slate-500 font-medium mt-0.5" th:text="${#locale.language == 'vi' ? 'Biểu đồ ma trận phân tích giá trị khách hàng. X: Win Rate | Y: Avg Revenue/Won | Size: Total Revenue.' : 'Customer value analysis matrix. X: Win Rate | Y: Avg Revenue/Won | Size: Total Revenue.'}">Biểu đồ ma trận phân tích giá trị khách hàng. X: Win Rate | Y: Avg Revenue/Won | Size: Total Revenue.</p>
                     </div>
                     <div class="bg-indigo-50 text-indigo-600 p-2 rounded-xl">
                         <i data-lucide="scatter-chart" class="w-5 h-5"></i>
@@ -206,8 +208,8 @@
                 </div>
             </div>
         </div>
-
-
+ 
+ 
         <!-- HÀNG 4: MARKET SEGMENT PERFORMANCE MATRIX -->
         <div class="grid grid-cols-1 gap-6 mt-6" id="sectionCustomerSegmentMatrix">
             <div class="p-6 rounded-2xl shadow-sm border bg-white border-slate-100 flex flex-col min-h-[520px]">
@@ -215,9 +217,9 @@
                     <div>
                         <h2 class="text-base font-bold flex items-center gap-2 text-slate-800">
                             <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
-                            <span>Hiệu suất Phân khúc</span>
+                            <span th:text="${#locale.language == 'vi' ? 'Hiệu suất Phân khúc' : 'Segment Performance'}">Hiệu suất Phân khúc</span>
                         </h2>
-                        <p class="text-[10px] text-slate-400 font-medium mt-1">Biểu đồ phân tích hiệu quả tỷ lệ thắng (Win Rate %) và quy mô leads (kích thước bong bóng) theo khu vực và ngành hàng.</p>
+                        <p class="text-[10px] text-slate-400 font-medium mt-1" th:text="${#locale.language == 'vi' ? 'Biểu đồ phân tích hiệu quả tỷ lệ thắng (Win Rate %) và quy mô leads (kích thước bong bóng) theo khu vực và ngành hàng.' : 'Performance analysis chart showing Win Rate % and lead volume (bubble size) by Region and Industry.'}">Biểu đồ phân tích hiệu quả tỷ lệ thắng (Win Rate %) và quy mô leads (kích thước bong bóng) theo khu vực và ngành hàng.</p>
                     </div>
                 </div>
                 <div class="w-full overflow-x-auto flex justify-center items-center py-2 flex-1">
@@ -248,7 +250,7 @@
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
-                    <span>Top 10 Khách hàng theo Doanh thu</span>
+                    <span th:text="${#locale.language == 'vi' ? 'Top 10 Khách hàng theo Doanh thu' : 'Top 10 Customers by Revenue'}">Top 10 Khách hàng theo Doanh thu</span>
                 </h2>
                 <div class="relative w-full flex-1 min-h-[400px]"><canvas id="topAccountsChart"></canvas></div>
             </div>
@@ -257,7 +259,7 @@
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-purple-500 rounded-full"></span>
-                    <span>Bảng chi tiết Khách hàng lớn</span>
+                    <span th:text="${#locale.language == 'vi' ? 'Bảng chi tiết Khách hàng lớn' : 'Top Customers Detail Table'}">Bảng chi tiết Khách hàng lớn</span>
                 </h2>
                 <div class="overflow-x-auto flex-1">
                     <table class="w-full text-left border-collapse min-w-[600px]">
@@ -485,10 +487,17 @@
 
         <!-- THƯ VIỆN JAVASCRIPT BÊN NGOÀI -->
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
         <script src="https://d3js.org/d3.v7.min.js"></script>
 
         <script>
+            const locale = /*[[${#locale.language}]]*/ 'vi';
+            const isVi = locale === 'vi';
+
+            // Register datalabels plugin
+            Chart.register(ChartDataLabels);
+            Chart.defaults.plugins.datalabels.display = false;
+
             // Helper format currency
             const formatCurrency = (val) => {
                 if (val === undefined || val === null) return '0 VNĐ';
@@ -502,6 +511,17 @@
                     formatted = Number(val).toLocaleString('vi-VN');
                 }
                 return (val < 0 ? '-' : '') + formatted + ' VNĐ';
+            };
+
+            const fmtShortNum = (val) => {
+                const absVal = Math.abs(val);
+                if (absVal >= 1e9) {
+                    return (val / 1e9).toFixed(1).replace(/\.0$/, '') + ' tỷ';
+                }
+                if (absVal >= 1e6) {
+                    return (val / 1e6).toFixed(1).replace(/\.0$/, '') + ' triệu';
+                }
+                return val.toLocaleString('vi-VN');
             };
 
             let chartsData = {};
@@ -1118,41 +1138,79 @@
                 if (canvas) {
                     const ctx = canvas.getContext('2d');
                     if (window.topAccountsChartInstance) window.topAccountsChartInstance.destroy();
+
+                    const values = accountsData.map(d => d.revenue);
+                    const labels = accountsData.map(d => d.name);
+                    const maxVal = Math.max(...values, 0);
+                    const roundedMax = Math.ceil((maxVal + 10000000000) / 5000000000) * 5000000000;
+
+                    // Gradient colors for bars
+                    const colors = values.map((_, i) => {
+                        const alpha = 0.9 - (i * 0.06);
+                        return `rgba(16, 185, 129, ${alpha})`;
+                    });
+
                     window.topAccountsChartInstance = new Chart(ctx, {
                         type: 'bar',
                         data: {
-                            labels: accountsData.map(d => d.name),
+                            labels: labels,
                             datasets: [{
-                                label: 'Revenue (VND)',
-                                data: accountsData.map(d => d.revenue),
-                                backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                                borderColor: 'rgba(16, 185, 129, 1)',
-                                borderWidth: 1,
-                                borderRadius: 4
+                                label: 'Revenue',
+                                data: values,
+                                backgroundColor: colors,
+                                borderRadius: 4,
+                                barThickness: 18
                             }]
                         },
                         options: {
+                            indexAxis: 'y',
                             responsive: true,
                             maintainAspectRatio: false,
                             onClick: (event, elements) => {
                                 if (elements.length > 0) {
                                     const index = elements[0].index;
-                                    const accountName = accountsData[index].name;
+                                    const accountName = labels[index];
                                     openAccountDetailsModal(accountName);
                                 }
                             },
                             onHover: (event, chartElement) => {
                                 event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
                             },
-                            plugins: {
-                                legend: { display: false },
-                                tooltip: {
-                                    callbacks: { label: c => formatCurrency(c.raw) }
+                            layout: {
+                                padding: {
+                                    right: 80
                                 }
                             },
                             scales: {
-                                x: { ticks: { font: { family: "'Inter', sans-serif" } } },
-                                y: { ticks: { callback: v => formatCurrency(v) } }
+                                x: {
+                                    beginAtZero: true,
+                                    max: roundedMax,
+                                    border: { display: false },
+                                    grid: { color: '#f1f5f9' },
+                                    ticks: { callback: v => fmtShortNum(v) }
+                                },
+                                y: {
+                                    grid: { display: false },
+                                    border: { display: false },
+                                    ticks: { font: { size: 11, weight: 'bold' } }
+                                }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                datalabels: {
+                                    display: true,
+                                    anchor: 'end',
+                                    align: 'right',
+                                    offset: 4,
+                                    color: '#064e3b',
+                                    font: { weight: 'bold', size: 10 },
+                                    formatter: v => fmtShortNum(v)
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: context => ` ${isVi ? 'Doanh thu' : 'Revenue'}: ${Number(context.raw).toLocaleString('vi-VN')} VNĐ`
+                                    }
+                                }
                             }
                         }
                     });

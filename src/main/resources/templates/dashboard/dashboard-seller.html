@@ -152,6 +152,20 @@
             let cachedKpi = null;
             let cachedFunnel = {};
 
+            function formatCurrency(val) {
+                if (val === undefined || val === null) return '0 đ';
+                const absVal = Math.abs(val);
+                let formatted = '';
+                if (absVal >= 1e9) {
+                    formatted = (val / 1e9).toFixed(2).replace(/\.?0+$/, '') + ' tỷ';
+                } else if (absVal >= 1e6) {
+                    formatted = (val / 1e6).toFixed(2).replace(/\.?0+$/, '') + ' triệu';
+                } else {
+                    formatted = Number(val).toLocaleString('vi-VN');
+                }
+                return (val < 0 ? '-' : '') + formatted + ' đ';
+            }
+
             document.addEventListener('DOMContentLoaded', async () => {
                 const urlParams = new URLSearchParams(window.location.search);
                 const gYear = urlParams.get('year') || '2026';
@@ -254,9 +268,9 @@
                     const wonRevenue = item.wonRevenue || 0;
                     const targetRevenue = item.targetRevenue || 0;
 
-                    document.getElementById('txtWonRevenue').innerText = wonRevenue.toLocaleString('vi-VN') + ' đ';
-                    document.getElementById('txtPipeline').innerText = openPipeline.toLocaleString('vi-VN') + ' đ';
-                    document.getElementById('txtTarget').innerText = targetRevenue.toLocaleString('vi-VN') + ' đ';
+                    document.getElementById('txtWonRevenue').innerText = formatCurrency(wonRevenue);
+                    document.getElementById('txtPipeline').innerText = formatCurrency(openPipeline);
+                    document.getElementById('txtTarget').innerText = formatCurrency(targetRevenue);
 
                     // 1. Tính tỷ lệ đạt chỉ tiêu thực tế từ deal chốt thắng (Won)
                     let percentWon = 0;
@@ -580,7 +594,7 @@
                                     callbacks: {
                                         label: function(context) {
                                             const leadInfo = context.raw.label || 'N/A';
-                                            return ` ${leadInfo}: BANT: ${context.parsed.x}/100, Giá trị: ${context.parsed.y.toLocaleString('vi-VN')} đ`;
+                                            return ` ${leadInfo}: BANT: ${context.parsed.x}/100, Giá trị: ${formatCurrency(context.parsed.y)}`;
                                         }
                                     }
                                 }
@@ -597,9 +611,9 @@
                                     ticks: {
                                         callback: function(value) {
                                             if (value >= 1000000000) {
-                                                return (value / 1000000000).toLocaleString('vi-VN') + ' Tỷ';
+                                                return (value / 1000000000).toLocaleString('vi-VN') + ' tỷ';
                                             } else if (value >= 1000000) {
-                                                return (value / 1000000).toLocaleString('vi-VN') + ' Tr';
+                                                return (value / 1000000).toLocaleString('vi-VN') + ' triệu';
                                             }
                                             return value.toLocaleString('vi-VN');
                                         }
@@ -658,17 +672,17 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                 <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
                                     <div class="text-xs font-bold text-emerald-600 uppercase">Đã chốt (Won)</div>
-                                    <div class="text-2xl font-black text-emerald-800 mt-1">${(cachedKpi.wonRevenue || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-2xl font-black text-emerald-800 mt-1">${formatCurrency(cachedKpi.wonRevenue || 0)}</div>
                                     <div class="text-[10px] text-emerald-500 mt-1">${wonLeads.length} leads chốt thành công</div>
                                 </div>
                                 <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
                                     <div class="text-xs font-bold text-blue-600 uppercase">Cơ hội (Pipeline)</div>
-                                    <div class="text-2xl font-black text-blue-800 mt-1">${(cachedKpi.openPipeline || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-2xl font-black text-blue-800 mt-1">${formatCurrency(cachedKpi.openPipeline || 0)}</div>
                                     <div class="text-[10px] text-blue-500 mt-1">${pipelineLeads.length} leads đang theo sát</div>
                                 </div>
                                 <div class="p-4 bg-amber-50 rounded-lg border border-amber-100">
                                     <div class="text-xs font-bold text-amber-600 uppercase">Chỉ tiêu (Target)</div>
-                                    <div class="text-2xl font-black text-amber-800 mt-1">${(cachedKpi.targetRevenue || 0).toLocaleString('vi-VN')} đ</div>
+                                    <div class="text-2xl font-black text-amber-800 mt-1">${formatCurrency(cachedKpi.targetRevenue || 0)}</div>
                                     <div class="text-[10px] text-amber-500 mt-1">Đạt chỉ tiêu: ${cachedKpi.targetRevenue > 0 ? Math.round((cachedKpi.wonRevenue / cachedKpi.targetRevenue) * 100) : 0}%</div>
                                 </div>
                             </div>
@@ -847,7 +861,7 @@
 
                             ${rowBant}
                             ${rowWonDate}
-                            <td class="py-3 px-4 text-xs font-bold text-gray-800 text-right">${(rev || 0).toLocaleString('vi-VN')} đ</td>
+                            <td class="py-3 px-4 text-xs font-bold text-gray-800 text-right">${formatCurrency(rev || 0)}</td>
                         </tr>
                     `;
                 });

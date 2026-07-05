@@ -70,25 +70,25 @@
 
         <!-- ROW 2: Sales Owner Win Rate Performance [Qualified Leads, Won Leads (cột) vs Win Rate (đường)] -->
         <div id="sectionSalesWinRatePerf" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Hiệu suất Tỷ lệ thắng (Win Rate) theo Sales Owner</h3>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Hiệu suất Tỷ lệ thắng (Win Rate) theo Sales Owner' : 'Win Rate Performance by Sales Owner'}">Hiệu suất Tỷ lệ thắng (Win Rate) theo Sales Owner</h3>
             <div class="relative w-full h-[400px]">
                 <canvas id="winRatePerformanceChart"></canvas>
             </div>
-            <p class="text-[11px] text-slate-400 mt-2 italic text-right">Click vào cột bất kỳ để xem chi tiết hiệu suất của Sales Owner đó.</p>
+            <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào cột bất kỳ để xem chi tiết hiệu suất của Sales Owner đó.' : 'Click on any column to view detailed sales owner performance.'}">Click vào cột bất kỳ để xem chi tiết hiệu suất của Sales Owner đó.</p>
         </div>
 
         <!-- ROW 3: Average Sales Cycle by Sales Owner -->
         <div id="sectionSalesAvgCycle" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)</h3>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)' : 'Average Sales Cycle by Sales Owner (Days)'}">Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)</h3>
             <div class="relative w-full h-[380px]">
                 <canvas id="avgSalesCycleChart"></canvas>
             </div>
-            <p class="text-[11px] text-slate-400 mt-2 italic text-right">Click vào cột để xem chi tiết thời gian chốt deal và BANT Score.</p>
+            <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào cột để xem chi tiết thời gian chốt deal và BANT Score.' : 'Click on a column to view detailed closing time and BANT score.'}">Click vào cột để xem chi tiết thời gian chốt deal và BANT Score.</p>
         </div>
 
         <!-- ROW 4: Top Loss Reasons by Product Line (Stacked Bar Chart) -->
         <div id="sectionSalesLossReasons" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Các lý do thất bại hàng đầu theo Dòng sản phẩm</h3>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Các lý do thất bại hàng đầu theo Dòng sản phẩm' : 'Top Loss Reasons by Product Line'}">Các lý do thất bại hàng đầu theo Dòng sản phẩm</h3>
             <div class="relative w-full h-[420px]">
                 <canvas id="lossReasonsProductChart"></canvas>
             </div>
@@ -96,7 +96,7 @@
 
         <!-- ROW 5: Workload vs Result Matrix (Bubble Chart) -->
         <div id="sectionSalesWorkload" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">Ma trận Khối lượng công việc vs Kết quả (Biểu đồ Bong bóng)</h3>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Ma trận Khối lượng công việc vs Kết quả (Biểu đồ Bong bóng)' : 'Workload vs Results Matrix (Bubble Chart)'}">Ma trận Khối lượng công việc vs Kết quả (Biểu đồ Bong bóng)</h3>
             <div class="relative w-full h-[500px]">
                 <canvas id="workloadBubbleChart"></canvas>
             </div>
@@ -529,38 +529,23 @@
             if (avgSalesCycleChartInstance) avgSalesCycleChartInstance.destroy();
 
             avgSalesCycleChartInstance = new Chart(ctx, {
-                type: 'bar',
+                type: 'radar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Average Sales Cycle (Days)',
+                        label: 'Chu kỳ bán hàng (Ngày)',
                         data: cycles,
-                        backgroundColor: 'rgba(14, 165, 233, 0.7)', // Sky blue
-                        borderColor: 'rgba(14, 165, 233, 1)',
-                        borderWidth: 1.5,
-                        borderRadius: 4
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)', // Light blue fill
+                        borderColor: '#3b82f6',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true
                     }]
                 },
-                plugins: [
-                    {
-                        id: 'valueOnBar',
-                        afterDatasetsDraw(chart) {
-                            const { ctx } = chart;
-                            ctx.save();
-                            chart.data.datasets.forEach((dataset, i) => {
-                                const meta = chart.getDatasetMeta(i);
-                                meta.data.forEach((bar, index) => {
-                                    const val = dataset.data[index];
-                                    ctx.fillStyle = '#475569';
-                                    ctx.font = 'bold 11px sans-serif';
-                                    ctx.textAlign = 'center';
-                                    ctx.fillText(Number(val).toFixed(1) + ' ngày', bar.x, bar.y - 8);
-                                });
-                            });
-                            ctx.restore();
-                        }
-                    }
-                ],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -572,19 +557,33 @@
                         }
                     },
                     scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { weight: 'bold', size: 11 }, color: '#475569' }
-                        },
-                        y: {
-                            grid: { color: '#f1f5f9' },
-                            ticks: { color: '#475569' },
-                            min: 0
+                        r: {
+                            grid: { color: '#e2e8f0' },
+                            angleLines: { color: '#e2e8f0' },
+                            pointLabels: {
+                                font: { size: 11, weight: 'bold' },
+                                color: '#475569'
+                            },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                color: '#64748b',
+                                font: { size: 9 },
+                                showLabelBackdrop: false
+                            },
+                            suggestedMin: 0
                         }
                     },
                     plugins: {
                         legend: { display: false },
-                        tooltip: { padding: 12, cornerRadius: 8 }
+                        tooltip: {
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${Number(context.raw).toFixed(1)} ngày`;
+                                }
+                            }
+                        }
                     }
                 }
             });
