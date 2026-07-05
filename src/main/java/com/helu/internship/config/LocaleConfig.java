@@ -1,5 +1,7 @@
 package com.helu.internship.config;
 
+import com.helu.internship.security.DateFilterInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
@@ -12,6 +14,9 @@ import java.util.Locale;
 
 @Configuration
 public class LocaleConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private DateFilterInterceptor dateFilterInterceptor;
 
     @Bean
     public LocaleResolver localeResolver() {
@@ -31,5 +36,6 @@ public class LocaleConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
+        registry.addInterceptor(dateFilterInterceptor);
     }
 }

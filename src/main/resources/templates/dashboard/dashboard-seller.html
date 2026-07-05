@@ -154,8 +154,17 @@
             let cachedFunnel = {};
 
             document.addEventListener('DOMContentLoaded', async () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const gYear = urlParams.get('year') || '2026';
+                const gQuarter = urlParams.get('quarter') || '2';
+                
+                const ySelect = document.getElementById('kpiYearSelect');
+                const qSelect = document.getElementById('kpiQuarterSelect');
+                if (ySelect && gYear !== 'all') ySelect.value = gYear;
+                if (qSelect && gQuarter !== 'all') qSelect.value = gQuarter;
+
                 loadStats();
-                loadKpiProgress();
+                loadKpiProgress(qSelect ? qSelect.value : null, ySelect ? ySelect.value : null);
                 loadFunnelChart();
                 loadBantScatterChart();
             });
