@@ -1955,7 +1955,8 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                     'Qualified',
                     'Proposal Sent',
                     'In Negotiation',
-                    'Won'
+                    'Won',
+                    'Lost'
                 )
                 THEN 1
                 ELSE 0
@@ -1986,7 +1987,8 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                             'Qualified',
                             'Proposal Sent',
                             'In Negotiation',
-                            'Won'
+                            'Won',
+                            'Lost'
                         )
                         THEN 1
                         ELSE 0
@@ -2013,7 +2015,8 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
                     'Qualified',
                     'Proposal Sent',
                     'In Negotiation',
-                    'Won'
+                    'Won',
+                    'Lost'
                 )
                 THEN 1
                 ELSE 0
