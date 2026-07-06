@@ -2477,13 +2477,15 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     List<SalesOwnerProductLineResponse> getSalesOwnerByProductLine(
             @Param("productLine") String productLine
     );
-
     @Query(value = """
     SELECT
 
-        l.status AS status,
+        CASE
+            WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+            ELSE l.status
+        END AS status,
 
-        SUM(ISNULL(l.business_result,0)) AS businessResult
+        SUM(ISNULL(l.business_result, 0)) AS businessResult
 
     FROM lead l
 
@@ -2496,15 +2498,40 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     )
 
     GROUP BY
-        l.status
+        CASE
+            WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+            ELSE l.status
+        END
 
     ORDER BY
-        CASE l.status
-            WHEN 'Qualified' THEN 1
-            WHEN 'Proposal Sent' THEN 2
-            WHEN 'In Negotiation' THEN 3
-            WHEN 'Won' THEN 4
-            WHEN 'Lost' THEN 5
+        CASE
+            WHEN
+                CASE
+                    WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+                    ELSE l.status
+                END = 'Qualified'
+            THEN 1
+
+            WHEN
+                CASE
+                    WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+                    ELSE l.status
+                END = 'Proposal Sent'
+            THEN 2
+
+            WHEN
+                CASE
+                    WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+                    ELSE l.status
+                END = 'In Negotiation'
+            THEN 3
+
+            WHEN
+                CASE
+                    WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+                    ELSE l.status
+                END = 'Closed'
+            THEN 4
         END
     """, nativeQuery = true)
     List<BusinessResultByStatusResponse> getBusinessResultByStatus();
@@ -2512,9 +2539,12 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     @Query(value = """
     SELECT
 
-        l.status AS status,
+        CASE
+            WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+            ELSE l.status
+        END AS status,
 
-        SUM(ISNULL(l.business_result,0)) AS businessResult
+        SUM(ISNULL(l.business_result, 0)) AS businessResult
 
     FROM lead l
 
@@ -2528,15 +2558,40 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     AND (:sourceId IS NULL OR l.source_id = :sourceId)
 
     GROUP BY
-        l.status
+        CASE
+            WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+            ELSE l.status
+        END
 
     ORDER BY
-        CASE l.status
-            WHEN 'Qualified' THEN 1
-            WHEN 'Proposal Sent' THEN 2
-            WHEN 'In Negotiation' THEN 3
-            WHEN 'Won' THEN 4
-            WHEN 'Lost' THEN 5
+        CASE
+            WHEN
+                CASE
+                    WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+                    ELSE l.status
+                END = 'Qualified'
+            THEN 1
+
+            WHEN
+                CASE
+                    WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+                    ELSE l.status
+                END = 'Proposal Sent'
+            THEN 2
+
+            WHEN
+                CASE
+                    WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+                    ELSE l.status
+                END = 'In Negotiation'
+            THEN 3
+
+            WHEN
+                CASE
+                    WHEN l.status IN ('Won', 'Lost') THEN 'Closed'
+                    ELSE l.status
+                END = 'Closed'
+            THEN 4
         END
     """, nativeQuery = true)
     List<BusinessResultByStatusResponse> getBusinessResultByStatusBySource(
