@@ -1,5 +1,5 @@
 // customer-value-matrix.js
-// Renders a packed bubble (Circle Packing) chart using D3.js based on the Customer Value Matrix API
+// Renders a packed bubble (Circle Packing) chart using D3.js based on the Conversion Rate Value Matrix API
 
 document.addEventListener('DOMContentLoaded', () => {
     const svgElement = document.getElementById('cvmChart');
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return (val < 0 ? '-' : '') + formatted + ' triệu';
     };
 
-    fetch('/api/dashboard/value-matrix-customer')
+    fetch('/api/dashboard/conversionrate-value-matrix')
         .then(res => {
             if (!res.ok) throw new Error('Network response not ok');
             return res.json();
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             svgElement.innerHTML = '';
 
             // 1. Group Classification based on medians
-            const winRates = data.map(d => d.winRate || 0);
+            const winRates = data.map(d => d.conversionRate || 0);
             const avgRevs = data.map(d => d.avgRevenuePerWon || 0);
             
             const getMedian = (arr) => {
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Classify segments into quadrants
             data.forEach(item => {
-                const isEasy = (item.winRate || 0) >= winRateThreshold;
+                const isEasy = (item.conversionRate || 0) >= winRateThreshold;
                 const isHigh = (item.avgRevenuePerWon || 0) >= revenueThreshold;
                 
                 let key = "hard_low";
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div style="display: flex; justify-content: space-between; gap: 20px;"><span>Tổng số Leads:</span><span style="font-weight: 700;">${d.data.totalLeads}</span></div>
                                 <div style="display: flex; justify-content: space-between; gap: 20px;"><span>Đã thắng:</span><span style="font-weight: 700; color: #10b981;">${d.data.wonLeads}</span></div>
                                 <div style="display: flex; justify-content: space-between; gap: 20px;"><span>Đã mất:</span><span style="font-weight: 700; color: #ef4444;">${d.data.lostLeads}</span></div>
-                                <div style="display: flex; justify-content: space-between; gap: 20px;"><span>Tỷ lệ thắng:</span><span style="font-weight: 700; color: #3b82f6;">${d.data.winRate}%</span></div>
+                                <div style="display: flex; justify-content: space-between; gap: 20px;"><span>Tỷ lệ thắng:</span><span style="font-weight: 700; color: #3b82f6;">${d.data.conversionRate}%</span></div>
                                 <div style="display: flex; justify-content: space-between; gap: 20px;"><span>Doanh thu Won:</span><span style="font-weight: 700; color: #0f172a;">${formatCurrency(d.data.revenueWon)}</span></div>
                                 <div style="display: flex; justify-content: space-between; gap: 20px;"><span>Doanh thu TB/Won:</span><span style="font-weight: 700; color: #0f172a;">${formatCurrency(d.data.avgRevenuePerWon)}</span></div>
                             </div>

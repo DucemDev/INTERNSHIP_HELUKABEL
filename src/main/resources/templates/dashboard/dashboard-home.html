@@ -1059,14 +1059,13 @@
                      const industries = [...new Set(data.map(d => d.industry).filter(Boolean))].sort();
 
                      matrixCellsGlobal = [];
-                     let maxVal = 0;
                      
                      data.forEach(item => {
                          matrixCellsGlobal.push({
                              industry: item.industry,
                              region: item.region,
-                             value: item.totalLeads || 0,
-                             winRate: item.conversionRate || 0,
+                             totalLeads: item.totalLeads || 0,
+                             conversionRate: item.conversionRate || 0,
                              wonLead: item.wonLeads || 0,
                              lostLead: item.lostLeads || 0,
                              avgRevenuePerWon: item.avgRevenuePerWon || 0,
@@ -1074,13 +1073,9 @@
                              topLossReason: item.topLossReason || 'N/A',
                              topSalesOwner: item.topSalesOwner || 'N/A'
                          });
-                         if ((item.totalLeads || 0) > maxVal) {
-                             maxVal = item.totalLeads;
-                         }
                      });
-                     if (maxVal === 0) maxVal = 1;
                      
-                     drawMatrixSVG(matrixCellsGlobal, regions, industries, maxVal);
+                     drawMatrixSVG(matrixCellsGlobal, regions, industries);
                  } catch (e) {
                      console.error('Error loading leads for matrix:', e);
                  }
@@ -1189,7 +1184,7 @@
             // ==========================================
             // HÀM 5.1: Draw Matrix SVG (Bubble Grid)
             // ==========================================
-            function drawMatrixSVG(cells, regions, industries, maxVal) {
+            function drawMatrixSVG(cells, regions, industries) {
                 const svg = document.getElementById('matrixBubbleChart');
                 if (!svg) return;
                 svg.innerHTML = '';
@@ -1266,7 +1261,7 @@
                 }
 
                 // Bubbles
-                const maxWinRate = Math.max(...cells.map(c => c.winRate), 1);
+                const maxConversionRate = Math.max(...cells.map(c => c.conversionRate || 0), 1);
                 cells.forEach(cell => {
                     const colIdx = regions.indexOf(cell.region);
                     const rowIdx = industries.indexOf(cell.industry);
@@ -1277,12 +1272,12 @@
 
                     const minR = 14;
                     const maxR = Math.min(colW, rowH) * 0.38;
-                    const r = cell.winRate > 0 ? minR + (maxR - minR) * Math.sqrt(cell.winRate / maxWinRate) : minR;
+                    const r = cell.conversionRate > 0 ? minR + (maxR - minR) * Math.sqrt(cell.conversionRate / maxConversionRate) : minR;
 
-                    // Color by win rate (High contrast, semantic palette: Green for high, Amber for medium, Red for low)
+                    // Color by conversion rate (High contrast, semantic palette: Green for high, Amber for medium, Red for low)
                     let fillColor;
-                    if (cell.winRate >= 15) fillColor = '#10b981'; // Emerald Green (High)
-                    else if (cell.winRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium)
+                    if (cell.conversionRate >= 15) fillColor = '#10b981'; // Emerald Green (High)
+                    else if (cell.conversionRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium)
                     else fillColor = '#ef4444'; // Rose Red (Low)
 
                     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -1304,7 +1299,7 @@
                     text.setAttribute('font-size', r > 20 ? '11' : '9');
                     text.setAttribute('font-weight', 'bold');
                     text.setAttribute('text-anchor', 'middle');
-                    text.textContent = cell.winRate + '%';
+                    text.textContent = cell.conversionRate + '%';
                     g.appendChild(text);
 
                     svg.appendChild(g);
@@ -1566,10 +1561,10 @@
 
                 const modal = document.getElementById('segmentModal');
                 document.getElementById('segmentModalTitle').innerText = `${i18n.segmentDetail || 'Segment Detail'}: ${industry} × ${region}`;
-                document.getElementById('segmentTotalLeads').innerText = fmtNum(cell.value);
+                document.getElementById('segmentTotalLeads').innerText = fmtNum(cell.totalLeads);
                 document.getElementById('segmentWonLeads').innerText = fmtNum(cell.wonLead);
                 document.getElementById('segmentLostLeads').innerText = fmtNum(cell.lostLead);
-                document.getElementById('segmentConvRate').innerText = Number(cell.winRate).toFixed(1) + '%';
+                document.getElementById('segmentConvRate').innerText = Number(cell.conversionRate).toFixed(1) + '%';
                 document.getElementById('segmentRevenue').innerText = cell.wonLead > 0 ? fmtCurrency(cell.avgRevenuePerWon) : '—';
                 document.getElementById('segmentTopProduct').innerText = topProduct;
                 document.getElementById('segmentTopLoss').innerText = topLoss;
