@@ -2670,4 +2670,241 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     )
     """, nativeQuery = true)
     QualifiedLeadResponse getQualifiedLead();
+
+
+    @Query(value = """
+WITH SegmentData AS (
+
+    SELECT
+        l.industry_type AS industry,
+        l.region AS region,
+
+        COUNT(DISTINCT l.lead_id) AS totalLeads,
+
+        COUNT(DISTINCT CASE
+            WHEN l.status = 'Won'
+            THEN l.lead_id
+        END) AS wonLeads,
+
+        COUNT(DISTINCT CASE
+            WHEN l.status = 'Lost'
+            THEN l.lead_id
+        END) AS lostLeads,
+
+        SUM(
+            CASE
+                WHEN l.status = 'Won'
+                THEN ISNULL(l.business_result,0)
+                ELSE 0
+            END
+        ) AS revenueWon,
+
+        AVG(
+            CASE
+                WHEN l.status = 'Won'
+                THEN CAST(l.business_result AS FLOAT)
+            END
+        ) AS avgRevenuePerWon
+
+    FROM lead l
+
+    GROUP BY
+        l.industry_type,
+        l.region
+)
+
+SELECT
+
+    CONCAT(industry,' - ',region) AS segmentName,
+
+    industry,
+
+    NULL AS customerRole,
+
+    region,
+
+    totalLeads,
+
+    wonLeads,
+
+    lostLeads,
+
+    ROUND(
+        wonLeads * 100.0 /
+        NULLIF(
+            SUM(wonLeads) OVER(PARTITION BY industry),
+            0
+        ),
+        2
+    ) AS conversionRate,
+
+    revenueWon,
+
+    ROUND(avgRevenuePerWon,2) AS avgRevenuePerWon,
+
+    NULL AS topProductLine,
+
+    NULL AS topLossReason,
+
+    NULL AS topSalesOwner
+
+FROM SegmentData
+
+ORDER BY
+    industry,
+    region
+
+""", nativeQuery = true)
+    List<ConversionRateValueMatrixResponse> getConversionRateValueMatrix();
+
+    @Query(value = """
+SELECT
+
+    l.industry_type AS industry,
+
+    l.customer_role AS customerRole,
+
+    l.region AS region,
+
+    CONCAT(
+        l.industry_type,
+        ' - ',
+        l.customer_role,
+        ' - ',
+        l.region
+    ) AS segmentName,
+
+    COUNT(DISTINCT CASE
+        WHEN l.status IN (
+            'Qualified',
+            'Proposal Sent',
+            'In Negotiation',
+            'Won',
+            'Lost'
+        )
+        THEN l.lead_id
+    END) AS totalLeads,
+
+    COUNT(DISTINCT CASE
+        WHEN l.status='Won'
+        THEN l.lead_id
+    END) AS wonLeads,
+
+    COUNT(DISTINCT CASE
+        WHEN l.status='Lost'
+        THEN l.lead_id
+    END) AS lostLeads,
+
+    SUM(
+        CASE
+            WHEN l.status='Won'
+            THEN ISNULL(l.business_result,0)
+            ELSE 0
+        END
+    ) AS revenueWon,
+
+    ROUND(
+        AVG(
+            CASE
+                WHEN l.status='Won'
+                THEN CAST(l.business_result AS FLOAT)
+            END
+        ),
+        2
+    ) AS avgRevenuePerWon,
+
+    ROUND(
+        COUNT(DISTINCT CASE
+            WHEN l.status='Won'
+            THEN l.lead_id
+        END)
+        *100.0
+        /
+        NULLIF(
+            COUNT(DISTINCT CASE
+                WHEN l.status IN (
+                    'Qualified',
+                    'Proposal Sent',
+                    'In Negotiation',
+                    'Won',
+                    'Lost'
+                )
+                THEN l.lead_id
+            END),
+            0
+        ),
+        2
+    ) AS winRate
+
+FROM lead l
+
+GROUP BY
+
+    l.industry_type,
+
+    l.customer_role,
+
+    l.region
+
+ORDER BY
+
+    revenueWon DESC
+""",nativeQuery = true)
+    List<ValueMatrixCustomerResponse> getValueMatrixCustomer();
+
+    @Query(value = """
+    SELECT
+        CONCAT(
+            l.industry_type,
+            ' - ',
+            l.customer_role,
+            ' - ',
+            l.region
+        ) AS segment,
+
+        COUNT(*) AS totalLeads,
+
+        SUM(CASE WHEN l.status = 'Qualified' THEN 1 ELSE 0 END) AS qualified,
+
+        SUM(CASE WHEN l.status = 'Proposal Sent' THEN 1 ELSE 0 END) AS proposalSent,
+
+        SUM(CASE WHEN l.status = 'In Negotiation' THEN 1 ELSE 0 END) AS inNegotiation,
+
+        SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) AS won,
+
+        SUM(CASE WHEN l.status = 'Lost' THEN 1 ELSE 0 END) AS lost,
+
+        SUM(
+            CASE
+                WHEN l.status IN (
+                    'Qualified',
+                    'Proposal Sent',
+                    'In Negotiation',
+                    'Won',
+                    'Lost'
+                )
+                THEN COALESCE(l.business_result, 0)
+                ELSE 0
+            END
+        ) AS pipelineValue,
+
+        ROUND(
+            SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) * 100.0
+            / COUNT(*),
+            2
+        ) AS winRate
+
+    FROM lead l
+
+    GROUP BY
+        l.industry_type,
+        l.customer_role,
+        l.region
+
+    HAVING
+        SUM(CASE WHEN l.status = 'Won' THEN 1 ELSE 0 END) = 0
+
+    ORDER BY pipelineValue DESC
+    """, nativeQuery = true)
+    List<CustomerSegmentPipelineResponse> getCustomerSegmentPipeline();
 }
