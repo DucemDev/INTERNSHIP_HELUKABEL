@@ -217,9 +217,9 @@
                     <div>
                         <h2 class="text-base font-bold flex items-center gap-2 text-slate-800">
                             <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
-                            <span th:text="${#locale.language == 'vi' ? 'Hiệu suất Phân khúc' : 'Segment Performance'}">Hiệu suất Phân khúc</span>
+                            <span th:text="${#locale.language == 'vi' ? 'Ma trận Hiệu suất Phân khúc' : 'Market Segment Performance Matrix'}">Ma trận Hiệu suất Phân khúc</span>
                         </h2>
-                        <p class="text-[10px] text-slate-400 font-medium mt-1" th:text="${#locale.language == 'vi' ? 'Biểu đồ phân tích hiệu quả tỷ lệ thắng (Win Rate %) và quy mô leads (kích thước bong bóng) theo khu vực và ngành hàng.' : 'Performance analysis chart showing Win Rate % and lead volume (bubble size) by Region and Industry.'}">Biểu đồ phân tích hiệu quả tỷ lệ thắng (Win Rate %) và quy mô leads (kích thước bong bóng) theo khu vực và ngành hàng.</p>
+                        <p class="text-[10px] text-slate-400 font-medium mt-1" th:text="${#locale.language == 'vi' ? 'Phân tích tỷ lệ chuyển đổi và quy mô lead theo khu vực và ngành hàng' : 'Conversion Rate analysis and lead volume by region and industry'}">Phân tích tỷ lệ chuyển đổi và quy mô lead theo khu vực và ngành hàng</p>
                     </div>
                 </div>
                 <div class="w-full overflow-x-auto flex justify-center items-center py-2 flex-1">
@@ -436,7 +436,7 @@
                             <!-- Doanh thu -->
                             <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu tích lũy</span>
-                                <span id="account-summary-revenue" class="text-base font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                                <span id="account-summary-revenue" class="text-base font-black text-emerald-600 mt-1 block">0</span>
                             </div>
                             <!-- Sản phẩm -->
                             <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
@@ -500,28 +500,17 @@
 
             // Helper format currency
             const formatCurrency = (val) => {
-                if (val === undefined || val === null) return '0 VNĐ';
-                const absVal = Math.abs(val);
-                let formatted = '';
-                if (absVal >= 1e9) {
-                    formatted = (val / 1e9).toFixed(2).replace(/\.?0+$/, '') + ' tỷ';
-                } else if (absVal >= 1e6) {
-                    formatted = (val / 1e6).toFixed(2).replace(/\.?0+$/, '') + ' triệu';
-                } else {
-                    formatted = Number(val).toLocaleString('vi-VN');
-                }
-                return (val < 0 ? '-' : '') + formatted + ' VNĐ';
+                if (val === undefined || val === null) return isVi ? '0 triệu' : '0 million';
+                const valInMil = val / 1e6;
+                const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
+                return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : ' million');
             };
 
             const fmtShortNum = (val) => {
-                const absVal = Math.abs(val);
-                if (absVal >= 1e9) {
-                    return (val / 1e9).toFixed(1).replace(/\.0$/, '') + ' tỷ';
-                }
-                if (absVal >= 1e6) {
-                    return (val / 1e6).toFixed(1).replace(/\.0$/, '') + ' triệu';
-                }
-                return val.toLocaleString('vi-VN');
+                if (val === undefined || val === null) return '0';
+                const valInMil = val / 1e6;
+                const formatted = Number(valInMil.toFixed(1)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
+                return formatted + (isVi ? ' triệu' : ' million');
             };
 
             let chartsData = {};

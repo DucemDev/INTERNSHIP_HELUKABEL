@@ -319,20 +319,10 @@
 
 
         <!-- ========================================== -->
-        <!-- [HÀNG 3] LEAD SOURCE SUMMARY (2 biểu đồ) -->
+        <!-- [HÀNG 3] LEAD SOURCE SUMMARY -->
         <!-- ========================================== -->
         <div class="grid grid-cols-1 gap-8">
-            <!-- Biểu đồ trái: Lead Source Profitability -->
-            <div id="sectionProfitability" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
-                    <span th:text="#{dashboard.lead_source_profitability}">Lead Source Profitability</span>
-
-                </h2>
-                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="leadSourceProfitChart"></canvas></div>
-            </div>
-
-            <!-- Biểu đồ phải: Lead Source Efficiency -->
+            <!-- Biểu đồ: Lead Source Efficiency -->
             <div id="sectionEfficiency" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
@@ -431,7 +421,7 @@
                             <!-- Bao nhiêu / Doanh thu -->
                             <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu tích lũy</span>
-                                <span id="account-summary-revenue" class="text-base font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                                <span id="account-summary-revenue" class="text-base font-black text-emerald-600 mt-1 block">0</span>
                             </div>
                             <!-- Product / Sản phẩm -->
                             <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
@@ -543,27 +533,21 @@
 
             // Locale
             const locale = /*[[${#locale.language}]]*/ 'vi';
-            const currency = locale === 'vi' ? ' VNĐ' : ' VND';
+            const currency = locale === 'vi' ? ' triệu' : ' million';
             const fmtNum = (v) => Number(v || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
             const fmtCurrency = (v) => {
-                const absVal = Math.abs(v);
-                let formatted = '';
-                if (absVal >= 1e9) {
-                    formatted = (v / 1e9).toFixed(2).replace(/\.?0+$/, '') + ' tỷ';
-                } else if (absVal >= 1e6) {
-                    formatted = (v / 1e6).toFixed(2).replace(/\.?0+$/, '') + ' triệu';
-                } else {
-                    formatted = fmtNum(v);
-                }
+                if (v === undefined || v === null) return '0' + currency;
+                const valInMil = v / 1e6;
+                const formatted = Number(valInMil.toFixed(2)).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
                 return (v < 0 ? '-' : '') + formatted + currency;
             };
             const fmtShortNum = (v) => {
-                const absV = Math.abs(v);
-                if (absV >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + ' tỷ';
-                if (absV >= 1e6) return (v / 1e6).toFixed(1).replace(/\.0$/, '') + ' triệu';
-                return fmtNum(v);
+                if (v === undefined || v === null) return '0';
+                const valInMil = v / 1e6;
+                const formatted = Number(valInMil.toFixed(1)).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
+                return formatted + currency;
             };
-            const fmtShortCurrency = (v) => fmtShortNum(v) + currency;
+            const fmtShortCurrency = (v) => fmtShortNum(v);
 
             // i18n labels
             const i18n = {
@@ -591,7 +575,6 @@
                 const keys = [
                     { storageKey: 'funnel', elementId: 'sectionFunnel' },
                     { storageKey: 'segment', elementId: 'sectionSegment' },
-                    { storageKey: 'profitability', elementId: 'sectionProfitability' },
                     { storageKey: 'efficiency', elementId: 'sectionEfficiency' },
                     { storageKey: 'topAccounts', elementId: 'sectionTopAccounts' },
                     { storageKey: 'salesOwnerSummary_v2', elementId: 'sectionSalesOwnerSummary' },
@@ -621,7 +604,6 @@
                  await Promise.all([
                      loadKPIs(),
                      loadLeadStatusChart(),
-                     loadLeadSourceProfitability(),
                      loadLeadSourceEfficiency(),
                      loadAllLeadsForMatrix(),
                      loadTopAccounts(),
@@ -672,9 +654,7 @@
                     document.getElementById('kpiQualifiedLeads').innerText = fmtNum(qualifiedLeads);
 
                     // New Leads
-                    const newLeads = statusData
-                        .filter(s => s.status === 'New')
-                        .reduce((sum, s) => sum + (s.total || 0), 0);
+                    const newLeads = qualifiedLeads;
                     document.getElementById('kpiNewLeads').innerText = fmtNum(newLeads);
 
                     // Conversion Rate
@@ -739,7 +719,7 @@
                     const v2 = getValue(['Qualified']);
                     const v3 = getValue(['Proposal Sent']);
                     const v4 = getValue(['In Negotiation']);
-                    const v5 = getValue(['Won']);
+                    const v5 = getValue(['Won', 'Closed']);
 
                     const values = [v1, v2, v3, v4, v5];
                     const totalActive = values.reduce((a, b) => a + b, 0);
@@ -749,7 +729,7 @@
                         { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
                         { key: 'Proposal Sent', label: 'Proposal Sent', statuses: ['Proposal Sent'], color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
                         { key: 'In Negotiation', label: 'In Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
-                        { key: 'Won', label: 'Won', statuses: ['Won'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
+                        { key: 'Closed', label: 'Closed', statuses: ['Won', 'Closed'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
                     ];
 
                     const totalHeight = 260;
@@ -957,133 +937,7 @@
             }
 
 
-            // ==========================================
-            // HÀM 3: Lead Source Profitability
-            // (Bar: Avg Cost/Won, Area: Avg Revenue/Won, Line: ROI)
-            // ==========================================
-            async function loadLeadSourceProfitability() {
-                try {
-                    const [costRes, roiRes] = await Promise.all([
-                        fetch(`${API_BASE}/cost-per-win-source`),
-                        fetch(`${API_BASE}/roi-lead-source`)
-                    ]);
-                    const costData = await costRes.json();
-                    const roiData = await roiRes.json();
 
-                    // Build ROI map
-                    const roiMap = {};
-                    roiData.forEach(item => {
-                        if (item.label) {
-                            roiMap[item.label.toLowerCase()] = {
-                                roi: item.roi || 0,
-                                avgRevPerWon: (item.wonLead && item.wonLead > 0) ? (item.totalWonValue / item.wonLead) : 0
-                            };
-                        }
-                    });
-
-                    const labels = costData.map(d => d.sourceName);
-                    const avgCostPerWon = costData.map(d => d.costPerWin || 0);
-                    const avgRevPerWon = costData.map(d => {
-                        const key = (d.sourceName || '').toLowerCase();
-                        return roiMap[key]?.avgRevPerWon || 0;
-                    });
-                    const roiValues = costData.map(d => {
-                        const key = (d.sourceName || '').toLowerCase();
-                        return roiMap[key]?.roi || 0;
-                    });
-
-                    const ctx = document.getElementById('leadSourceProfitChart').getContext('2d');
-                    const areaGrad = ctx.createLinearGradient(0, 0, 0, 350);
-                    areaGrad.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
-                    areaGrad.addColorStop(1, 'rgba(16, 185, 129, 0.02)');
-
-                    renderChart('leadSourceProfitChart', 'bar', {
-                        labels,
-                        datasets: [
-                            {
-                                type: 'bar',
-                                label: i18n.avgCostPerWon,
-                                data: avgCostPerWon,
-                                backgroundColor: 'rgba(244, 63, 94, 0.75)',
-                                borderColor: '#f43f5e',
-                                borderWidth: 1,
-                                borderRadius: 6,
-                                barPercentage: 0.5,
-                                order: 3,
-                                yAxisID: 'y2'
-                            },
-                            {
-                                type: 'line',
-                                label: i18n.avgRevPerWon,
-                                data: avgRevPerWon,
-                                borderColor: '#10b981',
-                                backgroundColor: areaGrad,
-                                fill: true,
-                                borderWidth: 2.5,
-                                pointBackgroundColor: '#fff',
-                                pointBorderColor: '#10b981',
-                                pointBorderWidth: 2.5,
-                                pointRadius: 4,
-                                tension: 0.4,
-                                order: 1,
-                                yAxisID: 'y'
-                            },
-                            {
-                                type: 'line',
-                                label: i18n.roi,
-                                data: roiValues,
-                                borderColor: '#8b5cf6',
-                                borderWidth: 2.5,
-                                borderDash: [6, 3],
-                                pointBackgroundColor: '#8b5cf6',
-                                pointRadius: 5,
-                                pointHoverRadius: 7,
-                                tension: 0.3,
-                                order: 2,
-                                yAxisID: 'y1'
-                            }
-                        ]
-                    }, {
-                        interaction: { mode: 'index', intersect: false },
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: {
-                                type: 'linear', position: 'left',
-                                border: { display: false },
-                                grid: { color: '#f1f5f9' },
-                                ticks: { callback: v => fmtShortNum(v) }
-                            },
-                            y1: {
-                                type: 'linear', position: 'right',
-                                grid: { display: false },
-                                border: { display: false },
-                                title: { display: true, text: 'ROI (x)', font: { weight: 'bold', size: 11 }, color: '#8b5cf6' },
-                                ticks: { callback: v => v.toFixed(1) + 'x', color: '#8b5cf6' }
-                            },
-                            y2: {
-                                type: 'linear', position: 'right',
-                                grid: { display: false },
-                                border: { display: false },
-                                title: { display: true, text: 'Chi phí TB', font: { weight: 'bold', size: 11 }, color: '#f43f5e' },
-                                ticks: { callback: v => fmtShortNum(v), color: '#f43f5e' }
-                            }
-                        },
-                        plugins: {
-                            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(ctx) {
-                                        if (ctx.dataset.yAxisID === 'y1') return ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}x`;
-                                        return ` ${ctx.dataset.label}: ${fmtCurrency(ctx.parsed.y)}`;
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading Lead Source Profitability:', error);
-                }
-            }
 
 
             // ==========================================
