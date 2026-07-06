@@ -2671,6 +2671,14 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     """, nativeQuery = true)
     QualifiedLeadResponse getQualifiedLead();
 
+    @Query(value = """
+    SELECT
+        COUNT(DISTINCT lead_id) AS qualifiedLead
+    FROM lead
+    WHERE status = 'New'
+    """, nativeQuery = true)
+    QualifiedLeadResponse getNewLead();
+
 
     @Query(value = """
 WITH SegmentData AS (

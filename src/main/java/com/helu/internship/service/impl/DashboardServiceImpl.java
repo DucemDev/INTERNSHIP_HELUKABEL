@@ -606,6 +606,10 @@ public class DashboardServiceImpl implements DashboardService {
         return leadRepo.getQualifiedLead();
     }
     @Override
+    public QualifiedLeadResponse getNewLead() {
+        return leadRepo.getNewLead();
+    }
+    @Override
     public List<ConversionRateValueMatrixResponse> getConversionRateValueMatrix() {
         return leadRepo.getConversionRateValueMatrix();
     }

@@ -160,6 +160,7 @@ public interface DashboardService {
     List<BusinessResultByStatusResponse> getBusinessResultByStatusBySource(String sourceId);
     WinRateResponse getWinRate();
     QualifiedLeadResponse getQualifiedLead();
+    QualifiedLeadResponse getNewLead();
     List<ConversionRateValueMatrixResponse> getConversionRateValueMatrix();
     List<ValueMatrixCustomerResponse> getValueMatrixCustomer();
     List<CustomerSegmentPipelineResponse> getCustomerSegmentPipeline();

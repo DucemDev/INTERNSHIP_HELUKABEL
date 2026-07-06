@@ -610,7 +610,7 @@
             // ==========================================
             async function loadKPIs() {
                 try {
-                    const [convRes, avgRes, revRes, pipeRes, costRes, statusRes, topIndRes, topRegRes, winRateRes, qualRes] = await Promise.all([
+                    const [convRes, avgRes, revRes, pipeRes, costRes, statusRes, topIndRes, topRegRes, winRateRes, qualRes, newRes] = await Promise.all([
                         fetch(`${API_BASE}/conversion-rate`),
                         fetch(`${API_BASE}/average-days-to-won`),
                         fetch(`${API_BASE}/revenue-summary`),
@@ -620,7 +620,8 @@
                         fetch(`${API_BASE}/best-industry-won-deal`),
                         fetch(`${API_BASE}/best-region-won-deal`),
                         fetch(`${API_BASE}/win-rate`),
-                        fetch(`${API_BASE}/qualified-leads`)
+                        fetch(`${API_BASE}/qualified-leads`),
+                        fetch(`${API_BASE}/new-leads`)
                     ]);
 
                     const conv = await convRes.json();
@@ -633,6 +634,7 @@
                     const topReg = await topRegRes.json();
                     const winRateData = await winRateRes.json();
                     const qualData = await qualRes.json();
+                    const newData = await newRes.json();
 
                     // Total Leads
                     const totalLeads = conv.totalLead || 0;
@@ -643,7 +645,7 @@
                     document.getElementById('kpiQualifiedLeads').innerText = fmtNum(qualifiedLeads);
 
                     // New Leads
-                    const newLeads = qualifiedLeads;
+                    const newLeads = newData.qualifiedLead || 0;
                     document.getElementById('kpiNewLeads').innerText = fmtNum(newLeads);
 
                     // Conversion Rate
