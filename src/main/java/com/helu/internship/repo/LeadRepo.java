@@ -2660,10 +2660,8 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     """, nativeQuery = true)
     QualifiedLeadResponse getQualifiedLead();
 
-
     @Query(value = """
 WITH SegmentData AS (
-
     SELECT
         l.industry_type AS industry,
         l.region AS region,
@@ -2671,13 +2669,11 @@ WITH SegmentData AS (
         COUNT(DISTINCT l.lead_id) AS totalLeads,
 
         COUNT(DISTINCT CASE
-            WHEN l.status = 'Won'
-            THEN l.lead_id
+            WHEN l.status = 'Won' THEN l.lead_id
         END) AS wonLeads,
 
         COUNT(DISTINCT CASE
-            WHEN l.status = 'Lost'
-            THEN l.lead_id
+            WHEN l.status = 'Lost' THEN l.lead_id
         END) AS lostLeads,
 
         SUM(
@@ -2696,7 +2692,6 @@ WITH SegmentData AS (
         ) AS avgRevenuePerWon
 
     FROM lead l
-
     GROUP BY
         l.industry_type,
         l.region
@@ -2704,45 +2699,75 @@ WITH SegmentData AS (
 
 SELECT
 
-    CONCAT(industry,' - ',region) AS segmentName,
+    CONCAT(sd.industry,' - ',sd.region) AS segmentName,
 
-    industry,
+    sd.industry,
 
-    NULL AS customerRole,
+    (
+        SELECT TOP 1 l.customer_role
+        FROM lead l
+        WHERE l.industry_type = sd.industry
+          AND l.region = sd.region
+        GROUP BY l.customer_role
+        ORDER BY COUNT(*) DESC
+    ) AS customerRole,
 
-    region,
+    sd.region,
 
-    totalLeads,
+    sd.totalLeads,
 
-    wonLeads,
+    sd.wonLeads,
 
-    lostLeads,
+    sd.lostLeads,
 
     ROUND(
-        wonLeads * 100.0 /
-        NULLIF(
-            SUM(wonLeads) OVER(PARTITION BY industry),
-            0
-        ),
+        sd.wonLeads * 100.0 /
+        NULLIF(sd.totalLeads,0),
         2
     ) AS conversionRate,
 
-    revenueWon,
+    CAST(sd.revenueWon AS FLOAT) AS revenueWon,
 
-    ROUND(avgRevenuePerWon,2) AS avgRevenuePerWon,
+    ROUND(CAST(sd.avgRevenuePerWon AS FLOAT),2) AS avgRevenuePerWon,
 
-    NULL AS topProductLine,
+    (
+        SELECT TOP 1 l.product_name
+        FROM lead l
+        WHERE l.industry_type = sd.industry
+          AND l.region = sd.region
+          AND l.product_name IS NOT NULL
+        GROUP BY l.product_name
+        ORDER BY COUNT(*) DESC
+    ) AS topProductLine,
 
-    NULL AS topLossReason,
+    (
+        SELECT TOP 1 l.loss_reason
+        FROM lead l
+        WHERE l.industry_type = sd.industry
+          AND l.region = sd.region
+          AND l.status = 'Lost'
+          AND l.loss_reason IS NOT NULL
+        GROUP BY l.loss_reason
+        ORDER BY COUNT(*) DESC
+    ) AS topLossReason,
 
-    NULL AS topSalesOwner
+    (
+        SELECT TOP 1 u.full_name
+        FROM lead l
+        JOIN [user] u
+            ON l.user_id = u.user_id
+        WHERE l.industry_type = sd.industry
+          AND l.region = sd.region
+          AND l.status = 'Won'
+        GROUP BY u.full_name
+        ORDER BY COUNT(*) DESC
+    ) AS topSalesOwner
 
-FROM SegmentData
+FROM SegmentData sd
 
 ORDER BY
-    industry,
-    region
-
+    sd.industry,
+    sd.region;
 """, nativeQuery = true)
     List<ConversionRateValueMatrixResponse> getConversionRateValueMatrix();
 
