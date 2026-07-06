@@ -570,6 +570,21 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
     public QualifiedLeadResponse getQualifiedLead() {
         return dashboardService.getQualifiedLead();
     }
+    // conversion rate dashboard matrix
+    @GetMapping("/conversionrate-value-matrix")
+    public List<ConversionRateValueMatrixResponse> getConversionRateValueMatrix() {
+        return dashboardService.getConversionRateValueMatrix();
+    }
+
+    @GetMapping("/value-matrix-customer")
+    public List<ValueMatrixCustomerResponse> getValueMatrixCustomer() {
+        return dashboardService.getValueMatrixCustomer();
+    }
+    @GetMapping("/value-matrix-customer/pipeline")
+    public List<CustomerSegmentPipelineResponse> getCustomerSegmentPipeline() {
+        return dashboardService.getCustomerSegmentPipeline();
+    }
+
 
 
 
