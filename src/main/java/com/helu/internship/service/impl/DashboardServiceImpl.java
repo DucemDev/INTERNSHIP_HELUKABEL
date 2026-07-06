@@ -570,5 +570,21 @@ public class DashboardServiceImpl implements DashboardService {
     public QualifiedLeadResponse getQualifiedLead() {
         return leadRepo.getQualifiedLead();
     }
+    @Override
+    public List<ConversionRateValueMatrixResponse> getConversionRateValueMatrix() {
+        return leadRepo.getConversionRateValueMatrix();
+    }
+
+    @Override
+    public List<ValueMatrixCustomerResponse> getValueMatrixCustomer() {
+        return leadRepo.getValueMatrixCustomer();
+    }
+
+    @Override
+    public List<CustomerSegmentPipelineResponse> getCustomerSegmentPipeline() {
+        return leadRepo.getCustomerSegmentPipeline();
+    }
+
+
 }
 
