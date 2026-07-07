@@ -59,7 +59,7 @@
         </div>
 
         <!-- Trợ lý AI Chatbot -->
-        <div th:classappend="${activeMenu == 'chatbot' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
+        <div sec:authorize="!hasRole('Seller')" th:classappend="${activeMenu == 'chatbot' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/chatbot" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="message-square" class="mr-3 w-5 h-5"></i>
                 <span th:text="${#locale.language == 'vi' ? 'Trợ lý AI Chatbot' : (#locale.language == 'th' ? 'ผู้ช่วยแชทบอท AI' : 'AI Chatbot Assistant')}">Trợ lý AI Chatbot</span>

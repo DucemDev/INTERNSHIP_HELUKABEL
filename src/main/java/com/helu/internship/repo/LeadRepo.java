@@ -3072,46 +3072,43 @@ ORDER BY roi DESC
 
     @Query(value = """
 SELECT
-
     l.account AS accountName,
-
     SUM(
         CASE
             WHEN l.status = 'Won'
-            THEN ISNULL(l.business_result, 0)
+            THEN COALESCE(l.business_result, expected_rev.val, 0)
             ELSE 0
         END
     ) AS revenueWon,
-
     SUM(
         CASE
             WHEN l.status = 'Lost'
-            THEN ISNULL(l.business_result, 0)
+            THEN COALESCE(expected_rev.val, 0)
             ELSE 0
         END
     ) AS lostOpportunityValue,
-
     SUM(
         CASE
-            WHEN l.status IN (
-                'New',
-                'Contacted',
-                'Qualified',
-                'Proposal Sent',
-                'In Negotiation'
-            )
-            THEN ISNULL(l.business_result, 0)
+            WHEN l.status IN ('Qualified', 'Proposal Sent', 'In Negotiation')
+            THEN COALESCE(expected_rev.val, 0)
             ELSE 0
         END
     ) AS openPipelineValue,
-
-    SUM(ISNULL(l.business_result, 0)) AS totalOpportunity
-
+    SUM(
+        CASE
+            WHEN l.status = 'Won' THEN COALESCE(l.business_result, expected_rev.val, 0)
+            WHEN l.status IN ('Lost', 'Qualified', 'Proposal Sent', 'In Negotiation') THEN COALESCE(expected_rev.val, 0)
+            ELSE 0
+        END
+    ) AS totalOpportunity
 FROM lead l
-
+LEFT JOIN (
+    SELECT li.lead_id, SUM(ISNULL(li.expected_revenue, 0)) AS val
+    FROM lead_item li
+    GROUP BY li.lead_id
+) expected_rev ON l.lead_id = expected_rev.lead_id
 GROUP BY l.account
-
-ORDER BY totalOpportunity DESC
+ORDER BY revenueWon DESC, totalOpportunity DESC
 """, nativeQuery = true)
     List<TopAccountResponse> getTopAccountsByOpportunityValue();
 }

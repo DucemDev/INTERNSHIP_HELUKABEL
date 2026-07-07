@@ -34,11 +34,7 @@ public class HomeController {
         return "dashboard/dashboard-home";
     }
 
-    @GetMapping("/dashboard/test")
-    public String dashboardTestPage(org.springframework.ui.Model model) {
-        model.addAttribute("activeMenu", "dashboard-test");
-        return "dashboard/dashboard-test";
-    }
+
 
     @GetMapping("/dashboard/lead-source-analysis")
     public String leadSourceAnalysisPage(org.springframework.ui.Model model) {

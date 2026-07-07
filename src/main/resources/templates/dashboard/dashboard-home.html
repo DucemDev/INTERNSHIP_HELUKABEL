@@ -339,7 +339,7 @@
             <div id="sectionTopAccounts" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
-                    <span th:text="#{dashboard.top_accounts}">Top 10 Accounts by Revenue</span>
+                    <span th:text="#{dashboard.top_accounts}">Top 5 Doanh nghiệp (Cơ cấu Cơ hội)</span>
 
                 </h2>
                 <div class="relative w-full flex-1 min-h-[400px]"><canvas id="topAccountsChart"></canvas></div>
@@ -1091,7 +1091,7 @@
                              industry: item.industry,
                              region: item.region,
                              totalLeads: item.totalLeads || 0,
-                             conversionRate: item.conversionRate || 0,
+                            conversionRate: item.conversionRate || 0,
                              wonLead: item.wonLeads || 0,
                              lostLead: item.lostLeads || 0,
                              avgRevenuePerWon: item.avgRevenuePerWon || 0,
@@ -1109,7 +1109,9 @@
 
             async function loadTopAccounts() {
                 try {
-                    const res = await fetch(`${API_BASE}/top10-accounts`);
+                    const isVi = locale === 'vi';
+                    const isTh = locale === 'th';
+                    const res = await fetch(`${API_BASE}/account/opportunity-value`);
                     if (!res.ok) {
                         drawTopAccountsEmpty();
                         return;
@@ -1121,26 +1123,40 @@
                     }
 
                     const top5Data = data.slice(0, 5);
-                    const labels = top5Data.map(d => d.account || 'N/A');
-                    const values = top5Data.map(d => d.revenue || 0);
-                    const maxVal = Math.max(...values);
-                    const roundedMax = Math.ceil((maxVal + 10000000000) / 5000000000) * 5000000000;
+                    const labels = top5Data.map(d => d.accountName || 'N/A');
+                    const wonValues = top5Data.map(d => d.revenueWon || 0);
+                    const lostValues = top5Data.map(d => d.lostOpportunityValue || 0);
+                    const openValues = top5Data.map(d => d.openPipelineValue || 0);
 
-                    // Gradient colors for bars
-                    const colors = values.map((_, i) => {
-                        const alpha = 0.9 - (i * 0.06);
-                        return `rgba(16, 185, 129, ${alpha})`;
-                    });
+                    const totals = top5Data.map(d => (d.revenueWon || 0) + (d.lostOpportunityValue || 0) + (d.openPipelineValue || 0));
+                    const maxVal = Math.max(...totals, 0);
+                    const roundedMax = Math.ceil((maxVal + 1000000000) / 1000000000) * 1000000000;
 
                     renderChart('topAccountsChart', 'bar', {
                         labels,
-                        datasets: [{
-                            label: 'Revenue',
-                            data: values,
-                            backgroundColor: colors,
-                            borderRadius: 4,
-                            barThickness: 18
-                        }]
+                        datasets: [
+                            {
+                                label: isVi ? 'Thành công (Won)' : (isTh ? 'ปิดการขายสำเร็จ (Won)' : 'Won'),
+                                data: wonValues,
+                                backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                                borderRadius: 4,
+                                barThickness: 18
+                            },
+                            {
+                                label: isVi ? 'Thất bại (Lost)' : (isTh ? 'ปิดการขายไม่สำเร็จ (Lost)' : 'Lost'),
+                                data: lostValues,
+                                backgroundColor: 'rgba(239, 68, 68, 0.85)',
+                                borderRadius: 4,
+                                barThickness: 18
+                            },
+                            {
+                                label: isVi ? 'Cơ hội mở (Open Pipeline)' : (isTh ? 'โอกาสการขาย (Open Pipeline)' : 'Open Pipeline'),
+                                data: openValues,
+                                backgroundColor: 'rgba(59, 130, 246, 0.85)',
+                                borderRadius: 4,
+                                barThickness: 18
+                            }
+                        ]
                     }, {
                         indexAxis: 'y',
                         onClick: (event, elements) => {
@@ -1155,11 +1171,12 @@
                         },
                         layout: {
                             padding: {
-                                right: 80
+                                right: 30
                             }
                         },
                         scales: {
                             x: {
+                                stacked: true,
                                 beginAtZero: true,
                                 max: roundedMax,
                                 border: { display: false },
@@ -1167,25 +1184,32 @@
                                 ticks: { callback: v => fmtShortNum(v) }
                             },
                             y: {
+                                stacked: true,
                                 grid: { display: false },
                                 border: { display: false },
                                 ticks: { font: { size: 11, weight: 'bold' } }
                             }
                         },
                         plugins: {
-                            legend: { display: false },
-                            datalabels: {
+                            legend: {
                                 display: true,
-                                anchor: 'end',
-                                align: 'right',
-                                offset: 4,
-                                color: '#064e3b',
-                                font: { weight: 'bold', size: 10 },
-                                formatter: v => fmtShortCurrency(v)
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 10,
+                                    font: { size: 10, weight: 'bold' }
+                                }
+                            },
+                            datalabels: {
+                                display: (context) => context.dataset.data[context.dataIndex] > 0,
+                                color: '#ffffff',
+                                font: { weight: 'bold', size: 9 },
+                                formatter: v => fmtShortCurrency(v),
+                                align: 'center',
+                                anchor: 'center'
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: ctx => ` Revenue: ${fmtCurrency(ctx.parsed.x)}`
+                                    label: ctx => ` ${ctx.dataset.label}: ${fmtCurrency(ctx.parsed.x)}`
                                 }
                             }
                         }
@@ -1303,9 +1327,9 @@
 
                     // Color by conversion rate (High contrast, semantic palette: Green for high, Amber for medium, Red for low)
                     let fillColor;
-                    if (cell.conversionRate >= 15) fillColor = '#10b981'; // Emerald Green (High)
-                    else if (cell.conversionRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium)
-                    else fillColor = '#ef4444'; // Rose Red (Low)
+                    if (cell.conversionRate >= 30) fillColor = '#10b981'; // Emerald Green (High >= 30%)
+                    else if (cell.conversionRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium 11% - 29%)
+                    else fillColor = '#ef4444'; // Rose Red (Low <= 10%)
 
                     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                     g.setAttribute('class', 'matrix-bubble');
