@@ -79,7 +79,21 @@
 
         <!-- ROW 3: Average Sales Cycle by Sales Owner -->
         <div id="sectionSalesAvgCycle" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)' : 'Average Sales Cycle by Sales Owner (Days)'}">Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)</h3>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)' : 'Average Sales Cycle by Sales Owner (Days)'}">Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)</h3>
+                <div class="flex flex-wrap items-center gap-1 bg-slate-100/80 p-1 rounded-xl max-w-full overflow-x-auto">
+                    <button onclick="changeAvgCycleChartType('radar')" id="btn-chart-radar" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all bg-white text-slate-800 shadow-sm border border-slate-200/50">Radar</button>
+                    <button onclick="changeAvgCycleChartType('bar')" id="btn-chart-bar" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Cột dọc</button>
+                    <button onclick="changeAvgCycleChartType('horizontalBar')" id="btn-chart-horizontalBar" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Cột ngang</button>
+                    <button onclick="changeAvgCycleChartType('line')" id="btn-chart-line" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Đường</button>
+                    <button onclick="changeAvgCycleChartType('doughnut')" id="btn-chart-doughnut" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Doughnut</button>
+                    <button onclick="changeAvgCycleChartType('polarArea')" id="btn-chart-polarArea" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Polar Area</button>
+                    <button onclick="changeAvgCycleChartType('pie')" id="btn-chart-pie" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Pie</button>
+                    <button onclick="changeAvgCycleChartType('stepped')" id="btn-chart-stepped" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Bậc thang</button>
+                    <button onclick="changeAvgCycleChartType('area')" id="btn-chart-area" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Vùng (Area)</button>
+                    <button onclick="changeAvgCycleChartType('mixed')" id="btn-chart-mixed" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Hỗn hợp</button>
+                </div>
+            </div>
             <div class="relative w-full h-[380px]">
                 <canvas id="avgSalesCycleChart"></canvas>
             </div>
@@ -184,6 +198,9 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <script th:inline="javascript">
+        const locale = /*[[${#locale.language}]]*/ 'vi';
+        const isVi = locale === 'vi';
+
         // Datasets
         let topRevData = null;
         let topWrData = null;
@@ -266,17 +283,10 @@
         }
 
         function formatCurrency(val) {
-            if (val === undefined || val === null) return '0 VNĐ';
-            const absVal = Math.abs(val);
-            let formatted = '';
-            if (absVal >= 1e9) {
-                formatted = (val / 1e9).toFixed(2).replace(/\.?0+$/, '') + ' tỷ';
-            } else if (absVal >= 1e6) {
-                formatted = (val / 1e6).toFixed(2).replace(/\.?0+$/, '') + ' triệu';
-            } else {
-                formatted = Number(val).toLocaleString('vi-VN');
-            }
-            return (val < 0 ? '-' : '') + formatted + ' VNĐ';
+            if (val === undefined || val === null) return isVi ? '0 triệu' : '0 million';
+            const valInMil = val / 1e6;
+            const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
+            return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : ' million');
         }
 
         async function reloadData() {
@@ -500,6 +510,23 @@
             });
         }
 
+        let currentAvgCycleChartType = 'radar';
+        function changeAvgCycleChartType(type) {
+            currentAvgCycleChartType = type;
+            
+            // Toggle active style on buttons
+            const buttons = document.querySelectorAll('.chart-type-btn');
+            buttons.forEach(btn => {
+                btn.className = 'chart-type-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40';
+            });
+            const activeBtn = document.getElementById('btn-chart-' + type);
+            if (activeBtn) {
+                activeBtn.className = 'chart-type-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-slate-800 shadow-sm border border-slate-200/50';
+            }
+            
+            renderAvgSalesCycleChart();
+        }
+
         // Hàng 3: Average Sales Cycle by Sales Owner
         function renderAvgSalesCycleChart() {
             const ctx = document.getElementById('avgSalesCycleChart').getContext('2d');
@@ -528,64 +555,160 @@
 
             if (avgSalesCycleChartInstance) avgSalesCycleChartInstance.destroy();
 
-            avgSalesCycleChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Chu kỳ bán hàng (Ngày)',
-                        data: cycles,
-                        backgroundColor: 'rgba(59, 130, 246, 0.2)', // Light blue fill
-                        borderColor: '#3b82f6',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#2563eb',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        fill: true
-                    }]
+            let chartType = currentAvgCycleChartType;
+            let indexAxis = undefined;
+            if (chartType === 'horizontalBar') {
+                chartType = 'bar';
+                indexAxis = 'y';
+            }
+
+            let realType = chartType;
+            if (chartType === 'stepped' || chartType === 'area') {
+                realType = 'line';
+            } else if (chartType === 'mixed') {
+                realType = 'bar';
+            }
+
+            let options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const salesOwner = cycleSalesData[index];
+                        if (salesOwner) openBantModal(salesOwner.fullName, salesOwner.userCode);
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    onClick: (event, elements) => {
-                        if (elements.length > 0) {
-                            const index = elements[0].index;
-                            const salesOwner = cycleSalesData[index];
-                            openBantModal(salesOwner.fullName, salesOwner.userCode);
-                        }
-                    },
-                    scales: {
-                        r: {
-                            grid: { color: '#e2e8f0' },
-                            angleLines: { color: '#e2e8f0' },
-                            pointLabels: {
-                                font: { size: 11, weight: 'bold' },
-                                color: '#475569'
-                            },
-                            ticks: {
-                                backdropColor: 'transparent',
-                                color: '#64748b',
-                                font: { size: 9 },
-                                showLabelBackdrop: false
-                            },
-                            suggestedMin: 0
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            padding: 12,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function(context) {
-                                    return ` ${context.label}: ${Number(context.raw).toFixed(1)} ngày`;
-                                }
+                plugins: {
+                    legend: { display: (realType === 'doughnut' || realType === 'pie' || realType === 'polarArea' || chartType === 'mixed') ? true : false },
+                    tooltip: {
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.label}: ${Number(context.raw).toFixed(1)} ngày`;
                             }
                         }
                     }
                 }
+            };
+
+            if (indexAxis) {
+                options.indexAxis = indexAxis;
+            }
+
+            // Scale configuration based on chart type
+            if (realType === 'radar') {
+                options.scales = {
+                    r: {
+                        grid: { color: '#e2e8f0' },
+                        angleLines: { color: '#e2e8f0' },
+                        pointLabels: {
+                            font: { size: 11, weight: 'bold' },
+                            color: '#475569'
+                        },
+                        ticks: {
+                            backdropColor: 'transparent',
+                            color: '#64748b',
+                            font: { size: 9 },
+                            showLabelBackdrop: false
+                        },
+                        suggestedMin: 0
+                    }
+                };
+            } else if (realType === 'polarArea') {
+                options.scales = {
+                    r: {
+                        grid: { color: '#e2e8f0' },
+                        ticks: {
+                            backdropColor: 'transparent',
+                            color: '#64748b',
+                            font: { size: 9 },
+                            showLabelBackdrop: false
+                        },
+                        suggestedMin: 0
+                    }
+                };
+            } else if (realType === 'doughnut' || realType === 'pie') {
+                // doughnut/pie doesn't need scales
+            } else {
+                // bar, horizontal bar, line
+                options.scales = {
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { weight: 'bold', size: 10 }, color: '#475569' }
+                    },
+                    y: {
+                        grid: { color: '#f1f5f9' },
+                        ticks: { color: '#475569' },
+                        title: { display: true, text: 'Số ngày', font: { weight: 'bold', size: 11 } },
+                        suggestedMin: 0
+                    }
+                };
+                if (indexAxis === 'y') {
+                    // swap titles for horizontal bar
+                    options.scales.x.title = { display: true, text: 'Số ngày', font: { weight: 'bold', size: 11 } };
+                    options.scales.y.title = undefined;
+                }
+            }
+
+            // Adjust datasets
+            let datasets = [];
+            if (realType === 'doughnut' || realType === 'pie' || realType === 'polarArea') {
+                datasets = [{
+                    label: 'Chu kỳ bán hàng (Ngày)',
+                    data: cycles,
+                    backgroundColor: chartColors.slice(0, cycles.length),
+                    borderWidth: 1.5
+                }];
+            } else if (chartType === 'mixed') {
+                const avgVal = cycles.reduce((a, b) => a + b, 0) / (cycles.length || 1);
+                datasets = [
+                    {
+                        type: 'bar',
+                        label: 'Từng nhân viên (Cột)',
+                        data: cycles,
+                        backgroundColor: 'rgba(59, 130, 246, 0.75)',
+                        borderColor: '#3b82f6',
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    },
+                    {
+                        type: 'line',
+                        label: 'Trung bình chung (Đường)',
+                        data: Array(cycles.length).fill(avgVal),
+                        borderColor: '#ef4444',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ];
+            } else {
+                datasets = [{
+                    label: 'Chu kỳ bán hàng (Ngày)',
+                    data: cycles,
+                    backgroundColor: (chartType === 'area') ? 'rgba(59, 130, 246, 0.25)' : (chartType === 'line' ? 'rgba(59, 130, 246, 0.05)' : 'rgba(59, 130, 246, 0.75)'),
+                    borderColor: '#3b82f6',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    fill: (chartType === 'area' || chartType === 'line') ? true : false,
+                    stepped: (chartType === 'stepped') ? true : false,
+                    borderRadius: (chartType === 'bar') ? 4 : 0
+                }];
+            }
+
+            avgSalesCycleChartInstance = new Chart(ctx, {
+                type: realType,
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: options
             });
         }
 

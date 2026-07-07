@@ -2672,6 +2672,15 @@ public interface LeadRepo extends JpaRepository<LeadEntity, String> {
     QualifiedLeadResponse getQualifiedLead();
 
     @Query(value = """
+    SELECT
+        COUNT(DISTINCT lead_id) AS qualifiedLead
+    FROM lead
+    WHERE status = 'New'
+    """, nativeQuery = true)
+    QualifiedLeadResponse getNewLead();
+
+
+    @Query(value = """
 WITH SegmentData AS (
     SELECT
         l.industry_type AS industry,
@@ -2703,6 +2712,7 @@ WITH SegmentData AS (
         ) AS avgRevenuePerWon
 
     FROM lead l
+
     GROUP BY
         l.industry_type,
         l.region

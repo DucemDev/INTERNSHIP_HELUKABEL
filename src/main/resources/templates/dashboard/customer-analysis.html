@@ -156,90 +156,71 @@
             </div>
         </div>
 
-        <!-- HÀNG 2: CHARTS -->
-        <div class="grid grid-cols-1 gap-6" id="sectionCustomerUnified" style="display: none;">
-            <!-- Unified Mixed Chart Card -->
-            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-800 tracking-tight" id="chartSectionTitle" th:text="${#locale.language == 'vi' ? 'Doanh thu & Leads theo Ngành nghề' : 'Revenue & Leads by Industry'}">Doanh thu & Leads theo Ngành nghề</h2>
-                        <p class="text-xs text-slate-500 font-medium mt-0.5" id="chartSectionSubtitle" th:text="${#locale.language == 'vi' ? 'Nhấp vào một cột để xem phân tích chi tiết của phân khúc.' : 'Click on a column to view detailed segment analysis.'}">Nhấp vào một cột để xem phân tích chi tiết của phân khúc.</p>
-                    </div>
-                    <!-- Filter Tab Buttons -->
-                    <div class="flex flex-wrap items-center gap-1.5 bg-slate-100/80 p-1 rounded-xl">
-                        <button onclick="switchMixedChart('industry')" id="btn-chart-industry" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-slate-800 shadow-sm" th:text="${#locale.language == 'vi' ? 'Ngành nghề' : 'Industry'}">
-                            Ngành nghề
-                        </button>
-                        <button onclick="switchMixedChart('role')" id="btn-chart-role" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850" th:text="${#locale.language == 'vi' ? 'Vai trò khách hàng' : 'Customer Role'}">
-                            Vai trò khách hàng
-                        </button>
-                        <button onclick="switchMixedChart('region')" id="btn-chart-region" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850" th:text="${#locale.language == 'vi' ? 'Khu vực' : 'Region'}">
-                            Khu vực
-                        </button>
-                        <button onclick="switchMixedChart('group')" id="btn-chart-group" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850" th:text="${#locale.language == 'vi' ? 'Nhóm khách hàng' : 'Customer Group'}">
-                            Nhóm khách hàng
-                        </button>
-                        <button onclick="switchMixedChart('product')" id="btn-chart-product" class="chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850" th:text="${#locale.language == 'vi' ? 'Dòng sản phẩm' : 'Product Line'}">
-                            Dòng sản phẩm
-                        </button>
-                    </div>
-                </div>
-                <div class="relative w-full" style="height: 400px;">
-                    <canvas id="unifiedMixedChart"></canvas>
-                </div>
-            </div>
-        </div>
- 
-        <!-- HÀNG 3: CUSTOMER VALUE MATRIX -->
-        <div class="grid grid-cols-1 gap-6 mt-6" id="sectionCustomerValueMatrix" style="display: none;">
-            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-800 tracking-tight" th:text="${#locale.language == 'vi' ? 'Ma trận Giá trị Khách hàng' : 'Customer Value Matrix'}">Ma trận Giá trị Khách hàng</h2>
-                        <p class="text-xs text-slate-500 font-medium mt-0.5" th:text="${#locale.language == 'vi' ? 'Biểu đồ ma trận phân tích giá trị khách hàng. X: Win Rate | Y: Avg Revenue/Won | Size: Total Revenue.' : 'Customer value analysis matrix. X: Win Rate | Y: Avg Revenue/Won | Size: Total Revenue.'}">Biểu đồ ma trận phân tích giá trị khách hàng. X: Win Rate | Y: Avg Revenue/Won | Size: Total Revenue.</p>
-                    </div>
-                    <div class="bg-indigo-50 text-indigo-600 p-2 rounded-xl">
-                        <i data-lucide="scatter-chart" class="w-5 h-5"></i>
-                    </div>
-                </div>
-                <div class="relative w-full flex justify-center items-center min-h-[500px]">
-                    <div id="matrixPackingContainer" class="w-full max-w-[700px] aspect-square flex justify-center items-center relative"></div>
-                    <div id="matrixTooltip" class="absolute hidden bg-slate-900/95 text-white p-3 rounded-xl text-xs shadow-xl pointer-events-none z-50 border border-slate-700 min-w-[220px] transition-opacity duration-150"></div>
-                </div>
-            </div>
-        </div>
- 
- 
+  
         <!-- HÀNG 4: MARKET SEGMENT PERFORMANCE MATRIX -->
         <div class="grid grid-cols-1 gap-6 mt-6" id="sectionCustomerSegmentMatrix">
-            <div class="p-6 rounded-2xl shadow-sm border bg-white border-slate-100 flex flex-col min-h-[520px]">
+            <div class="p-6 rounded-2xl shadow-sm border bg-white border-slate-100 flex flex-col min-h-[580px] relative">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
                     <div>
                         <h2 class="text-base font-bold flex items-center gap-2 text-slate-800">
-                            <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
-                            <span th:text="${#locale.language == 'vi' ? 'Hiệu suất Phân khúc' : 'Segment Performance'}">Hiệu suất Phân khúc</span>
+                            <span class="w-1.5 h-5 bg-red-500 rounded-full"></span>
+                            <span th:text="${#locale.language == 'vi' ? 'Ma trận Hiệu suất Phân khúc Thị trường (Market Segment Performance Matrix)' : 'Market Segment Performance Matrix'}">Ma trận Hiệu suất Phân khúc Thị trường (Market Segment Performance Matrix)</span>
                         </h2>
-                        <p class="text-[10px] text-slate-400 font-medium mt-1" th:text="${#locale.language == 'vi' ? 'Biểu đồ phân tích hiệu quả tỷ lệ thắng (Win Rate %) và quy mô leads (kích thước bong bóng) theo khu vực và ngành hàng.' : 'Performance analysis chart showing Win Rate % and lead volume (bubble size) by Region and Industry.'}">Biểu đồ phân tích hiệu quả tỷ lệ thắng (Win Rate %) và quy mô leads (kích thước bong bóng) theo khu vực và ngành hàng.</p>
+                        <p class="text-[10px] text-slate-400 font-medium mt-1" th:text="${#locale.language == 'vi' ? 'Bản đồ phân khúc khách hàng dựa trên tỷ lệ thắng (Win Rate) và doanh thu trung bình mỗi con thắng (Average Revenue / Won Lead)' : 'Customer segmentation map based on Win Rate and Average Revenue / Won Lead'}">Bản đồ phân khúc khách hàng dựa trên tỷ lệ thắng (Win Rate) và doanh thu trung bình mỗi con thắng (Average Revenue / Won Lead)</p>
                     </div>
                 </div>
-                <div class="w-full overflow-x-auto flex justify-center items-center py-2 flex-1">
-                    <div class="min-w-[400px] w-full max-w-[700px] h-[350px] relative">
-                        <svg id="matrixBubbleChart" class="w-full h-full" viewBox="0 0 700 400"></svg>
+                <div class="w-full relative flex-1 min-h-[420px] flex justify-center items-center py-2">
+                    <svg id="matrixBubbleChart" class="w-full h-full max-w-[850px] min-h-[420px]" viewBox="0 0 850 550" preserveAspectRatio="xMidYMid meet"></svg>
+                    <!-- Floating custom premium tooltip -->
+                    <div id="cvmTooltip" class="absolute hidden z-[3000] bg-white/95 backdrop-blur-md p-4 rounded-xl shadow-xl border border-slate-200/60 text-xs pointer-events-none transition-all duration-150 min-w-[265px]"></div>
+                </div>
+                <!-- Dynamic Legend matching the 4 quadrants -->
+                <div class="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-[10px] font-bold bg-slate-50/60 p-3 rounded-xl border border-slate-100 mt-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full shadow-sm" style="background-color: #10b981;"></span>
+                        <span class="text-slate-600" th:text="${#locale.language == 'vi' ? 'Dễ thắng + Giá trị cao' : 'Easy to Win + High Value'}">Dễ thắng + Giá trị cao</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full shadow-sm" style="background-color: #3b82f6;"></span>
+                        <span class="text-slate-600" th:text="${#locale.language == 'vi' ? 'Khó thắng + Giá trị cao' : 'Hard to Win + High Value'}">Khó thắng + Giá trị cao</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full shadow-sm" style="background-color: #f59e0b;"></span>
+                        <span class="text-slate-600" th:text="${#locale.language == 'vi' ? 'Dễ thắng + Giá trị thấp' : 'Easy to Win + Low Value'}">Dễ thắng + Giá trị thấp</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full shadow-sm" style="background-color: #ef4444;"></span>
+                        <span class="text-slate-600" th:text="${#locale.language == 'vi' ? 'Khó thắng + Giá trị thấp' : 'Hard to Win + Low Value'}">Khó thắng + Giá trị thấp</span>
                     </div>
                 </div>
-                <div class="flex items-center justify-center gap-4 text-[10px] font-semibold bg-slate-50 p-2 rounded-lg border border-slate-200 mt-2">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #10b981;"></span>
-                        <span class="text-slate-600">High (≥ 15%)</span>
+            </div>
+        </div>
+
+        <!-- HÀNG 2-4: REVENUE CHARTS (GỘP THÀNH 1 HÀNG CÓ BỘ LỌC) -->
+        <div class="grid grid-cols-1 gap-6 mt-6" id="sectionCustomerCharts">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[500px]">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-1.5 h-5 bg-indigo-500 rounded-full"></span>
+                        <span id="revenueChartTitle" th:text="${#locale.language == 'vi' ? 'Doanh thu theo Ngành (Industry)' : 'Revenue by Industry'}">Doanh thu theo Ngành</span>
+                    </h2>
+                    
+                    <!-- Premium Selector Dropdown -->
+                    <div class="relative min-w-[240px]">
+                        <select id="revenueDimensionSelector" class="w-full bg-slate-50 border border-slate-200 text-slate-700 font-bold py-2.5 px-4 pr-10 rounded-xl shadow-sm text-xs appearance-none focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 cursor-pointer transition-all">
+                            <option value="industry" th:text="${#locale.language == 'vi' ? 'Theo Ngành (Industry)' : 'By Industry'}">Theo Ngành (Industry)</option>
+                            <option value="role" th:text="${#locale.language == 'vi' ? 'Theo Vai trò (Customer Role)' : 'By Customer Role'}">Theo Vai trò (Customer Role)</option>
+                            <option value="region" th:text="${#locale.language == 'vi' ? 'Theo Khu vực (Region)' : 'By Region'}">Theo Khu vực (Region)</option>
+                            <option value="group" th:text="${#locale.language == 'vi' ? 'Theo Nhóm KH (Customer Group)' : 'By Customer Group'}">Theo Nhóm KH (Customer Group)</option>
+                            <option value="product" th:text="${#locale.language == 'vi' ? 'Theo Dòng sản phẩm (Product Line)' : 'By Product Line'}">Theo Dòng sản phẩm (Product Line)</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #f59e0b;"></span>
-                        <span class="text-slate-600">Medium (11% - 14%)</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: #ef4444;"></span>
-                        <span class="text-slate-600">Low (&lt; 11%)</span>
-                    </div>
+                </div>
+                <div class="relative w-full flex-1 min-h-[380px]">
+                    <canvas id="unifiedRevenueChart"></canvas>
                 </div>
             </div>
         </div>
@@ -372,37 +353,103 @@
             </div>
         </div>
 
+
+
         <!-- MODAL: SEGMENT DRILL-DOWN (Market Matrix click) -->
         <div id="segmentModal" class="fixed inset-0 z-[2000] hidden overflow-y-auto lg:pl-64">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeSegmentModal()"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full border border-slate-200">
+            <div class="flex items-center justify-center min-h-screen p-4 md:p-10">
+                <div class="segment-modal-overlay fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" onclick="closeSegmentModal()"></div>
+                <div class="relative z-[2010] bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all max-w-5xl w-full border border-slate-200">
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
                             <i data-lucide="grid-3x3" class="w-5 h-5 text-blue-600"></i>
-                            <span id="segmentModalTitle">Chi tiết Phân khúc</span>
+                            <span id="segmentModalTitle">Segment Detail</span>
                         </h3>
                         <button onclick="closeSegmentModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
                             <i data-lucide="x" class="w-5 h-5"></i>
                         </button>
                     </div>
                     <div class="p-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                             <!-- Total Leads -->
-                            <div class="bg-blue-50/60 p-5 rounded-xl border border-blue-100">
+                            <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100">
                                 <h4 class="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Total Leads</h4>
-                                <div id="segmentTotalLeads" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0</div>
+                                <div id="segmentTotalLeads" class="mt-1 text-base sm:text-lg font-black text-slate-800">0</div>
                             </div>
-                            <!-- Revenue / Won Deal -->
-                            <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-100">
-                                <h4 class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Revenue/Won Deal</h4>
-                                <div id="segmentRevenue" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0</div>
+                            <!-- Won Leads -->
+                            <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100">
+                                <h4 class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Won Leads</h4>
+                                <div id="segmentWonLeads" class="mt-1 text-base sm:text-lg font-black text-slate-800">0</div>
+                            </div>
+                            <!-- Lost Leads -->
+                            <div class="bg-rose-50/60 p-4 rounded-xl border border-rose-100">
+                                <h4 class="text-[10px] font-bold text-rose-700 uppercase tracking-wider">Lost Leads</h4>
+                                <div id="segmentLostLeads" class="mt-1 text-base sm:text-lg font-black text-slate-800">0</div>
                             </div>
                             <!-- Conversion Rate -->
-                            <div class="bg-amber-50/60 p-5 rounded-xl border border-amber-100">
+                            <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-100">
                                 <h4 class="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Conversion Rate</h4>
-                                <div id="segmentConvRate" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0%</div>
+                                <div id="segmentConvRate" class="mt-1 text-base sm:text-lg font-black text-slate-800">0%</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Revenue / Won Deal -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Revenue / Won Deal</h4>
+                                    <div id="segmentRevenue" class="mt-1 text-sm font-black text-slate-800">—</div>
+                                </div>
+                                <i data-lucide="dollar-sign" class="w-8 h-8 text-slate-300"></i>
+                            </div>
+                            <!-- Top Product Line -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Product Line</h4>
+                                    <div id="segmentTopProduct" class="mt-1 text-sm font-black text-slate-800">—</div>
+                                </div>
+                                <i data-lucide="package" class="w-8 h-8 text-slate-300"></i>
+                            </div>
+                            <!-- Top Loss Reason -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Loss Reason</h4>
+                                    <div id="segmentTopLoss" class="mt-1 text-sm font-black text-slate-800">—</div>
+                                </div>
+                                <i data-lucide="alert-triangle" class="w-8 h-8 text-slate-300"></i>
+                            </div>
+                            <!-- Top Sales Owner -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Sales Owner</h4>
+                                    <div id="segmentTopSeller" class="mt-1 text-sm font-black text-slate-800">—</div>
+                                </div>
+                                <i data-lucide="user" class="w-8 h-8 text-slate-300"></i>
+                            </div>
+                        </div>
+
+                        <!-- Sub-Segments Table -->
+                        <div class="mt-6">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                                <i data-lucide="layers" class="w-4 h-4 text-slate-400"></i>
+                                <span>Chi tiết Phân khúc con (Sub-Segments Detail)</span>
+                            </h4>
+                            <div class="overflow-x-auto border border-slate-100 rounded-xl">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-50/70">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phân khúc (Segment)</th>
+                                            <th class="px-4 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Leads</th>
+                                            <th class="px-4 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">Won Leads</th>
+                                            <th class="px-4 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">Win Rate</th>
+                                            <th class="px-4 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Doanh thu Won (Revenue Won)</th>
+                                            <th class="px-4 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">Avg Revenue / Won</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="segmentModalTableBody" class="bg-white divide-y divide-slate-100">
+                                        <!-- Dynamic rows -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -436,7 +483,7 @@
                             <!-- Doanh thu -->
                             <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu tích lũy</span>
-                                <span id="account-summary-revenue" class="text-base font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                                <span id="account-summary-revenue" class="text-base font-black text-emerald-600 mt-1 block">0</span>
                             </div>
                             <!-- Sản phẩm -->
                             <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
@@ -500,32 +547,23 @@
 
             // Helper format currency
             const formatCurrency = (val) => {
-                if (val === undefined || val === null) return '0 VNĐ';
-                const absVal = Math.abs(val);
-                let formatted = '';
-                if (absVal >= 1e9) {
-                    formatted = (val / 1e9).toFixed(2).replace(/\.?0+$/, '') + ' tỷ';
-                } else if (absVal >= 1e6) {
-                    formatted = (val / 1e6).toFixed(2).replace(/\.?0+$/, '') + ' triệu';
-                } else {
-                    formatted = Number(val).toLocaleString('vi-VN');
-                }
-                return (val < 0 ? '-' : '') + formatted + ' VNĐ';
+                if (val === undefined || val === null) return isVi ? '0 triệu' : '0 million';
+                const valInMil = val / 1e6;
+                const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
+                return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : ' million');
             };
 
             const fmtShortNum = (val) => {
-                const absVal = Math.abs(val);
-                if (absVal >= 1e9) {
-                    return (val / 1e9).toFixed(1).replace(/\.0$/, '') + ' tỷ';
-                }
-                if (absVal >= 1e6) {
-                    return (val / 1e6).toFixed(1).replace(/\.0$/, '') + ' triệu';
-                }
-                return val.toLocaleString('vi-VN');
+                if (val === undefined || val === null) return '0';
+                const valInMil = val / 1e6;
+                const formatted = Number(valInMil.toFixed(1)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
+                return formatted + (isVi ? ' triệu' : ' million');
             };
 
             let chartsData = {};
             let chartInstances = {};
+            let allLeadsData = [];
+            let matrixCellsGlobal = [];
 
             function closeLeadModal() {
                 document.getElementById('leadStatusModal').classList.add('hidden');
@@ -674,12 +712,102 @@
                 document.body.style.overflow = '';
             }
 
-            function openSegmentModal(industry, region, totalLeads, wonLead, winRate, revenue) {
-                const modal = document.getElementById('segmentModal');
-                document.getElementById('segmentModalTitle').innerText = `Chi tiết Phân khúc: ${industry} × ${region}`;
+            function openSegmentModal(industry, customerRole) {
+                const segments = matrixCellsGlobal.filter(c => c.industry === industry && c.customerRole === customerRole);
+                if (segments.length === 0) return;
+                
+                document.getElementById('segmentModalTitle').innerText = `Phân khúc: ${industry} - ${customerRole}`;
+                
+                let totalLeads = 0;
+                let wonLeads = 0;
+                let lostLeads = 0;
+                let revenueWon = 0;
+                
+                const tbody = document.getElementById('segmentModalTableBody');
+                tbody.innerHTML = '';
+                
+                segments.forEach(seg => {
+                    totalLeads += seg.totalLeads || 0;
+                    wonLeads += seg.wonLeads || 0;
+                    lostLeads += seg.lostLeads || 0;
+                    revenueWon += seg.revenueWon || 0;
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50/50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="px-4 py-3 text-xs font-bold text-slate-700">${seg.segmentName}</td>
+                        <td class="px-4 py-3 text-xs font-semibold text-slate-600 text-center">${seg.totalLeads}</td>
+                        <td class="px-4 py-3 text-xs font-semibold text-emerald-600 text-center">${seg.wonLeads}</td>
+                        <td class="px-4 py-3 text-xs font-bold text-blue-600 text-center">${seg.winRate}%</td>
+                        <td class="px-4 py-3 text-xs font-bold text-slate-700 text-right">${formatCurrency(seg.revenueWon)}</td>
+                        <td class="px-4 py-3 text-xs font-bold text-slate-700 text-right">${formatCurrency(seg.avgRevenuePerWon)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                const convRate = totalLeads > 0 ? Math.round((wonLeads / totalLeads) * 100) : 0;
+                
                 document.getElementById('segmentTotalLeads').innerText = totalLeads;
-                document.getElementById('segmentRevenue').innerText = wonLead > 0 ? formatCurrency(Math.round(revenue / wonLead)) : '—';
-                document.getElementById('segmentConvRate').innerText = winRate + '%';
+                document.getElementById('segmentWonLeads').innerText = wonLeads;
+                document.getElementById('segmentLostLeads').innerText = lostLeads;
+                document.getElementById('segmentConvRate').innerText = convRate + '%';
+                
+                // Get general segment leads for top values calculation
+                const segmentLeads = allLeadsData.filter(l => l.industryType === industry && l.customerRole === customerRole);
+                
+                // 1. Top Product Line
+                const productCounts = {};
+                segmentLeads.forEach(l => {
+                    if (l.productName) productCounts[l.productName] = (productCounts[l.productName] || 0) + 1;
+                });
+                let topProduct = '—';
+                let maxProdCount = 0;
+                for (const p in productCounts) {
+                    if (productCounts[p] > maxProdCount) {
+                        maxProdCount = productCounts[p];
+                        topProduct = p;
+                    }
+                }
+                
+                // 2. Top Loss Reason
+                const lossCounts = {};
+                segmentLeads.forEach(l => {
+                    if (l.status === 'Lost' && l.lossReason) {
+                        lossCounts[l.lossReason] = (lossCounts[l.lossReason] || 0) + 1;
+                    }
+                });
+                let topLoss = '—';
+                let maxLossCount = 0;
+                for (const lr in lossCounts) {
+                    if (lossCounts[lr] > maxLossCount) {
+                        maxLossCount = lossCounts[lr];
+                        topLoss = lr;
+                    }
+                }
+                
+                // 3. Top Sales Owner
+                const sellerCounts = {};
+                segmentLeads.forEach(l => {
+                    const sellerName = l.userName || (l.user ? l.user.fullName : '');
+                    if (sellerName) {
+                        sellerCounts[sellerName] = (sellerCounts[sellerName] || 0) + 1;
+                    }
+                });
+                let topSeller = '—';
+                let maxSellerCount = 0;
+                for (const s in sellerCounts) {
+                    if (sellerCounts[s] > maxSellerCount) {
+                        maxSellerCount = sellerCounts[s];
+                        topSeller = s;
+                    }
+                }
+                
+                document.getElementById('segmentRevenue').innerText = wonLeads > 0 ? formatCurrency(revenueWon / wonLeads) : '—';
+                document.getElementById('segmentTopProduct').innerText = topProduct;
+                document.getElementById('segmentTopLoss').innerText = topLoss;
+                document.getElementById('segmentTopSeller').innerText = topSeller;
+                
+                const modal = document.getElementById('segmentModal');
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
                 if(window.lucide) lucide.createIcons();
@@ -690,423 +818,221 @@
                 document.body.style.overflow = '';
             }
 
-            async function fetchMixedChartData(endpoint) {
-                let items = [];
-                try {
-                    const res = await fetch(endpoint);
-                    if (res.ok) {
-                        const rawData = await res.json();
-                        items = rawData.map((d, i) => {
-                            const name = d.industry || d.customerRole || d.role || d.region || d.customerGroup || d.productLine || `Item ${i}`;
-                            const revenue = d.revenue || 0;
-                            const totalLeads = d.totalLeads || 0;
-                            const wonLeads = d.wonLeads || 0;
-                            return {
-                                name: name,
-                                totalLeads: totalLeads,
-                                wonLeads: wonLeads,
-                                revenue: revenue,
-                                roi: d.roi || 0,
-                                conversionRate: d.conversionRate || (totalLeads > 0 ? wonLeads / totalLeads : 0),
-                                avgSalesCycle: d.avgSalesCycle || 0,
-                                bestLostReason: d.bestLostReason || 'N/A',
-                                lostReasonCount: d.lostReasonCount || 0
-                            };
-                        });
-                    }
-                } catch(e) { }
-                return items;
-            }
-
-            let cachedChartData = {
-                industry: [],
-                role: [],
-                region: [],
-                group: [],
-                product: []
-            };
-
-            let unifiedChartInstance = null;
-
-            function switchMixedChart(type) {
-                // Update active tab buttons styles
-                document.querySelectorAll('.chart-tab-btn').forEach(btn => {
-                    btn.className = "chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-850";
-                });
-                
-                const activeBtn = document.getElementById(`btn-chart-${type}`);
-                if (activeBtn) {
-                    activeBtn.className = "chart-tab-btn px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-slate-800 shadow-sm";
-                }
-
-                // Update titles
-                let title = "";
-                let subtitle = "";
-                let categoryName = "";
-                let dataItems = cachedChartData[type] || [];
-
-                switch(type) {
-                    case 'industry':
-                        title = "Doanh thu & Leads theo Ngành nghề";
-                        subtitle = "Nhấp vào cột để xem phân tích chi tiết của ngành.";
-                        categoryName = "Ngành nghề";
-                        break;
-                    case 'role':
-                        title = "Doanh thu & Leads theo Vai trò khách hàng";
-                        subtitle = "Nhấp vào cột để xem phân tích chi tiết theo vai trò.";
-                        categoryName = "Vai trò Khách hàng";
-                        break;
-                    case 'region':
-                        title = "Doanh thu & Leads theo Khu vực";
-                        subtitle = "Nhấp vào cột để xem phân tích chi tiết theo khu vực địa lý.";
-                        categoryName = "Khu vực";
-                        break;
-                    case 'group':
-                        title = "Doanh thu & Leads theo Phân nhóm khách hàng";
-                        subtitle = "Nhấp vào cột để xem phân tích chi tiết theo nhóm khách hàng.";
-                        categoryName = "Nhóm Khách hàng";
-                        break;
-                    case 'product':
-                        title = "Doanh thu & Leads theo Dòng sản phẩm";
-                        subtitle = "Nhấp vào cột để xem phân tích chi tiết theo dòng sản phẩm.";
-                        categoryName = "Dòng Sản phẩm";
-                        break;
-                }
-
-                document.getElementById('chartSectionTitle').innerText = title;
-                document.getElementById('chartSectionSubtitle').innerText = subtitle;
-
-                const labels = dataItems.map(d => d.name);
-                const leads = dataItems.map(d => d.totalLeads);
-                const revenues = dataItems.map(d => d.revenue);
-                const rois = dataItems.map(d => d.roi);
-
-                const ctx = document.getElementById('unifiedMixedChart').getContext('2d');
-                if (unifiedChartInstance) {
-                    unifiedChartInstance.destroy();
-                }
-
-                const chartDatasets = [
-                    {
-                        type: 'bar',
-                        label: 'Leads',
-                        data: leads,
-                        backgroundColor: 'rgba(246, 23, 27, 0.85)',
-                        hoverBackgroundColor: 'rgba(246, 23, 27, 1)',
-                        yAxisID: 'yLeads',
-                        borderRadius: 4,
-                        order: 3
-                    },
-                    {
-                        type: 'line',
-                        label: 'Doanh thu (VND)',
-                        data: revenues,
-                        borderColor: '#3b82f6', // Blue line
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2.5,
-                        tension: 0.3,
-                        fill: false,
-                        yAxisID: 'yRevenue',
-                        order: 2
-                    },
-                    {
-                        type: 'line',
-                        label: 'ROI (%)',
-                        data: rois,
-                        borderColor: '#eab308', // Yellow line
-                        backgroundColor: 'rgba(234, 179, 8, 0.1)',
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        tension: 0.3,
-                        fill: false,
-                        yAxisID: 'yRoi',
-                        order: 1
-                    }
-                ];
-
-                const scalesConfig = {
-                    x: {
-                        grid: { display: false }
-                    },
-                    yLeads: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: { display: true, text: 'Leads' },
-                        grid: { color: '#f1f5f9' },
-                        min: 0
-                    },
-                    yRevenue: {
-                        type: 'linear',
-                        display: false,
-                        position: 'right',
-                        min: 0
-                    },
-                    yRoi: {
-                        type: 'linear',
-                        display: false,
-                        position: 'right',
-                        min: 0
-                    }
-                };
-
-                unifiedChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: chartDatasets
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false,
-                        },
-                        plugins: {
-                            legend: { position: 'top' },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const datasetLabel = context.dataset.label || '';
-                                        const val = context.raw;
-                                        if (context.datasetIndex === 1) { // Revenue
-                                            return datasetLabel + ': ' + formatCurrency(val);
-                                        } else if (context.datasetIndex === 2) { // ROI
-                                            return datasetLabel + ': ' + val.toFixed(1) + '%';
-                                        }
-                                        return datasetLabel + ': ' + val;
-                                    }
-                                }
-                            }
-                        },
-                        scales: scalesConfig,
-                        onClick: (event, activeElements) => {
-                            if (activeElements.length > 0) {
-                                const index = activeElements[0].index;
-                                const dataObj = dataItems[index];
-                                openDetailModal(categoryName, dataObj.name, dataObj);
-                            }
-                        }
-                    }
+            function mergeValueMatrixData(matrixData, pipelineData) {
+                return matrixData.map(item => {
+                    const pipe = pipelineData.find(p => p.segment === item.segmentName);
+                    return {
+                        ...item,
+                        pipelineValue: pipe ? (pipe.pipelineValue || 0) : 0,
+                    };
                 });
             }
 
-            async function loadAllMixedCharts() {
-                try {
-                    cachedChartData.industry = await fetchMixedChartData('/api/dashboard/revenue-industry');
-                    cachedChartData.role = await fetchMixedChartData('/api/dashboard/customer-role/revenue');
-                    cachedChartData.region = await fetchMixedChartData('/api/dashboard/revenue-region');
-                    cachedChartData.group = await fetchMixedChartData('/api/dashboard/revenue-group');
-                    cachedChartData.product = await fetchMixedChartData('/api/dashboard/revenue-product-line');
-                    
-                    // Render default chart (industry)
-                    switchMixedChart('industry');
-                } catch(e) {
-                    console.error("Error loading charts:", e);
-                }
-            }
-
-
-            // ==========================================
-            // HÀNG 4: Draw Matrix SVG (Bubble Grid)
-            // ==========================================
             async function loadAllLeadsForMatrix() {
                 try {
-                    const res = await fetch('/api/leads');
-                    if (res.ok) {
-                        const leads = await res.json();
-                        if (leads && leads.length > 0) {
-                            drawMatrixFromLeads(leads);
-                            return;
-                        }
-                    }
-                    await loadMatrixFromFilters();
-                } catch (e) {
-                    console.error('Error loading leads for matrix:', e);
-                    await loadMatrixFromFilters();
-                }
-            }
-
-            async function loadMatrixFromFilters() {
-                try {
-                    const [regRes, indRes] = await Promise.all([
-                        fetch('/api/dashboard/win-rate-by-region'),
-                        fetch('/api/dashboard/win-rate-by-industry')
+                    const [matrixRes, pipelineRes, leadsRes] = await Promise.all([
+                        fetch('/api/dashboard/value-matrix-customer'),
+                        fetch('/api/dashboard/value-matrix-customer/pipeline'),
+                        fetch('/api/leads')
                     ]);
-                    const regions = (await regRes.json()).map(r => r.region).filter(Boolean);
-                    const industries = (await indRes.json()).map(i => i.industryType).filter(Boolean);
-
-                    let cells = [];
-                    for (const ind of industries) {
-                        for (const reg of regions) {
-                            try {
-                                const fRes = await fetch(`/api/dashboard/conversion-rate/filter?region=${encodeURIComponent(reg)}&industry=${encodeURIComponent(ind)}`);
-                                const fData = await fRes.json();
-                                const totalLead = fData.reduce((s, d) => s + (d.totalLead || 0), 0);
-                                const wonLead = fData.reduce((s, d) => s + (d.wonLead || 0), 0);
-                                const wr = totalLead > 0 ? Math.round((wonLead / totalLead) * 100) : 0;
-                                const revenue = fData.reduce((s, d) => s + (d.totalRevenue || d.revenue || 0), 0);
-                                cells.push({ industry: ind, region: reg, value: totalLead, winRate: wr, wonLead, revenue });
-                            } catch {
-                                cells.push({ industry: ind, region: reg, value: 0, winRate: 0, wonLead: 0, revenue: 0 });
-                            }
-                        }
+                    if (leadsRes.ok) {
+                        allLeadsData = await leadsRes.json();
                     }
-                    const maxVal = Math.max(...cells.map(c => c.value), 1);
-                    drawMatrixSVG(cells, regions, industries, maxVal);
+                    if (!matrixRes.ok || !pipelineRes.ok) return;
+                    const matrixData = await matrixRes.json();
+                    const pipelineData = await pipelineRes.json();
+                    
+                    const mergedData = mergeValueMatrixData(matrixData, pipelineData);
+                    matrixCellsGlobal = mergedData;
+                    
+                    drawPackedBubbleChart(mergedData);
                 } catch (e) {
-                    console.error('Error loading matrix from filters:', e);
+                    console.error('Error loading value matrix data:', e);
                 }
             }
 
-            function drawMatrixFromLeads(leads) {
-                const regions = [...new Set(leads.map(l => l.region).filter(Boolean))].sort();
-                const industries = [...new Set(leads.map(l => l.industryType).filter(Boolean))].sort();
+            function drawPackedBubbleChart(data) {
+                const svgElement = document.getElementById('matrixBubbleChart');
+                const tooltip = document.getElementById('cvmTooltip');
+                if (!svgElement) return;
+                
+                svgElement.innerHTML = '';
+                
+                const svg = d3.select(svgElement);
+                const width = 850;
+                const height = 550;
+                
+                const paddingLeft = 80;
+                const paddingRight = 50;
+                const paddingTop = 50;
+                const paddingBottom = 60;
+                
+                const maxAvgRev = d3.max(data, d => d.avgRevenuePerWon || 0) || 8000000000;
+                const xScale = d3.scaleLinear()
+                    .domain([0, Math.max(10000000000, maxAvgRev)])
+                    .range([paddingLeft, width - paddingRight]);
+                    
+                const yScale = d3.scaleLinear()
+                    .domain([0, 100])
+                    .range([height - paddingBottom, paddingTop]);
+                    
+                const maxLeads = d3.max(data, d => d.totalLeads || 1) || 1;
+                const rScale = d3.scaleSqrt()
+                    .domain([0, maxLeads])
+                    .range([6, 26]);
 
-                if (regions.length === 0 || industries.length === 0) {
-                    drawMatrixSVG([], regions.length ? regions : ['N/A'], industries.length ? industries : ['N/A'], 1);
-                    return;
-                }
+                const yTicks = [20, 40, 60, 80, 100];
+                yTicks.forEach(tick => {
+                    svg.append("line")
+                        .attr("x1", paddingLeft)
+                        .attr("y1", yScale(tick))
+                        .attr("x2", width - paddingRight)
+                        .attr("y2", yScale(tick))
+                        .attr("stroke", tick === 40 ? "#94a3b8" : "#f1f5f9")
+                        .attr("stroke-width", tick === 40 ? 1.5 : 1)
+                        .attr("stroke-dasharray", tick === 40 ? "4,4" : "none");
 
-                let cells = [];
-                let maxVal = 0;
-                industries.forEach(ind => {
-                    regions.forEach(reg => {
-                        const seg = leads.filter(l => l.industryType === ind && l.region === reg);
-                        const total = seg.length;
-                        const won = seg.filter(l => l.status === 'Won').length;
-                        const wr = total > 0 ? Math.round((won / total) * 100) : 0;
-                        const revenue = seg.filter(l => l.status === 'Won').reduce((s, l) => s + Number(l.businessResult || 0), 0);
-                        cells.push({ industry: ind, region: reg, value: total, winRate: wr, wonLead: won, revenue });
-                        if (total > maxVal) maxVal = total;
+                    svg.append("text")
+                        .attr("x", paddingLeft - 10)
+                        .attr("y", yScale(tick) + 4)
+                        .attr("text-anchor", "end")
+                        .attr("fill", "#64748b")
+                        .attr("font-size", "10px")
+                        .attr("font-weight", "bold")
+                        .text(`${tick}%`);
+                });
+
+                const xTicks = [1000000000, 3000000000, 5000000000, 7000000000, 9000000000];
+                xTicks.forEach(tick => {
+                    svg.append("line")
+                        .attr("x1", xScale(tick))
+                        .attr("y1", paddingTop)
+                        .attr("x2", xScale(tick))
+                        .attr("y2", height - paddingBottom)
+                        .attr("stroke", "#f1f5f9")
+                        .attr("stroke-width", 1);
+
+                    svg.append("text")
+                        .attr("x", xScale(tick))
+                        .attr("y", height - paddingBottom + 18)
+                        .attr("text-anchor", "middle")
+                        .attr("fill", "#64748b")
+                        .attr("font-size", "10px")
+                        .attr("font-weight", "bold")
+                        .text(formatCurrencyShort(tick));
+                });
+
+                svg.append("line")
+                    .attr("x1", xScale(4000000000))
+                    .attr("y1", paddingTop)
+                    .attr("x2", xScale(4000000000))
+                    .attr("y2", height - paddingBottom)
+                    .attr("stroke", "#94a3b8")
+                    .attr("stroke-width", 1.5)
+                    .attr("stroke-dasharray", "4,4");
+                
+                svg.append("text")
+                    .attr("x", paddingLeft + (width - paddingLeft - paddingRight) / 2)
+                    .attr("y", height - paddingBottom + 42)
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "#475569")
+                    .attr("font-size", "11px")
+                    .attr("font-weight", "bold")
+                    .text(isVi ? "Doanh thu trung bình / Won Lead" : "Avg Revenue / Won Lead");
+
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("x", -(paddingTop + (height - paddingTop - paddingBottom) / 2))
+                    .attr("y", paddingLeft - 45)
+                    .attr("text-anchor", "middle")
+                    .attr("fill", "#475569")
+                    .attr("font-size", "11px")
+                    .attr("font-weight", "bold")
+                    .text(isVi ? "Tỷ lệ thắng (Win Rate)" : "Win Rate");
+
+                const g = svg.append("g");
+                
+                g.selectAll(".dot")
+                    .data(data)
+                    .enter().append("circle")
+                    .attr("class", "dot")
+                    .attr("cx", d => xScale(d.avgRevenuePerWon || 0))
+                    .attr("cy", d => yScale(d.winRate || 0))
+                    .attr("r", d => rScale(d.totalLeads || 0))
+                    .attr("fill", d => {
+                        const isEasy = (d.winRate || 0) >= 40;
+                        const isHigh = (d.avgRevenuePerWon || 0) >= 4000000000;
+                        if (isEasy && isHigh) return "#10b981"; // Emerald
+                        if (!isEasy && isHigh) return "#3b82f6"; // Blue
+                        if (isEasy && !isHigh) return "#f59e0b"; // Amber
+                        return "#ef4444"; // Rose
+                    })
+                    .attr("fill-opacity", 0.75)
+                    .attr("stroke", "#ffffff")
+                    .attr("stroke-width", 1)
+                    .style("cursor", "pointer")
+                    .on("mouseover", function(event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(150)
+                            .attr("stroke-width", 2.5)
+                            .attr("fill-opacity", 0.95);
+                            
+                        const tooltipEl = d3.select(tooltip);
+                        tooltipEl.style("display", "block")
+                            .html(`
+                                <div class="font-bold text-slate-800 border-b border-slate-100 pb-1.5 mb-1.5 text-[11px] leading-snug">${d.segmentName}</div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between gap-4"><span class="text-slate-400 font-medium">${isVi ? 'Tổng số Leads:' : 'Total Leads:'}</span><span class="font-bold text-slate-800">${d.totalLeads}</span></div>
+                                    <div class="flex justify-between gap-4"><span class="text-slate-400 font-medium">${isVi ? 'Đã thắng (Won):' : 'Won Leads:'}</span><span class="font-bold text-emerald-600">${d.wonLeads}</span></div>
+                                    <div class="flex justify-between gap-4"><span class="text-slate-400 font-medium">${isVi ? 'Tỷ lệ thắng:' : 'Win Rate:'}</span><span class="font-bold text-blue-600">${d.winRate}%</span></div>
+                                    <div class="flex justify-between gap-4"><span class="text-slate-400 font-medium">${isVi ? 'Doanh thu Won:' : 'Revenue Won:'}</span><span class="font-bold text-slate-800">${formatCurrency(d.revenueWon)}</span></div>
+                                    <div class="flex justify-between gap-4"><span class="text-slate-400 font-medium">${isVi ? 'TB Doanh thu / Won:' : 'Avg Rev / Won:'}</span><span class="font-bold text-slate-800">${formatCurrency(d.avgRevenuePerWon)}</span></div>
+                                    ${d.pipelineValue > 0 ? `<div class="flex justify-between gap-4"><span class="text-slate-400 font-medium">${isVi ? 'Giá trị Pipeline:' : 'Pipeline Value:'}</span><span class="font-bold text-indigo-600">${formatCurrency(d.pipelineValue)}</span></div>` : ''}
+                                </div>
+                            `);
+                    })
+                    .on("mousemove", function(event) {
+                        const containerRect = svgElement.parentElement.getBoundingClientRect();
+                        const x = event.clientX - containerRect.left;
+                        const y = event.clientY - containerRect.top;
+                        
+                        const tooltipWidth = tooltip.offsetWidth;
+                        const tooltipHeight = tooltip.offsetHeight;
+                        
+                        let leftPos = x + 15;
+                        let topPos = y - tooltipHeight - 15;
+                        
+                        if (leftPos + tooltipWidth > containerRect.width) {
+                            leftPos = x - tooltipWidth - 15;
+                        }
+                        if (topPos < 0) {
+                            topPos = y + 15;
+                        }
+                        
+                        d3.select(tooltip)
+                            .style("left", leftPos + "px")
+                            .style("top", topPos + "px");
+                    })
+                    .on("mouseout", function() {
+                        d3.select(this)
+                            .transition()
+                            .duration(150)
+                            .attr("stroke-width", 1)
+                            .attr("fill-opacity", 0.75);
+                            
+                        d3.select(tooltip).style("display", "none");
+                    })
+                    .on("click", function(event, d) {
+                        openSegmentModal(d.industry, d.customerRole);
                     });
-                });
-                if (maxVal === 0) maxVal = 1;
-                drawMatrixSVG(cells, regions, industries, maxVal);
-            }
 
-            function drawMatrixSVG(cells, regions, industries, maxVal) {
-                const svg = document.getElementById('matrixBubbleChart');
-                if (!svg) return;
-                svg.innerHTML = '';
-
-                const width = 700;
-                const height = 400;
-                const paddingLeft = 160;
-                const paddingRight = 30;
-                const paddingTop = 30;
-                const paddingBottom = 10;
-
-                const chartW = width - paddingLeft - paddingRight;
-                const chartH = height - paddingTop - paddingBottom;
-
-                // Border
-                const borderRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                borderRect.setAttribute('x', paddingLeft);
-                borderRect.setAttribute('y', paddingTop);
-                borderRect.setAttribute('width', chartW);
-                borderRect.setAttribute('height', chartH);
-                borderRect.setAttribute('fill', 'none');
-                borderRect.setAttribute('stroke', '#e2e8f0');
-                borderRect.setAttribute('stroke-width', '1.5');
-                svg.appendChild(borderRect);
-
-                // Column labels
-                const colW = chartW / (regions.length || 1);
-                regions.forEach((reg, i) => {
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text.setAttribute('x', paddingLeft + (i + 0.5) * colW);
-                    text.setAttribute('y', paddingTop - 10);
-                    text.setAttribute('fill', '#94a3b8');
-                    text.setAttribute('font-size', '12');
-                    text.setAttribute('font-weight', 'bold');
-                    text.setAttribute('text-anchor', 'middle');
-                    text.textContent = reg;
-                    svg.appendChild(text);
-                });
-
-                // Row labels
-                const rowH = chartH / (industries.length || 1);
-                industries.forEach((ind, i) => {
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text.setAttribute('x', paddingLeft - 12);
-                    text.setAttribute('y', paddingTop + (i + 0.5) * rowH + 4);
-                    text.setAttribute('fill', '#94a3b8');
-                    text.setAttribute('font-size', '11');
-                    text.setAttribute('font-weight', 'bold');
-                    text.setAttribute('text-anchor', 'end');
-                    text.textContent = ind.length > 22 ? ind.substring(0, 20) + '...' : ind;
-                    svg.appendChild(text);
-                });
-
-                // Grid lines
-                for (let i = 1; i < regions.length; i++) {
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', paddingLeft + i * colW);
-                    line.setAttribute('y1', paddingTop);
-                    line.setAttribute('x2', paddingLeft + i * colW);
-                    line.setAttribute('y2', paddingTop + chartH);
-                    line.setAttribute('stroke', '#e2e8f0');
-                    line.setAttribute('stroke-width', '1');
-                    svg.appendChild(line);
+                function formatCurrencyShort(value) {
+                    if (value >= 1000000000) {
+                        return `${(value / 1000000000).toFixed(0)} tỷ`;
+                    }
+                    return value;
                 }
-                for (let i = 1; i < industries.length; i++) {
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', paddingLeft);
-                    line.setAttribute('y1', paddingTop + i * rowH);
-                    line.setAttribute('x2', paddingLeft + chartW);
-                    line.setAttribute('y2', paddingTop + i * rowH);
-                    line.setAttribute('stroke', '#e2e8f0');
-                    line.setAttribute('stroke-width', '1');
-                    svg.appendChild(line);
-                }
-
-                // Bubbles
-                const maxWinRate = Math.max(...cells.map(c => c.winRate), 1);
-                cells.forEach(cell => {
-                    const colIdx = regions.indexOf(cell.region);
-                    const rowIdx = industries.indexOf(cell.industry);
-                    if (colIdx === -1 || rowIdx === -1) return;
-
-                    const cx = paddingLeft + (colIdx + 0.5) * colW;
-                    const cy = paddingTop + (rowIdx + 0.5) * rowH;
-
-                    const minR = 14;
-                    const maxR = Math.min(colW, rowH) * 0.38;
-                    const r = cell.winRate > 0 ? minR + (maxR - minR) * Math.sqrt(cell.winRate / maxWinRate) : minR;
-
-                    // Color by win rate (High contrast, semantic palette: Green for high, Amber for medium, Red for low)
-                    let fillColor;
-                    if (cell.winRate >= 15) fillColor = '#10b981'; // Emerald Green (High)
-                    else if (cell.winRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium)
-                    else fillColor = '#ef4444'; // Rose Red (Low)
-
-                    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                    g.setAttribute('class', 'matrix-bubble');
-                    g.setAttribute('onclick', `openSegmentModal('${cell.industry}', '${cell.region}', ${cell.value}, ${cell.wonLead || 0}, ${cell.winRate}, ${cell.revenue || 0})`);
-                    g.style.cursor = 'pointer';
-
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    circle.setAttribute('cx', cx);
-                    circle.setAttribute('cy', cy);
-                    circle.setAttribute('r', r);
-                    circle.setAttribute('fill', fillColor);
-                    circle.setAttribute('opacity', '0.85');
-                    g.appendChild(circle);
-
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    text.setAttribute('x', cx);
-                    text.setAttribute('y', cy + 4);
-                    text.setAttribute('fill', '#ffffff');
-                    text.setAttribute('font-size', r > 20 ? '11' : '9');
-                    text.setAttribute('font-weight', 'bold');
-                    text.setAttribute('text-anchor', 'middle');
-                    text.textContent = cell.winRate + '%';
-                    g.appendChild(text);
-
-                    svg.appendChild(g);
-                });
             }
 
             // ==========================================
@@ -1243,314 +1169,10 @@
                 }
             }
 
-            async function renderCustomerValueMatrix() {
-                const container = document.getElementById('matrixPackingContainer');
-                if (!container) return;
-                container.innerHTML = '';
-
-                if (typeof d3 === 'undefined') {
-                    container.innerHTML = '<div class="text-slate-500 font-medium">Đang tải thư viện D3.js...</div>';
-                    setTimeout(renderCustomerValueMatrix, 500);
-                    return;
-                }
-
-                const width = container.clientWidth || 700;
-                const height = container.clientHeight || 700;
-                const packSize = Math.min(width, height) - 20;
-                
-                // Fetch actual leads to group by Accounts
-                let leads = [];
-                try {
-                    const res = await fetch('/api/leads');
-                    if (res.ok) {
-                        leads = await res.json();
-                    }
-                } catch (e) {
-                    console.error("Error fetching leads for matrix:", e);
-                }
-
-                // If no leads, fallback to basic defaults so chart isn't empty
-                if (!leads || leads.length === 0) {
-                    leads = [
-                        { account: 'Công ty Thép Hòa Phát', businessResult: 450000000, status: 'Won', costPerLead: 45000 },
-                        { account: 'Tập đoàn Điện lực EVN', businessResult: 750000000, status: 'Won', costPerLead: 50000 },
-                        { account: 'Nhà máy Lọc dầu Dung Quất', businessResult: 900000000, status: 'Won', costPerLead: 85000 },
-                        { account: 'Đại học Bách Khoa Hà Nội', businessResult: 80000000, status: 'Won', costPerLead: 15000 },
-                        { account: 'Công ty sữa Vinasoy', businessResult: 120000000, status: 'Won', costPerLead: 30000 },
-                        { account: 'Cáp điện CADIVI', businessResult: 180000000, status: 'Won', costPerLead: 40000 },
-                        { account: 'Công ty Cơ điện REE', businessResult: 320000000, status: 'Won', costPerLead: 75000 },
-                        { account: 'Tập đoàn FPT', businessResult: 60000000, status: 'Won', costPerLead: 20000 },
-                        { account: 'Tổng công ty Viettel', businessResult: 0, status: 'New', costPerLead: 25000 },
-                        { account: 'Nhà máy thép Posco', businessResult: 0, status: 'Lost', costPerLead: 30000 }
-                    ];
-                }
-
-                // Group by Account
-                const accountGroups = {};
-                leads.forEach(l => {
-                    const accName = l.account || 'Khách hàng ẩn danh';
-                    if (!accountGroups[accName]) {
-                        accountGroups[accName] = {
-                            name: accName,
-                            totalLeads: 0,
-                            wonLeads: 0,
-                            revenue: 0,
-                            roi: 0,
-                            cpl: 0
-                        };
-                    }
-                    const acc = accountGroups[accName];
-                    acc.totalLeads += 1;
-                    if (l.status?.toLowerCase() === 'won') {
-                        acc.wonLeads += 1;
-                        acc.revenue += (l.businessResult || 0);
-                    }
-                    acc.cpl += (l.costPerLead || 30000);
-                });
-
-                // Calculate metrics
-                const accountsList = Object.values(accountGroups).map(acc => {
-                    acc.winRate = acc.totalLeads > 0 ? (acc.wonLeads / acc.totalLeads) * 100 : 0;
-                    acc.roi = acc.revenue > 0 ? Math.min(100, (acc.revenue / acc.cpl) * 100) : (Math.random() * 25 + 5);
-                    acc.cpl = acc.cpl / acc.totalLeads;
-                    return acc;
-                });
-
-                // Categorize into the 4 groups
-                const groups = {
-                    'Rất tốt': { name: 'Rất tốt', color: '#10b981', children: [] },
-                    'Nhỏ': { name: 'Nhỏ', color: '#3b82f6', children: [] },
-                    'Deal Lớn': { name: 'Deal Lớn', color: '#f59e0b', children: [] },
-                    'Không ưu tiên': { name: 'Không ưu tiên', color: '#64748b', children: [] }
-                };
-
-                accountsList.forEach(acc => {
-                    let cat = 'Không ưu tiên';
-                    if (acc.revenue >= 300000000) {
-                        cat = 'Deal Lớn';
-                    } else if (acc.winRate >= 60 && acc.revenue > 0) {
-                        cat = 'Rất tốt';
-                    } else if (acc.revenue > 0) {
-                        cat = 'Nhỏ';
-                    } else {
-                        cat = 'Không ưu tiên';
-                    }
-
-                    // Boost the baseline size of smaller customer segments ('Nhỏ', 'Không ưu tiên') to render labels clearly
-                    let circleVal = acc.revenue || 0;
-                    if (cat === 'Nhỏ' || cat === 'Không ưu tiên') {
-                        circleVal = Math.max(280000000, circleVal);
-                    } else {
-                        circleVal = Math.max(150000000, circleVal);
-                    }
-
-                    groups[cat].children.push({
-                        name: acc.name,
-                        segmentName: acc.name,
-                        value: circleVal,
-                        winRate: acc.winRate,
-                        totalLeads: acc.totalLeads,
-                        wonLeads: acc.wonLeads,
-                        revenue: acc.revenue,
-                        roi: acc.roi,
-                        cpl: acc.cpl,
-                        color: groups[cat].color,
-                        parentGroup: cat
-                    });
-                });
-
-                const rootData = {
-                    name: "Customer Value",
-                    children: Object.values(groups).filter(g => g.children.length > 0)
-                };
-
-                const pack = d3.pack()
-                    .size([packSize, packSize])
-                    .padding(8);
-
-                const root = d3.hierarchy(rootData)
-                    .sum(d => d.value)
-                    .sort((a, b) => b.value - a.value);
-
-                const nodes = pack(root).descendants();
-
-                const svg = d3.select('#matrixPackingContainer')
-                    .append('svg')
-                    .attr('viewBox', `0 0 ${packSize} ${packSize}`)
-                    .attr('class', 'w-full h-full select-none max-w-[700px] max-h-[700px]');
-
-                const tooltip = document.getElementById('matrixTooltip');
-
-                // Draw circles (Skip root node)
-                const nodeGroups = svg.selectAll('g.node')
-                    .data(nodes.slice(1))
-                    .enter()
-                    .append('g')
-                    .attr('class', d => d.children ? 'node-group' : 'cursor-pointer node-leaf')
-                    .attr('transform', d => `translate(${d.x}, ${d.y})`);
-
-                // Group circles (parents)
-                nodeGroups.filter(d => d.children).append('circle')
-                    .attr('r', d => d.r)
-                    .attr('fill', d => d.data.color)
-                    .attr('fill-opacity', 0.15)
-                    .attr('stroke', d => d.data.color)
-                    .attr('stroke-width', 2)
-                    .attr('stroke-dasharray', '4 2')
-                    .on('mouseenter', function (event, d) {
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .attr('fill-opacity', 0.25)
-                            .attr('stroke-width', 3);
-                            
-                        const childrenData = d.data.children || [];
-                        const totalLeads = childrenData.reduce((sum, c) => sum + (c.totalLeads || 0), 0);
-                        const wonLeads = childrenData.reduce((sum, c) => sum + (c.wonLeads || 0), 0);
-                        const revenue = childrenData.reduce((sum, c) => sum + (c.revenue || 0), 0);
-                        const winRate = totalLeads > 0 ? (wonLeads / totalLeads) * 100 : 0;
-                        const roi = childrenData.reduce((sum, c) => sum + (c.roi || 0), 0) / (childrenData.length || 1);
-                        const cpl = childrenData.reduce((sum, c) => sum + (c.cpl || 0), 0) / (childrenData.length || 1);
-
-                        tooltip.innerHTML = `
-                            <div class="font-black text-slate-200 border-b border-slate-700 pb-1 mb-1.5">TỔNG NHÓM: ${d.data.name}</div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between gap-4"><span>Tổng Doanh thu:</span><span class="font-bold text-emerald-400">${formatCurrency(revenue)}</span></div>
-                                <div class="flex justify-between gap-4"><span>Tổng Leads:</span><span class="font-bold text-blue-400">${totalLeads}</span></div>
-                                <div class="flex justify-between gap-4"><span>Won Leads:</span><span class="font-bold text-emerald-400">${wonLeads}</span></div>
-                                <div class="flex justify-between gap-4"><span>Tỷ lệ chuyển đổi:</span><span class="font-bold text-yellow-400">${winRate.toFixed(1)}%</span></div>
-                                <div class="flex justify-between gap-4"><span>ROI Trung bình:</span><span class="font-bold text-sky-400">${roi.toFixed(1)}%</span></div>
-                                <div class="flex justify-between gap-4"><span>CPL Trung bình:</span><span class="font-bold text-rose-400">${formatCurrency(cpl)}</span></div>
-                            </div>
-                        `;
-                        tooltip.classList.remove('hidden');
-                    })
-                    .on('mousemove', function (event, d) {
-                        const rect = container.getBoundingClientRect();
-                        const tooltipWidth = tooltip.offsetWidth;
-                        const tooltipHeight = tooltip.offsetHeight;
-                        
-                        let x = event.clientX - rect.left + 15;
-                        let y = event.clientY - rect.top + 15;
-
-                        if (x + tooltipWidth > rect.width) x = event.clientX - rect.left - tooltipWidth - 15;
-                        if (y + tooltipHeight > rect.height) y = event.clientY - rect.top - tooltipHeight - 15;
-
-                        tooltip.style.left = `${x}px`;
-                        tooltip.style.top = `${y}px`;
-                    })
-                    .on('mouseleave', function (event, d) {
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .attr('fill-opacity', 0.15)
-                            .attr('stroke-width', 2);
-                            
-                        tooltip.classList.add('hidden');
-                    });
-                    
-                nodeGroups.filter(d => d.children).append('text')
-                    .attr('y', d => -d.r - 5)
-                    .attr('text-anchor', 'middle')
-                    .attr('class', 'text-sm font-black fill-slate-700 pointer-events-none')
-                    .text(d => d.data.name);
-
-                // Segment circles (leaves)
-                nodeGroups.filter(d => !d.children).append('circle')
-                    .attr('r', d => d.r)
-                    .attr('fill', d => d.data.color)
-                    .attr('fill-opacity', 0.8)
-                    .attr('stroke', d => d.data.color)
-                    .attr('stroke-width', 1)
-                    .on('mouseenter', function (event, d) {
-                        event.stopPropagation();
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .attr('r', d.r * 1.05)
-                            .attr('stroke-width', 2);
-                            
-                        const c = d.data;
-                        tooltip.innerHTML = `
-                            <div class="font-black text-slate-200 border-b border-slate-700 pb-1 mb-1.5">${c.segmentName}</div>
-                            <div class="space-y-1">
-                                <div class="flex justify-between gap-4"><span>Nhóm:</span><span class="font-bold" style="color: ${c.color}">${c.parentGroup}</span></div>
-                                <div class="flex justify-between gap-4"><span>Doanh thu Won:</span><span class="font-bold text-emerald-400">${formatCurrency(c.revenue)}</span></div>
-                                <div class="flex justify-between gap-4"><span>Tổng Leads:</span><span class="font-bold text-blue-400">${c.totalLeads}</span></div>
-                                <div class="flex justify-between gap-4"><span>Won Leads:</span><span class="font-bold text-emerald-400">${c.wonLeads}</span></div>
-                                <div class="flex justify-between gap-4"><span>Win Rate:</span><span class="font-bold text-yellow-400">${c.winRate.toFixed(1)}%</span></div>
-                                <div class="flex justify-between gap-4"><span>ROI:</span><span class="font-bold text-sky-400">${c.roi.toFixed(1)}%</span></div>
-                                <div class="flex justify-between gap-4"><span>CPL:</span><span class="font-bold text-rose-400">${formatCurrency(c.cpl)}</span></div>
-                            </div>
-                        `;
-                        tooltip.classList.remove('hidden');
-                    })
-                    .on('mousemove', function (event, d) {
-                        event.stopPropagation();
-                        const rect = container.getBoundingClientRect();
-                        const tooltipWidth = tooltip.offsetWidth;
-                        const tooltipHeight = tooltip.offsetHeight;
-                        
-                        let x = event.clientX - rect.left + 15;
-                        let y = event.clientY - rect.top + 15;
- 
-                        if (x + tooltipWidth > rect.width) x = event.clientX - rect.left - tooltipWidth - 15;
-                        if (y + tooltipHeight > rect.height) y = event.clientY - rect.top - tooltipHeight - 15;
- 
-                        tooltip.style.left = `${x}px`;
-                        tooltip.style.top = `${y}px`;
-                    })
-                    .on('mouseleave', function (event, d) {
-                        event.stopPropagation();
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .attr('r', d.r)
-                            .attr('stroke-width', 1);
-                            
-                        tooltip.classList.add('hidden');
-                    })
-                    .on('click', function(event, d) {
-                        event.stopPropagation();
-                        openDetailModal('Phân khúc', d.data.segmentName, d.data);
-                    });
-
-                // ForeignObject for text word-wrapping to fit the circle
-                nodeGroups.filter(d => !d.children).append('foreignObject')
-                    .attr('x', d => -d.r * 0.85)
-                    .attr('y', d => -d.r * 0.85)
-                    .attr('width', d => d.r * 1.7)
-                    .attr('height', d => d.r * 1.7)
-                    .attr('class', 'pointer-events-none')
-                    .append('xhtml:div')
-                    .attr('class', 'w-full h-full flex flex-col items-center justify-center text-center text-white drop-shadow-sm leading-tight')
-                    .style('font-size', d => Math.max(7, Math.min(11, d.r / 2.8)) + 'px')
-                    .html(d => {
-                        if (d.r < 15) return '';
-                        const c = d.data;
-                        const name = c.segmentName || 'N/A';
-                        const shortName = name.replace(' × ', '-').replace('Miền ', '');
-                        
-                        let shortRev = '';
-                        if (c.revenue >= 1000000000) {
-                            shortRev = (c.revenue / 1000000000).toFixed(1).replace('.0', '') + ' Tỷ';
-                        } else if (c.revenue >= 1000000) {
-                            shortRev = (c.revenue / 1000000).toFixed(0) + ' Tr';
-                        } else {
-                            shortRev = c.revenue + ' đ';
-                        }
-                        
-                        return `<div class="font-black text-[9px] uppercase opacity-95 truncate max-w-full px-1" title="${name}">${shortName}</div>
-                                <div class="text-[10px] font-bold text-yellow-300 mt-0.5">${shortRev}</div>`;
-                    });
-            }
-
             async function fetchKpis() {
                 const refreshIcon = document.getElementById('refresh-icon');
                 if (refreshIcon) refreshIcon.classList.add('animate-spin');
 
-                await loadAllMixedCharts();
-                await renderCustomerValueMatrix();
                 await loadAllLeadsForMatrix();
                 renderTopAccounts();
 
@@ -1637,10 +1259,8 @@
             }
 
             function applyChartVisibility() {
-                const defaultHidden = ['customer_unified_mixed_v2', 'customer_value_matrix_v2'];
+                const defaultHidden = [];
                 const keys = [
-                    { storageKey: 'customer_unified_mixed_v2', elementId: 'sectionCustomerUnified' },
-                    { storageKey: 'customer_value_matrix_v2', elementId: 'sectionCustomerValueMatrix' },
                     { storageKey: 'customer_segment_matrix', elementId: 'sectionCustomerSegmentMatrix' },
                     { storageKey: 'customer_top_accounts', elementId: 'sectionCustomerTopAccounts' }
                 ];
@@ -1657,6 +1277,152 @@
             document.addEventListener('DOMContentLoaded', () => {
                 applyChartVisibility();
                 fetchKpis();
+
+                const chartConfigs = {
+                    industry: {
+                        api: '/api/dashboard/revenue-industry',
+                        title: isVi ? 'Doanh thu theo Ngành (Industry)' : 'Revenue by Industry',
+                        categoryLabel: isVi ? 'Ngành' : 'Industry',
+                        color: '#6366f1'
+                    },
+                    role: {
+                        api: '/api/dashboard/customer-role/revenue',
+                        title: isVi ? 'Doanh thu theo Vai trò (Customer Role)' : 'Revenue by Customer Role',
+                        categoryLabel: isVi ? 'Vai trò' : 'Role',
+                        color: '#3b82f6'
+                    },
+                    region: {
+                        api: '/api/dashboard/revenue-region',
+                        title: isVi ? 'Doanh thu theo Khu vực (Region)' : 'Revenue by Region',
+                        categoryLabel: isVi ? 'Khu vực' : 'Region',
+                        color: '#10b981'
+                    },
+                    group: {
+                        api: '/api/dashboard/revenue-group',
+                        title: isVi ? 'Doanh thu theo Nhóm KH (Customer Group)' : 'Revenue by Customer Group',
+                        categoryLabel: isVi ? 'Nhóm KH' : 'Group',
+                        color: '#f59e0b'
+                    },
+                    product: {
+                        api: '/api/dashboard/revenue-product-line',
+                        title: isVi ? 'Doanh thu theo Dòng sản phẩm (Product Line)' : 'Revenue by Product Line',
+                        categoryLabel: isVi ? 'Sản phẩm' : 'Product Line',
+                        color: '#f43f5e'
+                    }
+                };
+
+                const renderUnifiedChart = async (dimensionKey) => {
+                    const cfg = chartConfigs[dimensionKey];
+                    if (!cfg) return;
+
+                    const titleEl = document.getElementById('revenueChartTitle');
+                    if (titleEl) {
+                        titleEl.innerText = cfg.title;
+                    }
+
+                    let data = [];
+                    try {
+                        const res = await fetch(cfg.api);
+                        if (res.ok) {
+                            data = await res.json();
+                        }
+                    } catch (e) {
+                        console.error(`Failed to load unified chart data for ${dimensionKey}:`, e);
+                    }
+
+                    const canvas = document.getElementById('unifiedRevenueChart');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    if (window.unifiedChartInstance) window.unifiedChartInstance.destroy();
+
+                    if (!data || !data.length) return;
+
+                    const labels = data.map(d => d.category || d.name || d.industry || d.customerGroup || d.customerRole || d.region || d.productName || d.productId);
+                    const revenueData = data.map(d => d.revenue);
+                    const leadsData = data.map(d => d.totalLeads || d.wonLead || d.totalWonLead || 0);
+
+                    window.unifiedChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    type: 'bar',
+                                    label: isVi ? 'Doanh thu' : 'Revenue',
+                                    data: revenueData,
+                                    backgroundColor: cfg.color + '99',
+                                    borderColor: cfg.color,
+                                    borderWidth: 1,
+                                    borderRadius: 4,
+                                    yAxisID: 'y'
+                                },
+                                {
+                                    type: 'line',
+                                    label: isVi ? 'Số lượng Leads' : 'Leads',
+                                    data: leadsData,
+                                    borderColor: '#f59e0b',
+                                    backgroundColor: '#f59e0b',
+                                    borderWidth: 3,
+                                    tension: 0.4,
+                                    pointRadius: 4,
+                                    yAxisID: 'y1'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false,
+                            },
+                            plugins: {
+                                legend: { position: 'bottom' },
+                                tooltip: {
+                                    callbacks: {
+                                        label: context => {
+                                            if (context.datasetIndex === 0) {
+                                                return ` ${context.dataset.label}: ${Number(context.raw).toLocaleString('vi-VN')} VNĐ`;
+                                            }
+                                            return ` ${context.dataset.label}: ${context.raw}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { grid: { display: false } },
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    ticks: { callback: v => fmtShortNum(v) }
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    grid: { drawOnChartArea: false }
+                                }
+                            },
+                            onClick: (e, elements) => {
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const itemData = data[index];
+                                    openDetailModal(cfg.categoryLabel, labels[index], itemData);
+                                }
+                            }
+                        }
+                    });
+                };
+
+                const selector = document.getElementById('revenueDimensionSelector');
+                if (selector) {
+                    selector.addEventListener('change', (e) => {
+                        renderUnifiedChart(e.target.value);
+                    });
+                }
+
+                renderUnifiedChart('industry');
             });
         </script>
     </div>

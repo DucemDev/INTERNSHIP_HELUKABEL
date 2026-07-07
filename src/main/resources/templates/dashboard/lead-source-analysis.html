@@ -98,20 +98,20 @@
             </div>
         </div>
 
-        <!-- ROW 3: Avg Cost per Lead vs Avg Revenue per Won -->
-        <div id="sectionSourceAvgCost" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Chi phí Lead TB vs Doanh thu TB chốt' : 'Avg Cost per Lead vs Avg Revenue per Won'}">Chi phí Lead TB vs Doanh thu TB chốt</h3>
-            <div class="relative w-full h-[450px]">
-                <canvas id="avgCostRevChart"></canvas>
+        <!-- ROW 2.5: Lead Source Profitability -->
+        <div id="sectionProfitability" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Lợi nhuận theo Nguồn Lead' : 'Lead Source Profitability'}">Lợi nhuận theo Nguồn Lead</h3>
+            <div class="relative w-full h-[400px]">
+                <canvas id="leadSourceProfitChart"></canvas>
             </div>
         </div>
 
-        <!-- ROW 4: Lead Funnel by Source & ROI by Source -->
+        <!-- ROW 4: Business Result Funnel by Source & Lead Source by Product Line -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
-            <!-- Cột trái: Lead Funnel by Source -->
+            <!-- Business Result Funnel by Source -->
             <div id="sectionSourceFunnel" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 flex flex-col justify-between shadow-sm min-h-[460px]">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Phễu Leads theo Nguồn' : 'Lead Funnel by Source'}">Phễu Leads theo Nguồn</h3>
+                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Phễu Doanh thu theo Nguồn' : 'Business Result Funnel by Source'}">Phễu Doanh thu theo Nguồn</h3>
                     <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
                         <label for="funnelSourceFilter" class="text-xs font-bold text-slate-500" th:text="${#locale.language == 'vi' ? 'Nguồn:' : 'Source:'}">Nguồn:</label>
                         <select id="funnelSourceFilter" onchange="loadFunnelData()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
@@ -124,30 +124,22 @@
                 </div>
             </div>
 
-            <!-- Cột phải: ROI by Source -->
-            <div id="sectionSourceRoi" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 flex flex-col justify-between shadow-sm min-h-[460px]">
-                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Chỉ số ROI theo Nguồn' : 'ROI by Source'}">Chỉ số ROI theo Nguồn</h3>
+            <!-- Lead Source by Product Line -->
+            <div id="sectionSourceProductLine" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 flex flex-col justify-between shadow-sm min-h-[460px]">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Nguồn Leads theo Dòng sản phẩm' : 'Leads by Product Line'}">Nguồn Leads theo Dòng sản phẩm</h3>
+                    <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
+                        <label for="productLineFilter" class="text-xs font-bold text-slate-500" th:text="${#locale.language == 'vi' ? 'Dòng sản phẩm:' : 'Product Line:'}">Dòng sản phẩm:</label>
+                        <select id="productLineFilter" onchange="renderProductLineChart()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
+                            <!-- Will be dynamically populated -->
+                        </select>
+                    </div>
+                </div>
                 <div class="relative w-full flex-1 min-h-[350px]">
-                    <canvas id="roiSourceChart"></canvas>
+                    <canvas id="productLineChart"></canvas>
                 </div>
+                <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào bất kỳ cột nào để hiển thị thông tin chi tiết.' : 'Click on any column to view details.'}">Click vào bất kỳ cột nào để hiển thị thông tin chi tiết.</p>
             </div>
-        </div>
-
-        <!-- ROW 5: Lead Source by Product Line -->
-        <div id="sectionSourceProductLine" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Nguồn Leads theo Dòng sản phẩm' : 'Leads by Product Line'}">Nguồn Leads theo Dòng sản phẩm</h3>
-                <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
-                    <label for="productLineFilter" class="text-xs font-bold text-slate-500" th:text="${#locale.language == 'vi' ? 'Dòng sản phẩm:' : 'Product Line:'}">Dòng sản phẩm:</label>
-                    <select id="productLineFilter" onchange="renderProductLineChart()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
-                        <!-- Will be dynamically populated -->
-                    </select>
-                </div>
-            </div>
-            <div class="relative w-full h-[400px]">
-                <canvas id="productLineChart"></canvas>
-            </div>
-            <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào bất kỳ cột nào để hiển thị thông tin chi tiết.' : 'Click on any column to view details.'}">Click vào bất kỳ cột nào để hiển thị thông tin chi tiết.</p>
         </div>
 
         <!-- Dynamic Popup / Modal -->
@@ -275,12 +267,11 @@
         let leadSources = [];
 
         let leadsCrChartInstance = null;
-        let avgCostRevChartInstance = null;
-        let roiSourceChartInstance = null;
         let funnelChartInstance = null; // compatibility fallback
         window.funnelChartInstances = {};
         let productLineChartInstance = null;
         let modalChartInstance = null;
+        let leadSourceProfitChartInstance = null;
 
         // Custom color helper
         const brandRed = 'rgba(246, 23, 27, 1)';
@@ -302,8 +293,7 @@
         function applyChartVisibility() {
             const keys = [
                 { storageKey: 'source_leads_cr', elementId: 'sectionSourceLeadsCr' },
-                { storageKey: 'source_avg_cost_rev', elementId: 'sectionSourceAvgCost' },
-                { storageKey: 'source_roi', elementId: 'sectionSourceRoi' },
+                { storageKey: 'profitability', elementId: 'sectionProfitability' },
                 { storageKey: 'source_funnel', elementId: 'sectionSourceFunnel' },
                 { storageKey: 'source_product_line', elementId: 'sectionSourceProductLine' }
             ];
@@ -358,13 +348,14 @@
 
             try {
                 // Fetch datasets safely
-                const [summaryRes, productRes, revProdRes, wonProdRes, lostProdRes, sourcesRes] = await Promise.all([
+                const [summaryRes, productRes, revProdRes, wonProdRes, lostProdRes, sourcesRes, roiRes] = await Promise.all([
                     safeFetch('/api/dashboard/lead-source-summary'),
                     safeFetch('/api/dashboard/lead-source-by-product'),
                     safeFetch('/api/dashboard/revenue-by-source-product'),
                     safeFetch('/api/dashboard/won-lead-by-source-product'),
                     safeFetch('/api/dashboard/lost-lead-by-source-product'),
-                    safeFetch('/api/dashboard/cost-per-win-source')
+                    safeFetch('/api/dashboard/cost-per-win-source'),
+                    safeFetch('/api/dashboard/roi-lead-source')
                 ]);
 
                 summaryData = summaryRes || [];
@@ -373,6 +364,7 @@
                 wonProductData = wonProdRes || [];
                 lostProductData = lostProdRes || [];
                 leadSources = sourcesRes || [];
+                const roiData = roiRes || [];
 
                 // Populate filters safely
                 try {
@@ -384,8 +376,7 @@
                 // Load individual components safely so that one chart failure doesn't block the others
                 try { renderKpis(); } catch (e) { console.error("Error rendering KPIs:", e); }
                 try { renderLeadsCrChart(); } catch (e) { console.error("Error rendering Leads CR Chart:", e); }
-                try { renderAvgCostRevChart(); } catch (e) { console.error("Error rendering Avg Cost Rev Chart:", e); }
-                try { renderRoiSourceChart(); } catch (e) { console.error("Error rendering ROI Source Chart:", e); }
+                try { renderLeadSourceProfitabilityChart(roiData); } catch (e) { console.error("Error rendering Profitability Chart:", e); }
                 try { await loadFunnelData(); } catch (e) { console.error("Error loading Funnel Data:", e); }
                 try { renderProductLineChart(); } catch (e) { console.error("Error rendering Product Line Chart:", e); }
 
@@ -434,17 +425,10 @@
 
         // Formatter helpers
         function formatCurrency(val) {
-            if (val === undefined || val === null) return '0 VNĐ';
-            const absVal = Math.abs(val);
-            let formatted = '';
-            if (absVal >= 1e9) {
-                formatted = (val / 1e9).toFixed(2).replace(/\.?0+$/, '') + ' tỷ';
-            } else if (absVal >= 1e6) {
-                formatted = (val / 1e6).toFixed(2).replace(/\.?0+$/, '') + ' triệu';
-            } else {
-                formatted = Number(val).toLocaleString('vi-VN');
-            }
-            return (val < 0 ? '-' : '') + formatted + ' VNĐ';
+            if (val === undefined || val === null) return isVi ? '0 triệu' : '0 million';
+            const valInMil = val / 1e6;
+            const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
+            return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : ' million');
         }
 
         function renderKpis() {
@@ -581,117 +565,131 @@
             });
         }
 
-        // ROW 3 Chart 1: Avg Cost per Lead vs Avg Revenue per Won
-        function renderAvgCostRevChart() {
-            const ctx = document.getElementById('avgCostRevChart').getContext('2d');
-            const labels = summaryData.map(d => d.sourceName);
-            const avgCost = summaryData.map(d => d.avgCostPerLead || 0);
-            const avgRevenue = summaryData.map(d => d.avgRevenuePerWon || 0);
 
-            if (avgCostRevChartInstance) avgCostRevChartInstance.destroy();
 
-            avgCostRevChartInstance = new Chart(ctx, {
+        // ROW 2.5: Lead Source Profitability
+        function fmtShortNum(v) {
+            if (v === undefined || v === null) return '0';
+            const valInMil = v / 1e6;
+            const formatted = Number(valInMil.toFixed(1)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
+            return formatted + (isVi ? ' triệu' : ' million');
+        }
+
+        function renderLeadSourceProfitabilityChart(roiData) {
+            const ctx = document.getElementById('leadSourceProfitChart').getContext('2d');
+            
+            // Build ROI map
+            const roiMap = {};
+            roiData.forEach(item => {
+                if (item.label) {
+                    roiMap[item.label.toLowerCase()] = {
+                        roi: item.roi || 0,
+                        avgRevPerWon: (item.wonLead && item.wonLead > 0) ? (item.totalWonValue / item.wonLead) : 0
+                    };
+                }
+            });
+
+            const labels = leadSources.map(d => d.sourceName);
+            const avgCostPerWon = leadSources.map(d => d.costPerWin || 0);
+            const avgRevPerWon = leadSources.map(d => {
+                const key = (d.sourceName || '').toLowerCase();
+                return roiMap[key]?.avgRevPerWon || 0;
+            });
+            const roiValues = leadSources.map(d => {
+                const key = (d.sourceName || '').toLowerCase();
+                return roiMap[key]?.roi || 0;
+            });
+
+            const areaGrad = ctx.createLinearGradient(0, 0, 0, 350);
+            areaGrad.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+            areaGrad.addColorStop(1, 'rgba(16, 185, 129, 0.02)');
+
+            if (leadSourceProfitChartInstance) leadSourceProfitChartInstance.destroy();
+
+            leadSourceProfitChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Avg Cost per Lead',
-                            data: avgCost,
-                            backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                            borderColor: 'rgba(239, 68, 68, 1)',
-                            borderWidth: 1.5,
-                            borderRadius: 4,
-                            yAxisID: 'yCost'
+                            type: 'bar',
+                            label: isVi ? 'Chi phí TB/Won' : 'Avg Cost/Won',
+                            data: avgCostPerWon,
+                            backgroundColor: 'rgba(244, 63, 94, 0.75)',
+                            borderColor: '#f43f5e',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            barPercentage: 0.5,
+                            order: 3,
+                            yAxisID: 'y2'
                         },
                         {
-                            label: 'Avg Revenue per Won',
-                            data: avgRevenue,
-                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                            borderColor: 'rgba(16, 185, 129, 1)',
-                            borderWidth: 1.5,
-                            borderRadius: 4,
-                            yAxisID: 'yRevenue'
+                            type: 'line',
+                            label: isVi ? 'Doanh thu TB/Won' : 'Avg Revenue/Won',
+                            data: avgRevPerWon,
+                            borderColor: '#10b981',
+                            backgroundColor: areaGrad,
+                            fill: true,
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#fff',
+                            pointBorderColor: '#10b981',
+                            pointBorderWidth: 2.5,
+                            pointRadius: 4,
+                            tension: 0.4,
+                            order: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'line',
+                            label: 'ROI',
+                            data: roiValues,
+                            borderColor: '#8b5cf6',
+                            borderWidth: 2.5,
+                            borderDash: [6, 3],
+                            pointBackgroundColor: '#8b5cf6',
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            tension: 0.3,
+                            order: 2,
+                            yAxisID: 'y1'
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     scales: {
-                        x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#475569' } },
-                        yRevenue: {
-                            type: 'linear',
-                            position: 'left',
-                            title: { display: true, text: 'Avg Revenue (Won)', color: 'rgba(16, 185, 129, 1)', font: { weight: 'bold', size: 11 } },
-                            grid: { color: '#f1f5f9' },
-                            ticks: {
-                                callback: val => val >= 1e9 ? (val / 1e9).toFixed(1).replace(/\.?0+$/, '') + ' tỷ' : (val / 1e6).toFixed(1).replace(/\.?0+$/, '') + ' triệu',
-                                color: '#475569'
-                            }
-                        },
-                        yCost: {
-                            type: 'linear',
-                            position: 'right',
-                            title: { display: true, text: 'Avg Cost (Lead)', color: 'rgba(239, 68, 68, 1)', font: { weight: 'bold', size: 11 } },
-                            grid: { drawOnChartArea: false },
-                            ticks: {
-                                callback: val => val >= 1e9 ? (val / 1e9).toFixed(1).replace(/\.?0+$/, '') + ' tỷ' : (val / 1e6).toFixed(1).replace(/\.?0+$/, '') + ' triệu',
-                                color: '#475569'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { position: 'top', labels: { font: { weight: 'bold' } } },
-                        tooltip: {
-                            callbacks: {
-                                label: context => context.dataset.label + ': ' + formatCurrency(context.raw)
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // ROW 3 Chart 2: ROI by Source
-        function renderRoiSourceChart() {
-            const ctx = document.getElementById('roiSourceChart').getContext('2d');
-            const labels = summaryData.map(d => d.sourceName);
-            const rois = summaryData.map(d => d.roi || 0);
-
-            if (roiSourceChartInstance) roiSourceChartInstance.destroy();
-
-            roiSourceChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'ROI',
-                        data: rois,
-                        backgroundColor: 'rgba(245, 158, 11, 0.75)',
-                        borderColor: 'rgba(245, 158, 11, 1)',
-                        borderWidth: 1.5,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#475569' } },
+                        x: { grid: { display: false } },
                         y: {
+                            type: 'linear', position: 'left',
+                            border: { display: false },
                             grid: { color: '#f1f5f9' },
-                            ticks: {
-                                callback: val => val.toFixed(1) + 'x',
-                                color: '#475569'
-                            }
+                            ticks: { callback: v => fmtShortNum(v) }
+                        },
+                        y1: {
+                            type: 'linear', position: 'right',
+                            grid: { display: false },
+                            border: { display: false },
+                            title: { display: true, text: 'ROI (x)', font: { weight: 'bold', size: 11 }, color: '#8b5cf6' },
+                            ticks: { callback: v => v.toFixed(1) + 'x', color: '#8b5cf6' }
+                        },
+                        y2: {
+                            type: 'linear', position: 'right',
+                            grid: { display: false },
+                            border: { display: false },
+                            title: { display: true, text: isVi ? 'Chi phí TB' : 'Avg Cost', font: { weight: 'bold', size: 11 }, color: '#f43f5e' },
+                            ticks: { callback: v => fmtShortNum(v), color: '#f43f5e' }
                         }
                     },
                     plugins: {
-                        legend: { display: false },
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
                         tooltip: {
                             callbacks: {
-                                label: context => 'ROI: ' + context.raw.toFixed(2) + 'x'
+                                label: function(context) {
+                                    if (context.dataset.yAxisID === 'y1') return ` ${context.dataset.label}: ${context.raw.toFixed(2)}x`;
+                                    return ` ${context.dataset.label}: ${formatCurrency(context.raw)}`;
+                                }
                             }
                         }
                     }
@@ -699,8 +697,8 @@
             });
         }
 
-        // ROW 4: Lead Funnel by Source
-        // ROW 4: Lead Funnel by Source
+        // ROW 4: Business Result Funnel by Source
+        // ROW 4: Business Result Funnel by Source
         async function loadFunnelData() {
             const sourceId = document.getElementById('funnelSourceFilter').value;
             if (!sourceId) return;
@@ -710,25 +708,28 @@
             container.innerHTML = '';
 
             try {
-                const res = await fetch(`/api/dashboard/lead-funnel/source?sourceId=${sourceId}`).then(r => r.json());
-                const data = res && res.length ? res[0] : null;
-
-                const values = [
-                    data ? (data.newLead || 0) : 0,
-                    data ? (data.contactedLead || 0) : 0,
-                    data ? (data.qualifiedLead || 0) : 0,
-                    data ? (data.proposalSentLead || 0) : 0,
-                    data ? (data.negotiationLead || 0) : 0
-                ];
-                const totalActive = values.reduce((a, b) => a + b, 0);
+                const res = await fetch(`/api/dashboard/funnel/business-result-by-source?sourceId=${sourceId}`).then(r => r.json());
+                const data = Array.isArray(res) ? res : [];
+                const dataMap = {};
+                data.forEach(item => {
+                    const key = (item.status || '').toLowerCase();
+                    dataMap[key] = Number(item.businessResult || 0);
+                });
 
                 const stagesConfig = [
-                    { key: 'New', label: 'New', statuses: ['New'], color: 'url(#grad-blue-3d)', topColor: 'url(#grad-funnel-interior)' },
-                    { key: 'Contacted', label: 'Contacted', statuses: ['Contacted'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
                     { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
                     { key: 'Proposal Sent', label: 'Proposal Sent', statuses: ['Proposal Sent'], color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
-                    { key: 'Negotiation', label: 'Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
+                    { key: 'In Negotiation', label: 'In Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
+                    { key: 'Closed', label: 'Closed', statuses: ['Won', 'Lost'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-funnel-interior)' }
                 ];
+
+                const values = stagesConfig.map(stage => {
+                    if (stage.key === 'Closed') {
+                        return dataMap['closed'] || 0;
+                    }
+                    return dataMap[stage.key.toLowerCase()] || 0;
+                });
+                const totalActive = values.reduce((a, b) => a + b, 0);
 
                 const totalHeight = 260;
                 const gap = 6;
@@ -744,9 +745,9 @@
                 const minH = 8;
                 let heights = [];
                 if (totalActive === 0) {
-                    heights = [52, 52, 52, 52, 52];
+                    heights = [65, 65, 65, 65];
                 } else {
-                    const remainingH = totalHeight - (5 * minH);
+                    const remainingH = totalHeight - (4 * minH);
                     heights = values.map(v => minH + remainingH * (v / totalActive));
                 }
 
@@ -815,7 +816,7 @@
                 let currentY = startY;
 
                 let calculatedStages = [];
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < stagesConfig.length; i++) {
                     const stage = stagesConfig[i];
                     const val = values[i];
                     const pct = totalActive > 0 ? ((val / totalActive) * 100).toFixed(1) : '0.0';
@@ -833,7 +834,7 @@
                     calculatedStages.push({ index: i, stage, val, pct, h, yTop, yBottom, rXt, rYt, rXb, rYb });
                 }
 
-                for (let i = 4; i >= 0; i--) {
+                for (let i = stagesConfig.length - 1; i >= 0; i--) {
                     const cs = calculatedStages[i];
                     const { stage, val, pct, h, yTop, yBottom, rXt, rYt, rXb, rYb } = cs;
 
@@ -854,7 +855,7 @@
                     svgHtml += `<path d="${pathD}" fill="${stage.color}" />`;
                     svgHtml += `<path d="M ${xTl} ${yTop} A ${rXt} ${rYt} 0 0 1 ${xTr} ${yTop}" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />`;
 
-                    if (i === 4) {
+                    if (i === stagesConfig.length - 1) {
                         const neckHeight = 18;
                         const yNeckBottom = yBottom + neckHeight;
                         const rXn = rXb;
@@ -873,11 +874,11 @@
                     if (h >= 35) {
                         svgHtml += `
                         <text x="280" y="${yMid - 3}" font-family="'Inter', sans-serif" font-size="13" font-weight="bold" fill="#1e293b">${stage.label}</text>
-                        <text x="280" y="${yMid + 13}" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#64748b">${val.toLocaleString()} Leads (${pct}%)</text>
+                        <text x="280" y="${yMid + 13}" font-family="'Inter', sans-serif" font-size="11" font-weight="600" fill="#64748b">${formatCurrency(val)} (${pct}%)</text>
                         `;
                     } else {
                         svgHtml += `
-                        <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${val.toLocaleString()} (${pct}%)</tspan></text>
+                        <text x="280" y="${yMid + 4}" font-family="'Inter', sans-serif" font-size="12" font-weight="bold" fill="#1e293b">${stage.label}: <tspan fill="#64748b" font-weight="600">${formatCurrency(val)} (${pct}%)</tspan></text>
                         `;
                     }
                     svgHtml += `</g></a>`;

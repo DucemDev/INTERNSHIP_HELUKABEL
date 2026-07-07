@@ -541,6 +541,9 @@
                     const coldData = [];
 
                     leads.forEach(lead => {
+                        if (lead.status === 'Won' || lead.status === 'Lost' || lead.status === 'Closed') {
+                            return;
+                        }
                         const totalBant = (lead.bantBudget || 0) + (lead.bantAuthority || 0) + (lead.bantNeed || 0) + (lead.bantTimeline || 0);
                         const point = {
                             x: totalBant,
@@ -742,13 +745,13 @@
                     switchFunnelDetailTab(activeTab || 'New');
                 } else if (type === 'bant') {
                     title.innerText = 'Bảng chi tiết Đánh giá tiêu chí BANT';
-                    subtitle.innerText = 'Báo cáo điểm số BANT, nhiệt độ và giá trị doanh thu dự kiến của toàn bộ Leads.';
-                    
+                    subtitle.innerText = 'Báo cáo điểm số BANT, nhiệt độ và giá trị doanh thu dự kiến của Leads.';
+                    const filteredLeads = cachedLeads.filter(lead => lead.status !== 'Won' && lead.status !== 'Lost' && lead.status !== 'Closed');
                     body.innerHTML = `
                         <div class="mb-4 flex items-center justify-between">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tổng số: ${cachedLeads.length} Leads</span>
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tổng số: ${filteredLeads.length} Leads</span>
                         </div>
-                        ${renderDetailTable(cachedLeads, true)}
+                        ${renderDetailTable(filteredLeads, true)}
                     `;
                 }
                 

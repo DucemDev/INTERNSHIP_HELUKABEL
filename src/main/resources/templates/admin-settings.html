@@ -97,38 +97,7 @@
                         </label>
                     </div>
 
-                    <div class="flex items-center justify-between py-4">
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800">Tổng quan theo Nhân viên KD (Sales Owner Summary)</h4>
-                            <p class="text-xs text-gray-400">Ẩn/hiện các thẻ tóm tắt số liệu theo Quý của nhân viên kinh doanh.</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggleSalesOwnerSummary" class="sr-only toggle-checkbox" onchange="saveSetting('salesOwnerSummary_v2', this.checked)">
-                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
-                        </label>
-                    </div>
 
-                    <div class="flex items-center justify-between py-4">
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800">So sánh Win Rate theo Nhân viên KD</h4>
-                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ so sánh Win Rate giữa các Quý của nhân viên KD.</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggleSalesWinRate" class="sr-only toggle-checkbox" onchange="saveSetting('salesWinRate_v2', this.checked)">
-                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
-                        </label>
-                    </div>
-
-                    <div class="flex items-center justify-between py-4">
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800">So sánh Target theo Nhân viên KD</h4>
-                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ so sánh Target/Open Pipeline giữa các Quý của nhân viên KD.</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggleSalesTarget" class="sr-only toggle-checkbox" onchange="saveSetting('salesTarget_v2', this.checked)">
-                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
-                        </label>
-                    </div>
                 </div>
             </div>
 
@@ -139,27 +108,7 @@
                     Trang Phân Tích Khách Hàng (Customer Analysis)
                 </h2>
                 <div class="divide-y divide-slate-100">
-                    <div class="flex items-center justify-between py-4">
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800">Doanh thu & Leads theo Ngành nghề (Unified Mixed Chart)</h4>
-                            <p class="text-xs text-gray-400">Ẩn/hiện biểu đồ hỗn hợp thể hiện doanh thu và leads.</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggleCustomerUnified" class="sr-only toggle-checkbox" onchange="saveSetting('customer_unified_mixed_v2', this.checked)">
-                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
-                        </label>
-                    </div>
 
-                    <div class="flex items-center justify-between py-4">
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800">Customer Value Matrix</h4>
-                            <p class="text-xs text-gray-400">Ẩn/hiện ma trận phân tích giá trị của khách hàng.</p>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="toggleCustomerValueMatrix" class="sr-only toggle-checkbox" onchange="saveSetting('customer_value_matrix_v2', this.checked)">
-                            <div class="w-11 h-6 rounded-full toggle-switch"></div>
-                        </label>
-                    </div>
 
                     <div class="flex items-center justify-between py-4">
                         <div>
@@ -312,12 +261,7 @@
                 { key: 'profitability', id: 'toggleProfitability' },
                 { key: 'efficiency', id: 'toggleEfficiency' },
                 { key: 'topAccounts', id: 'toggleTopAccounts' },
-                { key: 'salesOwnerSummary_v2', id: 'toggleSalesOwnerSummary' },
-                { key: 'salesWinRate_v2', id: 'toggleSalesWinRate' },
-                { key: 'salesTarget_v2', id: 'toggleSalesTarget' },
                 // Customer Analysis
-                { key: 'customer_unified_mixed_v2', id: 'toggleCustomerUnified' },
-                { key: 'customer_value_matrix_v2', id: 'toggleCustomerValueMatrix' },
                 { key: 'customer_segment_matrix', id: 'toggleCustomerSegmentMatrix' },
                 { key: 'customer_top_accounts', id: 'toggleCustomerTopAccounts' },
                 // Lead Source Analysis
@@ -333,7 +277,7 @@
                 { key: 'sales_workload', id: 'toggleSalesWorkload' }
             ];
             
-            const defaultHiddenKeys = ['customer_value_matrix_v2', 'customer_unified_mixed_v2', 'salesOwnerSummary_v2', 'salesWinRate_v2', 'salesTarget_v2'];
+            const defaultHiddenKeys = [];
 
             function loadSettings() {
                 configSettings.forEach(item => {

@@ -319,20 +319,10 @@
 
 
         <!-- ========================================== -->
-        <!-- [HÀNG 3] LEAD SOURCE SUMMARY (2 biểu đồ) -->
+        <!-- [HÀNG 3] LEAD SOURCE SUMMARY -->
         <!-- ========================================== -->
         <div class="grid grid-cols-1 gap-8">
-            <!-- Biểu đồ trái: Lead Source Profitability -->
-            <div id="sectionProfitability" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
-                <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
-                    <span th:text="#{dashboard.lead_source_profitability}">Lead Source Profitability</span>
-
-                </h2>
-                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="leadSourceProfitChart"></canvas></div>
-            </div>
-
-            <!-- Biểu đồ phải: Lead Source Efficiency -->
+            <!-- Biểu đồ: Lead Source Efficiency -->
             <div id="sectionEfficiency" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
@@ -357,49 +347,6 @@
         </div>
 
 
-        <!-- ========================================== -->
-        <!-- [HÀNG 4] SALES OWNER SUMMARY (QUARTERLY COMPARISONS) -->
-        <!-- ========================================== -->
-        <div id="sectionSalesOwnerSummary" class="mt-8" style="display: none;">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-indigo-500 rounded-full"></span>
-                    <span>Sales Owner Summary: Total Leads & Wins (This vs Last Quarter)</span>
-
-                </h2>
-                <div class="flex items-center gap-3 hidden">
-                    <label for="yearFilter" class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chọn Năm:</label>
-                    <select id="yearFilter" onchange="onYearChange()">
-                        <option value="2026" selected>2026</option>
-                    </select>
-                </div>
-            </div>
-            <div id="quarterlyLeadsComparisonCardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Populated via JavaScript -->
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-8 mt-8">
-            <!-- Chart 1: Win Rate by Sales Owner (This quarter) vs Win Rate by Sales Owner (Last quarter) -->
-            <div id="sectionSalesWinRate" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]" style="display: none;">
-                <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
-                    <span>Win Rate by Sales Owner (This vs Last Quarter)</span>
-
-                </h2>
-                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="salesWinRateQuarterlyComparisonChart"></canvas></div>
-            </div>
-
-            <!-- Chart 2: Target by Sales Owner (This quarter) vs Target by Sales Owner (Last quarter) -->
-            <div id="sectionSalesTarget" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]" style="display: none;">
-                <h2 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
-                    <span>Target by Sales Owner (This vs Last Quarter)</span>
-
-                </h2>
-                <div class="relative w-full flex-1 min-h-[400px]"><canvas id="salesTargetQuarterlyComparisonChart"></canvas></div>
-            </div>
-        </div>
 
         <!-- ========================================== -->
         <!-- MODAL: DANH SÁCH LEADS THEO TRẠNG THÁI (GIỮ NGUYÊN) -->
@@ -431,7 +378,7 @@
                             <!-- Bao nhiêu / Doanh thu -->
                             <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu tích lũy</span>
-                                <span id="account-summary-revenue" class="text-base font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                                <span id="account-summary-revenue" class="text-base font-black text-emerald-600 mt-1 block">0</span>
                             </div>
                             <!-- Product / Sản phẩm -->
                             <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
@@ -497,21 +444,61 @@
                         </button>
                     </div>
                     <div class="p-6">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                             <!-- Total Leads -->
-                            <div class="bg-blue-50/60 p-5 rounded-xl border border-blue-100">
-                                <h4 class="text-[10px] font-bold text-blue-700 uppercase tracking-wider" th:text="#{dashboard.segment_total_leads}">Total Leads</h4>
-                                <div id="segmentTotalLeads" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0</div>
+                            <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100">
+                                <h4 class="text-[10px] font-bold text-blue-700 uppercase tracking-wider">Total Leads</h4>
+                                <div id="segmentTotalLeads" class="mt-1 text-base sm:text-lg font-black text-slate-800">0</div>
                             </div>
-                            <!-- Revenue / Won Deal -->
-                            <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-100">
-                                <h4 class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider" th:text="#{dashboard.segment_revenue}">Revenue/Won Deal</h4>
-                                <div id="segmentRevenue" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0</div>
+                            <!-- Won Leads -->
+                            <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100">
+                                <h4 class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Won Leads</h4>
+                                <div id="segmentWonLeads" class="mt-1 text-base sm:text-lg font-black text-slate-800">0</div>
+                            </div>
+                            <!-- Lost Leads -->
+                            <div class="bg-rose-50/60 p-4 rounded-xl border border-rose-100">
+                                <h4 class="text-[10px] font-bold text-rose-700 uppercase tracking-wider">Lost Leads</h4>
+                                <div id="segmentLostLeads" class="mt-1 text-base sm:text-lg font-black text-slate-800">0</div>
                             </div>
                             <!-- Conversion Rate -->
-                            <div class="bg-amber-50/60 p-5 rounded-xl border border-amber-100">
-                                <h4 class="text-[10px] font-bold text-amber-700 uppercase tracking-wider" th:text="#{dashboard.segment_conv_rate}">Conversion Rate</h4>
-                                <div id="segmentConvRate" class="mt-2 text-lg sm:text-xl font-black text-slate-800 whitespace-nowrap">0%</div>
+                            <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-100">
+                                <h4 class="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Conversion Rate</h4>
+                                <div id="segmentConvRate" class="mt-1 text-base sm:text-lg font-black text-slate-800">0%</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Revenue / Won Deal -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Revenue / Won Deal</h4>
+                                    <div id="segmentRevenue" class="mt-1 text-sm font-black text-slate-800">—</div>
+                                </div>
+                                <i data-lucide="dollar-sign" class="w-8 h-8 text-slate-300"></i>
+                            </div>
+                            <!-- Top Product Line -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Product Line</h4>
+                                    <div id="segmentTopProduct" class="mt-1 text-sm font-black text-slate-800">—</div>
+                                </div>
+                                <i data-lucide="package" class="w-8 h-8 text-slate-300"></i>
+                            </div>
+                            <!-- Top Loss Reason -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Loss Reason</h4>
+                                    <div id="segmentTopLoss" class="mt-1 text-sm font-black text-slate-800">—</div>
+                                </div>
+                                <i data-lucide="alert-triangle" class="w-8 h-8 text-slate-300"></i>
+                            </div>
+                            <!-- Top Sales Owner -->
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Top Sales Owner</h4>
+                                    <div id="segmentTopSeller" class="mt-1 text-sm font-black text-slate-800">—</div>
+                                </div>
+                                <i data-lucide="user" class="w-8 h-8 text-slate-300"></i>
                             </div>
                         </div>
                     </div>
@@ -543,27 +530,21 @@
 
             // Locale
             const locale = /*[[${#locale.language}]]*/ 'vi';
-            const currency = locale === 'vi' ? ' VNĐ' : ' VND';
+            const currency = locale === 'vi' ? ' triệu' : ' million';
             const fmtNum = (v) => Number(v || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
             const fmtCurrency = (v) => {
-                const absVal = Math.abs(v);
-                let formatted = '';
-                if (absVal >= 1e9) {
-                    formatted = (v / 1e9).toFixed(2).replace(/\.?0+$/, '') + ' tỷ';
-                } else if (absVal >= 1e6) {
-                    formatted = (v / 1e6).toFixed(2).replace(/\.?0+$/, '') + ' triệu';
-                } else {
-                    formatted = fmtNum(v);
-                }
+                if (v === undefined || v === null) return '0' + currency;
+                const valInMil = v / 1e6;
+                const formatted = Number(valInMil.toFixed(2)).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
                 return (v < 0 ? '-' : '') + formatted + currency;
             };
             const fmtShortNum = (v) => {
-                const absV = Math.abs(v);
-                if (absV >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + ' tỷ';
-                if (absV >= 1e6) return (v / 1e6).toFixed(1).replace(/\.0$/, '') + ' triệu';
-                return fmtNum(v);
+                if (v === undefined || v === null) return '0';
+                const valInMil = v / 1e6;
+                const formatted = Number(valInMil.toFixed(1)).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
+                return formatted + currency;
             };
-            const fmtShortCurrency = (v) => fmtShortNum(v) + currency;
+            const fmtShortCurrency = (v) => fmtShortNum(v);
 
             // i18n labels
             const i18n = {
@@ -587,16 +568,12 @@
             // KHỞI CHẠY
             // ==========================================
             function applyChartVisibility() {
-                const defaultHidden = ['salesOwnerSummary_v2', 'salesWinRate_v2', 'salesTarget_v2'];
+                const defaultHidden = [];
                 const keys = [
                     { storageKey: 'funnel', elementId: 'sectionFunnel' },
                     { storageKey: 'segment', elementId: 'sectionSegment' },
-                    { storageKey: 'profitability', elementId: 'sectionProfitability' },
                     { storageKey: 'efficiency', elementId: 'sectionEfficiency' },
-                    { storageKey: 'topAccounts', elementId: 'sectionTopAccounts' },
-                    { storageKey: 'salesOwnerSummary_v2', elementId: 'sectionSalesOwnerSummary' },
-                    { storageKey: 'salesWinRate_v2', elementId: 'sectionSalesWinRate' },
-                    { storageKey: 'salesTarget_v2', elementId: 'sectionSalesTarget' }
+                    { storageKey: 'topAccounts', elementId: 'sectionTopAccounts' }
                 ];
                 keys.forEach(item => {
                     const stored = localStorage.getItem('dashboard_show_' + item.storageKey);
@@ -621,17 +598,11 @@
                  await Promise.all([
                      loadKPIs(),
                      loadLeadStatusChart(),
-                     loadLeadSourceProfitability(),
                      loadLeadSourceEfficiency(),
                      loadAllLeadsForMatrix(),
-                     loadTopAccounts(),
-                     loadQuarterlyComparisons()
+                     loadTopAccounts()
                  ]);
              }
-
-            function onYearChange() {
-                loadQuarterlyComparisons();
-            }
 
 
             // ==========================================
@@ -639,7 +610,7 @@
             // ==========================================
             async function loadKPIs() {
                 try {
-                    const [convRes, avgRes, revRes, pipeRes, costRes, statusRes, topIndRes, topRegRes, winRateRes, qualRes] = await Promise.all([
+                    const [convRes, avgRes, revRes, pipeRes, costRes, statusRes, topIndRes, topRegRes, winRateRes, qualRes, newRes] = await Promise.all([
                         fetch(`${API_BASE}/conversion-rate`),
                         fetch(`${API_BASE}/average-days-to-won`),
                         fetch(`${API_BASE}/revenue-summary`),
@@ -649,7 +620,8 @@
                         fetch(`${API_BASE}/best-industry-won-deal`),
                         fetch(`${API_BASE}/best-region-won-deal`),
                         fetch(`${API_BASE}/win-rate`),
-                        fetch(`${API_BASE}/qualified-leads`)
+                        fetch(`${API_BASE}/qualified-leads`),
+                        fetch(`${API_BASE}/new-leads`)
                     ]);
 
                     const conv = await convRes.json();
@@ -662,6 +634,7 @@
                     const topReg = await topRegRes.json();
                     const winRateData = await winRateRes.json();
                     const qualData = await qualRes.json();
+                    const newData = await newRes.json();
 
                     // Total Leads
                     const totalLeads = conv.totalLead || 0;
@@ -672,9 +645,7 @@
                     document.getElementById('kpiQualifiedLeads').innerText = fmtNum(qualifiedLeads);
 
                     // New Leads
-                    const newLeads = statusData
-                        .filter(s => s.status === 'New')
-                        .reduce((sum, s) => sum + (s.total || 0), 0);
+                    const newLeads = newData.qualifiedLead || 0;
                     document.getElementById('kpiNewLeads').innerText = fmtNum(newLeads);
 
                     // Conversion Rate
@@ -739,7 +710,7 @@
                     const v2 = getValue(['Qualified']);
                     const v3 = getValue(['Proposal Sent']);
                     const v4 = getValue(['In Negotiation']);
-                    const v5 = getValue(['Won']);
+                    const v5 = getValue(['Won', 'Closed']);
 
                     const values = [v1, v2, v3, v4, v5];
                     const totalActive = values.reduce((a, b) => a + b, 0);
@@ -749,7 +720,7 @@
                         { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
                         { key: 'Proposal Sent', label: 'Proposal Sent', statuses: ['Proposal Sent'], color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
                         { key: 'In Negotiation', label: 'In Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
-                        { key: 'Won', label: 'Won', statuses: ['Won'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
+                        { key: 'Closed', label: 'Closed', statuses: ['Won', 'Closed'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
                     ];
 
                     const totalHeight = 260;
@@ -957,133 +928,7 @@
             }
 
 
-            // ==========================================
-            // HÀM 3: Lead Source Profitability
-            // (Bar: Avg Cost/Won, Area: Avg Revenue/Won, Line: ROI)
-            // ==========================================
-            async function loadLeadSourceProfitability() {
-                try {
-                    const [costRes, roiRes] = await Promise.all([
-                        fetch(`${API_BASE}/cost-per-win-source`),
-                        fetch(`${API_BASE}/roi-lead-source`)
-                    ]);
-                    const costData = await costRes.json();
-                    const roiData = await roiRes.json();
 
-                    // Build ROI map
-                    const roiMap = {};
-                    roiData.forEach(item => {
-                        if (item.label) {
-                            roiMap[item.label.toLowerCase()] = {
-                                roi: item.roi || 0,
-                                avgRevPerWon: (item.wonLead && item.wonLead > 0) ? (item.totalWonValue / item.wonLead) : 0
-                            };
-                        }
-                    });
-
-                    const labels = costData.map(d => d.sourceName);
-                    const avgCostPerWon = costData.map(d => d.costPerWin || 0);
-                    const avgRevPerWon = costData.map(d => {
-                        const key = (d.sourceName || '').toLowerCase();
-                        return roiMap[key]?.avgRevPerWon || 0;
-                    });
-                    const roiValues = costData.map(d => {
-                        const key = (d.sourceName || '').toLowerCase();
-                        return roiMap[key]?.roi || 0;
-                    });
-
-                    const ctx = document.getElementById('leadSourceProfitChart').getContext('2d');
-                    const areaGrad = ctx.createLinearGradient(0, 0, 0, 350);
-                    areaGrad.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
-                    areaGrad.addColorStop(1, 'rgba(16, 185, 129, 0.02)');
-
-                    renderChart('leadSourceProfitChart', 'bar', {
-                        labels,
-                        datasets: [
-                            {
-                                type: 'bar',
-                                label: i18n.avgCostPerWon,
-                                data: avgCostPerWon,
-                                backgroundColor: 'rgba(244, 63, 94, 0.75)',
-                                borderColor: '#f43f5e',
-                                borderWidth: 1,
-                                borderRadius: 6,
-                                barPercentage: 0.5,
-                                order: 3,
-                                yAxisID: 'y2'
-                            },
-                            {
-                                type: 'line',
-                                label: i18n.avgRevPerWon,
-                                data: avgRevPerWon,
-                                borderColor: '#10b981',
-                                backgroundColor: areaGrad,
-                                fill: true,
-                                borderWidth: 2.5,
-                                pointBackgroundColor: '#fff',
-                                pointBorderColor: '#10b981',
-                                pointBorderWidth: 2.5,
-                                pointRadius: 4,
-                                tension: 0.4,
-                                order: 1,
-                                yAxisID: 'y'
-                            },
-                            {
-                                type: 'line',
-                                label: i18n.roi,
-                                data: roiValues,
-                                borderColor: '#8b5cf6',
-                                borderWidth: 2.5,
-                                borderDash: [6, 3],
-                                pointBackgroundColor: '#8b5cf6',
-                                pointRadius: 5,
-                                pointHoverRadius: 7,
-                                tension: 0.3,
-                                order: 2,
-                                yAxisID: 'y1'
-                            }
-                        ]
-                    }, {
-                        interaction: { mode: 'index', intersect: false },
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: {
-                                type: 'linear', position: 'left',
-                                border: { display: false },
-                                grid: { color: '#f1f5f9' },
-                                ticks: { callback: v => fmtShortNum(v) }
-                            },
-                            y1: {
-                                type: 'linear', position: 'right',
-                                grid: { display: false },
-                                border: { display: false },
-                                title: { display: true, text: 'ROI (x)', font: { weight: 'bold', size: 11 }, color: '#8b5cf6' },
-                                ticks: { callback: v => v.toFixed(1) + 'x', color: '#8b5cf6' }
-                            },
-                            y2: {
-                                type: 'linear', position: 'right',
-                                grid: { display: false },
-                                border: { display: false },
-                                title: { display: true, text: 'Chi phí TB', font: { weight: 'bold', size: 11 }, color: '#f43f5e' },
-                                ticks: { callback: v => fmtShortNum(v), color: '#f43f5e' }
-                            }
-                        },
-                        plugins: {
-                            legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(ctx) {
-                                        if (ctx.dataset.yAxisID === 'y1') return ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}x`;
-                                        return ` ${ctx.dataset.label}: ${fmtCurrency(ctx.parsed.y)}`;
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading Lead Source Profitability:', error);
-                }
-            }
 
 
             // ==========================================
@@ -1200,82 +1045,41 @@
              // ==========================================
              async function loadAllLeadsForMatrix() {
                  try {
-                     const res = await fetch('/api/leads');
-                     if (res.ok) {
-                         allLeadsData = await res.json();
+                     const [matrixRes, leadsRes] = await Promise.all([
+                         fetch(`${API_BASE}/conversionrate-value-matrix`),
+                         fetch('/api/leads')
+                     ]);
+                     if (leadsRes.ok) {
+                         allLeadsData = await leadsRes.json();
                      }
- 
-                     if (!allLeadsData || allLeadsData.length === 0) {
-                         // Fallback: use conversion-rate/filter to get data by region/industry
-                         await loadMatrixFromFilters();
-                     } else {
-                         drawMatrixFromLeads(allLeadsData);
-                     }
+                     if (!matrixRes.ok) return;
+                     const data = await matrixRes.json();
+                     
+                     const regions = [...new Set(data.map(d => d.region).filter(Boolean))].sort();
+                     const industries = [...new Set(data.map(d => d.industry).filter(Boolean))].sort();
+
+                     matrixCellsGlobal = [];
+                     
+                     data.forEach(item => {
+                         matrixCellsGlobal.push({
+                             industry: item.industry,
+                             region: item.region,
+                             totalLeads: item.totalLeads || 0,
+                             conversionRate: item.conversionRate || 0,
+                             wonLead: item.wonLeads || 0,
+                             lostLead: item.lostLeads || 0,
+                             avgRevenuePerWon: item.avgRevenuePerWon || 0,
+                             topProductLine: item.topProductLine || 'N/A',
+                             topLossReason: item.topLossReason || 'N/A',
+                             topSalesOwner: item.topSalesOwner || 'N/A'
+                         });
+                     });
+                     
+                     drawMatrixSVG(matrixCellsGlobal, regions, industries);
                  } catch (e) {
                      console.error('Error loading leads for matrix:', e);
-                     await loadMatrixFromFilters();
                  }
              }
-
-            // Fallback: Build matrix from filter API
-            async function loadMatrixFromFilters() {
-                try {
-                    const [regRes, indRes] = await Promise.all([
-                        fetch(`${API_BASE}/win-rate-by-region`),
-                        fetch(`${API_BASE}/win-rate-by-industry`)
-                    ]);
-                    const regions = (await regRes.json()).map(r => r.region).filter(Boolean);
-                    const industries = (await indRes.json()).map(i => i.industryType).filter(Boolean);
-
-                    // Build matrix cells using conversion-rate/filter
-                    let cells = [];
-                    for (const ind of industries) {
-                        for (const reg of regions) {
-                            try {
-                                const fRes = await fetch(`${API_BASE}/conversion-rate/filter?region=${encodeURIComponent(reg)}&industry=${encodeURIComponent(ind)}`);
-                                const fData = await fRes.json();
-                                const totalLead = fData.reduce((s, d) => s + (d.totalLead || 0), 0);
-                                const wonLead = fData.reduce((s, d) => s + (d.wonLead || 0), 0);
-                                const wr = totalLead > 0 ? Math.round((wonLead / totalLead) * 100) : 0;
-                                cells.push({ industry: ind, region: reg, value: totalLead, winRate: wr, wonLead });
-                            } catch { cells.push({ industry: ind, region: reg, value: 0, winRate: 0, wonLead: 0 }); }
-                        }
-                    }
-                    const maxVal = Math.max(...cells.map(c => c.value), 1);
-                    drawMatrixSVG(cells, regions, industries, maxVal);
-                    // No top accounts available in this fallback
-                    drawTopAccountsEmpty();
-                } catch (e) {
-                    console.error('Error loading matrix from filters:', e);
-                }
-            }
-
-            // Build matrix + top accounts from leads data
-            function drawMatrixFromLeads(leads) {
-                const regions = [...new Set(leads.map(l => l.region).filter(Boolean))].sort();
-                const industries = [...new Set(leads.map(l => l.industryType).filter(Boolean))].sort();
-
-                if (regions.length === 0 || industries.length === 0) {
-                    drawMatrixSVG([], regions.length ? regions : ['N/A'], industries.length ? industries : ['N/A'], 1);
-                    return;
-                }
-
-                let cells = [];
-                let maxVal = 0;
-                industries.forEach(ind => {
-                    regions.forEach(reg => {
-                        const seg = leads.filter(l => l.industryType === ind && l.region === reg);
-                        const total = seg.length;
-                        const won = seg.filter(l => l.status === 'Won').length;
-                        const wr = total > 0 ? Math.round((won / total) * 100) : 0;
-                        const revenue = seg.filter(l => l.status === 'Won').reduce((s, l) => s + Number(l.businessResult || 0), 0);
-                        cells.push({ industry: ind, region: reg, value: total, winRate: wr, wonLead: won, revenue });
-                        if (total > maxVal) maxVal = total;
-                    });
-                });
-                if (maxVal === 0) maxVal = 1;
-                drawMatrixSVG(cells, regions, industries, maxVal);
-            }
 
             async function loadTopAccounts() {
                 try {
@@ -1380,7 +1184,7 @@
             // ==========================================
             // HÀM 5.1: Draw Matrix SVG (Bubble Grid)
             // ==========================================
-            function drawMatrixSVG(cells, regions, industries, maxVal) {
+            function drawMatrixSVG(cells, regions, industries) {
                 const svg = document.getElementById('matrixBubbleChart');
                 if (!svg) return;
                 svg.innerHTML = '';
@@ -1457,7 +1261,7 @@
                 }
 
                 // Bubbles
-                const maxWinRate = Math.max(...cells.map(c => c.winRate), 1);
+                const maxConversionRate = Math.max(...cells.map(c => c.conversionRate || 0), 1);
                 cells.forEach(cell => {
                     const colIdx = regions.indexOf(cell.region);
                     const rowIdx = industries.indexOf(cell.industry);
@@ -1468,17 +1272,17 @@
 
                     const minR = 14;
                     const maxR = Math.min(colW, rowH) * 0.38;
-                    const r = cell.winRate > 0 ? minR + (maxR - minR) * Math.sqrt(cell.winRate / maxWinRate) : minR;
+                    const r = cell.conversionRate > 0 ? minR + (maxR - minR) * Math.sqrt(cell.conversionRate / maxConversionRate) : minR;
 
-                    // Color by win rate (High contrast, semantic palette: Green for high, Amber for medium, Red for low)
+                    // Color by conversion rate (High contrast, semantic palette: Green for high, Amber for medium, Red for low)
                     let fillColor;
-                    if (cell.winRate >= 15) fillColor = '#10b981'; // Emerald Green (High)
-                    else if (cell.winRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium)
+                    if (cell.conversionRate >= 15) fillColor = '#10b981'; // Emerald Green (High)
+                    else if (cell.conversionRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium)
                     else fillColor = '#ef4444'; // Rose Red (Low)
 
                     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                     g.setAttribute('class', 'matrix-bubble');
-                    g.setAttribute('onclick', `openSegmentModal('${cell.industry}', '${cell.region}', ${cell.value}, ${cell.wonLead || 0}, ${cell.winRate}, ${cell.revenue || 0})`);
+                    g.setAttribute('onclick', `openSegmentModal('${cell.industry}', '${cell.region}')`);
 
                     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                     circle.setAttribute('cx', cx);
@@ -1495,7 +1299,7 @@
                     text.setAttribute('font-size', r > 20 ? '11' : '9');
                     text.setAttribute('font-weight', 'bold');
                     text.setAttribute('text-anchor', 'middle');
-                    text.textContent = cell.winRate + '%';
+                    text.textContent = cell.conversionRate + '%';
                     g.appendChild(text);
 
                     svg.appendChild(g);
@@ -1506,218 +1310,7 @@
 
 
 
-            // ==========================================
-            // HÀM 7: Quarterly Comparisons (Table & 2 Charts)
-            // ==========================================
-            async function loadQuarterlyComparisons() {
-                try {
-                    const globalYearVal = document.getElementById('globalYearFilter')?.value;
-                    const selectedYear = (globalYearVal && globalYearVal !== 'all') ? parseInt(globalYearVal) : new Date().getFullYear();
-                    const yearParam = `&year=${selectedYear}`;
-                    
-                    const globalQuarterVal = document.getElementById('globalQuarterFilter')?.value;
-                    const refQuarterParam = (globalQuarterVal && globalQuarterVal !== 'all') ? `&refQuarter=${globalQuarterVal}` : '';
 
-                    const [soThis, soLast, wrThis, wrLast, pcThis, pcLast] = await Promise.all([
-                        fetch(`${API_BASE}/sales-owner-dashboard-by-quarter?quarter=this${yearParam}${refQuarterParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/sales-owner-dashboard-by-quarter?quarter=last${yearParam}${refQuarterParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/win-rate-by-saleowner-by-quarter?quarter=this${yearParam}${refQuarterParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/win-rate-by-saleowner-by-quarter?quarter=last${yearParam}${refQuarterParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/pipeline-coverage-by-quarter?quarter=this${yearParam}${refQuarterParam}`).then(r => r.json()),
-                        fetch(`${API_BASE}/pipeline-coverage-by-quarter?quarter=last${yearParam}${refQuarterParam}`).then(r => r.json())
-                    ]);
-
-                    // 1. KPI Cards
-                    let sumLeadsThis = 0;
-                    let sumWonThis = 0;
-                    let sumLeadsLast = 0;
-
-                    soThis.forEach(d => {
-                        sumLeadsThis += (d.totalLead || 0);
-                        sumWonThis += (d.wonLead || 0);
-                    });
-
-                    soLast.forEach(d => {
-                        sumLeadsLast += (d.totalLead || 0);
-                    });
-
-                    let thisQ;
-                    if (globalQuarterVal && globalQuarterVal !== 'all') {
-                        thisQ = parseInt(globalQuarterVal);
-                    } else {
-                        const today = new Date();
-                        const currentMonth = today.getMonth();
-                        thisQ = Math.floor(currentMonth / 3) + 1;
-                    }
-                    const lastQ = thisQ === 1 ? 4 : thisQ - 1;
-                    const lastQYear = lastQ === 4 ? selectedYear - 1 : selectedYear;
-
-                    let cardsHtml = `
-                        <!-- Card 1: Total Leads (This vs Last Quarter Comparison) -->
-                        <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[140px] relative overflow-hidden md:col-span-2">
-                            <div class="accent-bar bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-                            <div class="flex items-center gap-2 mb-3 mt-1">
-                                <div class="bg-blue-50 text-blue-600 p-1.5 rounded-lg"><i data-lucide="users" class="w-4 h-4"></i></div>
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Leads: This Quarter (Q${thisQ}/${selectedYear}) vs Last Quarter (Q${lastQ}/${lastQYear})</h3>
-                            </div>
-                            <div class="flex items-center gap-8 py-2">
-                                <div>
-                                    <span class="text-xs text-slate-400 font-bold block mb-1">THIS QUARTER (Q${thisQ}/${selectedYear})</span>
-                                    <span class="text-3xl font-black text-slate-800">${sumLeadsThis.toLocaleString()}</span>
-                                </div>
-                                <div class="h-10 w-[1px] bg-slate-200"></div>
-                                <div>
-                                    <span class="text-xs text-slate-400 font-bold block mb-1">LAST QUARTER (Q${lastQ}/${lastQYear})</span>
-                                    <span class="text-3xl font-black text-slate-500">${sumLeadsLast.toLocaleString()}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card 2: Total Won This Quarter -->
-                        <div class="kpi-card bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[140px] relative overflow-hidden">
-                            <div class="accent-bar bg-gradient-to-r from-emerald-500 to-teal-600"></div>
-                            <div class="flex items-center gap-2 mb-3 mt-1">
-                                <div class="bg-emerald-50 text-emerald-600 p-1.5 rounded-lg"><i data-lucide="trophy" class="w-4 h-4"></i></div>
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Won (Q${thisQ}/${selectedYear})</h3>
-                            </div>
-                            <div class="text-3xl font-black text-slate-800">${sumWonThis.toLocaleString()}</div>
-                        </div>
-                    `;
-
-                    document.getElementById('quarterlyLeadsComparisonCardsContainer').innerHTML = cardsHtml;
-                    if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
-                    }
-
-                     // 2. Win Rate Chart
-                    const allUsersSet = new Set();
-                    wrThis.forEach(d => { if (d.userName) allUsersSet.add(d.userName); });
-                    wrLast.forEach(d => { if (d.userName) allUsersSet.add(d.userName); });
-                    const wrLabels = Array.from(allUsersSet);
-
-                    const wrThisMap = {};
-                    wrThis.forEach(d => { wrThisMap[d.userName] = d.winRate || 0; });
-                    const wrThisValues = wrLabels.map(name => wrThisMap[name] || 0);
-
-                    const wrLastMap = {};
-                    wrLast.forEach(d => { wrLastMap[d.userName] = d.winRate || 0; });
-                    const wrLastValues = wrLabels.map(name => wrLastMap[name] || 0);
-
-                    renderChart('salesWinRateQuarterlyComparisonChart', 'bar', {
-                        labels: wrLabels,
-                        datasets: [
-                            {
-                                label: 'Win Rate (This Quarter)',
-                                data: wrThisValues,
-                                backgroundColor: 'rgba(16, 185, 129, 0.85)',
-                                borderColor: '#10b981',
-                                borderWidth: 1,
-                                borderRadius: 6,
-                                barPercentage: 0.6
-                            },
-                            {
-                                label: 'Win Rate (Last Quarter)',
-                                data: wrLastValues,
-                                backgroundColor: 'rgba(99, 102, 241, 0.85)',
-                                borderColor: '#6366f1',
-                                borderWidth: 1,
-                                borderRadius: 6,
-                                barPercentage: 0.6
-                            }
-                        ]
-                    }, {
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: {
-                                beginAtZero: true,
-                                suggestedMax: 120,
-                                border: { display: false },
-                                grid: { color: '#f1f5f9' },
-                                ticks: { callback: v => v + '%' }
-                            }
-                        },
-                        plugins: {
-                            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11, weight: 'bold' } } },
-                            datalabels: {
-                                display: true,
-                                anchor: 'end',
-                                align: 'top',
-                                font: { weight: 'bold', size: 10 },
-                                color: '#475569',
-                                formatter: v => (v || 0).toFixed(1) + '%'
-                            }
-                        }
-                    });
-
-                    // 3. Target Chart
-                    const allPcUsersSet = new Set();
-                    pcThis.forEach(d => { if (d.salesOwner || d.userCode) allPcUsersSet.add(d.salesOwner || d.userCode); });
-                    pcLast.forEach(d => { if (d.salesOwner || d.userCode) allPcUsersSet.add(d.salesOwner || d.userCode); });
-                    const pcLabels = Array.from(allPcUsersSet);
-
-                    const pcThisMap = {};
-                    pcThis.forEach(d => { pcThisMap[d.salesOwner || d.userCode] = Number(d.targetRevenue || d.target || 0); });
-                    const pcThisTarget = pcLabels.map(name => pcThisMap[name] || 0);
-
-                    const pcLastMap = {};
-                    pcLast.forEach(d => { pcLastMap[d.salesOwner || d.userCode] = Number(d.targetRevenue || d.target || 0); });
-                    const pcLastTarget = pcLabels.map(name => pcLastMap[name] || 0);
-
-                    renderChart('salesTargetQuarterlyComparisonChart', 'bar', {
-                        labels: pcLabels,
-                        datasets: [
-                            {
-                                label: 'Target (This Quarter)',
-                                data: pcThisTarget,
-                                backgroundColor: 'rgba(245, 158, 11, 0.85)',
-                                borderColor: '#f59e0b',
-                                borderWidth: 1,
-                                borderRadius: 6,
-                                barPercentage: 0.6
-                            },
-                            {
-                                label: 'Target (Last Quarter)',
-                                data: pcLastTarget,
-                                backgroundColor: 'rgba(59, 130, 246, 0.85)',
-                                borderColor: '#3b82f6',
-                                borderWidth: 1,
-                                borderRadius: 6,
-                                barPercentage: 0.6
-                            }
-                        ]
-                    }, {
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: {
-                                beginAtZero: true,
-                                grace: '15%',
-                                border: { display: false },
-                                grid: { color: '#f1f5f9' },
-                                ticks: { callback: v => fmtNum(v) }
-                            }
-                        },
-                        plugins: {
-                            legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11, weight: 'bold' } } },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ` ${ctx.dataset.label}: ${fmtCurrency(ctx.parsed.y)}`
-                                }
-                            },
-                            datalabels: {
-                                display: true,
-                                anchor: 'end',
-                                align: 'top',
-                                font: { weight: 'bold', size: 10 },
-                                color: '#475569',
-                                formatter: v => v > 0 ? fmtNum(v) : '0'
-                            }
-                        }
-                    });
-
-                } catch (error) {
-                    console.error('Error loading Quarterly Comparisons:', error);
-                }
-            }
 
 
             // ==========================================
@@ -1908,15 +1501,75 @@
             }
 
 
-            // ==========================================
-            // MODAL: Segment Drill-Down (Matrix bubble click)
-            // ==========================================
-            function openSegmentModal(industry, region, totalLeads, wonLead, winRate, revenue) {
+            let matrixCellsGlobal = [];
+
+            function openSegmentModal(industry, region) {
+                const cell = matrixCellsGlobal.find(c => c.industry === industry && c.region === region);
+                if (!cell) return;
+                
+                // Calculate top values in frontend
+                const segmentLeads = allLeadsData.filter(l => l.industryType === industry && l.region === region);
+                
+                // 1. Top Product Line
+                const productCounts = {};
+                segmentLeads.forEach(l => {
+                    if (l.productName) {
+                        productCounts[l.productName] = (productCounts[l.productName] || 0) + 1;
+                    }
+                });
+                let topProduct = '—';
+                let maxProdCount = 0;
+                for (const p in productCounts) {
+                    if (productCounts[p] > maxProdCount) {
+                        maxProdCount = productCounts[p];
+                        topProduct = p;
+                    }
+                }
+
+                // 2. Top Loss Reason
+                const lossCounts = {};
+                segmentLeads.forEach(l => {
+                    if (l.status === 'Lost' && l.lossReason) {
+                        lossCounts[l.lossReason] = (lossCounts[l.lossReason] || 0) + 1;
+                    }
+                });
+                let topLoss = '—';
+                let maxLossCount = 0;
+                for (const lr in lossCounts) {
+                    if (lossCounts[lr] > maxLossCount) {
+                        maxLossCount = lossCounts[lr];
+                        topLoss = lr;
+                    }
+                }
+
+                // 3. Top Sales Owner
+                const sellerCounts = {};
+                segmentLeads.forEach(l => {
+                    const sellerName = l.userName || (l.user ? l.user.fullName : '');
+                    if (sellerName) {
+                        sellerCounts[sellerName] = (sellerCounts[sellerName] || 0) + 1;
+                    }
+                });
+                let topSeller = '—';
+                let maxSellerCount = 0;
+                for (const s in sellerCounts) {
+                    if (sellerCounts[s] > maxSellerCount) {
+                        maxSellerCount = sellerCounts[s];
+                        topSeller = s;
+                    }
+                }
+
                 const modal = document.getElementById('segmentModal');
-                document.getElementById('segmentModalTitle').innerText = `${i18n.segmentDetail}: ${industry} × ${region}`;
-                document.getElementById('segmentTotalLeads').innerText = fmtNum(totalLeads);
-                document.getElementById('segmentRevenue').innerText = wonLead > 0 ? fmtCurrency(Math.round(revenue / wonLead)) : '—';
-                document.getElementById('segmentConvRate').innerText = winRate + '%';
+                document.getElementById('segmentModalTitle').innerText = `${i18n.segmentDetail || 'Segment Detail'}: ${industry} × ${region}`;
+                document.getElementById('segmentTotalLeads').innerText = fmtNum(cell.totalLeads);
+                document.getElementById('segmentWonLeads').innerText = fmtNum(cell.wonLead);
+                document.getElementById('segmentLostLeads').innerText = fmtNum(cell.lostLead);
+                document.getElementById('segmentConvRate').innerText = Number(cell.conversionRate).toFixed(1) + '%';
+                document.getElementById('segmentRevenue').innerText = cell.wonLead > 0 ? fmtCurrency(cell.avgRevenuePerWon) : '—';
+                document.getElementById('segmentTopProduct').innerText = topProduct;
+                document.getElementById('segmentTopLoss').innerText = topLoss;
+                document.getElementById('segmentTopSeller').innerText = topSeller;
+
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
                 if (typeof lucide !== 'undefined') lucide.createIcons();
