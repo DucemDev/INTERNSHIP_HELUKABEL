@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::div.customer-analysis-container})}">
 <body>
     <div class="customer-analysis-container space-y-8 p-4 md:p-6 min-h-screen" style="background-color: #f8fafc;">
+        <input type="hidden" id="currentLocale" th:value="${#locale.language}" />
         <style>
             .customer-analysis-container {
                 backdrop-filter: none !important;
@@ -538,7 +539,7 @@
         <script src="https://d3js.org/d3.v7.min.js"></script>
 
         <script>
-            const locale = /*[[${#locale.language}]]*/ 'vi';
+            const locale = document.getElementById('currentLocale')?.value || 'vi';
             const isVi = locale === 'vi';
             const isTh = locale === 'th';
 

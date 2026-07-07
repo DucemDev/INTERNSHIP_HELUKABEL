@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main-layout :: layout(~{::main})}">
 <body>
 <main class="space-y-8">
+    <input type="hidden" id="currentLocale" th:value="${#locale.language}" />
     <style>
         /* Funnel hover effects */
         .funnel-stage {
@@ -24,8 +25,8 @@
         }
     </style>
     <div>
-        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Bảng điều khiển Nhân viên</h1>
-        <p class="mt-1 text-sm font-medium text-gray-500">Theo dõi hiệu suất cá nhân và so sánh với khu vực.</p>
+        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight" th:text="${#locale.language == 'vi' ? 'Bảng điều khiển Nhân viên' : (#locale.language == 'th' ? 'แดชบอร์ดพนักงาน' : 'Seller Dashboard')}">Bảng điều khiển Nhân viên</h1>
+        <p class="mt-1 text-sm font-medium text-gray-500" th:text="${#locale.language == 'vi' ? 'Theo dõi hiệu suất cá nhân và so sánh với khu vực.' : (#locale.language == 'th' ? 'ติดตามประสิทธิภาพส่วนบุคคลและเปรียบเทียบกับภูมิภาค' : 'Track personal performance and compare with the region.')}">Theo dõi hiệu suất cá nhân và so sánh với khu vực.</p>
     </div>
 
     <!-- KPI Cards -->
@@ -34,18 +35,18 @@
             <div class="flex justify-between items-start mb-4">
                 <div class="bg-blue-100 text-blue-600 p-3 rounded-xl"><i data-lucide="users" class="w-6 h-6"></i></div>
             </div>
-            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Leads của tôi</h3>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="${#locale.language == 'vi' ? 'Leads của tôi' : (#locale.language == 'th' ? 'ลีดของฉัน' : 'My Leads')}">Leads của tôi</h3>
             <div id="myTotalLeads" class="mt-4 text-4xl font-extrabold text-gray-900 tracking-tight kpi-val">0</div>
-            <p class="mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg">Đang theo dõi</p>
+            <p class="mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-lg" th:text="${#locale.language == 'vi' ? 'Đang theo dõi' : (#locale.language == 'th' ? 'กำลังติดตาม' : 'Following')}">Đang theo dõi</p>
         </div>
 
         <div class="relative rounded-3xl border border-helu-border bg-white p-8 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="openDetailModal('kpi')">
             <div class="flex justify-between items-start mb-4">
                 <div class="bg-purple-100 text-purple-600 p-3 rounded-xl"><i data-lucide="pie-chart" class="w-6 h-6"></i></div>
             </div>
-            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400">Tỷ lệ thắng</h3>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400" th:text="${#locale.language == 'vi' ? 'Tỷ lệ thắng' : (#locale.language == 'th' ? 'อัตราการชนะ' : 'Win Rate')}">Tỷ lệ thắng</h3>
             <div id="myConversionRate" class="mt-4 text-4xl font-extrabold text-blue-600 tracking-tight kpi-val">0%</div>
-            <p class="mt-2 text-xs font-medium text-gray-500 italic text-left">Hiệu quả chốt đơn</p>
+            <p class="mt-2 text-xs font-medium text-gray-500 italic text-left" th:text="${#locale.language == 'vi' ? 'Hiệu quả chốt đơn' : (#locale.language == 'th' ? 'ประสิทธิภาพการปิดดีล' : 'Closing efficiency')}">Hiệu quả chốt đơn</p>
         </div>
     </div>
 
@@ -56,7 +57,7 @@
             <div class="flex justify-between items-center mb-6" onclick="event.stopPropagation()">
                 <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-helu-red rounded-full"></span>
-                    Tiến độ Target & Chỉ tiêu KPI
+                    <span th:text="${#locale.language == 'vi' ? 'Tiến độ Target & Chỉ tiêu KPI' : (#locale.language == 'th' ? 'ความคืบหน้าเป้าหมายและ KPI' : 'Target Progress & KPI')}">Tiến độ Target & Chỉ tiêu KPI</span>
                 </h2>
                 <div class="flex items-center gap-2">
                     <select id="kpiYearSelect" class="text-xs font-bold border border-gray-200 rounded-xl px-3 py-1.5 bg-slate-50 text-slate-600 outline-none focus:border-helu-red transition-all cursor-pointer" onchange="changeKpiQuarter()">
@@ -65,10 +66,10 @@
                         <option value="2026">2026</option>
                     </select>
                     <select id="kpiQuarterSelect" class="text-xs font-bold border border-gray-200 rounded-xl px-3 py-1.5 bg-slate-50 text-slate-600 outline-none focus:border-helu-red transition-all cursor-pointer" onchange="changeKpiQuarter()">
-                        <option value="1">Quý 1</option>
-                        <option value="2">Quý 2</option>
-                        <option value="3">Quý 3</option>
-                        <option value="4">Quý 4</option>
+                        <option value="1" th:text="${#locale.language == 'vi' ? 'Quý 1' : (#locale.language == 'th' ? 'ไตรมาส 1' : 'Quarter 1')}">Quý 1</option>
+                        <option value="2" th:text="${#locale.language == 'vi' ? 'Quý 2' : (#locale.language == 'th' ? 'ไตรมาส 2' : 'Quarter 2')}">Quý 2</option>
+                        <option value="3" th:text="${#locale.language == 'vi' ? 'Quý 3' : (#locale.language == 'th' ? 'ไตรมาส 3' : 'Quarter 3')}">Quý 3</option>
+                        <option value="4" th:text="${#locale.language == 'vi' ? 'Quý 4' : (#locale.language == 'th' ? 'ไตรมาส 4' : 'Quarter 4')}">Quý 4</option>
                     </select>
                 </div>
             </div>
@@ -81,7 +82,7 @@
                     </svg>
                     <div class="absolute text-center">
                         <span id="kpiPercent" class="text-3xl font-black text-slate-800">0%</span>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Đạt chỉ tiêu</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1" th:text="${#locale.language == 'vi' ? 'Đạt chỉ tiêu' : (#locale.language == 'th' ? 'บรรลุเป้าหมาย' : 'Achieved')}">Đạt chỉ tiêu</p>
                     </div>
                 </div>
 
@@ -90,8 +91,8 @@
                     <!-- Doanh số đã chốt (Won) -->
                     <div class="space-y-1">
                         <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                            <span>Doanh số đã chốt (Won Quý)</span>
-                            <span id="txtWonRevenue" class="text-slate-800 font-extrabold">0 đ</span>
+                            <span th:text="${#locale.language == 'vi' ? 'Doanh số đã chốt (Won Quý)' : (#locale.language == 'th' ? 'ยอดขายที่ปิดได้ (รายไตรมาส)' : 'Won Revenue (Quarter)')}">Doanh số đã chốt (Won Quý)</span>
+                            <span id="txtWonRevenue" class="text-slate-800 font-extrabold" th:text="${#locale.language == 'vi' ? '0 triệu' : (#locale.language == 'th' ? '0 ล้าน' : '0 million')}">0 triệu</span>
                         </div>
                         <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                             <div id="barWonRevenue" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
@@ -101,8 +102,8 @@
                     <!-- Cơ hội (Pipeline) -->
                     <div class="space-y-1">
                         <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                            <span>Cơ hội (Pipeline Quý)</span>
-                            <span id="txtPipeline" class="text-slate-800 font-extrabold">0 đ</span>
+                            <span th:text="${#locale.language == 'vi' ? 'Cơ hội (Pipeline Quý)' : (#locale.language == 'th' ? 'โอกาสการขาย (รายไตรมาส)' : 'Pipeline (Quarter)')}">Cơ hội (Pipeline Quý)</span>
+                            <span id="txtPipeline" class="text-slate-800 font-extrabold" th:text="${#locale.language == 'vi' ? '0 triệu' : (#locale.language == 'th' ? '0 ล้าน' : '0 million')}">0 triệu</span>
                         </div>
                         <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                             <div id="barPipeline" class="bg-gradient-to-r from-blue-500 to-cyan-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
@@ -112,11 +113,11 @@
                     <!-- Chỉ tiêu (Target) -->
                     <div class="space-y-1">
                         <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                            <span>Chỉ tiêu (Target Quý)</span>
-                            <span id="txtTarget" class="text-slate-800 font-extrabold">0 đ</span>
+                            <span th:text="${#locale.language == 'vi' ? 'Chỉ tiêu (Target Quý)' : (#locale.language == 'th' ? 'เป้าหมาย (รายไตรมาส)' : 'Target (Quarter)')}">Chỉ tiêu (Target Quý)</span>
+                            <span id="txtTarget" class="text-slate-800 font-extrabold" th:text="${#locale.language == 'vi' ? '0 triệu' : (#locale.language == 'th' ? '0 ล้าน' : '0 million')}">0 triệu</span>
                         </div>
                         <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                            <div id="barTarget" class="bg-gradient-to-r from-amber-400 to-yellow-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                            <div id="barTarget" class="bg-red-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
@@ -127,7 +128,7 @@
         <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow" onclick="openDetailModal('funnel')">
             <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                 <span class="w-1.5 h-5 bg-blue-500 rounded-full"></span>
-                Phễu Chuyển đổi Khách hàng (SLA Stages)
+                <span th:text="${#locale.language == 'vi' ? 'Phễu Chuyển đổi Khách hàng (SLA Stages)' : (#locale.language == 'th' ? 'กรวยการแปลงลูกค้า (SLA Stages)' : 'Customer Conversion Funnel (SLA Stages)')}">Phễu Chuyển đổi Khách hàng (SLA Stages)</span>
             </h2>
             <div class="relative w-full flex-1 min-h-[400px] flex items-center justify-center" id="leadStatusFunnelContainer"></div>
         </div>
@@ -138,7 +139,7 @@
         <div class="rounded-3xl border border-helu-border bg-white p-8 shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow" onclick="openDetailModal('bant')">
             <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                 <span class="w-1.5 h-5 bg-amber-500 rounded-full"></span>
-                Bản đồ Phân tán Leads (BANT vs Giá trị)
+                <span th:text="${#locale.language == 'vi' ? 'Bản đồ Phân tán Leads (BANT vs Giá trị)' : (#locale.language == 'th' ? 'แผนภาพการกระจายลีด (BANT vs มูลค่า)' : 'Leads Scatter Plot (BANT vs Value)')}">Bản đồ Phân tán Leads (BANT vs Giá trị)</span>
             </h2>
             <div class="relative h-[350px]">
                 <canvas id="bantScatterChart"></canvas>
@@ -148,22 +149,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        const locale = document.getElementById('currentLocale')?.value || 'vi';
+        const isVi = locale === 'vi';
+        const isTh = locale === 'th';
+
         let cachedLeads = [];
         let cachedKpi = null;
         let cachedFunnel = {};
 
         function formatCurrency(val) {
-            if (val === undefined || val === null) return '0 đ';
-            const absVal = Math.abs(val);
-            let formatted = '';
-            if (absVal >= 1e9) {
-                formatted = (val / 1e9).toFixed(2).replace(/\.?0+$/, '') + ' tỷ';
-            } else if (absVal >= 1e6) {
-                formatted = (val / 1e6).toFixed(2).replace(/\.?0+$/, '') + ' triệu';
-            } else {
-                formatted = Number(val).toLocaleString('vi-VN');
-            }
-            return (val < 0 ? '-' : '') + formatted + ' đ';
+            if (val === undefined || val === null) return isVi ? '0 triệu' : (isTh ? '0 ล้าน' : '0 million');
+            const valInMil = val / 1e6;
+            const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US'));
+            return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : (isTh ? ' ล้าน' : ' million'));
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -278,13 +276,28 @@
                     percentWon = Math.round((wonRevenue / targetRevenue) * 100);
                 }
 
-                document.getElementById('kpiPercent').innerText = percentWon + '%';
+                const percentSpan = document.getElementById('kpiPercent');
+                percentSpan.innerText = percentWon + '%';
 
                 // Vẽ vòng SVG progress của Deal Won (chu vi là 408)
                 const circle = document.getElementById('kpiProgressCircle');
                 const drawPercentWon = Math.min(percentWon, 100);
                 const offset = 408 - (408 * drawPercentWon) / 100;
                 circle.style.strokeDashoffset = offset;
+
+                // Cập nhật màu sắc động dựa trên % đạt chỉ tiêu (<= 30% đỏ, >= 80% xanh lá, còn lại vàng)
+                circle.classList.remove('stroke-helu-red', 'stroke-red-500', 'stroke-emerald-500', 'stroke-amber-500');
+                percentSpan.classList.remove('text-slate-800', 'text-red-500', 'text-emerald-500', 'text-amber-500');
+                if (percentWon <= 30) {
+                    circle.classList.add('stroke-red-500');
+                    percentSpan.classList.add('text-red-500');
+                } else if (percentWon >= 80) {
+                    circle.classList.add('stroke-emerald-500');
+                    percentSpan.classList.add('text-emerald-500');
+                } else {
+                    circle.classList.add('stroke-amber-500');
+                    percentSpan.classList.add('text-amber-500');
+                }
 
                 // Cập nhật thanh tiến trình Won Revenue
                 document.getElementById('barWonRevenue').style.width = drawPercentWon + '%';
@@ -656,11 +669,11 @@
             modal.classList.add('flex');
 
             if (type === 'kpi') {
-                title.innerText = 'Chi tiết Tiến độ Target & KPI';
-                subtitle.innerText = 'Chi tiết phân bổ chỉ tiêu doanh số và tiến trình thực tế.';
+                title.innerText = isVi ? 'Chi tiết Tiến độ Target & KPI' : (isTh ? 'รายละเอียดเป้าหมายและ KPI' : 'KPI & Target Progress Detail');
+                subtitle.innerText = isVi ? 'Chi tiết phân bổ chỉ tiêu doanh số và tiến trình thực tế.' : (isTh ? 'รายละเอียดเป้าหมายยอดขายและความคืบหน้าจริง' : 'Details of sales target allocation and actual progress.');
 
                 if (!cachedKpi) {
-                    body.innerHTML = `<p class="text-sm text-gray-500">Chưa có dữ liệu thống kê KPI.</p>`;
+                    body.innerHTML = `<p class="text-sm text-gray-500">${isVi ? 'Chưa có dữ liệu thống kê KPI.' : (isTh ? 'ไม่มีข้อมูลสถิติ KPI' : 'No KPI data available.')}</p>`;
                     return;
                 }
 
@@ -679,42 +692,63 @@
 
                     const response = await fetch(`/api/dashboard/seller/kpi-leads?quarter=${q}&year=${y}`);
                     if (!response.ok) {
-                        body.innerHTML = `<p class="text-sm text-red-500">Không thể tải chi tiết danh sách lead.</p>`;
+                        body.innerHTML = `<p class="text-sm text-red-500">${isVi ? 'Không thể tải chi tiết danh sách lead.' : (isTh ? 'ไม่สามารถโหลดรายชื่อลีดได้' : 'Failed to load lead details.')}</p>`;
                         return;
                     }
                     const details = await response.json();
                     const wonLeads = details.wonLeads || [];
                     const pipelineLeads = details.pipelineLeads || [];
 
+                    const targetRevenue = cachedKpi.targetRevenue || 0;
+                    const wonRevenue = cachedKpi.wonRevenue || 0;
+                    const percentWon = targetRevenue > 0 ? Math.round((wonRevenue / targetRevenue) * 100) : 0;
+
+                    let kpiColorClass = 'text-amber-600';
+                    let kpiBgClass = 'bg-amber-50 border-amber-100';
+                    let kpiTextClass = 'text-amber-500';
+                    let kpiHeadingClass = 'text-amber-800';
+
+                    if (percentWon <= 30) {
+                        kpiColorClass = 'text-red-600';
+                        kpiBgClass = 'bg-red-50 border-red-100';
+                        kpiTextClass = 'text-red-500';
+                        kpiHeadingClass = 'text-red-800';
+                    } else if (percentWon >= 80) {
+                        kpiColorClass = 'text-emerald-600';
+                        kpiBgClass = 'bg-emerald-50 border-emerald-100';
+                        kpiTextClass = 'text-emerald-500';
+                        kpiHeadingClass = 'text-emerald-800';
+                    }
+
                     body.innerHTML = `
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                             <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
-                                <div class="text-xs font-bold text-emerald-600 uppercase">Đã chốt (Won)</div>
+                                <div class="text-xs font-bold text-emerald-600 uppercase">${isVi ? 'Đã chốt (Won)' : (isTh ? 'ปิดการขายสำเร็จ (Won)' : 'Won Revenue')}</div>
                                 <div class="text-2xl font-black text-emerald-800 mt-1">${formatCurrency(cachedKpi.wonRevenue || 0)}</div>
-                                <div class="text-[10px] text-emerald-500 mt-1">${wonLeads.length} leads chốt thành công</div>
+                                <div class="text-[10px] text-emerald-500 mt-1">${wonLeads.length} ${isVi ? 'leads chốt thành công' : (isTh ? 'ลีดปิดการขายสำเร็จ' : 'leads won successfully')}</div>
                             </div>
                             <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                                <div class="text-xs font-bold text-blue-600 uppercase">Cơ hội (Pipeline)</div>
+                                <div class="text-xs font-bold text-blue-600 uppercase">${isVi ? 'Cơ hội (Pipeline)' : (isTh ? 'โอกาสการขาย (Pipeline)' : 'Pipeline')}</div>
                                 <div class="text-2xl font-black text-blue-800 mt-1">${formatCurrency(cachedKpi.openPipeline || 0)}</div>
-                                <div class="text-[10px] text-blue-500 mt-1">${pipelineLeads.length} leads đang theo sát</div>
+                                <div class="text-[10px] text-blue-500 mt-1">${pipelineLeads.length} ${isVi ? 'leads đang theo sát' : (isTh ? 'ลีดกำลังติดตาม' : 'leads in pipeline')}</div>
                             </div>
-                            <div class="p-4 bg-amber-50 rounded-lg border border-amber-100">
-                                <div class="text-xs font-bold text-amber-600 uppercase">Chỉ tiêu (Target)</div>
-                                <div class="text-2xl font-black text-amber-800 mt-1">${formatCurrency(cachedKpi.targetRevenue || 0)}</div>
-                                <div class="text-[10px] text-amber-500 mt-1">Đạt chỉ tiêu: ${cachedKpi.targetRevenue > 0 ? Math.round((cachedKpi.wonRevenue / cachedKpi.targetRevenue) * 100) : 0}%</div>
+                            <div class="p-4 ${kpiBgClass} rounded-lg border">
+                                <div class="text-xs font-bold ${kpiColorClass} uppercase">${isVi ? 'Chỉ tiêu (Target)' : (isTh ? 'เป้าหมาย (Target)' : 'Target')}</div>
+                                <div class="text-2xl font-black ${kpiHeadingClass} mt-1">${formatCurrency(cachedKpi.targetRevenue || 0)}</div>
+                                <div class="text-[10px] ${kpiTextClass} mt-1">${isVi ? 'Đạt chỉ tiêu' : (isTh ? 'บรรลุเป้าหมาย' : 'Achieved')}: ${percentWon}%</div>
                             </div>
                         </div>
 
                         <div class="space-y-6">
                             <div>
                                 <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Hợp đồng đã chốt thành công (Won)
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> ${isVi ? 'Hợp đồng đã chốt thành công (Won)' : (isTh ? 'สัญญาที่ปิดการขายสำเร็จ (Won)' : 'Contracts Won Successfully (Won)')}
                                 </h4>
                                 ${renderDetailTable(wonLeads, false, true)}
                             </div>
                             <div>
                                 <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Cơ hội đang chăm sóc (Pipeline)
+                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> ${isVi ? 'Cơ hội đang chăm sóc (Pipeline)' : (isTh ? 'โอกาสการขายกำลังดูแล (Pipeline)' : 'Opportunities in Pipeline (Pipeline)')}
                                 </h4>
                                 ${renderDetailTable(pipelineLeads, false, false)}
                             </div>
@@ -722,21 +756,21 @@
                     `;
                 } catch (error) {
                     console.error('Error loading KPI details:', error);
-                    body.innerHTML = `<p class="text-sm text-red-500">Đã xảy ra lỗi khi tải dữ liệu chi tiết.</p>`;
+                    body.innerHTML = `<p class="text-sm text-red-500">${isVi ? 'Đã xảy ra lỗi khi tải dữ liệu chi tiết.' : (isTh ? 'เกิดข้อผิดพลาดในการโหลดข้อมูลรายละเอียด' : 'An error occurred while loading detailed data.')}</p>`;
                 }
             } else if (type === 'funnel') {
-                title.innerText = 'Chi tiết Phễu Chuyển đổi Khách hàng';
-                subtitle.innerText = 'Danh sách khách hàng tiềm năng chia theo từng giai đoạn chuyển đổi.';
+                title.innerText = isVi ? 'Chi tiết Phễu Chuyển đổi Khách hàng' : (isTh ? 'รายละเอียดกรวยการแปลงลูกค้า' : 'Customer Conversion Funnel Detail');
+                subtitle.innerText = isVi ? 'Danh sách khách hàng tiềm năng chia theo từng giai đoạn chuyển đổi.' : (isTh ? 'รายชื่อลูกค้าเป้าหมายแบ่งตามแต่ละขั้นตอนการแปลง' : 'List of potential customers divided by conversion stages.');
 
                 let stageTabs = '';
                 const stages = ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'In Negotiation', 'Won'];
                 const stageLabels = {
-                    'New': 'Mới nhận',
-                    'Contacted': 'Tiếp cận',
-                    'Qualified': 'Thẩm định',
-                    'Proposal Sent': 'Báo giá',
-                    'In Negotiation': 'Thương thảo',
-                    'Won': 'Chốt thắng'
+                    'New': isVi ? 'Mới nhận' : (isTh ? 'ใหม่' : 'New'),
+                    'Contacted': isVi ? 'Tiếp cận' : (isTh ? 'ติดต่อ rồi' : 'Contacted'),
+                    'Qualified': isVi ? 'Thẩm định' : (isTh ? 'ผ่านการประเมิน' : 'Qualified'),
+                    'Proposal Sent': isVi ? 'Báo giá' : (isTh ? 'ส่งใบเสนอราคา' : 'Proposal Sent'),
+                    'In Negotiation': isVi ? 'Thương thảo' : (isTh ? 'เจรจาต่อรอง' : 'In Negotiation'),
+                    'Won': isVi ? 'Chốt thắng' : (isTh ? 'ปิดการขายสำเร็จ' : 'Won')
                 };
 
                 stages.forEach(st => {
@@ -759,12 +793,12 @@
 
                 switchFunnelDetailTab(activeTab || 'New');
             } else if (type === 'bant') {
-                title.innerText = 'Bảng chi tiết Đánh giá tiêu chí BANT';
-                subtitle.innerText = 'Báo cáo điểm số BANT, nhiệt độ và giá trị doanh thu dự kiến của Leads.';
+                title.innerText = isVi ? 'Bảng chi tiết Đánh giá tiêu chí BANT' : (isTh ? 'ตารางรายละเอียดการประเมิน BANT' : 'BANT Criteria Evaluation Detail Table');
+                subtitle.innerText = isVi ? 'Báo cáo điểm số BANT, nhiệt độ và giá trị doanh thu dự kiến của Leads.' : (isTh ? 'รายงานคะแนน BANT และมูลค่าที่คาดหวังของลีด' : 'Report of BANT scores and expected revenue value of Leads.');
                 const filteredLeads = cachedLeads.filter(lead => lead.status !== 'Won' && lead.status !== 'Lost' && lead.status !== 'Closed');
                 body.innerHTML = `
                     <div class="mb-4 flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tổng số: ${filteredLeads.length} Leads</span>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">${isVi ? 'Tổng số' : (isTh ? 'ทั้งหมด' : 'Total')}: ${filteredLeads.length} Leads</span>
                     </div>
                     ${renderDetailTable(filteredLeads, true)}
                 `;
@@ -793,7 +827,7 @@
                                                  (stage === 'In Negotiation' && (l.status || '').trim().toLowerCase() === 'in negotiation'));
 
             if (leads.length === 0) {
-                container.innerHTML = `<p class="text-sm text-gray-500 py-8 text-center bg-gray-50/50 rounded-lg border border-dashed border-gray-200">Không có leads nào ở giai đoạn này.</p>`;
+                container.innerHTML = `<p class="text-sm text-gray-500 py-8 text-center bg-gray-50/50 rounded-lg border border-dashed border-gray-200">${isVi ? 'Không có leads nào ở giai đoạn này.' : (isTh ? 'ไม่มีลีดในขั้นตอนนี้' : 'No leads in this stage.')}</p>`;
             } else {
                 container.innerHTML = renderDetailTable(leads);
             }
@@ -801,7 +835,7 @@
 
         function renderDetailTable(leads, showBantDetails = false, showWonDate = false) {
             if (leads.length === 0) {
-                return `<p class="text-xs text-gray-400 py-3 text-center">Không có bản ghi nào.</p>`;
+                return `<p class="text-xs text-gray-400 py-3 text-center">${isVi ? 'Không có bản ghi nào.' : (isTh ? 'ไม่มีข้อมูล' : 'No records found.')}</p>`;
             }
 
             const statusColors = {
@@ -813,33 +847,40 @@
                 'Proposal Sent': 'bg-cyan-50 text-cyan-600 border-cyan-100'
             };
 
-            const heatColors = {
-                'HOT': 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-sm',
-                'WARM': 'bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-sm',
-                'COLD': 'bg-gradient-to-r from-slate-400 to-slate-500 text-white shadow-sm'
+            const getStatusLabel = (status) => {
+                if (!status) return '—';
+                const st = status.toLowerCase();
+                if (st === 'new') return isVi ? 'Mới' : (isTh ? 'ใหม่' : 'New');
+                if (st === 'contacted') return isVi ? 'Đã liên hệ' : (isTh ? 'ติดต่อแล้ว' : 'Contacted');
+                if (st === 'qualified') return isVi ? 'Đạt yêu cầu' : (isTh ? 'มีคุณสมบัติ' : 'Qualified');
+                if (st === 'proposal sent') return isVi ? 'Đã gửi báo giá' : (isTh ? 'ส่งข้อเสนอแล้ว' : 'Proposal Sent');
+                if (st === 'in negotiation') return isVi ? 'Đang đàm phán' : (isTh ? 'กำลังเจรจา' : 'In Negotiation');
+                if (st === 'won') return isVi ? 'Chốt thắng' : (isTh ? 'ชนะ' : 'Won');
+                if (st === 'lost') return isVi ? 'Thất bại' : (isTh ? 'แพ้' : 'Lost');
+                return status;
             };
 
             let headers = `
-                <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Mã Lead</th>
-                <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Khách hàng</th>
-                <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Trạng thái</th>
+                <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">${isVi ? 'Mã Lead' : (isTh ? 'รหัสลีด' : 'Lead ID')}</th>
+                <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">${isVi ? 'Khách hàng' : (isTh ? 'ลูกค้า' : 'Customer')}</th>
+                <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">${isVi ? 'Trạng thái' : (isTh ? 'สถานะ' : 'Status')}</th>
             `;
 
             if (showBantDetails) {
                 headers += `
-                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Ngân sách (B)</th>
-                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Quyết định (A)</th>
-                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Nhu cầu (N)</th>
-                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Tiến độ (T)</th>
-                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">Tổng Điểm</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">${isVi ? 'Ngân sách (B)' : (isTh ? 'งบประมาณ (B)' : 'Budget (B)')}</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">${isVi ? 'Quyết định (A)' : (isTh ? 'อำนาจตัดสินใจ (A)' : 'Authority (A)')}</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">${isVi ? 'Nhu cầu (N)' : (isTh ? 'ความต้องการ (N)' : 'Need (N)')}</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">${isVi ? 'Tiến độ (T)' : (isTh ? 'ระยะเวลา (T)' : 'Timeline (T)')}</th>
+                    <th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-center">${isVi ? 'Tổng Điểm' : (isTh ? 'คะแนนรวม' : 'Total Score')}</th>
                 `;
             }
 
             if (showWonDate) {
-                headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">Thời gian Win</th>`;
+                headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase">${isVi ? 'Thời gian Win' : (isTh ? 'เวลาที่ชนะ' : 'Won Date')}</th>`;
             }
 
-            headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-right">Doanh thu</th>`;
+            headers += `<th class="py-3 px-4 text-xs font-bold text-slate-500 uppercase text-right">${isVi ? 'Doanh thu' : (isTh ? 'รายได้' : 'Revenue')}</th>`;
 
             let rows = '';
             leads.forEach((l, index) => {
@@ -873,7 +914,7 @@
                         </td>
                         <td class="py-3 px-4">
                             <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase ${statusColors[l.status] || 'bg-gray-50 text-gray-600 border-gray-100'}">
-                                ${l.status}
+                                ${getStatusLabel(l.status)}
                             </span>
                         </td>
 
@@ -939,8 +980,8 @@
         <div class="w-full max-w-4xl rounded-2xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh] border border-gray-100" style="background-color: #ffffff !important;">
             <div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
                 <div>
-                    <h2 id="modalDetailTitle" class="text-xl font-extrabold text-gray-900 tracking-tight">Chi tiết số liệu</h2>
-                    <p id="modalDetailSubtitle" class="text-xs text-gray-400 mt-1">Báo cáo chi tiết từ hệ thống.</p>
+                    <h2 id="modalDetailTitle" class="text-xl font-extrabold text-gray-900 tracking-tight" th:text="${#locale.language == 'vi' ? 'Chi tiết số liệu' : (#locale.language == 'th' ? 'รายละเอียดข้อมูล' : 'Detailed statistics')}">Chi tiết số liệu</h2>
+                    <p id="modalDetailSubtitle" class="text-xs text-gray-400 mt-1" th:text="${#locale.language == 'vi' ? 'Báo cáo chi tiết từ hệ thống.' : (#locale.language == 'th' ? 'รายงานรายละเอียดจากระบบ' : 'Detailed report from the system.')}">Báo cáo chi tiết từ hệ thống.</p>
                 </div>
                 <button onclick="closeDetailModal()" class="rounded-xl p-2 text-gray-400 hover:bg-gray-50 hover:text-[#f6171b] transition-all">
                     <i data-lucide="x" class="w-5 h-5"></i>
