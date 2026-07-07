@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from contextlib import asynccontextmanager
 from datetime import datetime
+import asyncio
 import logging
 import sys
 import os
@@ -30,15 +31,8 @@ from chatbot.config import (
     MAX_QUESTION_LENGTH, LOG_LEVEL, LOG_FORMAT
 )
 from chatbot.api_client import CachedAPIClient
-from chatbot.intent_detector import detect_intent
 from chatbot.gemini_client import GeminiClient
-from chatbot.analyzers import (
-    get_dashboard_context,
-    make_ai_summary, format_status_table, answer_status_count,
-    analyze_lead_source, analyze_sales_owner,
-    analyze_pipeline, analyze_lost,
-    analyze_revenue, analyze_forecast, analyze_bant
-)
+from chatbot.analyzers import get_system_db_context
 
 # ==================
 # LOGGING SETUP
@@ -54,8 +48,25 @@ client = CachedAPIClient(
     cache_ttl=CACHE_TTL,
     timeout=API_TIMEOUT
 )
-# Initialise Gemini client for fallback LLM responses
+# Initialise Gemini client for LLM responses
 gemini_client = GeminiClient()
+
+# System instruction for Gemini – tells the LLM its role and how to behave
+SYSTEM_INSTRUCTION = (
+    "Bạn là trợ lý AI thông minh cho hệ thống CRM của Helukabel Việt Nam.\n"
+    "Nhiệm vụ của bạn là trả lời các câu hỏi của người dùng dựa trên DỮ LIỆU THỰC TẾ từ hệ thống CRM được cung cấp bên dưới.\n\n"
+    "QUY TẮC BẮT BUỘC:\n"
+    "1. LUÔN trả lời bằng tiếng Việt.\n"
+    "2. LUÔN sử dụng số liệu thực tế từ phần 'DỮ LIỆU HỆ THỐNG' để trả lời. KHÔNG BAO GIỜ bịa số liệu.\n"
+    "3. Nếu người dùng hỏi về dữ liệu cụ thể (doanh thu, lead, seller...), hãy trích dẫn CON SỐ CHÍNH XÁC từ dữ liệu được cung cấp.\n"
+    "4. KHÔNG BAO GIỜ hướng dẫn user 'hãy vào dashboard để xem' hoặc 'hãy kiểm tra trên hệ thống'. Bạn phải TRẢ LỜI TRỰC TIẾP với dữ liệu.\n"
+    "5. Khi trả lời về số tiền, hãy format với dấu phẩy phân cách hàng nghìn và đơn vị VNĐ (ví dụ: 1,500,000,000 VNĐ).\n"
+    "6. Nếu câu hỏi liên quan đến dự báo/giả lập (forecast, what-if), hãy phân tích dựa trên xu hướng dữ liệu hiện có và LUÔN thêm disclaimer rằng đây là ước tính.\n"
+    "7. Nếu dữ liệu hệ thống không đủ để trả lời câu hỏi, hãy nói rõ phần nào bạn có thể trả lời và phần nào thiếu dữ liệu.\n"
+    "8. Trả lời ngắn gọn, rõ ràng, có cấu trúc (sử dụng bullet points, đánh số khi cần).\n"
+    "9. Khi phân tích, hãy đưa ra nhận xét/insight hữu ích cho người quản lý.\n"
+    "10. Nếu người dùng chào hỏi hoặc hỏi câu không liên quan đến CRM, hãy trả lời thân thiện và gợi ý các câu hỏi họ có thể hỏi về hệ thống CRM.\n"
+)
 
 # ==================
 # APP LIFESPAN
@@ -70,7 +81,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Helukabel CRM Chatbot",
     description="AI-powered chatbot for CRM dashboard queries",
-    version="2.0.0",
+    version="3.0.0",
     lifespan=lifespan
 )
 
@@ -124,103 +135,50 @@ class QuestionRequest(BaseModel):
     )
 
 # ==================
-# MAIN CHATBOT LOGIC
+# MAIN CHATBOT LOGIC (v3 – All questions go through Gemini with real data)
 # ==================
 async def ask_dashboard(question: str) -> str:
-    """Process a question and return the chatbot response."""
-    intent = detect_intent(question)
-    logger.info(f"Question: {question[:100]}... | Intent: {intent}")
-    # If intent could not be determined, fall back to Gemini LLM
-    if intent == "unknown":
-        # Use Gemini to generate a response based on the raw question
-        try:
-            return gemini_client.generate_content(
-                prompt=question,
-                system_instruction="Bạn là trợ lý AI cho Helukabel CRM. Trả lời các câu hỏi bằng tiếng Việt, dựa trên dữ liệu dashboard nếu cần."
-            )
-        except Exception as e:
-            logger.error("Gemini fallback failed: %s", e)
-            return "Xin lỗi, tôi không thể trả lời câu hỏi lúc này. Vui lòng thử lại sau."
+    """Process a question by fetching real system data and passing it to Gemini LLM."""
+    logger.info(f"Question: {question[:100]}...")
 
+    # Step 1: Fetch all real data from the Spring Boot backend
+    try:
+        db_context = await get_system_db_context(client)
+    except Exception as e:
+        logger.error("Failed to fetch system data: %s", e)
+        db_context = "Không lấy được dữ liệu từ hệ thống. Backend có thể chưa khởi động."
 
-    # --- SALES OWNER ---
-    if intent in [
-        "best_seller_revenue", "top_5_seller_revenue", "revenue_seller_bottom5",
-        "best_seller_win_rate", "seller_most_open_leads", "seller_fastest"
-    ]:
-        return await analyze_sales_owner(client, intent)
-
-    # --- LEAD SOURCE ---
-    if intent in [
-        "best_source_leads", "best_source_conversion",
-        "best_source_revenue", "best_source_roi",
-        "source_cpl", "source_cpw"
-    ]:
-        return await analyze_lead_source(client, intent)
-
-    # --- PIPELINE COVERAGE ---
-    if intent in ["pipeline_current", "pipeline_best_seller", "pipeline_enough_target"]:
-        return await analyze_pipeline(client, intent)
-
-    # --- LOST ANALYSIS ---
-    if intent in [
-        "lost_reason_most_common", "lost_reason_price", "lost_rate_current",
-        "total_lost", "lost_reason_list", "lost_reason_highest_rate",
-        "lost_seller_highest_rate", "lost_seller_most_count",
-        "lost_source_most", "lost_region_most", "lost_industry_most",
-        "top_5_lost_reasons"
-    ]:
-        return await analyze_lost(client, intent, question)
-
-    # --- REVENUE ---
-    if intent.startswith("revenue_"):
-        return await analyze_revenue(client, intent, question)
-
-    # --- FORECAST & WHAT-IF ---
-    if intent.startswith("forecast_") or intent.startswith("what_if_"):
-        return await analyze_forecast(client, intent, question)
-
-    # --- BANT ---
-    if intent.startswith("bant_"):
-        return await analyze_bant(client, intent)
-
-    # --- LEAD OVERVIEW ---
-    ctx = await get_dashboard_context(client)
-
-    if ctx["total"] == 0 and not ctx["status_data"]:
-        return "Tôi chưa lấy được dữ liệu từ API /lead-status. Vui lòng kiểm tra Spring Boot backend."
-
-    if intent == "lead_summary":
-        return make_ai_summary(ctx)
-    if intent == "lead_status":
-        return format_status_table(ctx)
-    if intent == "lead_new":
-        return answer_status_count(ctx, "new", "New")
-    if intent == "lead_connected":
-        return answer_status_count(ctx, "connected", "Connected")
-    if intent == "lead_qualified":
-        return answer_status_count(ctx, "qualified", "Qualified")
-    if intent == "lead_won":
-        return answer_status_count(ctx, "won", "Won")
-    if intent == "lead_lost":
-        return answer_status_count(ctx, "lost", "Lost")
-    if intent == "won_rate":
-        return f"Tỉ lệ Won hiện tại là {ctx['won_rate']}%."
-    if intent == "lost_rate":
-        return f"Tỉ lệ Lost hiện tại là {ctx['lost_rate']}%."
-
-    # --- UNKNOWN ---
-    return (
-        "Tôi chưa hiểu rõ câu hỏi.\n"
-        "Bạn có thể hỏi về:\n"
-        "• Tổng quan lead (VD: 'Tình hình lead hiện tại?')\n"
-        "• Doanh thu (VD: 'Doanh thu theo seller như thế nào?')\n"
-        "• Seller (VD: 'Seller nào doanh thu cao nhất?')\n"
-        "• Lead source (VD: 'Nguồn nào mang lại nhiều lead?')\n"
-        "• Lost analysis (VD: 'Lý do Lost phổ biến nhất?')\n"
-        "• Pipeline (VD: 'Pipeline coverage hiện tại?')\n"
-        "• Dự báo (VD: 'Dự đoán doanh thu tháng sau?')"
+    # Step 2: Build the full prompt with real data + user question
+    full_prompt = (
+        f"## DỮ LIỆU HỆ THỐNG CRM HELUKABEL (Dữ liệu thực tế, cập nhật realtime):\n\n"
+        f"{db_context}\n\n"
+        f"---\n\n"
+        f"## CÂU HỎI CỦA NGƯỜI DÙNG:\n"
+        f"{question}\n\n"
+        f"Hãy trả lời câu hỏi trên dựa trên dữ liệu thực tế đã cung cấp."
     )
+
+    # Step 3: Call Gemini LLM with the data-enriched prompt
+    # NOTE: gemini_client.generate_content() is a SYNCHRONOUS blocking call.
+    # We MUST run it in a thread pool via asyncio.to_thread() to avoid blocking
+    # the FastAPI event loop (which would freeze the entire server).
+    try:
+        answer = await asyncio.wait_for(
+            asyncio.to_thread(
+                gemini_client.generate_content,
+                prompt=full_prompt,
+                system_instruction=SYSTEM_INSTRUCTION,
+                max_output_tokens=4096,
+            ),
+            timeout=120.0  # 120-second safety timeout (includes retry + fallback time)
+        )
+        return answer
+    except asyncio.TimeoutError:
+        logger.error("Gemini LLM call timed out after 60 seconds")
+        return "Xin lỗi, hệ thống AI đang phản hồi chậm. Vui lòng thử lại sau."
+    except Exception as e:
+        logger.error("Gemini LLM call failed: %s", e)
+        return "Xin lỗi, tôi không thể trả lời câu hỏi lúc này. Vui lòng thử lại sau."
 
 # ==================
 # API ROUTES
@@ -245,6 +203,6 @@ async def health():
     """Health check endpoint."""
     return {
         "status": "AI service is running",
-        "version": "2.0.0",
+        "version": "3.0.0",
         "backend_url": BASE_URL
     }

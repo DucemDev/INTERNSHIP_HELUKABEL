@@ -4,6 +4,11 @@ This module provides a simple interface to Google Gemini models using the
 official ``google-generativeai`` SDK. It abstracts API key handling, model
 selection and basic error handling.
 
+Features:
+- Automatic retry with exponential backoff on 503/429 errors
+- Fallback model chain when primary model is overloaded
+- Configurable via environment variables
+
 Usage example::
 
     from chatbot.gemini_client import GeminiClient
@@ -15,6 +20,7 @@ Usage example::
 """
 
 import os
+import time
 import logging
 from typing import Optional
 
@@ -30,12 +36,24 @@ except Exception:
 try:
     from google import genai  # type: ignore
     from google.genai import types  # type: ignore
+    from google.genai import errors as genai_errors  # type: ignore
 except Exception as e:  # pragma: no cover
     genai = None
     types = None
+    genai_errors = None
     logging.getLogger(__name__).warning("google-genai SDK not available: %s", e)
 
 logger = logging.getLogger(__name__)
+
+# Fallback model chain – tried in order when the primary model is unavailable
+FALLBACK_MODELS = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+]
+
+# Retry settings
+MAX_RETRIES = 3
+INITIAL_BACKOFF = 2  # seconds
 
 
 class GeminiClient:
@@ -54,8 +72,34 @@ class GeminiClient:
             raise EnvironmentError("GEMINI_API_KEY environment variable not set.")
         # Initialize a client with the API key
         self.client = genai.Client(api_key=api_key)
-        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         logger.info("GeminiClient initialised with model %s", self.model_name)
+
+    def _call_model(
+        self,
+        model_name: str,
+        prompt: str,
+        config: "types.GenerateContentConfig",
+    ) -> str:
+        """Make a single generate_content call to a specific model."""
+        response = self.client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+            config=config,
+        )
+        return (response.text or "").strip()
+
+    def _is_retryable(self, exc: Exception) -> bool:
+        """Check if an exception is a transient error worth retrying."""
+        error_str = str(exc).lower()
+        # 503 Service Unavailable or 429 Too Many Requests
+        if "503" in error_str or "429" in error_str:
+            return True
+        if "unavailable" in error_str or "overloaded" in error_str:
+            return True
+        if "resource exhausted" in error_str or "rate limit" in error_str:
+            return True
+        return False
 
     def generate_content(
         self,
@@ -64,24 +108,67 @@ class GeminiClient:
         temperature: float = 0.7,
         max_output_tokens: Optional[int] = None,
     ) -> str:
-        """Generate a response from the Gemini model."""
-        try:
-            config = types.GenerateContentConfig(
-                temperature=temperature,
-                max_output_tokens=max_output_tokens,
-                system_instruction=system_instruction,
-            )
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=config,
-            )
-            answer = (response.text or "").strip()
-            if not answer:
-                logger.warning("Gemini returned empty response, using fallback message")
-                return "Xin lỗi, tôi không thể tạo nội dung trả lời lúc này. Vui lòng thử lại sau."
-            logger.debug("Gemini response: %s", answer[:200])
-            return answer
-        except Exception as exc:  # pragma: no cover
-            logger.error("Gemini generation error: %s", exc)
-            raise
+        """Generate a response from the Gemini model.
+
+        Includes automatic retry with exponential backoff and fallback
+        to alternative models when the primary model returns 503/429.
+        """
+        config = types.GenerateContentConfig(
+            temperature=temperature,
+            max_output_tokens=max_output_tokens,
+            system_instruction=system_instruction,
+        )
+
+        # Build the list of models to try: primary first, then fallbacks
+        models_to_try = [self.model_name]
+        for fb in FALLBACK_MODELS:
+            if fb != self.model_name:
+                models_to_try.append(fb)
+
+        last_error = None
+
+        for model_name in models_to_try:
+            # Retry each model up to MAX_RETRIES times
+            for attempt in range(1, MAX_RETRIES + 1):
+                try:
+                    logger.info(
+                        "Calling Gemini model=%s (attempt %d/%d), prompt_length=%d chars, max_tokens=%s",
+                        model_name, attempt, MAX_RETRIES, len(prompt), max_output_tokens
+                    )
+                    answer = self._call_model(model_name, prompt, config)
+
+                    if not answer:
+                        logger.warning("Gemini returned empty response on model=%s", model_name)
+                        break  # Try next model
+
+                    logger.info("Gemini response OK, model=%s, length=%d chars", model_name, len(answer))
+                    return answer
+
+                except Exception as exc:
+                    last_error = exc
+                    if self._is_retryable(exc) and attempt < MAX_RETRIES:
+                        wait_time = INITIAL_BACKOFF * (2 ** (attempt - 1))  # 2s, 4s, 8s
+                        logger.warning(
+                            "Gemini model=%s returned retryable error (attempt %d/%d). "
+                            "Retrying in %ds... Error: %s",
+                            model_name, attempt, MAX_RETRIES, wait_time, exc
+                        )
+                        time.sleep(wait_time)
+                        continue
+                    elif self._is_retryable(exc):
+                        # Exhausted retries for this model, try fallback
+                        logger.warning(
+                            "Gemini model=%s exhausted %d retries. Trying fallback model... Error: %s",
+                            model_name, MAX_RETRIES, exc
+                        )
+                        break  # Break inner retry loop, try next model
+                    else:
+                        # Non-retryable error, raise immediately
+                        logger.error("Gemini non-retryable error on model=%s: %s", model_name, exc, exc_info=True)
+                        raise
+
+        # All models and retries exhausted
+        logger.error("All Gemini models failed. Last error: %s", last_error)
+        if last_error:
+            raise last_error
+        return "Xin lỗi, tôi không thể tạo nội dung trả lời lúc này. Vui lòng thử lại sau."

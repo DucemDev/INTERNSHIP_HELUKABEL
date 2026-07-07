@@ -1561,19 +1561,93 @@ async def analyze_bant(client: CachedAPIClient, intent: str):
 # =========================
 
 async def get_system_db_context(client: CachedAPIClient) -> str:
-    """Fetch all database metrics and compile them into a text context for the LLM."""
+    """Fetch ALL database metrics and compile them into a text context for the LLM.
+    
+    Fetches 80+ endpoints in parallel via CachedAPIClient to provide comprehensive data coverage:
+    - Lead status overview & overall conversion rate
+    - Detailed breakdowns by source, product line, region, and industry
+    - Seller stats, rankings, and avg sales cycle
+    - Historical trends (monthly, quarterly)
+    - Source-Product matrix
+    - Bant completion rate and avg scores
+    - Highlights (Best region, best industry, best account, best customer group)
+    """
     try:
         import asyncio
-        (
-            ctx_summary,
-            sources,
-            sellers,
-            pipelines,
-            lost_reasons,
-            rev_summary,
-            bant_rate,
-            bant_avg
-        ) = await asyncio.gather(
+        
+        endpoints = {
+            "conversion_rate": "/conversion-rate",
+            "avg_days_to_won": "/average-days-to-won",
+            "win_rate_by_industry": "/win-rate-by-industry",
+            "win_rate_by_region": "/win-rate-by-region",
+            "revenue_group": "/revenue-group",
+            "roi_lead_source": "/roi-lead-source",
+            "lead_source_summary": "/lead-source-summary",
+            "revenue_monthly": "/revenue-monthly",
+            "revenue_quarterly": "/revenue-quarterly",
+            "lead_monthly": "/lead-monthly",
+            "lead_quarterly": "/lead-quarterly",
+            "revenue_seller_monthly": "/revenue-seller-monthly",
+            "revenue_source_monthly": "/revenue-source-monthly",
+            "revenue_region_monthly": "/revenue-region-monthly",
+            "revenue_industry_monthly": "/revenue-industry-monthly",
+            "revenue_product_line_monthly": "/revenue-product-line-monthly",
+            "revenue_account": "/revenue/account",
+            "potential_lead_industry": "/potential-lead/industry",
+            "lead_source_by_product": "/lead-source-by-product",
+            "revenue_by_source_product": "/revenue-by-source-product",
+            "won_lead_by_source_product": "/won-lead-by-source-product",
+            "lost_lead_by_source_product": "/lost-lead-by-source-product",
+            "total_accounts": "/total-accounts",
+            "won_accounts": "/won-accounts",
+            "top_underserved_segment": "/top-underserved-segment",
+            "best_account_revenue": "/best-account-revenue",
+            "best_industry_won_deal": "/best-industry-won-deal",
+            "best_industry_revenue": "/best-industry-revenue",
+            "best_region_won_deal": "/best-region-won-deal",
+            "best_region_revenue": "/best-region-revenue",
+            "best_customer_group_lead": "/best-customer-group-lead",
+            "best_customer_group_revenue": "/best-customer-group-revenue",
+            "industry_won_leads": "/industry/won-leads",
+            "industry_conversion_rate": "/industry/conversion-rate",
+            "industry_avg_sales_cycle": "/industry/avg-sales-cycle",
+            "industry_best_lost_reason": "/industry/best-lost-reason",
+            "customer_role_revenue": "/customer-role/revenue",
+            "customer_role_total_leads": "/customer-role/total-leads",
+            "customer_role_conversion_rate": "/customer-role/conversion-rate",
+            "customer_role_avg_revenue_won": "/customer-role/avg-revenue-won",
+            "customer_role_lost_leads": "/customer-role/lost-leads",
+            "customer_role_best_lost_reason": "/customer-role/best-lost-reason",
+            "region_total_leads": "/region/total-leads",
+            "region_won_leads": "/region/won-leads",
+            "region_conversion_rate": "/region/conversion-rate",
+            "region_avg_revenue_won": "/region/avg-revenue-won",
+            "region_lost_leads": "/region/lost-leads",
+            "region_best_lost_reason": "/region/best-lost-reason",
+            "product_line_total_leads": "/product-line/total-leads",
+            "product_line_won_leads": "/product-line/won-leads",
+            "product_line_conversion_rate": "/product-line/conversion-rate",
+            "product_line_avg_revenue_won": "/product-line/avg-revenue-won",
+            "product_line_lost_leads": "/product-line/lost-leads",
+            "product_line_best_lost_reason": "/product-line/best-lost-reason",
+            "customer_group_roi": "/customer-group/roi",
+            "customer_group_cost_per_lead": "/customer-group/cost-per-lead",
+            "top10_accounts": "/top10-accounts",
+            "top_sales_owner_revenue": "/top-sales-owner-revenue",
+            "top_sales_owner_win_rate": "/top-sales-owner-win-rate",
+            "fastest_sales_owner": "/fastest-sales-owner",
+            "sales_owner_avg_sales_cycle": "/sales-owner/avg-sales-cycle",
+            "customer_value_matrix": "/customer-value-matrix",
+            "product_line_loss_reasons": "/product-line/loss-reasons",
+            "daily_compare": "/daily-compare",
+            "win_rate_by_saleowner": "/win-rate-by-saleowner",
+            "cost_per_win_source": "/cost-per-win-source",
+        }
+        
+        keys = list(endpoints.keys())
+        
+        # Parallel fetch of helper endpoints + individual endpoints
+        results = await asyncio.gather(
             get_dashboard_context(client),
             get_lead_source_data(client),
             get_sales_owner_data(client),
@@ -1582,12 +1656,49 @@ async def get_system_db_context(client: CachedAPIClient) -> str:
             get_revenue_summary_data(client),
             get_sales_owner_bant_complete_rate(client),
             get_sales_owner_avg_bant_score(client),
+            get_revenue_product_line_data(client),
+            get_revenue_region_data(client),
+            get_revenue_industry_data(client),
+            get_lost_by_seller_data(client),
+            get_lost_by_source_data(client),
+            get_lost_by_region_data(client),
+            get_lost_by_industry_data(client),
+            *[client.get(endpoints[k]) for k in keys],
             return_exceptions=True
         )
+        
+        # Extract variables
+        ctx_summary = results[0]
+        sources = results[1]
+        sellers = results[2]
+        pipelines = results[3]
+        lost_reasons = results[4]
+        rev_summary = results[5]
+        bant_rate = results[6]
+        bant_avg = results[7]
+        rev_product = results[8]
+        rev_region = results[9]
+        rev_industry = results[10]
+        lost_by_seller = results[11]
+        lost_by_source = results[12]
+        lost_by_region = results[13]
+        lost_by_industry = results[14]
+        
+        # Map extra endpoints
+        res = {}
+        for idx, k in enumerate(keys):
+            val = results[15 + idx]
+            res[k] = None if isinstance(val, Exception) else val
+            
+        def fmt_vnd(val):
+            try:
+                return f"{float(val):,.0f} VNĐ" if val is not None else "0 VNĐ"
+            except Exception:
+                return "0 VNĐ"
 
         context_parts = []
 
-        # 1. Lead Summary & Statuses
+        # 1. Lead Summary & Overall Conversion
         if not isinstance(ctx_summary, Exception) and ctx_summary:
             context_parts.append(
                 f"### TỔNG QUAN LEAD HỆ THỐNG:\n"
@@ -1599,17 +1710,39 @@ async def get_system_db_context(client: CachedAPIClient) -> str:
                 f"- Lead đang thương lượng (In Negotiation): {ctx_summary.get('negotiation', 0)}\n"
                 f"- Lead thành công (Won): {ctx_summary.get('won', 0)} (Tỷ lệ: {ctx_summary.get('won_rate', 0)}%)\n"
                 f"- Lead thất bại (Lost): {ctx_summary.get('lost', 0)} (Tỷ lệ: {ctx_summary.get('lost_rate', 0)}%)\n"
-                f"- Lead đang xử lý (Open): {ctx_summary.get('open_leads', 0)}\n"
+                f"- Lead đang xử lý (Open): {ctx_summary.get('open_leads', 0)}"
+            )
+
+        c_rate = res.get("conversion_rate")
+        if isinstance(c_rate, dict):
+            context_parts.append(
+                f"### TỶ LỆ CHUYỂN ĐỔI CHUNG (CONVERSION RATE):\n"
+                f"- Tổng số lead: {c_rate.get('totalLead', 0)}\n"
+                f"- Lead thắng (Won): {c_rate.get('wonLead', 0)}\n"
+                f"- Lead thua (Lost): {c_rate.get('lostLead', 0)}\n"
+                f"- Tỷ lệ chuyển đổi: {c_rate.get('conversionRate', 0)}%"
+            )
+
+        avg_days = res.get("avg_days_to_won")
+        if avg_days is not None:
+            context_parts.append(f"- Thời gian chốt deal trung bình (Average days to Won): {avg_days:.1f} ngày")
+
+        daily = res.get("daily_compare")
+        if isinstance(daily, dict):
+            context_parts.append(
+                f"### SO SÁNH HÀNG NGÀY (DAILY COMPARE):\n"
+                f"- Số lead hôm nay: {daily.get('todayLeads', 0)} (Hôm qua: {daily.get('yesterdayLeads', 0)})\n"
+                f"- Doanh thu hôm nay: {fmt_vnd(daily.get('todayRevenue', 0))} (Hôm qua: {fmt_vnd(daily.get('yesterdayRevenue', 0))})"
             )
 
         # 2. Revenue Summary
         if not isinstance(rev_summary, Exception) and rev_summary:
             context_parts.append(
                 f"### DOANH THU CHUNG:\n"
-                f"- Tổng doanh thu chốt (Won): {rev_summary.get('totalRevenue', 0):,.0f} VNĐ\n"
-                f"- Doanh thu trung bình mỗi lead Won: {rev_summary.get('avgRevenuePerWonLead', 0):,.0f} VNĐ\n"
-                f"- Doanh thu tháng này: {rev_summary.get('thisMonthRevenue', 0):,.0f} VNĐ\n"
-                f"- Doanh thu tháng trước: {rev_summary.get('lastMonthRevenue', 0):,.0f} VNĐ\n"
+                f"- Tổng doanh thu chốt (Won): {fmt_vnd(rev_summary.get('totalRevenue', 0))}\n"
+                f"- Doanh thu trung bình mỗi lead Won: {fmt_vnd(rev_summary.get('avgRevenuePerWonLead', 0))}\n"
+                f"- Doanh thu tháng này: {fmt_vnd(rev_summary.get('thisMonthRevenue', 0))}\n"
+                f"- Doanh thu tháng trước: {fmt_vnd(rev_summary.get('lastMonthRevenue', 0))}"
             )
 
         # 3. Sales Owners / Sellers
@@ -1617,11 +1750,25 @@ async def get_system_db_context(client: CachedAPIClient) -> str:
             context_parts.append("### HIỆU SUẤT TỪNG SELLER (SALES OWNER):")
             for s in sellers:
                 context_parts.append(
-                    f"- {s['userName']}: Doanh thu {s['totalRevenue']:,.0f} VNĐ, "
+                    f"- {s['userName']}: Doanh thu {fmt_vnd(s['totalRevenue'])}, "
                     f"Tổng lead phụ trách: {s['totalLead']:.0f}, Won: {s['wonLead']:.0f}, "
                     f"Open: {s['openLead']:.0f}, Tỷ lệ thắng (Win Rate): {s['winRate']}%, "
                     f"Thời gian chốt deal TB: {s['avgDaysToWon']} ngày"
                 )
+            context_parts.append("")
+
+        win_rate_owner = res.get("win_rate_by_saleowner")
+        if isinstance(win_rate_owner, list):
+            context_parts.append("### WIN RATE THEO SELLER:")
+            for x in win_rate_owner:
+                context_parts.append(f"- {x.get('userName')}: Win Rate {x.get('winRate', 0)}% ({x.get('wonLead', 0)}/{x.get('totalLead', 0)} lead)")
+            context_parts.append("")
+
+        sales_owner_avg_cycle = res.get("sales_owner_avg_sales_cycle")
+        if isinstance(sales_owner_avg_cycle, list):
+            context_parts.append("### CHU KỲ BÁN HÀNG TRUNG BÌNH THEO SELLER:")
+            for x in sales_owner_avg_cycle:
+                context_parts.append(f"- {x.get('userName')}: {x.get('avgDays', 0):.1f} ngày")
             context_parts.append("")
 
         # 4. Lead Sources
@@ -1629,14 +1776,185 @@ async def get_system_db_context(client: CachedAPIClient) -> str:
             context_parts.append("### HIỆU QUẢ CÁC NGUỒN LEAD (LEAD SOURCES):")
             for src in sources:
                 context_parts.append(
-                    f"- Nguồn {src['leadSource']}: Doanh thu {src['revenue']:,.0f} VNĐ, "
+                    f"- Nguồn {src['leadSource']}: Doanh thu {fmt_vnd(src['revenue'])}, "
                     f"Tổng lead: {src['totalLeads']:.0f}, Won: {src['wonLeads']:.0f}, "
-                    f"Chi phí: {src['cost']:,.0f} VNĐ, ROI: {src['roi']}%, "
-                    f"CPL (Chi phí/Lead): {src['costPerLead']:,.0f} VNĐ, CPW (Chi phí/Win): {src['costPerWin']:,.0f} VNĐ"
+                    f"Chi phí: {fmt_vnd(src['cost'])}, ROI: {src['roi']}%, "
+                    f"CPL (Chi phí/Lead): {fmt_vnd(src['costPerLead'])}, CPW (Chi phí/Win): {fmt_vnd(src['costPerWin'])}"
                 )
             context_parts.append("")
 
-        # 5. Lost Reasons
+        roi_source = res.get("roi_lead_source")
+        if isinstance(roi_source, list):
+            context_parts.append("### ROI THEO NGUỒN LEAD:")
+            for r in roi_source:
+                context_parts.append(f"- {r.get('leadSource')}: ROI {r.get('roi', 0)}%, Doanh thu: {fmt_vnd(r.get('revenue', 0))}, Chi phí: {fmt_vnd(r.get('cost', 0))}")
+            context_parts.append("")
+
+        cpw_source = res.get("cost_per_win_source")
+        if isinstance(cpw_source, list):
+            context_parts.append("### CHI PHÍ ĐẠT DEAL THẮNG (CPW) THEO NGUỒN:")
+            for c in cpw_source:
+                context_parts.append(f"- {c.get('leadSource')}: CPW = {fmt_vnd(c.get('costPerWin'))}")
+            context_parts.append("")
+
+        # 5. Historical Trends
+        if isinstance(res.get("revenue_monthly"), list):
+            context_parts.append("### DOANH THU LỊCH SỬ HÀNG THÁNG:")
+            for m in res["revenue_monthly"]:
+                context_parts.append(f"- T{m.get('month')}/{m.get('year')}: {fmt_vnd(m.get('revenue'))}")
+            context_parts.append("")
+
+        if isinstance(res.get("revenue_quarterly"), list):
+            context_parts.append("### DOANH THU LỊCH SỬ HÀNG QUÝ:")
+            for q in res["revenue_quarterly"]:
+                context_parts.append(f"- Q{q.get('quarter')}/{q.get('year')}: {fmt_vnd(q.get('revenue'))}")
+            context_parts.append("")
+
+        if isinstance(res.get("lead_monthly"), list):
+            context_parts.append("### LƯỢNG LEAD PHÁT SINH HÀNG THÁNG:")
+            for l in res["lead_monthly"]:
+                context_parts.append(f"- T{l.get('month')}/{l.get('year')}: {l.get('totalLead')} lead (Won: {l.get('wonLead')}, Lost: {l.get('lostLead')})")
+            context_parts.append("")
+
+        # 6. Detailed Monthly Breakdowns
+        if isinstance(res.get("revenue_industry_monthly"), list):
+            context_parts.append("### XU HƯỚNG DOANH THU THEO NGÀNH HÀNG THÁNG (INDUSTRY MONTHLY TRENDS):")
+            for x in res["revenue_industry_monthly"][:15]: # Limit to prevent context overflow
+                context_parts.append(f"- Ngành {x.get('industryType')} | T{x.get('month')}/{x.get('year')}: {fmt_vnd(x.get('revenue'))}")
+            context_parts.append("")
+
+        # 7. Revenue by Product Line
+        if not isinstance(rev_product, Exception) and rev_product:
+            context_parts.append("### DOANH THU THEO DÒNG SẢN PHẨM (PRODUCT LINE):")
+            total_rev = sum(x["revenue"] for x in rev_product)
+            for item in sorted(rev_product, key=lambda x: x["revenue"], reverse=True):
+                rate = round((item["revenue"] / total_rev) * 100, 2) if total_rev > 0 else 0
+                context_parts.append(
+                    f"- {item['name']}: Doanh thu {fmt_vnd(item['revenue'])} ({rate}%), "
+                    f"Won: {item['wonLead']:.0f} lead, TB/Won: {fmt_vnd(item['avgRevenue'])}"
+                )
+            context_parts.append("")
+
+        # Product Line Detailed Stats
+        if isinstance(res.get("product_line_conversion_rate"), list):
+            context_parts.append("### HIỆU SUẤT THEO SẢN PHẨM (PRODUCT PERFORMANCE):")
+            for x in res["product_line_conversion_rate"]:
+                p_name = x.get('productLine')
+                tot = next((p.get('totalLead', 0) for p in res.get("product_line_total_leads", []) if p.get('productLine') == p_name), 0)
+                won = next((p.get('wonLead', 0) for p in res.get("product_line_won_leads", []) if p.get('productLine') == p_name), 0)
+                lost = next((p.get('lostLead', 0) for p in res.get("product_line_lost_leads", []) if p.get('productLine') == p_name), 0)
+                avg_won = next((p.get('avgRevenue', 0) for p in res.get("product_line_avg_revenue_won", []) if p.get('productLine') == p_name), 0)
+                reason = next((p.get('reason', 'N/A') for p in res.get("product_line_best_lost_reason", []) if p.get('productLine') == p_name), 'N/A')
+                context_parts.append(
+                    f"- {p_name}: Conversion Rate {x.get('conversionRate', 0)}% | Tổng Lead: {tot}, Won: {won}, Lost: {lost} | "
+                    f"Doanh thu TB deal Won: {fmt_vnd(avg_won)} | Lý do Lost chính: {reason}"
+                )
+            context_parts.append("")
+
+        # 8. Revenue by Region
+        if not isinstance(rev_region, Exception) and rev_region:
+            context_parts.append("### DOANH THU THEO KHU VỰC (REGION):")
+            total_rev = sum(x["revenue"] for x in rev_region)
+            for item in sorted(rev_region, key=lambda x: x["revenue"], reverse=True):
+                rate = round((item["revenue"] / total_rev) * 100, 2) if total_rev > 0 else 0
+                context_parts.append(
+                    f"- {item['name']}: Doanh thu {fmt_vnd(item['revenue'])} ({rate}%), "
+                    f"Won: {item['wonLead']:.0f} lead, TB/Won: {fmt_vnd(item['avgRevenue'])}"
+                )
+            context_parts.append("")
+
+        # Region Detailed Stats
+        if isinstance(res.get("region_conversion_rate"), list):
+            context_parts.append("### HIỆU SUẤT THEO KHU VỰC (REGION PERFORMANCE):")
+            for x in res["region_conversion_rate"]:
+                r_name = x.get('region')
+                tot = next((r.get('totalLead', 0) for r in res.get("region_total_leads", []) if r.get('region') == r_name), 0)
+                won = next((r.get('wonLead', 0) for r in res.get("region_won_leads", []) if r.get('region') == r_name), 0)
+                lost = next((r.get('lostLead', 0) for r in res.get("region_lost_leads", []) if r.get('region') == r_name), 0)
+                avg_won = next((r.get('avgRevenue', 0) for r in res.get("region_avg_revenue_won", []) if r.get('region') == r_name), 0)
+                reason = next((r.get('reason', 'N/A') for r in res.get("region_best_lost_reason", []) if r.get('region') == r_name), 'N/A')
+                context_parts.append(
+                    f"- Khu vực {r_name}: Conversion Rate {x.get('conversionRate', 0)}% | Tổng Lead: {tot}, Won: {won}, Lost: {lost} | "
+                    f"Doanh thu TB deal Won: {fmt_vnd(avg_won)} | Lý do Lost chính: {reason}"
+                )
+            context_parts.append("")
+
+        # 9. Revenue by Industry
+        if not isinstance(rev_industry, Exception) and rev_industry:
+            context_parts.append("### DOANH THU THEO NGÀNH NGHỀ (INDUSTRY):")
+            total_rev = sum(x["revenue"] for x in rev_industry)
+            for item in sorted(rev_industry, key=lambda x: x["revenue"], reverse=True):
+                rate = round((item["revenue"] / total_rev) * 100, 2) if total_rev > 0 else 0
+                context_parts.append(
+                    f"- {item['name']}: Doanh thu {fmt_vnd(item['revenue'])} ({rate}%), "
+                    f"Won: {item['wonLead']:.0f} lead, TB/Won: {fmt_vnd(item['avgRevenue'])}"
+                )
+            context_parts.append("")
+
+        # Industry Detailed Stats
+        if isinstance(res.get("industry_conversion_rate"), list):
+            context_parts.append("### HIỆU SUẤT THEO NGÀNH NGHỀ (INDUSTRY PERFORMANCE):")
+            for x in res["industry_conversion_rate"]:
+                ind_name = x.get('industryType')
+                tot = next((i.get('totalLead', 0) for i in res.get("potential_lead_industry", []) if i.get('industryType') == ind_name), 0)
+                won = next((i.get('wonLead', 0) for i in res.get("industry_won_leads", []) if i.get('industryType') == ind_name), 0)
+                avg_cycle = next((i.get('avgDays', 0) for i in res.get("industry_avg_sales_cycle", []) if i.get('industryType') == ind_name), 0)
+                reason = next((i.get('reason', 'N/A') for i in res.get("industry_best_lost_reason", []) if i.get('industryType') == ind_name), 'N/A')
+                context_parts.append(
+                    f"- Ngành {ind_name}: Conversion Rate {x.get('conversionRate', 0)}% | Tổng Lead: {tot}, Won: {won} | "
+                    f"Chu kỳ chốt deal TB: {avg_cycle:.1f} ngày | Lý do Lost chính: {reason}"
+                )
+            context_parts.append("")
+
+        # 10. Customer Roles & Groups
+        if isinstance(res.get("revenue_group"), list):
+            context_parts.append("### DOANH THU VÀ HIỆU QUẢ THEO NHÓM KHÁCH HÀNG (CUSTOMER GROUP):")
+            for cg in res["revenue_group"]:
+                cg_name = cg.get('customerGroup')
+                roi_val = next((r.get('roi', 0) for r in res.get("customer_group_roi", []) if r.get('customerGroup') == cg_name), 0)
+                cpl_val = next((r.get('costPerLead', 0) for r in res.get("customer_group_cost_per_lead", []) if r.get('customerGroup') == cg_name), 0)
+                context_parts.append(
+                    f"- Nhóm {cg_name}: Doanh thu {fmt_vnd(cg.get('revenue'))}, Won: {cg.get('wonLead')} lead | "
+                    f"ROI: {roi_val}% | CPL: {fmt_vnd(cpl_val)}"
+                )
+            context_parts.append("")
+
+        if isinstance(res.get("customer_role_revenue"), list):
+            context_parts.append("### CHI TIẾT THEO VAI TRÒ KHÁCH HÀNG (CUSTOMER ROLE):")
+            for cr in res["customer_role_revenue"]:
+                cr_name = cr.get('customerRole')
+                tot = next((x.get('totalLead', 0) for x in res.get("customer_role_total_leads", []) if x.get('customerRole') == cr_name), 0)
+                won = next((x.get('wonLead', 0) for x in res.get("customer_role_conversion_rate", []) if x.get('customerRole') == cr_name), 0)
+                conv = next((x.get('conversionRate', 0) for x in res.get("customer_role_conversion_rate", []) if x.get('customerRole') == cr_name), 0)
+                avg_rev = next((x.get('avgRevenue', 0) for x in res.get("customer_role_avg_revenue_won", []) if x.get('customerRole') == cr_name), 0)
+                lost = next((x.get('lostLead', 0) for x in res.get("customer_role_lost_leads", []) if x.get('customerRole') == cr_name), 0)
+                reason = next((x.get('reason', 'N/A') for x in res.get("customer_role_best_lost_reason", []) if x.get('customerRole') == cr_name), 'N/A')
+                context_parts.append(
+                    f"- Vai trò {cr_name}: Doanh thu {fmt_vnd(cr.get('revenue'))} | Lead: {tot}, Won: {won}, Lost: {lost} (Conversion {conv}%) | "
+                    f"Doanh thu TB deal Won: {fmt_vnd(avg_rev)} | Lý do Lost chính: {reason}"
+                )
+            context_parts.append("")
+
+        # 11. Top Accounts & Value Matrix
+        t_accs = res.get("total_accounts")
+        w_accs = res.get("won_accounts")
+        if t_accs is not None or w_accs is not None:
+            context_parts.append(f"### MA TRẬN KHÁCH HÀNG (ACCOUNTS OVERVIEW):\n- Tổng số accounts: {t_accs}\n- Số accounts đã chốt Won: {w_accs}\n")
+
+        if isinstance(res.get("top10_accounts"), list):
+            context_parts.append("### TOP 10 KHÁCH HÀNG DOANH THU CAO NHẤT:")
+            for idx, acc in enumerate(res["top10_accounts"], 1):
+                context_parts.append(f"{idx}. {acc.get('accountName')}: Doanh thu {fmt_vnd(acc.get('revenue'))} | Won: {acc.get('wonLead')} lead")
+            context_parts.append("")
+
+        # 12. Source-Product Matrix
+        if isinstance(res.get("revenue_by_source_product"), list):
+            context_parts.append("### PHÂN TÍCH DOANH THU THEO NGUỒN VÀ SẢN PHẨM (SOURCE-PRODUCT REVENUE MATRIX):")
+            for item in res["revenue_by_source_product"][:12]:
+                context_parts.append(f"- Nguồn {item.get('leadSource')} - {item.get('productLine')}: Doanh thu {fmt_vnd(item.get('revenue'))}")
+            context_parts.append("")
+
+        # 13. Lost Analysis
         if not isinstance(lost_reasons, Exception) and lost_reasons:
             context_parts.append("### LÝ DO THẤT BẠI (LOST REASONS):")
             for r in lost_reasons:
@@ -1645,17 +1963,39 @@ async def get_system_db_context(client: CachedAPIClient) -> str:
                 )
             context_parts.append("")
 
-        # 6. Pipeline Coverage
-        if not isinstance(pipelines, Exception) and pipelines:
-            context_parts.append("### ĐỘ PHỦ PIPELINE (PIPELINE COVERAGE):")
-            for p in pipelines:
+        if not isinstance(lost_by_seller, Exception) and lost_by_seller:
+            context_parts.append("### THẤT BẠI THEO SELLER (LOST BY SELLER):")
+            for item in sorted(lost_by_seller, key=lambda x: x["lostLead"], reverse=True):
                 context_parts.append(
-                    f"- Seller {p['sellerName']}: Open Pipeline {p['openPipeline']:,.0f} VNĐ, "
-                    f"Mục tiêu (Target): {p['target']:,.0f} VNĐ, Độ phủ: {p['pipelineCoverage']} lần"
+                    f"- {item['salesOwner']}: {item['lostLead']:.0f} lead lost (Tỷ lệ: {item['lostRate']}%)"
                 )
             context_parts.append("")
 
-        # 7. BANT Completion Rate
+        if not isinstance(lost_by_source, Exception) and lost_by_source:
+            context_parts.append("### THẤT BẠI THEO NGUỒN LEAD (LOST BY SOURCE):")
+            for item in sorted(lost_by_source, key=lambda x: x["lostLead"], reverse=True):
+                context_parts.append(
+                    f"- {item['sourceName']}: {item['lostLead']:.0f} lead lost (Tỷ lệ: {item['lostRate']}%)"
+                )
+            context_parts.append("")
+
+        if not isinstance(lost_by_region, Exception) and lost_by_region:
+            context_parts.append("### THẤT BẠI THEO KHU VỰC (LOST BY REGION):")
+            for item in sorted(lost_by_region, key=lambda x: x["lostLead"], reverse=True):
+                context_parts.append(
+                    f"- {item['region']}: {item['lostLead']:.0f} lead lost (Tỷ lệ: {item['lostRate']}%)"
+                )
+            context_parts.append("")
+
+        if not isinstance(lost_by_industry, Exception) and lost_by_industry:
+            context_parts.append("### THẤT BẠI THEO NGÀNH NGHỀ (LOST BY INDUSTRY):")
+            for item in sorted(lost_by_industry, key=lambda x: x["lostLead"], reverse=True):
+                context_parts.append(
+                    f"- {item['industryType']}: {item['lostLead']:.0f} lead lost (Tỷ lệ: {item['lostRate']}%)"
+                )
+            context_parts.append("")
+
+        # 14. BANT Information
         if not isinstance(bant_rate, Exception) and bant_rate:
             context_parts.append("### TỶ LỆ HOÀN THÀNH BANT THEO SELLER:")
             for item in bant_rate:
@@ -1664,7 +2004,6 @@ async def get_system_db_context(client: CachedAPIClient) -> str:
                 )
             context_parts.append("")
 
-        # 8. BANT Average Score
         if not isinstance(bant_avg, Exception) and bant_avg:
             context_parts.append("### ĐIỂM BANT TRUNG BÌNH THEO SELLER:")
             for item in bant_avg:
@@ -1673,9 +2012,56 @@ async def get_system_db_context(client: CachedAPIClient) -> str:
                 )
             context_parts.append("")
 
+        # 15. Highlights & Best Performers
+        context_parts.append("### ĐIỂM NỔI BẬT & TỐT NHẤT HỆ THỐNG (CRM HIGHLIGHTS):")
+        
+        best_acc = res.get("best_account_revenue")
+        if isinstance(best_acc, dict):
+            context_parts.append(f"- Khách hàng tạo doanh thu cao nhất (Best Account): {best_acc.get('accountName')} - {fmt_vnd(best_acc.get('revenue'))}")
+            
+        best_ind_rev = res.get("best_industry_revenue")
+        if isinstance(best_ind_rev, dict):
+            context_parts.append(f"- Ngành nghề doanh thu cao nhất (Best Industry): {best_ind_rev.get('industryType')} - {fmt_vnd(best_ind_rev.get('revenue'))}")
+
+        best_ind_won = res.get("best_industry_won_deal")
+        if isinstance(best_ind_won, dict):
+            context_parts.append(f"- Ngành nghề có nhiều deal Won nhất: {best_ind_won.get('industryType')} - {best_ind_won.get('wonDeal')} deal Won")
+
+        best_reg_rev = res.get("best_region_revenue")
+        if isinstance(best_reg_rev, dict):
+            context_parts.append(f"- Khu vực doanh thu cao nhất (Best Region): {best_reg_rev.get('region')} - {fmt_vnd(best_reg_rev.get('revenue'))}")
+
+        best_reg_won = res.get("best_region_won_deal")
+        if isinstance(best_reg_won, dict):
+            context_parts.append(f"- Khu vực có nhiều deal Won nhất: {best_reg_won.get('region')} - {best_reg_won.get('wonDeal')} deal Won")
+
+        best_cg_rev = res.get("best_customer_group_revenue")
+        if isinstance(best_cg_rev, dict):
+            context_parts.append(f"- Nhóm khách hàng doanh thu cao nhất: {best_cg_rev.get('customerGroup')} - {fmt_vnd(best_cg_rev.get('revenue'))}")
+
+        best_cg_lead = res.get("best_customer_group_lead")
+        if isinstance(best_cg_lead, dict):
+            context_parts.append(f"- Nhóm khách hàng có nhiều lead nhất: {best_cg_lead.get('customerGroup')} - {best_cg_lead.get('totalLead')} lead")
+
+        top_seller_rev = res.get("top_sales_owner_revenue")
+        if isinstance(top_seller_rev, dict):
+            context_parts.append(f"- Seller doanh thu cao nhất (Top Revenue Seller): {top_seller_rev.get('userName')} - {fmt_vnd(top_seller_rev.get('revenue'))}")
+
+        top_seller_wr = res.get("top_sales_owner_win_rate")
+        if isinstance(top_seller_wr, dict):
+            context_parts.append(f"- Seller có Win Rate cao nhất: {top_seller_wr.get('userName')} - {top_seller_wr.get('winRate')}%")
+
+        fastest_seller = res.get("fastest_sales_owner")
+        if isinstance(fastest_seller, dict):
+            context_parts.append(f"- Seller chốt deal nhanh nhất: {fastest_seller.get('userName')} - trung bình {fastest_seller.get('avgDays', 0):.1f} ngày")
+
+        top_underserved = res.get("top_underserved_segment")
+        if isinstance(top_underserved, dict):
+            context_parts.append(f"- Phân khúc tiềm năng chưa khai thác tốt (Top Underserved Segment): {top_underserved.get('segment')} - {top_underserved.get('totalLead')} lead, Won: {top_underserved.get('wonLead')} lead")
+
         return "\n".join(context_parts)
     except Exception as e:
-        logger.error(f"Error compiling database context: {e}")
+        logger.error(f"Error compiling database context: {e}", exc_info=True)
         return "Không lấy được dữ liệu động từ hệ thống."
 
 
