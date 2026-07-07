@@ -584,7 +584,24 @@ public class DashboardServiceImpl implements DashboardService {
     public List<CustomerSegmentPipelineResponse> getCustomerSegmentPipeline() {
         return leadRepo.getCustomerSegmentPipeline();
     }
+    @Override
+    public List<ProductLineROIResponse> getProductLineROI() {
+        return leadRepo.getProductLineROI();
+    }
 
+    @Override
+    public List<RegionROIResponse> getRegionROI() {
+        return leadRepo.getRegionROI();
+    }
+
+    @Override
+    public List<CustomerRoleROIResponse> getCustomerRoleROI() {
+        return leadRepo.getCustomerRoleROI();
+    }
+    @Override
+    public List<TopAccountResponse> getTopAccountsByOpportunityValue() {
+        return leadRepo.getTopAccountsByOpportunityValue();
+    }
 
 }
 

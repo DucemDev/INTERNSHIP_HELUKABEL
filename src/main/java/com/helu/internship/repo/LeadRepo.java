@@ -2921,4 +2921,176 @@ ORDER BY
     ORDER BY pipelineValue DESC
     """, nativeQuery = true)
     List<CustomerSegmentPipelineResponse> getCustomerSegmentPipeline();
+
+    @Query(value = """
+SELECT
+
+    p.product_name AS productName,
+
+    COUNT(DISTINCT l.lead_id) AS totalLead,
+
+    SUM(
+        CASE
+            WHEN l.status = 'Won'
+            THEN ISNULL(l.business_result,0)
+            ELSE 0
+        END
+    ) AS revenueWon,
+
+    AVG(ISNULL(l.cost,0)) AS costPerLead,
+
+    COUNT(DISTINCT l.lead_id)
+        * AVG(ISNULL(l.cost,0))
+        AS totalCost,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN l.status = 'Won'
+                THEN ISNULL(l.business_result,0)
+                ELSE 0
+            END
+        )
+        /
+        NULLIF(
+            COUNT(DISTINCT l.lead_id)
+            * AVG(ISNULL(l.cost,0)),
+            0
+        )
+    ,2) AS roi
+
+FROM lead l
+
+INNER JOIN lead_item li
+    ON l.lead_id = li.lead_id
+
+INNER JOIN product p
+    ON li.product_id = p.product_id
+
+GROUP BY
+    p.product_name
+
+ORDER BY roi DESC
+""", nativeQuery = true)
+    List<ProductLineROIResponse> getProductLineROI();
+
+    @Query(value = """
+SELECT
+
+    l.region AS region,
+
+    COUNT(DISTINCT l.lead_id) AS totalLead,
+
+    SUM(
+        CASE
+            WHEN l.status = 'Won'
+            THEN ISNULL(l.business_result,0)
+            ELSE 0
+        END
+    ) AS revenueWon,
+
+    SUM(ISNULL(l.cost,0)) AS totalCost,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN l.status = 'Won'
+                THEN ISNULL(l.business_result,0)
+                ELSE 0
+            END
+        )
+        /
+        NULLIF(SUM(ISNULL(l.cost,0)),0)
+    ,2) AS roi
+
+FROM lead l
+
+GROUP BY
+    l.region
+
+ORDER BY roi DESC
+""", nativeQuery = true)
+    List<RegionROIResponse> getRegionROI();
+
+    @Query(value = """
+SELECT
+
+    l.customer_role AS customerRole,
+
+    COUNT(DISTINCT l.lead_id) AS totalLead,
+
+    SUM(
+        CASE
+            WHEN l.status = 'Won'
+            THEN ISNULL(l.business_result, 0)
+            ELSE 0
+        END
+    ) AS revenueWon,
+
+    SUM(ISNULL(l.cost, 0)) AS totalCost,
+
+    ROUND(
+        SUM(
+            CASE
+                WHEN l.status = 'Won'
+                THEN ISNULL(l.business_result, 0)
+                ELSE 0
+            END
+        )
+        /
+        NULLIF(SUM(ISNULL(l.cost, 0)), 0)
+    , 2) AS roi
+
+FROM lead l
+
+GROUP BY l.customer_role
+
+ORDER BY roi DESC
+""", nativeQuery = true)
+    List<CustomerRoleROIResponse> getCustomerRoleROI();
+
+    @Query(value = """
+SELECT
+
+    l.account AS accountName,
+
+    SUM(
+        CASE
+            WHEN l.status = 'Won'
+            THEN ISNULL(l.business_result, 0)
+            ELSE 0
+        END
+    ) AS revenueWon,
+
+    SUM(
+        CASE
+            WHEN l.status = 'Lost'
+            THEN ISNULL(l.business_result, 0)
+            ELSE 0
+        END
+    ) AS lostOpportunityValue,
+
+    SUM(
+        CASE
+            WHEN l.status IN (
+                'New',
+                'Contacted',
+                'Qualified',
+                'Proposal Sent',
+                'In Negotiation'
+            )
+            THEN ISNULL(l.business_result, 0)
+            ELSE 0
+        END
+    ) AS openPipelineValue,
+
+    SUM(ISNULL(l.business_result, 0)) AS totalOpportunity
+
+FROM lead l
+
+GROUP BY l.account
+
+ORDER BY totalOpportunity DESC
+""", nativeQuery = true)
+    List<TopAccountResponse> getTopAccountsByOpportunityValue();
 }
