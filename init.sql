@@ -1536,6 +1536,32 @@ SELECT
 FROM lead l;
 GO
 
+-- Fix created_date to match Excel
+BEGIN TRANSACTION;
+UPDATE lead SET created_date = '2025-10-30' WHERE lead_id = 'L-2026-0004';
+UPDATE lead SET created_date = '2025-11-09' WHERE lead_id = 'L-2026-0006';
+UPDATE lead SET created_date = '2025-09-29' WHERE lead_id = 'L-2026-0015';
+UPDATE lead SET created_date = '2025-08-23' WHERE lead_id = 'L-2026-0019';
+UPDATE lead SET created_date = '2025-06-14' WHERE lead_id = 'L-2026-0021';
+UPDATE lead SET created_date = '2025-12-02' WHERE lead_id = 'L-2026-0024';
+UPDATE lead SET created_date = '2025-11-21' WHERE lead_id = 'L-2026-0027';
+UPDATE lead SET created_date = '2025-12-17' WHERE lead_id = 'L-2026-0032';
+UPDATE lead SET created_date = '2025-09-08' WHERE lead_id = 'L-2026-0034';
+UPDATE lead SET created_date = '2025-09-02' WHERE lead_id = 'L-2026-0036';
+UPDATE lead SET created_date = '2025-09-10' WHERE lead_id = 'L-2026-0037';
+UPDATE lead SET created_date = '2025-05-12' WHERE lead_id = 'L-2026-0041';
+UPDATE lead SET created_date = '2025-09-16' WHERE lead_id = 'L-2026-0045';
+UPDATE lead SET created_date = '2025-10-24' WHERE lead_id = 'L-2026-0051';
+UPDATE lead SET created_date = '2025-11-24' WHERE lead_id = 'L-2026-0058';
+UPDATE lead SET created_date = '2025-07-24' WHERE lead_id = 'L-2026-0062';
+UPDATE lead SET created_date = '2025-10-20' WHERE lead_id = 'L-2026-0063';
+UPDATE lead SET created_date = '2025-11-12' WHERE lead_id = 'L-2026-0065';
+UPDATE lead SET created_date = '2025-03-20' WHERE lead_id = 'L-2026-0071';
+UPDATE lead SET created_date = '2025-05-15' WHERE lead_id = 'L-2026-0072';
+COMMIT;
+
+
+
 SELECT
     COUNT(*) AS won_count,
     SUM(business_result) AS won_revenue
@@ -1594,3 +1620,30 @@ GROUP BY
 ORDER BY
     p.product_name,
     lost_leads DESC;
+
+SELECT
+    account,
+    COUNT(*) AS total_leads,
+    SUM(business_result) AS total_business_result
+FROM lead
+WHERE account = 'Yamaha Motor Vietnam'
+GROUP BY account;
+
+
+
+SELECT
+    l.lead_id,
+    l.created_date,
+    l.account,
+    l.full_name,
+    p.product_name,
+    l.loss_reason,
+    l.business_result
+FROM lead l
+         JOIN lead_item li
+              ON l.lead_id = li.lead_id
+         JOIN product p
+              ON li.product_id = p.product_id
+WHERE l.status = 'Lost'
+  AND p.product_name = 'Control Cable'
+ORDER BY l.created_date;
