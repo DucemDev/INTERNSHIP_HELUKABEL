@@ -19,6 +19,8 @@ public interface LeadStatusHistoryRepo extends JpaRepository<LeadStatusHistoryEn
         FROM lead_status_history new_stage
         JOIN lead_status_history won_stage
             ON new_stage.lead_id = won_stage.lead_id
+        JOIN lead l
+            ON new_stage.lead_id = l.lead_id
         WHERE new_stage.new_status = 'New'
           AND won_stage.new_status = 'Won'
         """, nativeQuery = true)
