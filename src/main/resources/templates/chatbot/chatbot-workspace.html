@@ -9,8 +9,8 @@
     <!-- Header Page -->
     <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">AI Assistant Workspace</h1>
-            <p class="text-sm font-medium text-gray-500">Phân tích dữ liệu CRM, hỗ trợ chốt sales và chấm điểm BANT tự động bằng Trí tuệ nhân tạo.</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight" th:text="${#locale.language == 'vi' ? 'AI Assistant Workspace' : (#locale.language == 'th' ? 'พื้นที่ทำงานผู้ช่วย AI' : 'AI Assistant Workspace')}">AI Assistant Workspace</h1>
+            <p class="text-sm font-medium text-gray-500" th:text="${#locale.language == 'vi' ? 'Phân tích dữ liệu CRM, hỗ trợ chốt sales và chấm điểm BANT tự động bằng Trí tuệ nhân tạo.' : (#locale.language == 'th' ? 'วิเคราะห์ข้อมูล CRM สนับสนุนการปิดการขาย และประเมินคะแนน BANT อัตโนมัติด้วยปัญญาประดิษฐ์' : 'Analyze CRM data, support sales closing, and evaluate BANT scores automatically with AI.')}">Phân tích dữ liệu CRM, hỗ trợ chốt sales và chấm điểm BANT tự động bằng Trí tuệ nhân tạo.</p>
         </div>
     </div>
 
@@ -22,14 +22,14 @@
                 <div class="flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-red-600 to-orange-500 font-extrabold text-white shadow-md shadow-red-200">AI</div>
                     <div>
-                        <h2 class="text-sm font-extrabold text-gray-800 tracking-tight" id="activeSessionTitle">Phân tích BANT & Nhiệt độ Lead</h2>
-                        <p class="text-[10px] font-medium text-emerald-500">Mô hình AI HELU-LLM v1.2 đang sẵn sàng</p>
+                        <h2 class="text-sm font-extrabold text-gray-800 tracking-tight" id="activeSessionTitle" th:text="${#locale.language == 'vi' ? 'Phân tích BANT & Nhiệt độ Lead' : (#locale.language == 'th' ? 'การวิเคราะห์ BANT และอุณหภูมิของลีด' : 'BANT Analysis & Lead Temperature')}">Phân tích BANT & Nhiệt độ Lead</h2>
+                        <p class="text-[10px] font-medium text-emerald-500" th:text="${#locale.language == 'vi' ? 'Mô hình AI HELU-LLM v1.2 đang sẵn sàng' : (#locale.language == 'th' ? 'โมเดล AI HELU-LLM v1.2 พร้อมใช้งานแล้ว' : 'AI Model HELU-LLM v1.2 is ready')}">Mô hình AI HELU-LLM v1.2 đang sẵn sàng</p>
                     </div>
                 </div>
                 <!-- Action buttons -->
                 <div class="flex items-center gap-2">
-                    <button onclick="clearChatWorkspace()" class="rounded-xl border border-gray-200 bg-white p-2 text-gray-500 hover:text-helu-red hover:border-red-100 hover:bg-red-50/20 transition-all cursor-pointer" title="Xóa lịch sử">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <button onclick="clearChatWorkspace()" class="rounded-xl border border-gray-200 bg-white p-2 text-gray-500 hover:text-helu-red hover:border-red-100 hover:bg-red-50/20 transition-all cursor-pointer" th:title="${#locale.language == 'vi' ? 'Làm mới' : (#locale.language == 'th' ? 'รีเฟรช' : 'Refresh')}" title="Làm mới">
+                        <i data-lucide="loader-2" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
@@ -40,24 +40,26 @@
                 <div class="flex gap-4 items-start max-w-[85%]">
                     <div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-helu-red text-xs font-bold text-white flex-shrink-0 shadow-md">AI</div>
                     <div class="rounded-3xl rounded-tl-none bg-white p-4 border border-helu-border text-xs text-gray-700 shadow-sm leading-relaxed font-medium">
-                        <p class="font-bold text-gray-900 mb-1">Xin chào!</p>
-                        Tôi là trợ lý trí tuệ nhân tạo được huấn luyện riêng cho dự án HELUKABEL CRM. Tôi có quyền truy cập thông tin các Lead, bảng phân tích BANT, lý do lost, nguồn gốc đối tác. 
-                        <br/><br/>
-                        Bạn có thể hỏi tôi bất kỳ câu hỏi nào bằng cách nhập vào khung chat phía dưới, hoặc thử các gợi ý phân tích nhanh dưới đây:
+                        <p class="font-bold text-gray-900 mb-1" th:text="${#locale.language == 'vi' ? 'Xin chào!' : (#locale.language == 'th' ? 'สวัสดี!' : 'Hello!')}">Xin chào!</p>
+                        <span th:utext="${#locale.language == 'vi' ? 'Tôi là trợ lý trí tuệ nhân tạo được huấn luyện riêng cho dự án HELUKABEL CRM. Tôi có quyền truy cập thông tin các Lead, bảng phân tích BANT, lý do lost, nguồn gốc đối tác. <br/><br/> Bạn có thể hỏi tôi bất kỳ câu hỏi nào bằng cách nhập vào khung chat phía dưới, hoặc thử các gợi ý phân tích nhanh dưới đây:' : (#locale.language == 'th' ? 'ฉันคือผู้ช่วยปัญญาประดิษฐ์ที่ได้รับการฝึกฝนมาเป็นพิเศษสำหรับโครงการ HELUKABEL CRM ฉันสามารถเข้าถึงข้อมูลลีด การวิเคราะห์ BANT เหตุผลที่สูญเสียดีล และแหล่งที่มาของคู่ค้า <br/><br/> คุณสามารถถามคำถามใดๆ กับฉันได้โดยป้อนในช่องแชทด้านล่าง หรือลองใช้คำแนะนำการวิเคราะห์ด่วนด้านล่าง:' : 'I am an AI assistant trained specifically for the HELUKABEL CRM project. I have access to Lead information, BANT analysis, loss reasons, and partner sources. <br/><br/> You can ask me any question by typing in the chat box below, or try the quick analysis suggestions below:')}">
+                            Tôi là trợ lý trí tuệ nhân tạo được huấn luyện riêng cho dự án HELUKABEL CRM. Tôi có quyền truy cập thông tin các Lead, bảng phân tích BANT, lý do lost, nguồn gốc đối tác. 
+                            <br/><br/>
+                            Bạn có thể hỏi tôi bất kỳ câu hỏi nào bằng cách nhập vào khung chat phía dưới, hoặc thử các gợi ý phân tích nhanh dưới đây:
+                        </span>
                     </div>
                 </div>
             </div>
 
             <!-- Suggestion Prompt Starters -->
             <div class="px-6 py-2 border-t border-gray-100 flex flex-wrap gap-2 items-center bg-white" id="promptStarters">
-                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mr-2">Gợi ý nhanh:</span>
-                <button onclick="triggerSuggestedPrompt(this)" class="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:border-helu-red hover:text-helu-red bg-gray-50 hover:bg-red-50/20 transition-all cursor-pointer font-semibold shadow-sm">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mr-2" th:text="${#locale.language == 'vi' ? 'Gợi ý nhanh:' : (#locale.language == 'th' ? 'คำแนะนำด่วน:' : 'Quick suggestions:')}">Gợi ý nhanh:</span>
+                <button onclick="triggerSuggestedPrompt(this)" class="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:border-helu-red hover:text-helu-red bg-gray-50 hover:bg-red-50/20 transition-all cursor-pointer font-semibold shadow-sm" th:text="${#locale.language == 'vi' ? 'Phân tích BANT là gì?' : (#locale.language == 'th' ? 'การวิเคราะห์ BANT คืออะไร?' : 'What is BANT analysis?')}">
                     Phân tích BANT là gì?
                 </button>
-                <button onclick="triggerSuggestedPrompt(this)" class="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:border-helu-red hover:text-helu-red bg-gray-50 hover:bg-red-50/20 transition-all cursor-pointer font-semibold shadow-sm">
+                <button onclick="triggerSuggestedPrompt(this)" class="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:border-helu-red hover:text-helu-red bg-gray-50 hover:bg-red-50/20 transition-all cursor-pointer font-semibold shadow-sm" th:text="${#locale.language == 'vi' ? 'Làm thế nào để giảm tỷ lệ Lost?' : (#locale.language == 'th' ? 'จะลดอัตราการสูญเสียดีลได้อย่างไร?' : 'How to reduce the Lost rate?')}">
                     Làm thế nào để giảm tỷ lệ Lost?
                 </button>
-                <button onclick="triggerSuggestedPrompt(this)" class="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:border-helu-red hover:text-helu-red bg-gray-50 hover:bg-red-50/20 transition-all cursor-pointer font-semibold shadow-sm">
+                <button onclick="triggerSuggestedPrompt(this)" class="rounded-full border border-gray-200 px-3 py-1.5 text-xs text-gray-600 hover:border-helu-red hover:text-helu-red bg-gray-50 hover:bg-red-50/20 transition-all cursor-pointer font-semibold shadow-sm" th:text="${#locale.language == 'vi' ? 'Xem tổng quan doanh thu Won' : (#locale.language == 'th' ? 'ดูภาพรวมรายได้ที่ชนะ' : 'View Won revenue overview')}">
                     Xem tổng quan doanh thu Won
                 </button>
             </div>
@@ -65,16 +67,8 @@
             <!-- Message Input Workspace -->
             <div class="p-4 border-t border-helu-border bg-white">
                 <div class="flex items-center gap-3 rounded-2xl border border-gray-200 px-4 py-2 focus-within:border-helu-red focus-within:ring-2 focus-within:ring-red-100 transition-all">
-                    <!-- Attachment button mock -->
-                    <button class="text-gray-400 hover:text-gray-600 cursor-pointer">
-                        <i data-lucide="paperclip" class="w-5 h-5"></i>
-                    </button>
                     <!-- Message text input -->
-                    <input type="text" id="workspaceChatInput" placeholder="Nhập câu hỏi của bạn cho Trợ lý AI..." class="flex-1 h-10 outline-none text-xs bg-transparent font-medium text-gray-700" onkeydown="handleWorkspaceKey(event)" />
-                    <!-- Microphone mock -->
-                    <button class="text-gray-400 hover:text-gray-600 cursor-pointer">
-                        <i data-lucide="mic" class="w-5 h-5"></i>
-                    </button>
+                    <input type="text" id="workspaceChatInput" th:placeholder="${#locale.language == 'vi' ? 'Nhập câu hỏi của bạn cho Trợ lý AI...' : (#locale.language == 'th' ? 'ป้อนคำถามของคุณสำหรับผู้ช่วย AI...' : 'Type your question for the AI Assistant...')}" placeholder="Nhập câu hỏi của bạn cho Trợ lý AI..." class="flex-1 h-10 outline-none text-xs bg-transparent font-medium text-gray-700" onkeydown="handleWorkspaceKey(event)" />
                     <!-- Submit button -->
                     <button onclick="sendWorkspaceMessage()" class="flex h-9 w-9 items-center justify-center rounded-xl bg-helu-red text-white hover:bg-red-700 shadow-md shadow-red-200 transition-all active:scale-95 cursor-pointer">
                         <i data-lucide="send" class="w-4 h-4"></i>
@@ -84,8 +78,11 @@
         </div>
     </div>
 
-    <!-- Script moved inside the main content div so it's not discarded by Thymeleaf replacement -->
     <script th:inline="javascript">
+        const locale = /*[[${#locale.language}]]*/ 'vi';
+        const isVi = locale === 'vi';
+        const isTh = locale === 'th';
+
         // Helper to press enter to submit
         function handleWorkspaceKey(e) {
             if (e.key === 'Enter') {
@@ -107,7 +104,7 @@
                 <div class="flex gap-4 items-start max-w-[85%]">
                     <div class="flex h-8 w-8 items-center justify-center rounded-2xl bg-helu-red text-xs font-bold text-white flex-shrink-0 shadow-md">AI</div>
                     <div class="rounded-3xl rounded-tl-none bg-white p-4 border border-helu-border text-xs text-gray-700 shadow-sm leading-relaxed font-medium">
-                        Lịch sử trò chuyện đã được làm sạch. Tôi có thể giúp gì tiếp cho bạn?
+                        ${isVi ? 'Lịch sử trò chuyện đã được làm sạch. Tôi có thể giúp gì tiếp cho bạn?' : (isTh ? 'ล้างประวัติการสนทนาแล้ว มีอะไรให้ฉันช่วยเพิ่มเติมไหม' : 'Chat history cleared. How can I help you next?')}
                     </div>
                 </div>
             `;
@@ -138,12 +135,12 @@
                     const data = await response.json();
                     appendWorkspaceMessage(data.response, false);
                 } else {
-                    appendWorkspaceMessage("Đã xảy ra lỗi khi trao đổi với trợ lý ảo.", false);
+                    appendWorkspaceMessage(isVi ? "Đã xảy ra lỗi khi trao đổi với trợ lý ảo." : (isTh ? "เกิดข้อผิดพลาดในการสื่อสารกับผู้ช่วยเสมือน" : "An error occurred while communicating with the AI Assistant."), false);
                 }
             } catch (err) {
                 document.getElementById(typingId)?.remove();
                 console.error("Chat error:", err);
-                appendWorkspaceMessage("Lỗi kết nối tới hệ thống AI.", false);
+                appendWorkspaceMessage(isVi ? "Lỗi kết nối tới hệ thống AI." : (isTh ? "ข้อผิดพลาดในการเชื่อมต่อกับระบบ AI" : "Connection error to the AI system."), false);
             }
         }
 
