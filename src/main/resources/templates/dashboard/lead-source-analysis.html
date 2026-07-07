@@ -92,7 +92,7 @@
 
         <!-- ROW 2: Total Leads (Bar) + Conversion Rate (Line) by Source -->
         <div id="sectionSourceLeadsCr" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Tổng Leads & Tỷ lệ chốt theo Nguồn' : 'Total Leads & Win Rate by Source'}">Tổng Leads & Tỷ lệ chốt theo Nguồn</h3>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Tổng Leads & Tỷ lệ chốt theo Nguồn' : (#locale.language == 'th' ? 'จำนวนลูกค้าเป้าหมายทั้งหมดและอัตราการปิดดีลแยกตามแหล่งที่มา' : 'Total Leads & Win Rate by Source')}">Tổng Leads & Tỷ lệ chốt theo Nguồn</h3>
             <div class="relative w-full h-[400px]">
                 <canvas id="leadsCrChart"></canvas>
             </div>
@@ -100,7 +100,7 @@
 
         <!-- ROW 2.5: Lead Source Profitability -->
         <div id="sectionProfitability" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Lợi nhuận theo Nguồn Lead' : 'Lead Source Profitability'}">Lợi nhuận theo Nguồn Lead</h3>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Lợi nhuận theo Nguồn Lead' : (#locale.language == 'th' ? 'ความสามารถในการทำกำไรตามแหล่งที่มาลูกค้าเป้าหมาย' : 'Lead Source Profitability')}">Lợi nhuận theo Nguồn Lead</h3>
             <div class="relative w-full h-[400px]">
                 <canvas id="leadSourceProfitChart"></canvas>
             </div>
@@ -111,9 +111,9 @@
             <!-- Business Result Funnel by Source -->
             <div id="sectionSourceFunnel" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 flex flex-col justify-between shadow-sm min-h-[460px]">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Phễu Doanh thu theo Nguồn' : 'Business Result Funnel by Source'}">Phễu Doanh thu theo Nguồn</h3>
+                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Phễu Doanh thu theo Nguồn' : (#locale.language == 'th' ? 'กรวยผลลัพธ์ทางธุรกิจตามแหล่งที่มา' : 'Business Result Funnel by Source')}">Phễu Doanh thu theo Nguồn</h3>
                     <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
-                        <label for="funnelSourceFilter" class="text-xs font-bold text-slate-500" th:text="${#locale.language == 'vi' ? 'Nguồn:' : 'Source:'}">Nguồn:</label>
+                        <label for="funnelSourceFilter" class="text-xs font-bold text-slate-500" th:text="${#locale.language == 'vi' ? 'Nguồn:' : (#locale.language == 'th' ? 'แหล่งที่มา:' : 'Source:')}">Nguồn:</label>
                         <select id="funnelSourceFilter" onchange="loadFunnelData()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
                             <!-- Will be dynamically populated -->
                         </select>
@@ -127,9 +127,9 @@
             <!-- Lead Source by Product Line -->
             <div id="sectionSourceProductLine" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 flex flex-col justify-between shadow-sm min-h-[460px]">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Nguồn Leads theo Dòng sản phẩm' : 'Leads by Product Line'}">Nguồn Leads theo Dòng sản phẩm</h3>
+                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Nguồn Leads theo Dòng sản phẩm' : (#locale.language == 'th' ? 'แหล่งที่มาลูกค้าเป้าหมายตามกลุ่มผลิตภัณฑ์' : 'Leads by Product Line')}">Nguồn Leads theo Dòng sản phẩm</h3>
                     <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg shadow-sm">
-                        <label for="productLineFilter" class="text-xs font-bold text-slate-500" th:text="${#locale.language == 'vi' ? 'Dòng sản phẩm:' : 'Product Line:'}">Dòng sản phẩm:</label>
+                        <label for="productLineFilter" class="text-xs font-bold text-slate-500" th:text="${#locale.language == 'vi' ? 'Dòng sản phẩm:' : (#locale.language == 'th' ? 'กลุ่มผลิตภัณฑ์:' : 'Product Line:')}">Dòng sản phẩm:</label>
                         <select id="productLineFilter" onchange="renderProductLineChart()" class="bg-transparent border-none text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
                             <!-- Will be dynamically populated -->
                         </select>
@@ -138,7 +138,7 @@
                 <div class="relative w-full flex-1 min-h-[350px]">
                     <canvas id="productLineChart"></canvas>
                 </div>
-                <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào bất kỳ cột nào để hiển thị thông tin chi tiết.' : 'Click on any column to view details.'}">Click vào bất kỳ cột nào để hiển thị thông tin chi tiết.</p>
+                <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào bất kỳ cột nào để hiển thị thông tin chi tiết.' : (#locale.language == 'th' ? 'คลิกที่คอลัมน์ใดก็ได้เพื่อดูรายละเอียดเพิ่มเติม' : 'Click on any column to view details.')}">Click vào bất kỳ cột nào để hiển thị thông tin chi tiết.</p>
             </div>
         </div>
 
@@ -152,7 +152,7 @@
                     <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <div>
                             <h3 class="text-lg font-black text-slate-800 tracking-tight" id="modalTitle">Lead Source Insights</h3>
-                            <p class="text-slate-400 text-xs font-medium mt-0.5" id="modalSubtitle" th:text="${#locale.language == 'vi' ? 'Nguồn lead dưới dòng sản phẩm đã chọn' : 'Lead sources under the selected product line'}">Nguồn lead dưới dòng sản phẩm đã chọn</p>
+                            <p class="text-slate-400 text-xs font-medium mt-0.5" id="modalSubtitle" th:text="${#locale.language == 'vi' ? 'Nguồn lead dưới dòng sản phẩm đã chọn' : (#locale.language == 'th' ? 'แหล่งที่มาลูกค้าเป้าหมายภายใต้กลุ่มผลิตภัณฑ์ที่เลือก' : 'Lead sources under the selected product line')}">Nguồn lead dưới dòng sản phẩm đã chọn</p>
                         </div>
                         <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-100 rounded-xl transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -164,25 +164,25 @@
                         <!-- Modal KPIs (3 Dashboard Card Widgets) -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <!-- Total Revenue -->
-                            <div class="bg-slate-50/75 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu</span>
-                                <span id="modal-kpi-revenue" class="text-lg font-black text-emerald-600 mt-1 block">0 VNĐ</span>
+                            <div class="bg-indigo-50/60 border border-indigo-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-indigo-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Tổng doanh thu' : (#locale.language == 'th' ? 'รายได้รวม' : 'Total Revenue')}">Tổng doanh thu</span>
+                                <span id="modal-kpi-revenue" class="text-lg font-black text-indigo-800 mt-1 block">0 VNĐ</span>
                             </div>
                             <!-- Total Won Leads -->
-                            <div class="bg-slate-50/75 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng số lead Won</span>
-                                <span id="modal-kpi-won" class="text-lg font-black text-[#f6171b] mt-1 block">0</span>
+                            <div class="bg-emerald-50/60 border border-emerald-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Tổng số lead Won' : (#locale.language == 'th' ? 'จำนวนดีลปิดการขายสำเร็จ' : 'Total Won Leads')}">Tổng số lead Won</span>
+                                <span id="modal-kpi-won" class="text-lg font-black text-emerald-800 mt-1 block">0</span>
                             </div>
                             <!-- Total Lost Leads -->
-                            <div class="bg-slate-50/75 border border-slate-100 rounded-xl p-4 flex flex-col justify-between">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng số lead Lost</span>
-                                <span id="modal-kpi-lost" class="text-lg font-black text-slate-700 mt-1 block">0</span>
+                            <div class="bg-rose-50/60 border border-rose-100 rounded-xl p-4 flex flex-col justify-between">
+                                <span class="text-[10px] font-bold text-rose-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Tổng số lead Lost' : (#locale.language == 'th' ? 'จำนวนดีลที่สูญเสีย' : 'Total Lost Leads')}">Tổng số lead Lost</span>
+                                <span id="modal-kpi-lost" class="text-lg font-black text-rose-800 mt-1 block">0</span>
                             </div>
                         </div>
 
                         <!-- Lost Reason Bar Chart -->
                         <div class="bg-slate-50/75 border border-slate-100 rounded-xl p-4">
-                            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Số lượng lý do Lost</h4>
+                            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3" th:text="${#locale.language == 'vi' ? 'Số lượng lý do Lost' : (#locale.language == 'th' ? 'จำนวนเหตุผลหลักที่สูญเสียดีล' : 'Number of Loss Reasons')}">Số lượng lý do Lost</h4>
                             <div class="relative w-full h-[180px]">
                                 <canvas id="modalLostReasonChart"></canvas>
                             </div>
@@ -257,6 +257,7 @@
     <script th:inline="javascript">
         const locale = /*[[${#locale.language}]]*/ 'vi';
         const isVi = locale === 'vi';
+        const isTh = locale === 'th';
 
         // Global variables for charts and data
         let summaryData = [];
@@ -410,7 +411,7 @@
 
             // Product line filter
             const prodFilter = document.getElementById('productLineFilter');
-            prodFilter.innerHTML = `<option value="All" selected>${isVi ? 'Tất cả sản phẩm' : 'All Products'}</option>`;
+            prodFilter.innerHTML = `<option value="All" selected>${isVi ? 'Tất cả sản phẩm' : (isTh ? 'ผลิตภัณฑ์ทั้งหมด' : 'All Products')}</option>`;
             
             if (Array.isArray(productLineData)) {
                 const uniqueProds = [...new Set(productLineData.map(d => d.productName))].filter(Boolean);
@@ -425,10 +426,10 @@
 
         // Formatter helpers
         function formatCurrency(val) {
-            if (val === undefined || val === null) return isVi ? '0 triệu' : '0 million';
+            if (val === undefined || val === null) return isVi ? '0 triệu' : (isTh ? '0 ล้าน' : '0 million');
             const valInMil = val / 1e6;
-            const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
-            return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : ' million');
+            const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US'));
+            return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : (isTh ? ' ล้าน' : ' million'));
         }
 
         function renderKpis() {
@@ -571,8 +572,8 @@
         function fmtShortNum(v) {
             if (v === undefined || v === null) return '0';
             const valInMil = v / 1e6;
-            const formatted = Number(valInMil.toFixed(1)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
-            return formatted + (isVi ? ' triệu' : ' million');
+            const formatted = Number(valInMil.toFixed(1)).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US'));
+            return formatted + (isVi ? ' triệu' : (isTh ? ' ล้าน' : ' million'));
         }
 
         function renderLeadSourceProfitabilityChart(roiData) {
@@ -613,7 +614,7 @@
                     datasets: [
                         {
                             type: 'bar',
-                            label: isVi ? 'Chi phí TB/Won' : 'Avg Cost/Won',
+                            label: isVi ? 'Chi phí TB/Won' : (isTh ? 'ต้นทุนเฉลี่ย/Won' : 'Avg Cost/Won'),
                             data: avgCostPerWon,
                             backgroundColor: 'rgba(244, 63, 94, 0.75)',
                             borderColor: '#f43f5e',
@@ -625,7 +626,7 @@
                         },
                         {
                             type: 'line',
-                            label: isVi ? 'Doanh thu TB/Won' : 'Avg Revenue/Won',
+                            label: isVi ? 'Doanh thu TB/Won' : (isTh ? 'รายได้เฉลี่ย/Won' : 'Avg Revenue/Won'),
                             data: avgRevPerWon,
                             borderColor: '#10b981',
                             backgroundColor: areaGrad,
@@ -717,10 +718,10 @@
                 });
 
                 const stagesConfig = [
-                    { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
-                    { key: 'Proposal Sent', label: 'Proposal Sent', statuses: ['Proposal Sent'], color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
+                    { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-blue-3d)', topColor: 'url(#grad-blue-top)' },
+                    { key: 'Proposal Sent', label: 'Proposal Sent', statuses: ['Proposal Sent'], color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
                     { key: 'In Negotiation', label: 'In Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
-                    { key: 'Closed', label: 'Closed', statuses: ['Won', 'Lost'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-funnel-interior)' }
+                    { key: 'Closed', label: 'Closed', statuses: ['Won', 'Lost'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
                 ];
 
                 const values = stagesConfig.map(stage => {
@@ -792,6 +793,10 @@
                             <stop offset="50%" stop-color="#34d399" />
                             <stop offset="70%" stop-color="#10b981" />
                             <stop offset="100%" stop-color="#047857" />
+                        </linearGradient>
+                        <linearGradient id="grad-blue-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#60a5fa" />
+                            <stop offset="100%" stop-color="#3b82f6" />
                         </linearGradient>
                         <linearGradient id="grad-purple-top" x1="0%" y1="0%" x2="0%" y2="100%">
                             <stop offset="0%" stop-color="#c084fc" />
@@ -953,10 +958,11 @@
 
         // Popup details handlers
         function openSourceDetailsModal(sourceName, productFilter) {
-            document.getElementById('modalTitle').innerText = `${sourceName} - Insights`;
+            const insightsSuffix = isVi ? 'Thông tin chi tiết' : (isTh ? 'ข้อมูลเชิงลึก' : 'Insights');
+            document.getElementById('modalTitle').innerText = `${sourceName} - ${insightsSuffix}`;
             document.getElementById('modalSubtitle').innerText = productFilter === 'All' 
-                ? `Tất cả sản phẩm` 
-                : `Dòng sản phẩm: ${productFilter}`;
+                ? (isVi ? `Tất cả sản phẩm` : (isTh ? `ผลิตภัณฑ์ทั้งหมด` : `All Products`)) 
+                : (isVi ? `Dòng sản phẩm: ${productFilter}` : (isTh ? `กลุ่มผลิตภัณฑ์: ${productFilter}` : `Product Line: ${productFilter}`));
 
             // Calculate Revenue
             let revFiltered = revenueProductData.filter(d => d.sourceName === sourceName);
@@ -1055,7 +1061,11 @@
             const empty = document.getElementById('modalEmpty');
             const container = document.getElementById('modalTableContainer');
 
-            title.innerText = Array.isArray(status) ? status.join(' + ') : status;
+            let displayTitle = Array.isArray(status) ? status.join(' + ') : status;
+            if (displayTitle === 'Won + Closed' || displayTitle === 'Won + Lost' || displayTitle === 'Won,Closed' || displayTitle === 'Won,Lost' || displayTitle === 'Won, Lost' || displayTitle === 'Won + Lost') {
+                displayTitle = 'Closed';
+            }
+            title.innerText = displayTitle;
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
 
@@ -1091,6 +1101,18 @@
 
                 container.classList.remove('hidden');
                 data.forEach(lead => {
+                    let badgeClass = 'bg-blue-50 text-blue-600';
+                    const ls = (lead.status || '').toLowerCase();
+                    if (ls === 'won') {
+                        badgeClass = 'bg-emerald-50 text-emerald-600';
+                    } else if (ls === 'lost') {
+                        badgeClass = 'bg-rose-50 text-rose-600';
+                    } else if (ls === 'qualified') {
+                        badgeClass = 'bg-purple-50 text-purple-600';
+                    } else if (ls === 'contacted') {
+                        badgeClass = 'bg-amber-50 text-amber-600';
+                    }
+
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50 transition-colors group';
                     tr.innerHTML = `
@@ -1100,7 +1122,7 @@
                         <td class="px-4 py-3 text-sm text-slate-500">${lead.email || '-'}</td>
                         <td class="px-4 py-3 text-sm text-slate-500">${lead.phoneNumber || '-'}</td>
                         <td class="px-4 py-3">
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-50 text-blue-600">${lead.status || '-'}</span>
+                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full ${badgeClass}">${lead.status || '-'}</span>
                         </td>
                         <td class="px-4 py-3 text-sm text-slate-600">${lead.userName || '-'}</td>
                         <td class="px-4 py-3 text-xs text-slate-400">${lead.createdDate || '-'}</td>

@@ -27,25 +27,25 @@
                    th:classappend="${activeMenu == 'dashboard' ? 'text-helu-red font-semibold bg-white/60' : 'text-gray-500 hover:text-helu-red'}"
                    class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
                     <i data-lucide="pie-chart" class="mr-3 w-4 h-4"></i>
-                    <span th:text="${#locale.language == 'vi' ? 'Tổng quan' : 'Overview'}">Tổng quan (Overview)</span>
+                    <span th:text="${#locale.language == 'vi' ? 'Tổng quan' : (#locale.language == 'th' ? 'ภาพรวม' : 'Overview')}">Tổng quan (Overview)</span>
                 </a>
                 <a href="/dashboard/lead-source-analysis" 
                    th:classappend="${activeMenu == 'lead-source-analysis' ? 'text-helu-red font-semibold bg-white/60' : 'text-gray-500 hover:text-helu-red'}"
                    class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
                     <i data-lucide="bar-chart-3" class="mr-3 w-4 h-4"></i>
-                    <span>Lead Source</span>
+                    <span th:text="${#locale.language == 'vi' ? 'Nguồn Lead' : (#locale.language == 'th' ? 'แหล่งที่มาลูกค้าเป้าหมาย' : 'Lead Source')}">Lead Source</span>
                 </a>
                 <a href="/dashboard/sales-performance-analysis" 
                    th:classappend="${activeMenu == 'sales-performance-analysis' ? 'text-helu-red font-semibold bg-white/60' : 'text-gray-500 hover:text-helu-red'}"
                    class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
                     <i data-lucide="line-chart" class="mr-3 w-4 h-4"></i>
-                    <span>Sales Performance</span>
+                    <span th:text="${#locale.language == 'vi' ? 'Hiệu suất Sales' : (#locale.language == 'th' ? 'ประสิทธิภาพยอดขาย' : 'Sales Performance')}">Sales Performance</span>
                 </a>
                 <a href="/customer-analysis" 
                    th:classappend="${activeMenu == 'customer-analysis' ? 'text-helu-red font-semibold bg-white/60' : 'text-gray-500 hover:text-helu-red'}"
                    class="flex items-center px-4 py-2 text-sm rounded-lg transition-colors">
                     <i data-lucide="pie-chart" class="mr-3 w-4 h-4"></i>
-                    <span>Customer</span>
+                    <span th:text="${#locale.language == 'vi' ? 'Khách hàng' : (#locale.language == 'th' ? 'ลูกค้า' : 'Customer')}">Customer</span>
                 </a>
             </div>
         </div>
@@ -62,7 +62,7 @@
         <div th:classappend="${activeMenu == 'chatbot' ? 'bg-helu-red text-white shadow-lg shadow-red-500/10' : 'text-gray-600 hover:bg-white/50 hover:text-helu-red'}" class="rounded-xl transition-all duration-200">
             <a href="/chatbot" class="flex items-center px-4 py-3 font-medium">
                 <i data-lucide="message-square" class="mr-3 w-5 h-5"></i>
-                <span th:text="${#locale.language == 'vi' ? 'Trợ lý AI Chatbot' : 'AI Chatbot Assistant'}">Trợ lý AI Chatbot</span>
+                <span th:text="${#locale.language == 'vi' ? 'Trợ lý AI Chatbot' : (#locale.language == 'th' ? 'ผู้ช่วยแชทบอท AI' : 'AI Chatbot Assistant')}">Trợ lý AI Chatbot</span>
             </a>
         </div>
 

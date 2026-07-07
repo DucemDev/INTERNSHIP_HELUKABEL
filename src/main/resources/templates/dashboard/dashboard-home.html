@@ -716,11 +716,11 @@
                     const totalActive = values.reduce((a, b) => a + b, 0);
 
                     const stages = [
-                        { key: 'New_Contacted', label: 'New + Contacted', statuses: ['New', 'Contacted'], color: 'url(#grad-blue-3d)', topColor: 'url(#grad-funnel-interior)' },
-                        { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
+                        { key: 'New_Contacted', label: 'New + Contacted', statuses: ['New', 'Contacted'], color: 'url(#grad-pink-3d)', topColor: 'url(#grad-pink-top)' },
+                        { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-blue-3d)', topColor: 'url(#grad-blue-top)' },
                         { key: 'Proposal Sent', label: 'Proposal Sent', statuses: ['Proposal Sent'], color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
-                        { key: 'In Negotiation', label: 'In Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
-                        { key: 'Closed', label: 'Closed', statuses: ['Won', 'Closed'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
+                        { key: 'In Negotiation', label: 'In Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
+                        { key: 'Closed', label: 'Closed', statuses: ['Won', 'Lost'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
                     ];
 
                     const totalHeight = 260;
@@ -787,6 +787,32 @@
                                 <stop offset="50%" stop-color="#34d399" />
                                 <stop offset="70%" stop-color="#10b981" />
                                 <stop offset="100%" stop-color="#047857" />
+                            </linearGradient>
+                            <linearGradient id="grad-red-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#7f1d1d" />
+                                <stop offset="30%" stop-color="#ef4444" />
+                                <stop offset="50%" stop-color="#f87171" />
+                                <stop offset="70%" stop-color="#ef4444" />
+                                <stop offset="100%" stop-color="#b91c1c" />
+                            </linearGradient>
+                            <linearGradient id="grad-red-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#f87171" />
+                                <stop offset="100%" stop-color="#ef4444" />
+                            </linearGradient>
+                            <linearGradient id="grad-blue-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#60a5fa" />
+                                <stop offset="100%" stop-color="#3b82f6" />
+                            </linearGradient>
+                            <linearGradient id="grad-pink-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#be185d" />
+                                <stop offset="30%" stop-color="#f43f5e" />
+                                <stop offset="50%" stop-color="#fda4af" />
+                                <stop offset="70%" stop-color="#f43f5e" />
+                                <stop offset="100%" stop-color="#e11d48" />
+                            </linearGradient>
+                            <linearGradient id="grad-pink-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#fecdd3" />
+                                <stop offset="100%" stop-color="#fda4af" />
                             </linearGradient>
                             <linearGradient id="grad-purple-top" x1="0%" y1="0%" x2="0%" y2="100%">
                                 <stop offset="0%" stop-color="#c084fc" />
@@ -1094,8 +1120,9 @@
                         return;
                     }
 
-                    const labels = data.map(d => d.account || 'N/A');
-                    const values = data.map(d => d.revenue || 0);
+                    const top5Data = data.slice(0, 5);
+                    const labels = top5Data.map(d => d.account || 'N/A');
+                    const values = top5Data.map(d => d.revenue || 0);
                     const maxVal = Math.max(...values);
                     const roundedMax = Math.ceil((maxVal + 10000000000) / 5000000000) * 5000000000;
 
@@ -1330,7 +1357,11 @@
 
                 if (summaryBlock) summaryBlock.classList.add('hidden');
 
-                title.innerText = Array.isArray(status) ? status.join(' + ') : status;
+                let displayTitle = Array.isArray(status) ? status.join(' + ') : status;
+                if (displayTitle === 'Won + Closed' || displayTitle === 'Won + Lost' || displayTitle === 'Won,Closed' || displayTitle === 'Won,Lost' || displayTitle === 'Won, Lost' || displayTitle === 'Won + Lost') {
+                    displayTitle = 'Closed';
+                }
+                title.innerText = displayTitle;
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
 

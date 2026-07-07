@@ -360,10 +360,10 @@
                     const totalActive = values.reduce((a, b) => a + b, 0);
 
                     const stages = [
-                        { key: 'New_Contacted', label: 'New + Contacted', color: 'url(#grad-blue-3d)', topColor: 'url(#grad-funnel-interior)' },
-                        { key: 'Qualified', label: 'Qualified', color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
+                        { key: 'New_Contacted', label: 'New + Contacted', color: 'url(#grad-pink-3d)', topColor: 'url(#grad-pink-top)' },
+                        { key: 'Qualified', label: 'Qualified', color: 'url(#grad-blue-3d)', topColor: 'url(#grad-blue-top)' },
                         { key: 'Proposal Sent', label: 'Proposal Sent', color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
-                        { key: 'In Negotiation', label: 'In Negotiation', color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
+                        { key: 'In Negotiation', label: 'In Negotiation', color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
                         { key: 'Won', label: 'Won', color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
                     ];
 
@@ -428,6 +428,21 @@
                                 <stop offset="50%" stop-color="#34d399" />
                                 <stop offset="70%" stop-color="#10b981" />
                                 <stop offset="100%" stop-color="#047857" />
+                            </linearGradient>
+                            <linearGradient id="grad-blue-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#60a5fa" />
+                                <stop offset="100%" stop-color="#3b82f6" />
+                            </linearGradient>
+                            <linearGradient id="grad-pink-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#be185d" />
+                                <stop offset="30%" stop-color="#f43f5e" />
+                                <stop offset="50%" stop-color="#fda4af" />
+                                <stop offset="70%" stop-color="#f43f5e" />
+                                <stop offset="100%" stop-color="#e11d48" />
+                            </linearGradient>
+                            <linearGradient id="grad-pink-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#fecdd3" />
+                                <stop offset="100%" stop-color="#fda4af" />
                             </linearGradient>
                             <linearGradient id="grad-purple-top" x1="0%" y1="0%" x2="0%" y2="100%">
                                 <stop offset="0%" stop-color="#c084fc" />
