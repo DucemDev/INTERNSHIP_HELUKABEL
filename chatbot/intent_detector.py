@@ -192,7 +192,13 @@ def detect_intent(question: str) -> str:
         return "revenue_current"
 
     # LEAD OVERVIEW
-    if has_any_word(q2, ["tong quan", "tinh hinh", "dashboard", "bao cao nhanh", "hom nay the nao", "lead hien tai sao roi", "tong lead", "co bao nhieu lead", "co may lead"]): return "lead_summary"
+    if has_any_word(q2, [
+        "tong quan", "tinh hinh", "dashboard", "bao cao nhanh", "hom nay the nao",
+        "lead hien tai sao roi", "tong lead", "tong so lead", "so luong lead", "so lead",
+        "tat ca lead", "toan bo lead", "bao nhieu lead", "co bao nhieu lead", "co may lead",
+        "he thong co bao nhieu lead"
+    ]):
+        return "lead_summary"
     if "trang thai lead" in q2 or "lead theo trang thai" in q2 or "status" in q2: return "lead_status"
 
     # Lead status queries - require context to avoid false positives on simple words
@@ -204,5 +210,13 @@ def detect_intent(question: str) -> str:
     
     if "won_rate" in q2 or has_any_word(q2, ["ti le won", "ty le won", "won rate"]): return "won_rate"
     if "lost_rate" in q2 or has_any_word(q2, ["ti le lost", "ty le lost", "lost rate"]): return "lost_rate"
+
+    # BANT INFO
+    if has_any_word(q2, ["ti le hoan thanh bant", "ty le hoan thanh bant", "ti le bant", "ty le bant", "phan tram bant", "hoan thanh bant"]):
+        return "bant_complete_rate"
+    if has_any_word(q2, ["diem bant trung binh", "bant trung binh", "avg bant", "trung binh diem bant"]):
+        return "bant_avg_score"
+    if has_any_word(q2, ["bant", "diem bant", "tieu chi bant", "cach tinh diem bant", "phan loai nhiet do"]):
+        return "bant_info"
 
     return "unknown"
