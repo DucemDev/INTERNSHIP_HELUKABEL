@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 # Fallback model chain – tried in order when the primary model is unavailable
 FALLBACK_MODELS = [
     "gemini-2.5-flash",
-    "gemini-2.0-flash",
+    "gemini-3.5-flash",
 ]
 
 # Retry settings
@@ -146,8 +146,11 @@ class GeminiClient:
 
                 except Exception as exc:
                     last_error = exc
+                    is_rate_limit = "429" in str(exc) or "exhausted" in str(exc).lower()
+                    
                     if self._is_retryable(exc) and attempt < MAX_RETRIES:
-                        wait_time = INITIAL_BACKOFF * (2 ** (attempt - 1))  # 2s, 4s, 8s
+                        # For rate limits (429), wait at least 15s to let the window reset. Otherwise use exponential backoff.
+                        wait_time = 15 if is_rate_limit else (INITIAL_BACKOFF * (2 ** (attempt - 1)))
                         logger.warning(
                             "Gemini model=%s returned retryable error (attempt %d/%d). "
                             "Retrying in %ds... Error: %s",
@@ -156,7 +159,11 @@ class GeminiClient:
                         time.sleep(wait_time)
                         continue
                     elif self._is_retryable(exc):
-                        # Exhausted retries for this model, try fallback
+                        # Exhausted retries for this model, try fallback.
+                        # Wait 10s before switching models to prevent cascading 429s.
+                        if is_rate_limit:
+                            logger.warning("Rate limit hit. Waiting 10s before switching to fallback model...")
+                            time.sleep(10)
                         logger.warning(
                             "Gemini model=%s exhausted %d retries. Trying fallback model... Error: %s",
                             model_name, MAX_RETRIES, exc
