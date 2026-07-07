@@ -30,19 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clear any existing contents
             svgElement.innerHTML = '';
 
-            // 1. Group Classification based on medians
-            const winRates = data.map(d => d.conversionRate || 0);
-            const avgRevs = data.map(d => d.avgRevenuePerWon || 0);
-            
-            const getMedian = (arr) => {
-                if (arr.length === 0) return 0;
-                const sorted = [...arr].sort((a, b) => a - b);
-                const mid = Math.floor(sorted.length / 2);
-                return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-            };
-            
-            const winRateThreshold = getMedian(winRates) || 15;
-            const revenueThreshold = getMedian(avgRevs) || 100000000;
+            // 1. Group Classification based on requested thresholds
+            const winRateThreshold = 40; // 40%
+            const revenueThreshold = 2000000000; // 2 Billion VND
 
             const groupsConfig = {
                 easy_high: {

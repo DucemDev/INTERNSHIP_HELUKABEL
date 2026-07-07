@@ -589,6 +589,24 @@ public List<CustomerRoleConversionRateResponse> getCustomerRoleConversionRate() 
     public List<CustomerSegmentPipelineResponse> getCustomerSegmentPipeline() {
         return dashboardService.getCustomerSegmentPipeline();
     }
+    @GetMapping("/product-line/roi")
+    public List<ProductLineROIResponse> getProductLineROI() {
+        return dashboardService.getProductLineROI();
+    }
+    @GetMapping("/region/roi")
+    public List<RegionROIResponse> getRegionROI() {
+        return dashboardService.getRegionROI();
+    }
+    @GetMapping("/customer-role/roi")
+    public List<CustomerRoleROIResponse> getCustomerRoleROI() {
+        return dashboardService.getCustomerRoleROI();
+    }
+    @GetMapping("/account/opportunity-value")
+    public List<TopAccountResponse> getTopAccountsByOpportunityValue() {
+        return dashboardService.getTopAccountsByOpportunityValue();
+    }
+
+
 
 
 

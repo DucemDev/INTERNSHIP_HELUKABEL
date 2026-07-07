@@ -3,6 +3,7 @@
 
 <body>
     <main class="space-y-8">
+        <input type="hidden" id="currentLocale" th:value="${#locale.language}" />
 
     <style>
         /* Funnel hover effects (GIỮA NGUYÊN) */
@@ -339,7 +340,7 @@
             <div id="sectionTopAccounts" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[480px]">
                 <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-5 bg-emerald-500 rounded-full"></span>
-                    <span th:text="#{dashboard.top_accounts}">Top 10 Accounts by Revenue</span>
+                    <span th:text="#{dashboard.top_accounts}">Top 5 Doanh nghiệp (Cơ cấu Cơ hội)</span>
 
                 </h2>
                 <div class="relative w-full flex-1 min-h-[400px]"><canvas id="topAccountsChart"></canvas></div>
@@ -471,7 +472,7 @@
                             <!-- Revenue / Won Deal -->
                             <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
                                 <div>
-                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Revenue / Won Deal</h4>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Revenue Won</h4>
                                     <div id="segmentRevenue" class="mt-1 text-sm font-black text-slate-800">—</div>
                                 </div>
                                 <i data-lucide="dollar-sign" class="w-8 h-8 text-slate-300"></i>
@@ -525,11 +526,21 @@
             Chart.defaults.plugins.datalabels.display = false;
 
             const API_BASE = '/api/dashboard';
+            async function fetchWithParams(url, options) {
+                const pageParams = new URLSearchParams(window.location.search);
+                const targetUrl = new URL(url, window.location.origin);
+                pageParams.forEach((value, key) => {
+                    if (!targetUrl.searchParams.has(key)) {
+                        targetUrl.searchParams.set(key, value);
+                    }
+                });
+                return fetch(targetUrl.pathname + targetUrl.search, options);
+            }
             let charts = {};
             let allLeadsData = []; // Cache leads data cho matrix và top accounts
 
             // Locale
-            const locale = /*[[${#locale.language}]]*/ 'vi';
+            const locale = document.getElementById('currentLocale')?.value || 'vi';
             const currency = locale === 'vi' ? ' triệu' : ' million';
             const fmtNum = (v) => Number(v || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
             const fmtCurrency = (v) => {
@@ -611,17 +622,17 @@
             async function loadKPIs() {
                 try {
                     const [convRes, avgRes, revRes, pipeRes, costRes, statusRes, topIndRes, topRegRes, winRateRes, qualRes, newRes] = await Promise.all([
-                        fetch(`${API_BASE}/conversion-rate`),
-                        fetch(`${API_BASE}/average-days-to-won`),
-                        fetch(`${API_BASE}/revenue-summary`),
-                        fetch(`${API_BASE}/pipeline-coverage`),
-                        fetch(`${API_BASE}/lead-source-cost`),
-                        fetch(`${API_BASE}/lead-status`),
-                        fetch(`${API_BASE}/best-industry-won-deal`),
-                        fetch(`${API_BASE}/best-region-won-deal`),
-                        fetch(`${API_BASE}/win-rate`),
-                        fetch(`${API_BASE}/qualified-leads`),
-                        fetch(`${API_BASE}/new-leads`)
+                        fetchWithParams(`${API_BASE}/conversion-rate`),
+                        fetchWithParams(`${API_BASE}/average-days-to-won`),
+                        fetchWithParams(`${API_BASE}/revenue-summary`),
+                        fetchWithParams(`${API_BASE}/pipeline-coverage`),
+                        fetchWithParams(`${API_BASE}/lead-source-cost`),
+                        fetchWithParams(`${API_BASE}/lead-status`),
+                        fetchWithParams(`${API_BASE}/best-industry-won-deal`),
+                        fetchWithParams(`${API_BASE}/best-region-won-deal`),
+                        fetchWithParams(`${API_BASE}/win-rate`),
+                        fetchWithParams(`${API_BASE}/qualified-leads`),
+                        fetchWithParams(`${API_BASE}/new-leads`)
                     ]);
 
                     const conv = await convRes.json();
@@ -697,7 +708,7 @@
             // ==========================================
             async function loadLeadStatusChart() {
                 try {
-                    const res = await fetch(`${API_BASE}/funnel/business-result`);
+                    const res = await fetchWithParams(`${API_BASE}/funnel/business-result`);
                     const data = await res.json();
 
                     const getValue = (statuses) => {
@@ -716,11 +727,11 @@
                     const totalActive = values.reduce((a, b) => a + b, 0);
 
                     const stages = [
-                        { key: 'New_Contacted', label: 'New + Contacted', statuses: ['New', 'Contacted'], color: 'url(#grad-blue-3d)', topColor: 'url(#grad-funnel-interior)' },
-                        { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
+                        { key: 'New_Contacted', label: 'New + Contacted', statuses: ['New', 'Contacted'], color: 'url(#grad-pink-3d)', topColor: 'url(#grad-pink-top)' },
+                        { key: 'Qualified', label: 'Qualified', statuses: ['Qualified'], color: 'url(#grad-blue-3d)', topColor: 'url(#grad-blue-top)' },
                         { key: 'Proposal Sent', label: 'Proposal Sent', statuses: ['Proposal Sent'], color: 'url(#grad-amber-3d)', topColor: 'url(#grad-amber-top)' },
-                        { key: 'In Negotiation', label: 'In Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-teal-3d)', topColor: 'url(#grad-teal-top)' },
-                        { key: 'Closed', label: 'Closed', statuses: ['Won', 'Closed'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
+                        { key: 'In Negotiation', label: 'In Negotiation', statuses: ['In Negotiation'], color: 'url(#grad-purple-3d)', topColor: 'url(#grad-purple-top)' },
+                        { key: 'Closed', label: 'Closed', statuses: ['Won', 'Lost'], color: 'url(#grad-emerald-3d)', topColor: 'url(#grad-emerald-top)' }
                     ];
 
                     const totalHeight = 260;
@@ -787,6 +798,32 @@
                                 <stop offset="50%" stop-color="#34d399" />
                                 <stop offset="70%" stop-color="#10b981" />
                                 <stop offset="100%" stop-color="#047857" />
+                            </linearGradient>
+                            <linearGradient id="grad-red-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#7f1d1d" />
+                                <stop offset="30%" stop-color="#ef4444" />
+                                <stop offset="50%" stop-color="#f87171" />
+                                <stop offset="70%" stop-color="#ef4444" />
+                                <stop offset="100%" stop-color="#b91c1c" />
+                            </linearGradient>
+                            <linearGradient id="grad-red-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#f87171" />
+                                <stop offset="100%" stop-color="#ef4444" />
+                            </linearGradient>
+                            <linearGradient id="grad-blue-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#60a5fa" />
+                                <stop offset="100%" stop-color="#3b82f6" />
+                            </linearGradient>
+                            <linearGradient id="grad-pink-3d" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#be185d" />
+                                <stop offset="30%" stop-color="#f43f5e" />
+                                <stop offset="50%" stop-color="#fda4af" />
+                                <stop offset="70%" stop-color="#f43f5e" />
+                                <stop offset="100%" stop-color="#e11d48" />
+                            </linearGradient>
+                            <linearGradient id="grad-pink-top" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#fecdd3" />
+                                <stop offset="100%" stop-color="#fda4af" />
                             </linearGradient>
                             <linearGradient id="grad-purple-top" x1="0%" y1="0%" x2="0%" y2="100%">
                                 <stop offset="0%" stop-color="#c084fc" />
@@ -938,8 +975,8 @@
             async function loadLeadSourceEfficiency() {
                 try {
                     const [costRes, roiRes] = await Promise.all([
-                        fetch(`${API_BASE}/lead-source-cost`),
-                        fetch(`${API_BASE}/roi-lead-source`)
+                        fetchWithParams(`${API_BASE}/lead-source-cost`),
+                        fetchWithParams(`${API_BASE}/roi-lead-source`)
                     ]);
                     const costData = await costRes.json();
                     const roiData = await roiRes.json();
@@ -1046,8 +1083,8 @@
              async function loadAllLeadsForMatrix() {
                  try {
                      const [matrixRes, leadsRes] = await Promise.all([
-                         fetch(`${API_BASE}/conversionrate-value-matrix`),
-                         fetch('/api/leads')
+                         fetchWithParams(`${API_BASE}/conversionrate-value-matrix`),
+                         fetchWithParams('/api/leads')
                      ]);
                      if (leadsRes.ok) {
                          allLeadsData = await leadsRes.json();
@@ -1065,10 +1102,11 @@
                              industry: item.industry,
                              region: item.region,
                              totalLeads: item.totalLeads || 0,
-                             conversionRate: item.conversionRate || 0,
+                            conversionRate: item.conversionRate || 0,
                              wonLead: item.wonLeads || 0,
                              lostLead: item.lostLeads || 0,
                              avgRevenuePerWon: item.avgRevenuePerWon || 0,
+                             revenueWon: item.revenueWon || 0,
                              topProductLine: item.topProductLine || 'N/A',
                              topLossReason: item.topLossReason || 'N/A',
                              topSalesOwner: item.topSalesOwner || 'N/A'
@@ -1083,7 +1121,9 @@
 
             async function loadTopAccounts() {
                 try {
-                    const res = await fetch(`${API_BASE}/top10-accounts`);
+                    const isVi = locale === 'vi';
+                    const isTh = locale === 'th';
+                    const res = await fetchWithParams(`${API_BASE}/account/opportunity-value`);
                     if (!res.ok) {
                         drawTopAccountsEmpty();
                         return;
@@ -1094,26 +1134,41 @@
                         return;
                     }
 
-                    const labels = data.map(d => d.account || 'N/A');
-                    const values = data.map(d => d.revenue || 0);
-                    const maxVal = Math.max(...values);
-                    const roundedMax = Math.ceil((maxVal + 10000000000) / 5000000000) * 5000000000;
+                    const top5Data = data.slice(0, 5);
+                    const labels = top5Data.map(d => d.accountName || 'N/A');
+                    const wonValues = top5Data.map(d => d.revenueWon || 0);
+                    const lostValues = top5Data.map(d => d.lostOpportunityValue || 0);
+                    const openValues = top5Data.map(d => d.openPipelineValue || 0);
 
-                    // Gradient colors for bars
-                    const colors = values.map((_, i) => {
-                        const alpha = 0.9 - (i * 0.06);
-                        return `rgba(16, 185, 129, ${alpha})`;
-                    });
+                    const totals = top5Data.map(d => (d.revenueWon || 0) + (d.lostOpportunityValue || 0) + (d.openPipelineValue || 0));
+                    const maxVal = Math.max(...totals, 0);
+                    const roundedMax = Math.ceil((maxVal + 1000000000) / 1000000000) * 1000000000;
 
                     renderChart('topAccountsChart', 'bar', {
                         labels,
-                        datasets: [{
-                            label: 'Revenue',
-                            data: values,
-                            backgroundColor: colors,
-                            borderRadius: 4,
-                            barThickness: 18
-                        }]
+                        datasets: [
+                            {
+                                label: isVi ? 'Thành công (Won)' : (isTh ? 'ปิดการขายสำเร็จ (Won)' : 'Won'),
+                                data: wonValues,
+                                backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                                borderRadius: 4,
+                                barThickness: 18
+                            },
+                            {
+                                label: isVi ? 'Thất bại (Lost)' : (isTh ? 'ปิดการขายไม่สำเร็จ (Lost)' : 'Lost'),
+                                data: lostValues,
+                                backgroundColor: 'rgba(239, 68, 68, 0.85)',
+                                borderRadius: 4,
+                                barThickness: 18
+                            },
+                            {
+                                label: isVi ? 'Cơ hội mở (Open Pipeline)' : (isTh ? 'โอกาสการขาย (Open Pipeline)' : 'Open Pipeline'),
+                                data: openValues,
+                                backgroundColor: 'rgba(59, 130, 246, 0.85)',
+                                borderRadius: 4,
+                                barThickness: 18
+                            }
+                        ]
                     }, {
                         indexAxis: 'y',
                         onClick: (event, elements) => {
@@ -1128,11 +1183,12 @@
                         },
                         layout: {
                             padding: {
-                                right: 80
+                                right: 30
                             }
                         },
                         scales: {
                             x: {
+                                stacked: true,
                                 beginAtZero: true,
                                 max: roundedMax,
                                 border: { display: false },
@@ -1140,25 +1196,32 @@
                                 ticks: { callback: v => fmtShortNum(v) }
                             },
                             y: {
+                                stacked: true,
                                 grid: { display: false },
                                 border: { display: false },
                                 ticks: { font: { size: 11, weight: 'bold' } }
                             }
                         },
                         plugins: {
-                            legend: { display: false },
-                            datalabels: {
+                            legend: {
                                 display: true,
-                                anchor: 'end',
-                                align: 'right',
-                                offset: 4,
-                                color: '#064e3b',
-                                font: { weight: 'bold', size: 10 },
-                                formatter: v => fmtShortCurrency(v)
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 10,
+                                    font: { size: 10, weight: 'bold' }
+                                }
+                            },
+                            datalabels: {
+                                display: (context) => context.dataset.data[context.dataIndex] > 0,
+                                color: '#ffffff',
+                                font: { weight: 'bold', size: 9 },
+                                formatter: v => fmtShortCurrency(v),
+                                align: 'center',
+                                anchor: 'center'
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: ctx => ` Revenue: ${fmtCurrency(ctx.parsed.x)}`
+                                    label: ctx => ` ${ctx.dataset.label}: ${fmtCurrency(ctx.parsed.x)}`
                                 }
                             }
                         }
@@ -1276,9 +1339,9 @@
 
                     // Color by conversion rate (High contrast, semantic palette: Green for high, Amber for medium, Red for low)
                     let fillColor;
-                    if (cell.conversionRate >= 15) fillColor = '#10b981'; // Emerald Green (High)
-                    else if (cell.conversionRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium)
-                    else fillColor = '#ef4444'; // Rose Red (Low)
+                    if (cell.conversionRate >= 30) fillColor = '#10b981'; // Emerald Green (High >= 30%)
+                    else if (cell.conversionRate >= 11) fillColor = '#f59e0b'; // Amber Orange (Medium 11% - 29%)
+                    else fillColor = '#ef4444'; // Rose Red (Low <= 10%)
 
                     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                     g.setAttribute('class', 'matrix-bubble');
@@ -1330,7 +1393,11 @@
 
                 if (summaryBlock) summaryBlock.classList.add('hidden');
 
-                title.innerText = Array.isArray(status) ? status.join(' + ') : status;
+                let displayTitle = Array.isArray(status) ? status.join(' + ') : status;
+                if (displayTitle === 'Won + Closed' || displayTitle === 'Won + Lost' || displayTitle === 'Won,Closed' || displayTitle === 'Won,Lost' || displayTitle === 'Won, Lost' || displayTitle === 'Won + Lost') {
+                    displayTitle = 'Closed';
+                }
+                title.innerText = displayTitle;
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
 
@@ -1344,7 +1411,7 @@
                     let data = [];
                     if (Array.isArray(status)) {
                         const promises = status.map(st =>
-                            fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(st)}`).then(r => {
+                            fetchWithParams(`${API_BASE}/leads-by-status?status=${encodeURIComponent(st)}`).then(r => {
                                 if (!r.ok) throw new Error('API error');
                                 return r.json();
                             })
@@ -1352,7 +1419,7 @@
                         const results = await Promise.all(promises);
                         data = results.flat();
                     } else {
-                        const res = await fetch(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
+                        const res = await fetchWithParams(`${API_BASE}/leads-by-status?status=${encodeURIComponent(status)}`);
                         if (!res.ok) throw new Error('Network error');
                         data = await res.json();
                     }
@@ -1419,7 +1486,7 @@
                 if (typeof lucide !== 'undefined') lucide.createIcons();
 
                 try {
-                    const res = await fetch('/api/leads');
+                    const res = await fetchWithParams('/api/leads');
                     if (!res.ok) throw new Error('API error');
                     const leads = await res.json();
                     
@@ -1442,9 +1509,9 @@
                     const dates = filtered.map(l => l.createdDate).filter(Boolean).sort();
                     let timeText = 'N/A';
                     if (dates.length > 0) {
-                        const firstDate = dates[0];
-                        const lastDate = dates[dates.length - 1];
-                        timeText = firstDate === lastDate ? firstDate : `${firstDate} ~ ${lastDate}`;
+                        const firstDate = dates[0].replace(/-/g, '/');
+                        const lastDate = dates[dates.length - 1].replace(/-/g, '/');
+                        timeText = firstDate === lastDate ? firstDate : `${firstDate} - ${lastDate}`;
                     }
 
                     // Populate summary metrics
@@ -1565,7 +1632,7 @@
                 document.getElementById('segmentWonLeads').innerText = fmtNum(cell.wonLead);
                 document.getElementById('segmentLostLeads').innerText = fmtNum(cell.lostLead);
                 document.getElementById('segmentConvRate').innerText = Number(cell.conversionRate).toFixed(1) + '%';
-                document.getElementById('segmentRevenue').innerText = cell.wonLead > 0 ? fmtCurrency(cell.avgRevenuePerWon) : '—';
+                document.getElementById('segmentRevenue').innerText = fmtCurrency(cell.revenueWon || 0);
                 document.getElementById('segmentTopProduct').innerText = topProduct;
                 document.getElementById('segmentTopLoss').innerText = topLoss;
                 document.getElementById('segmentTopSeller').innerText = topSeller;

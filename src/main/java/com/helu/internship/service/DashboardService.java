@@ -164,6 +164,11 @@ public interface DashboardService {
     List<ConversionRateValueMatrixResponse> getConversionRateValueMatrix();
     List<ValueMatrixCustomerResponse> getValueMatrixCustomer();
     List<CustomerSegmentPipelineResponse> getCustomerSegmentPipeline();
+    List<ProductLineROIResponse> getProductLineROI();
+    List<RegionROIResponse> getRegionROI();
+    List<CustomerRoleROIResponse> getCustomerRoleROI();
+    List<TopAccountResponse> getTopAccountsByOpportunityValue();
+
 
 
 

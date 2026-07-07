@@ -51,7 +51,7 @@
     </div>
 
     <!-- Floating Chatbot Widget -->
-    <div id="floatingChatbotWidget" class="fixed bottom-6 right-6 z-[999]">
+    <div sec:authorize="!hasRole('Seller')" id="floatingChatbotWidget" class="fixed bottom-6 right-6 z-[999]">
         <!-- Trigger Button -->
         <button id="chatbotTrigger" onclick="toggleFloatingChat()" class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-red-600 to-orange-500 text-white shadow-xl shadow-red-500/40 hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer relative group">
             <i id="chatbotTriggerIcon" data-lucide="message-square" class="w-6 h-6 transition-all duration-300"></i>

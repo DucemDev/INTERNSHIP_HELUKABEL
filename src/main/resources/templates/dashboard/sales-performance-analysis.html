@@ -70,17 +70,17 @@
 
         <!-- ROW 2: Sales Owner Win Rate Performance [Qualified Leads, Won Leads (cột) vs Win Rate (đường)] -->
         <div id="sectionSalesWinRatePerf" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Hiệu suất Tỷ lệ thắng (Win Rate) theo Sales Owner' : 'Win Rate Performance by Sales Owner'}">Hiệu suất Tỷ lệ thắng (Win Rate) theo Sales Owner</h3>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Hiệu suất Tỷ lệ thắng (Win Rate) theo Sales Owner' : (#locale.language == 'th' ? 'ประสิทธิภาพอัตราการชนะ (Win Rate) ตามผู้ดูแลยอดขาย' : 'Win Rate Performance by Sales Owner')}">Hiệu suất Tỷ lệ thắng (Win Rate) theo Sales Owner</h3>
             <div class="relative w-full h-[400px]">
                 <canvas id="winRatePerformanceChart"></canvas>
             </div>
-            <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào cột bất kỳ để xem chi tiết hiệu suất của Sales Owner đó.' : 'Click on any column to view detailed sales owner performance.'}">Click vào cột bất kỳ để xem chi tiết hiệu suất của Sales Owner đó.</p>
+            <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào cột bất kỳ để xem chi tiết hiệu suất của Sales Owner đó.' : (#locale.language == 'th' ? 'คลิกที่คอลัมน์ใดก็ได้เพื่อดูรายละเอียดประสิทธิภาพของผู้ดูแลยอดขายรายนั้น' : 'Click on any column to view detailed sales owner performance.')}">Click vào cột bất kỳ để xem chi tiết hiệu suất của Sales Owner đó.</p>
         </div>
 
         <!-- ROW 3: Average Sales Cycle by Sales Owner -->
         <div id="sectionSalesAvgCycle" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)' : 'Average Sales Cycle by Sales Owner (Days)'}">Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)</h3>
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider" th:text="${#locale.language == 'vi' ? 'Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)' : (#locale.language == 'th' ? 'รอบการขายเฉลี่ยตามผู้ดูแลยอดขาย (วัน)' : 'Average Sales Cycle by Sales Owner (Days)')}">Chu kỳ bán hàng trung bình theo Sales Owner (Ngày)</h3>
                 <div class="flex flex-wrap items-center gap-1 bg-slate-100/80 p-1 rounded-xl max-w-full overflow-x-auto">
                     <button onclick="changeAvgCycleChartType('radar')" id="btn-chart-radar" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all bg-white text-slate-800 shadow-sm border border-slate-200/50">Radar</button>
                     <button onclick="changeAvgCycleChartType('bar')" id="btn-chart-bar" class="chart-type-btn px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all text-slate-600 hover:text-slate-800 hover:bg-white/40">Cột dọc</button>
@@ -97,12 +97,12 @@
             <div class="relative w-full h-[380px]">
                 <canvas id="avgSalesCycleChart"></canvas>
             </div>
-            <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào cột để xem chi tiết thời gian chốt deal và BANT Score.' : 'Click on a column to view detailed closing time and BANT score.'}">Click vào cột để xem chi tiết thời gian chốt deal và BANT Score.</p>
+            <p class="text-[11px] text-slate-400 mt-2 italic text-right" th:text="${#locale.language == 'vi' ? 'Click vào cột để xem chi tiết thời gian chốt deal và BANT Score.' : (#locale.language == 'th' ? 'คลิกที่คอลัมน์เพื่อดูรายละเอียดระยะเวลาปิดดีลและคะแนน BANT' : 'Click on a column to view detailed closing time and BANT score.')}">Click vào cột để xem chi tiết thời gian chốt deal và BANT Score.</p>
         </div>
 
         <!-- ROW 4: Top Loss Reasons by Product Line (Stacked Bar Chart) -->
         <div id="sectionSalesLossReasons" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Các lý do thất bại hàng đầu theo Dòng sản phẩm' : 'Top Loss Reasons by Product Line'}">Các lý do thất bại hàng đầu theo Dòng sản phẩm</h3>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Các lý do thất bại hàng đầu theo Dòng sản phẩm' : (#locale.language == 'th' ? 'เหตุผลหลักที่สูญเสียดีลตามกลุ่มผลิตภัณฑ์' : 'Top Loss Reasons by Product Line')}">Các lý do thất bại hàng đầu theo Dòng sản phẩm</h3>
             <div class="relative w-full h-[420px]">
                 <canvas id="lossReasonsProductChart"></canvas>
             </div>
@@ -110,7 +110,7 @@
 
         <!-- ROW 5: Workload vs Result Matrix (Bubble Chart) -->
         <div id="sectionSalesWorkload" class="bg-white/55 backdrop-blur-[16px] saturate-[120%] border border-white/60 rounded-lg p-6 relative z-10 shadow-sm">
-            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Ma trận Khối lượng công việc vs Kết quả (Biểu đồ Bong bóng)' : 'Workload vs Results Matrix (Bubble Chart)'}">Ma trận Khối lượng công việc vs Kết quả (Biểu đồ Bong bóng)</h3>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4" th:text="${#locale.language == 'vi' ? 'Ma trận Khối lượng công việc vs Kết quả (Biểu đồ Bong bóng)' : (#locale.language == 'th' ? 'เมทริกซ์ปริมาณงานเทียบกับผลลัพธ์ (แผนภูมิฟอง)' : 'Workload vs Results Matrix (Bubble Chart)')}">Ma trận Khối lượng công việc vs Kết quả (Biểu đồ Bong bóng)</h3>
             <div class="relative w-full h-[500px]">
                 <canvas id="workloadBubbleChart"></canvas>
             </div>
@@ -123,7 +123,7 @@
                 <div class="flex items-center justify-between p-6 border-b border-slate-100">
                     <div>
                         <h2 class="text-xl font-black text-slate-800 tracking-tight" id="genModalTitle">Sales Owner Performance</h2>
-                        <p class="text-slate-500 text-xs font-medium mt-1">Tổng quan thông số cơ hội và chuyển đổi</p>
+                        <p class="text-slate-500 text-xs font-medium mt-1" th:text="${#locale.language == 'vi' ? 'Tổng quan thông số cơ hội và chuyển đổi' : (#locale.language == 'th' ? 'ภาพรวมโอกาสและอัตราการแปลง' : 'Overview of opportunities and conversion')}">Tổng quan thông số cơ hội và chuyển đổi</p>
                     </div>
                     <button onclick="closeGeneralModal()" class="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-lg transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -131,19 +131,19 @@
                 </div>
                 <div class="p-6 grid grid-cols-2 gap-6 bg-slate-50/50">
                     <div class="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
-                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Total Leads</span>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Tổng số Leads' : (#locale.language == 'th' ? 'ลูกค้าเป้าหมายทั้งหมด' : 'Total Leads')}">Total Leads</span>
                         <span id="gen-modal-total-leads" class="text-2xl font-black text-slate-700 mt-1 block">0</span>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
-                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Revenue Won</span>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Doanh thu Won' : (#locale.language == 'th' ? 'รายได้ที่ชนะ' : 'Revenue Won')}">Revenue Won</span>
                         <span id="gen-modal-revenue-won" class="text-2xl font-black text-emerald-600 mt-1 block">0 VNĐ</span>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
-                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Conversion Rate</span>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Tỷ lệ thắng' : (#locale.language == 'th' ? 'อัตราการชนะ' : 'Win Rate')}">Win Rate</span>
                         <span id="gen-modal-cr" class="text-2xl font-black text-indigo-600 mt-1 block">0%</span>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-xl p-5 shadow-sm">
-                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block">Avg Sales Cycle</span>
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Chu kỳ bán hàng TB' : (#locale.language == 'th' ? 'รอบการขายเฉลี่ย' : 'Avg Sales Cycle')}">Avg Sales Cycle</span>
                         <span id="gen-modal-sales-cycle" class="text-2xl font-black text-sky-600 mt-1 block">0 Ngày</span>
                     </div>
                 </div>
@@ -157,7 +157,7 @@
                 <div class="flex items-center justify-between p-6 border-b border-slate-100">
                     <div>
                         <h2 class="text-xl font-black text-slate-800 tracking-tight" id="bantModalTitle">Sales Owner Detailed Insights</h2>
-                        <p class="text-slate-500 text-xs font-medium mt-1">Đánh giá chất lượng lead và chi tiết phễu chốt deal</p>
+                        <p class="text-slate-500 text-xs font-medium mt-1" th:text="${#locale.language == 'vi' ? 'Đánh giá chất lượng lead và chi tiết phễu chốt deal' : (#locale.language == 'th' ? 'การประเมินคุณภาพลูกค้าเป้าหมายและรายละเอียดกรวยการปิดดีล' : 'Lead quality assessment and closing funnel details')}">Đánh giá chất lượng lead và chi tiết phễu chốt deal</p>
                     </div>
                     <button onclick="closeBantModal()" class="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-lg transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -165,27 +165,27 @@
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50/50">
                     <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Won Leads</span>
-                        <span id="bant-modal-won-leads" class="text-xl font-black text-[#f6171b] mt-1 block">0</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Leads Thắng' : (#locale.language == 'th' ? 'ปิดการขายสำเร็จ' : 'Won Leads')}">Won Leads</span>
+                        <span id="bant-modal-won-leads" class="text-xl font-black text-emerald-600 mt-1 block">0</span>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Revenue Won</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Doanh thu Won' : (#locale.language == 'th' ? 'รายได้ที่ชนะ' : 'Revenue Won')}">Revenue Won</span>
                         <span id="bant-modal-revenue-won" class="text-xl font-black text-emerald-600 mt-1 block">0 VNĐ</span>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Avg Deal Size</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Giá trị TB / Won' : (#locale.language == 'th' ? 'ขนาดดีลเฉลี่ย' : 'Avg Deal Size')}">Avg Deal Size</span>
                         <span id="bant-modal-deal-size" class="text-xl font-black text-slate-700 mt-1 block">0 VNĐ</span>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Win Rate</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Tỷ lệ thắng' : (#locale.language == 'th' ? 'อัตราการชนะ' : 'Win Rate')}">Win Rate</span>
                         <span id="bant-modal-win-rate" class="text-xl font-black text-indigo-600 mt-1 block">0%</span>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">BANT Complete Rate</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Tỷ lệ hoàn thành BANT' : (#locale.language == 'th' ? 'อัตราความสมบูรณ์ของ BANT' : 'BANT Complete Rate')}">BANT Complete Rate</span>
                         <span id="bant-modal-complete-rate" class="text-xl font-black text-amber-600 mt-1 block">0%</span>
                     </div>
                     <div class="bg-white border border-slate-100 rounded-xl p-4 shadow-sm">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Avg BANT Score</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block" th:text="${#locale.language == 'vi' ? 'Điểm số BANT TB' : (#locale.language == 'th' ? 'คะแนน BANT เฉลี่ย' : 'Avg BANT Score')}">Avg BANT Score</span>
                         <span id="bant-modal-avg-score" class="text-xl font-black text-sky-600 mt-1 block">0</span>
                     </div>
                 </div>
@@ -200,6 +200,7 @@
     <script th:inline="javascript">
         const locale = /*[[${#locale.language}]]*/ 'vi';
         const isVi = locale === 'vi';
+        const isTh = locale === 'th';
 
         // Datasets
         let topRevData = null;
@@ -283,10 +284,10 @@
         }
 
         function formatCurrency(val) {
-            if (val === undefined || val === null) return isVi ? '0 triệu' : '0 million';
+            if (val === undefined || val === null) return isVi ? '0 triệu' : (isTh ? '0 ล้าน' : '0 million');
             const valInMil = val / 1e6;
-            const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : 'en-US');
-            return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : ' million');
+            const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US'));
+            return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : (isTh ? ' ล้าน' : ' million'));
         }
 
         async function reloadData() {
@@ -887,7 +888,8 @@
         // Modals Management
         // Modal 1: General Dashboard (Clicked Row 2)
         async function openGeneralModal(userName, userCode) {
-            document.getElementById('genModalTitle').innerText = `${userName} - Performance`;
+            const perfSuffix = isVi ? 'Hiệu suất' : (isTh ? 'ประสิทธิภาพ' : 'Performance');
+            document.getElementById('genModalTitle').innerText = `${userName} - ${perfSuffix}`;
 
             // Load details from API
             try {
@@ -907,7 +909,7 @@
                         document.getElementById('gen-modal-total-leads').innerText = totalLeads;
                         document.getElementById('gen-modal-revenue-won').innerText = formatCurrency(totalRevenue);
                         document.getElementById('gen-modal-cr').innerText = (details.winRate || 0).toFixed(1) + '%';
-                        document.getElementById('gen-modal-sales-cycle').innerText = (details.avgSalesCycle || 0).toFixed(1) + ' Ngày';
+                        document.getElementById('gen-modal-sales-cycle').innerText = (details.avgSalesCycle || 0).toFixed(1) + (isVi ? ' Ngày' : (isTh ? ' วัน' : ' Days'));
                     }
                 }
             } catch (err) {
@@ -935,7 +937,8 @@
 
         // Modal 2: BANT Dashboard (Clicked Row 3)
         async function openBantModal(fullName, userCode) {
-            document.getElementById('bantModalTitle').innerText = `${fullName} - Insights`;
+            const insightsSuffix = isVi ? 'Thông tin chi tiết' : (isTh ? 'ข้อมูลเชิงลึก' : 'Insights');
+            document.getElementById('bantModalTitle').innerText = `${fullName} - ${insightsSuffix}`;
 
             try {
                 // Fetch metrics
