@@ -549,17 +549,17 @@
 
             // Helper format currency
             const formatCurrency = (val) => {
-                if (val === undefined || val === null) return isVi ? '0 triệu' : (isTh ? '0 ล้าน' : '0 million');
+                if (val === undefined || val === null) return isVi ? '0 triệu' : (isTh ? '0 Baht' : '0 million');
                 const valInMil = val / 1e6;
                 const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US'));
-                return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : (isTh ? ' ล้าน' : ' million'));
+                return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : (isTh ? ' Baht' : ' million'));
             };
 
             const fmtShortNum = (val) => {
                 if (val === undefined || val === null) return '0';
                 const valInMil = val / 1e6;
                 const formatted = Number(valInMil.toFixed(1)).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US'));
-                return formatted + (isVi ? ' triệu' : (isTh ? ' ล้าน' : ' million'));
+                return formatted + (isVi ? ' triệu' : (isTh ? ' Baht' : ' million'));
             };
 
             let chartsData = {};

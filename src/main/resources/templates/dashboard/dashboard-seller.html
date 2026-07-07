@@ -92,7 +92,7 @@
                     <div class="space-y-1">
                         <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                             <span th:text="${#locale.language == 'vi' ? 'Doanh số đã chốt (Won Quý)' : (#locale.language == 'th' ? 'ยอดขายที่ปิดได้ (รายไตรมาส)' : 'Won Revenue (Quarter)')}">Doanh số đã chốt (Won Quý)</span>
-                            <span id="txtWonRevenue" class="text-slate-800 font-extrabold" th:text="${#locale.language == 'vi' ? '0 triệu' : (#locale.language == 'th' ? '0 ล้าน' : '0 million')}">0 triệu</span>
+                            <span id="txtWonRevenue" class="text-slate-800 font-extrabold" th:text="${#locale.language == 'vi' ? '0 triệu' : (#locale.language == 'th' ? '0 Baht' : '0 million')}">0 triệu</span>
                         </div>
                         <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                             <div id="barWonRevenue" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
@@ -103,7 +103,7 @@
                     <div class="space-y-1">
                         <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                             <span th:text="${#locale.language == 'vi' ? 'Cơ hội (Pipeline Quý)' : (#locale.language == 'th' ? 'โอกาสการขาย (รายไตรมาส)' : 'Pipeline (Quarter)')}">Cơ hội (Pipeline Quý)</span>
-                            <span id="txtPipeline" class="text-slate-800 font-extrabold" th:text="${#locale.language == 'vi' ? '0 triệu' : (#locale.language == 'th' ? '0 ล้าน' : '0 million')}">0 triệu</span>
+                            <span id="txtPipeline" class="text-slate-800 font-extrabold" th:text="${#locale.language == 'vi' ? '0 triệu' : (#locale.language == 'th' ? '0 Baht' : '0 million')}">0 triệu</span>
                         </div>
                         <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                             <div id="barPipeline" class="bg-gradient-to-r from-blue-500 to-cyan-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
@@ -114,7 +114,7 @@
                     <div class="space-y-1">
                         <div class="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                             <span th:text="${#locale.language == 'vi' ? 'Chỉ tiêu (Target Quý)' : (#locale.language == 'th' ? 'เป้าหมาย (รายไตรมาส)' : 'Target (Quarter)')}">Chỉ tiêu (Target Quý)</span>
-                            <span id="txtTarget" class="text-slate-800 font-extrabold" th:text="${#locale.language == 'vi' ? '0 triệu' : (#locale.language == 'th' ? '0 ล้าน' : '0 million')}">0 triệu</span>
+                            <span id="txtTarget" class="text-slate-800 font-extrabold" th:text="${#locale.language == 'vi' ? '0 triệu' : (#locale.language == 'th' ? '0 Baht' : '0 million')}">0 triệu</span>
                         </div>
                         <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                             <div id="barTarget" class="bg-red-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
@@ -158,10 +158,10 @@
         let cachedFunnel = {};
 
         function formatCurrency(val) {
-            if (val === undefined || val === null) return isVi ? '0 triệu' : (isTh ? '0 ล้าน' : '0 million');
+            if (val === undefined || val === null) return isVi ? '0 triệu' : (isTh ? '0 Baht' : '0 million');
             const valInMil = val / 1e6;
             const formatted = Number(valInMil.toFixed(2)).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US'));
-            return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : (isTh ? ' ล้าน' : ' million'));
+            return (val < 0 ? '-' : '') + formatted + (isVi ? ' triệu' : (isTh ? ' Baht' : ' million'));
         }
 
         document.addEventListener('DOMContentLoaded', async () => {

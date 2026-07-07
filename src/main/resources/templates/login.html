@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Đăng nhập - HELUKABEL CRM</title>
+    <title th:text="${#locale.language == 'vi' ? 'Đăng nhập - HELU CRM' : (#locale.language == 'th' ? 'เข้าสู่ระบบ - HELU CRM' : 'Login - HELU CRM')}">Đăng nhập - HELU CRM</title>
+    <link rel="icon" type="image/png" sizes="50x50" th:href="@{/images/logo nho.png}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Fonts -->
@@ -43,25 +44,30 @@
     <div class="glass-panel rounded-[2.5rem] px-10 py-6 border border-white/60 shadow-[0_20px_50px_rgba(31,38,135,0.04)] overflow-hidden">
         <!-- Branding -->
         <div class="text-center mb-6">
-            <img th:src="@{/images/helu-logo.png}" alt="HELUKABEL" class="h-8 w-auto mx-auto mb-3">
-            <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight uppercase">Hệ Thống Quản Trị</h2>
-            <p class="text-[13px] font-medium text-gray-400 mt-0.5">Vui lòng đăng nhập để tiếp tục</p>
+            <img th:src="@{/images/helu-logo.png}" alt="HELU" class="h-8 w-auto mx-auto mb-3">
+            <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight uppercase"
+                th:text="${#locale.language == 'vi' ? 'Hệ Thống Quản Trị' : (#locale.language == 'th' ? 'ระบบการจัดการ' : 'Management System')}">Hệ Thống Quản Trị</h2>
+            <p class="text-[13px] font-medium text-gray-400 mt-0.5"
+               th:text="${#locale.language == 'vi' ? 'Vui lòng đăng nhập để tiếp tục' : (#locale.language == 'th' ? 'กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ' : 'Please sign in to continue')}">Vui lòng đăng nhập để tiếp tục</p>
         </div>
 
         <!-- Alerts -->
         <div th:if="${param.error}" class="mb-4 p-3 rounded-2xl bg-red-50 border border-red-100 flex items-center gap-3 text-red-600 animate-in fade-in zoom-in duration-300">
             <i data-lucide="alert-circle" class="w-4 h-4"></i>
-            <span class="text-xs font-bold">Sai email hoặc mật khẩu</span>
+            <span class="text-xs font-bold"
+                  th:text="${#locale.language == 'vi' ? 'Sai email hoặc mật khẩu' : (#locale.language == 'th' ? 'อีเมลหรือรหัสผ่าน không hợp lệ' : 'Invalid email or password')}">Sai email hoặc mật khẩu</span>
         </div>
 
         <div th:if="${param.logout}" class="mb-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center gap-3 text-emerald-600 animate-in fade-in zoom-in duration-300">
             <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-            <span class="text-xs font-bold">Đăng xuất thành công</span>
+            <span class="text-xs font-bold"
+                  th:text="${#locale.language == 'vi' ? 'Đăng xuất thành công' : (#locale.language == 'th' ? 'ออกจากระบบสำเร็จ' : 'Logout successful')}">Đăng xuất thành công</span>
         </div>
 
         <form th:action="@{/login}" method="post" class="space-y-4">
             <div class="space-y-1.5">
-                <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Tài khoản Email</label>
+                <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1"
+                       th:text="${#locale.language == 'vi' ? 'Tài khoản Email' : (#locale.language == 'th' ? 'บัญชีอีเมล' : 'Email Account')}">Tài khoản Email</label>
                 <div class="relative group">
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-helu-red transition-colors">
                         <i data-lucide="mail" class="w-5 h-5"></i>
@@ -72,7 +78,8 @@
 
             <div class="space-y-1.5">
                 <div class="flex justify-between items-center ml-1">
-                    <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Mật khẩu</label>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400"
+                           th:text="${#locale.language == 'vi' ? 'Mật khẩu' : (#locale.language == 'th' ? 'รหัสผ่าน' : 'Password')}">Mật khẩu</label>
                 </div>
                 <div class="relative group">
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-helu-red transition-colors">
@@ -85,7 +92,7 @@
             <div class="pt-1">
                 <button type="submit" class="group relative h-12 w-full overflow-hidden rounded-2xl bg-helu-red text-sm font-bold text-white shadow-xl shadow-red-100 transition-all hover:scale-[1.01] hover:shadow-red-200 active:scale-[0.99] uppercase tracking-widest">
                         <span class="relative z-10 flex items-center justify-center gap-2">
-                            Đăng Nhập Hệ Thống
+                            <span th:text="${#locale.language == 'vi' ? 'Đăng Nhập Hệ Thống' : (#locale.language == 'th' ? 'เข้าสู่ระบบ' : 'Sign In')}">Đăng Nhập Hệ Thống</span>
                             <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         </span>
                     <div class="absolute inset-0 z-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-500 -translate-x-full group-hover:translate-x-full"></div>
@@ -97,25 +104,30 @@
         <div class="mt-5 pt-5 border-t border-gray-50">
             <div class="flex items-center gap-3 mb-3">
                 <div class="h-px flex-1 bg-gray-100"></div>
-                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Tài khoản thử nghiệm</span>
+                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest"
+                      th:text="${#locale.language == 'vi' ? 'Tài khoản thử nghiệm' : (#locale.language == 'th' ? 'บัญชีทดสอบ' : 'Test Accounts')}">Tài khoản thử nghiệm</span>
                 <div class="h-px flex-1 bg-gray-100"></div>
             </div>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="p-2.5 bg-white/30 backdrop-blur-md rounded-xl border border-white/50 flex flex-col justify-center test-account hover:bg-white/50 transition-all" data-username="admin@helukabel.vn" data-password="123">
-                    <p class="text-[9px] font-bold text-gray-400 uppercase mb-0.5">Quản trị</p>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase mb-0.5"
+                       th:text="${#locale.language == 'vi' ? 'Quản trị' : (#locale.language == 'th' ? 'ผู้ดูแลระบบ' : 'Admin')}">Quản trị</p>
                     <p class="text-[10px] font-semibold text-gray-600">admin@helukabel.vn | 123</p>
-                    <button type="button" class="mt-2 text-xs font-medium text-helu-red hover:underline" onclick="fillCredentials(this)">Sử dụng</button>
+                    <button type="button" class="mt-2 text-xs font-medium text-helu-red hover:underline" onclick="fillCredentials(this)"
+                            th:text="${#locale.language == 'vi' ? 'Sử dụng' : (#locale.language == 'th' ? 'ใช้งาน' : 'Use')}">Sử dụng</button>
                 </div>
                  <div class="p-2.5 bg-white/30 backdrop-blur-md rounded-xl border border-white/50 flex flex-col justify-center test-account hover:bg-white/50 transition-all" data-username="seller_lan@helukabel.vn" data-password="123">
-                    <p class="text-[9px] font-bold text-gray-400 uppercase mb-0.5">Nhân viên</p>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase mb-0.5"
+                       th:text="${#locale.language == 'vi' ? 'Nhân viên' : (#locale.language == 'th' ? 'พนักงานขาย' : 'Seller')}">Nhân viên</p>
                     <p class="text-[10px] font-semibold text-gray-600">seller_lan@helukabel.vn | 123</p>
-                    <button type="button" class="mt-2 text-xs font-medium text-helu-red hover:underline" onclick="fillCredentials(this)">Sử dụng</button>
+                    <button type="button" class="mt-2 text-xs font-medium text-helu-red hover:underline" onclick="fillCredentials(this)"
+                            th:text="${#locale.language == 'vi' ? 'Sử dụng' : (#locale.language == 'th' ? 'ใช้งาน' : 'Use')}">Sử dụng</button>
                 </div>
             </div>
 
             <a th:href="@{/}" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-gray-100 text-[10px] font-bold text-gray-400 hover:bg-gray-50 hover:text-helu-red transition-all uppercase tracking-widest">
                 <i data-lucide="arrow-left" class="w-3 h-3"></i>
-                Về trang chủ
+                <span th:text="${#locale.language == 'vi' ? 'Về trang chủ' : (#locale.language == 'th' ? 'กลับสู่หน้าหลัก' : 'Back to Home')}">Về trang chủ</span>
             </a>
         </div>
     </div>

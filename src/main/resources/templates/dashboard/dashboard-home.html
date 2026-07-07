@@ -541,12 +541,12 @@
 
             // Locale
             const locale = document.getElementById('currentLocale')?.value || 'vi';
-            const currency = locale === 'vi' ? ' triệu' : ' million';
-            const fmtNum = (v) => Number(v || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
+            const currency = locale === 'vi' ? ' triệu' : (locale === 'th' ? ' Baht' : ' million');
+            const fmtNum = (v) => Number(v || 0).toLocaleString(locale === 'vi' ? 'vi-VN' : (locale === 'th' ? 'th-TH' : 'en-US'));
             const fmtCurrency = (v) => {
                 if (v === undefined || v === null) return '0' + currency;
                 const valInMil = v / 1e6;
-                const formatted = Number(valInMil.toFixed(2)).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US');
+                const formatted = Number(valInMil.toFixed(2)).toLocaleString(locale === 'vi' ? 'vi-VN' : (locale === 'th' ? 'th-TH' : 'en-US'));
                 return (v < 0 ? '-' : '') + formatted + currency;
             };
             const fmtShortNum = (v) => {

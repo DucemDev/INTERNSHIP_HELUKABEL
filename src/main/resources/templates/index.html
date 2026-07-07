@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HELUKABEL CRM Portal</title>
+    <title>HELU CRM Portal</title>
+    <link rel="icon" type="image/png" sizes="50x50" th:href="@{/images/logo nho.png}">
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
@@ -50,10 +51,23 @@
     <!-- NAVIGATION -->
     <nav class="w-full bg-white border-b border-slate-100 flex-none z-50 relative">
         <div class="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between">
-            <img th:src="@{/images/helu-logo.png}" alt="HELUKABEL" class="h-5 w-auto object-contain">
-            <a th:href="@{/login}" class="px-5 py-2 bg-slate-900 hover:bg-helu-red text-white text-xs font-bold rounded-lg transition-all active:scale-95">
-                Đăng nhập
-            </a>
+            <img th:src="@{/images/helu-logo.png}" alt="HELU" class="h-5 w-auto object-contain">
+            <div class="flex items-center gap-4">
+                <!-- 3 Language buttons -->
+                <div class="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                    <a th:href="@{/(lang=vi)}" class="px-2.5 py-1 text-[10px] font-black rounded-md transition-all uppercase tracking-wider" 
+                       th:classappend="${#locale.language == 'vi' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}">VI</a>
+                    <a th:href="@{/(lang=en)}" class="px-2.5 py-1 text-[10px] font-black rounded-md transition-all uppercase tracking-wider" 
+                       th:classappend="${#locale.language == 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}">EN</a>
+                    <a th:href="@{/(lang=th)}" class="px-2.5 py-1 text-[10px] font-black rounded-md transition-all uppercase tracking-wider" 
+                       th:classappend="${#locale.language == 'th' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}">TH</a>
+                </div>
+                
+                <a th:href="@{/login}" class="px-5 py-2 bg-slate-900 hover:bg-helu-red text-white text-xs font-bold rounded-lg transition-all active:scale-95"
+                   th:text="${#locale.language == 'vi' ? 'Đăng nhập' : (#locale.language == 'th' ? 'เข้าสู่ระบบ' : 'Login')}">
+                    Đăng nhập
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -62,19 +76,21 @@
         
         <!-- Left Side: Corporate Portal Info -->
         <div class="w-full lg:w-5/12 space-y-6 text-left">
-            <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-lg text-slate-700 text-[10px] font-bold tracking-wider uppercase border border-slate-200">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-lg text-slate-700 text-[10px] font-bold tracking-wider uppercase border border-slate-200"
+                 th:text="${#locale.language == 'vi' ? 'Hệ thống CRM Nội bộ' : (#locale.language == 'th' ? 'ระบบ CRM ภายใน' : 'Internal CRM System')}">
                 Hệ thống CRM Nội bộ
             </div>
             <h1 class="text-3xl md:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight leading-[1.15]">
-                Hệ thống CRM <br>
+                <span th:text="${#locale.language == 'vi' ? 'Hệ thống CRM' : (#locale.language == 'th' ? 'ระบบ CRM' : 'CRM System')}">Hệ thống CRM</span> <br>
                 <span class="text-helu-red">HELU</span>
             </h1>
-            <p class="text-sm md:text-base text-slate-500 leading-relaxed max-w-lg font-medium">
-                Hệ thống quản trị khách hàng, đánh giá Leads và phân tích hiệu suất kinh doanh của HELUKABEL.
+            <p class="text-sm md:text-base text-slate-500 leading-relaxed max-w-lg font-medium"
+               th:text="${#locale.language == 'vi' ? 'Hệ thống quản trị khách hàng, đánh giá Leads và phân tích hiệu suất kinh doanh của HELU.' : (#locale.language == 'th' ? 'ระบบการจัดการความสัมพันธ์ลูกค้า การประเมินลีด และวิเคราะห์ประสิทธิภาพทางธุรกิจของ HELU' : 'Customer relationship management, lead evaluation, and business performance analysis system of HELU.')}">
+                Hệ thống quản trị khách hàng, đánh giá Leads và phân tích hiệu suất kinh doanh của HELU.
             </p>
             <div class="pt-2">
                 <a th:href="@{/login}" id="magnetic-btn" class="inline-flex items-center gap-2.5 px-7 py-3.5 bg-helu-red text-white text-sm font-bold rounded-xl shadow-lg shadow-red-200 hover:bg-red-700 transition-all duration-200 active:scale-95 ease-out">
-                    Bắt đầu làm việc
+                    <span th:text="${#locale.language == 'vi' ? 'Bắt đầu làm việc' : (#locale.language == 'th' ? 'เริ่มการทำงาน' : 'Start Working')}">Bắt đầu làm việc</span>
                     <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
             </div>
@@ -105,7 +121,7 @@
     <!-- FOOTER (Ultra Compact) -->
     <footer class="w-full bg-white border-t border-slate-100 py-4 flex-none z-20 relative">
         <div class="max-w-7xl mx-auto px-8 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-            <span>&copy; 2026 HELUKABEL VIETNAM</span>
+            <span>&copy; 2026 HELU VIETNAM</span>
             <div class="flex gap-6">
                 <a href="#" class="hover:text-helu-red transition-colors">Bảo mật</a>
                 <a href="#" class="hover:text-helu-red transition-colors">Hỗ trợ</a>
