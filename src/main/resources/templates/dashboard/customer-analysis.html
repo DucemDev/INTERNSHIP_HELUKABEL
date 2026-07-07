@@ -958,7 +958,7 @@
                 const width = 850;
                 const height = 550;
                 
-                const paddingLeft = 80;
+                const paddingLeft = 100;
                 const paddingRight = 50;
                 const paddingTop = 50;
                 const paddingBottom = 60;
@@ -1049,7 +1049,7 @@
                 svg.append("text")
                     .attr("transform", "rotate(-90)")
                     .attr("x", -(paddingTop + (height - paddingTop - paddingBottom) / 2))
-                    .attr("y", paddingLeft - 45)
+                    .attr("y", paddingLeft - 72)
                     .attr("text-anchor", "middle")
                     .attr("fill", "#475569")
                     .attr("font-size", "11px")
@@ -1153,8 +1153,10 @@
                     });
 
                 function formatCurrencyShort(value) {
-                    if (value >= 1000000000) {
-                        return `${(value / 1000000000).toFixed(0)} tỷ`;
+                    if (value >= 1000000) {
+                        const valInMil = value / 1000000;
+                        const formatted = Number(valInMil.toFixed(0)).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US'));
+                        return formatted + (isVi ? ' triệu' : (isTh ? ' ล้าน' : ' million'));
                     }
                     return value;
                 }
