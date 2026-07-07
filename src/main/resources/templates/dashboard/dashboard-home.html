@@ -471,7 +471,7 @@
                             <!-- Revenue / Won Deal -->
                             <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
                                 <div>
-                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Revenue / Won Deal</h4>
+                                    <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Revenue Won</h4>
                                     <div id="segmentRevenue" class="mt-1 text-sm font-black text-slate-800">—</div>
                                 </div>
                                 <i data-lucide="dollar-sign" class="w-8 h-8 text-slate-300"></i>
@@ -1095,6 +1095,7 @@
                              wonLead: item.wonLeads || 0,
                              lostLead: item.lostLeads || 0,
                              avgRevenuePerWon: item.avgRevenuePerWon || 0,
+                             revenueWon: item.revenueWon || 0,
                              topProductLine: item.topProductLine || 'N/A',
                              topLossReason: item.topLossReason || 'N/A',
                              topSalesOwner: item.topSalesOwner || 'N/A'
@@ -1497,9 +1498,9 @@
                     const dates = filtered.map(l => l.createdDate).filter(Boolean).sort();
                     let timeText = 'N/A';
                     if (dates.length > 0) {
-                        const firstDate = dates[0];
-                        const lastDate = dates[dates.length - 1];
-                        timeText = firstDate === lastDate ? firstDate : `${firstDate} ~ ${lastDate}`;
+                        const firstDate = dates[0].replace(/-/g, '/');
+                        const lastDate = dates[dates.length - 1].replace(/-/g, '/');
+                        timeText = firstDate === lastDate ? firstDate : `${firstDate} - ${lastDate}`;
                     }
 
                     // Populate summary metrics
@@ -1620,7 +1621,7 @@
                 document.getElementById('segmentWonLeads').innerText = fmtNum(cell.wonLead);
                 document.getElementById('segmentLostLeads').innerText = fmtNum(cell.lostLead);
                 document.getElementById('segmentConvRate').innerText = Number(cell.conversionRate).toFixed(1) + '%';
-                document.getElementById('segmentRevenue').innerText = cell.wonLead > 0 ? fmtCurrency(cell.avgRevenuePerWon) : '—';
+                document.getElementById('segmentRevenue').innerText = fmtCurrency(cell.revenueWon || 0);
                 document.getElementById('segmentTopProduct').innerText = topProduct;
                 document.getElementById('segmentTopLoss').innerText = topLoss;
                 document.getElementById('segmentTopSeller').innerText = topSeller;

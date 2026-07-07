@@ -626,9 +626,9 @@
                     const dates = filtered.map(l => l.createdDate).filter(Boolean).sort();
                     let timeText = 'N/A';
                     if (dates.length > 0) {
-                        const firstDate = dates[0];
-                        const lastDate = dates[dates.length - 1];
-                        timeText = firstDate === lastDate ? firstDate : `${firstDate} ~ ${lastDate}`;
+                        const firstDate = dates[0].replace(/-/g, '/');
+                        const lastDate = dates[dates.length - 1].replace(/-/g, '/');
+                        timeText = firstDate === lastDate ? firstDate : `${firstDate} - ${lastDate}`;
                     }
 
                     // Populate summary metrics
