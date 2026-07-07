@@ -1337,9 +1337,9 @@
 
                     if (!data || !data.length) return;
 
-                    const labels = data.map(d => d.category || d.name);
+                    const labels = data.map(d => d.category || d.name || d.industry || d.customerGroup || d.customerRole || d.region || d.productName || d.productId);
                     const revenueData = data.map(d => d.revenue);
-                    const leadsData = data.map(d => d.totalLeads);
+                    const leadsData = data.map(d => d.totalLeads || d.wonLead || d.totalWonLead || 0);
 
                     window.unifiedChartInstance = new Chart(ctx, {
                         type: 'bar',
