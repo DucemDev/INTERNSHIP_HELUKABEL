@@ -642,11 +642,11 @@
                                 ticks: {
                                     callback: function(value) {
                                         if (value >= 1000000000) {
-                                            return (value / 1000000000).toLocaleString('vi-VN') + ' tỷ';
+                                            return (value / 1000000000).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US')) + (isVi ? ' tỷ' : (isTh ? ' พันล้าน' : ' billion'));
                                         } else if (value >= 1000000) {
-                                            return (value / 1000000).toLocaleString('vi-VN') + ' triệu';
+                                            return (value / 1000000).toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US')) + (isVi ? ' triệu' : (isTh ? ' ล้าน' : ' million'));
                                         }
-                                        return value.toLocaleString('vi-VN');
+                                        return value.toLocaleString(isVi ? 'vi-VN' : (isTh ? 'th-TH' : 'en-US'));
                                     }
                                 }
                             }

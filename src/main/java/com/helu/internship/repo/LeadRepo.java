@@ -2716,6 +2716,7 @@ WITH SegmentData AS (
     GROUP BY
         l.industry_type,
         l.region
+    HAVING COUNT(DISTINCT l.lead_id) >= 3
 )
 
 SELECT
@@ -2880,6 +2881,17 @@ GROUP BY
     l.customer_role,
 
     l.region
+
+HAVING COUNT(DISTINCT CASE
+        WHEN l.status IN (
+            'Qualified',
+            'Proposal Sent',
+            'In Negotiation',
+            'Won',
+            'Lost'
+        )
+        THEN l.lead_id
+    END) >= 3
 
 ORDER BY
 
